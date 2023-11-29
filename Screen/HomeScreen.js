@@ -87,7 +87,6 @@ const HomeScreen = () => {
 
   return (
     <>
-    {/* // <ImageBackground source={require('../assets/splash81.png')} style={styles.backgroundImage}> */}
     <StatusBar barStyle="default" />
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.header}>User Information</Text>
@@ -99,12 +98,10 @@ const HomeScreen = () => {
       {renderTouchableInput('State', state, 'state')}
       {renderTouchableInput('Pincode', pincode, 'pincode')}
 
-      {/* <Button title="Submit" onPress={handleSubmit} /> */}
       <TouchableOpacity  style={styles.submit} onPress ={handleSubmit}>
         <Text style={styles.submitText}>SUBMIT</Text>
       </TouchableOpacity>
     </ScrollView>
-    {/* // </ImageBackground> */}
     </>
   );
 };
@@ -137,8 +134,6 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 30,
-    // borderColor: 'gray',
-    // borderWidth: 1,
     paddingHorizontal: 10,
   },
   backgroundImage: {

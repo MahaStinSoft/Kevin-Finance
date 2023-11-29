@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, Modal, StatusBar, KeyboardAvoidingView, ScrollView } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome5';
 import { Ionicons } from '@expo/vector-icons';
 
 
@@ -30,15 +29,15 @@ const Dashboard = ({ navigation }) => {
           <View style={styles.container}>
             <View style={styles.navBar}>
               <TouchableOpacity style={styles.iconButton} onPress={() => navigation.openDrawer()}>
-                <Ionicons name="list-sharp" size={20} color="#fff" />
+                <Ionicons name="list-sharp" size={25} color="#fff" />
               </TouchableOpacity>
               <Text style={styles.text}>Kevin Small Finance</Text>
               <TouchableOpacity style={styles.iconButton} onPress={() => console.log('notification icon pressed')}>
-                <Ionicons name="notifications" size={20} color="#fff" />
+                <Ionicons name="notifications" size={25} color="#fff" />
               </TouchableOpacity>
             </View>
             <View style={styles.searchSection}>
-              <Ionicons style={styles.searchIcon} name="search" size={20} color="rgba(255, 28, 53, 255)" />
+              <Ionicons style={styles.searchIcon} name="search" size={25} color="rgba(255, 28, 53, 255)" />
               <TextInput
                 style={styles.input}
                 placeholder="Search"

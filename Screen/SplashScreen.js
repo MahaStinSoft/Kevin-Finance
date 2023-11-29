@@ -15,27 +15,23 @@ const SplashScreen = () => {
   };
 
   const handleButtonPress = () => {
-    // Handle button press, navigate to the next screen, etc.
     console.log('Button Pressed');
-    // Example: Navigate to the next screen
     navigation.navigate('ToggleForm');
   };
 
   useEffect(() => {
     fadeIn();
 
-    // Set a timeout to navigate after 3000 milliseconds (3 seconds)
     const timeoutId = setTimeout(() => {
       navigation.navigate('ToggleFormScreen');
     }, 3000);
 
-    // Clear the timeout when the component is unmounted
     return () => clearTimeout(timeoutId);
   }, []);
 
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/splash6.png')} style={styles.image} />
+      {/* <Image source={require('../assets/splash6.png')} style={styles.image} /> */}
       <Animated.View style={[styles.buttonContainer, { opacity: buttonOpacity }]}>
         {/* <TouchableOpacity style={styles.button} onPress={handleButtonPress}>
           <Animated.Text style={styles.buttonText}>Get Started</Animated.Text>

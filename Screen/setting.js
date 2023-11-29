@@ -1,36 +1,42 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+import { primaryColor,textColor, fontSize, fontWeight } from './constant/color';
 
-const Setting = ({navigation}) => {
+const Setting = () => {
+  const navigation = useNavigation();
 
-  const handleSignOut = () => {
-    console.log("sign out");
-    navigation.navigate('ToggleForm');
+  const handleGoBack = () => {
+    navigation.goBack();
   };
 
   return (
-    <View>
-        <Text>Setting</Text>
-        <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
-        <Text style={styles.signOutText}>Sign Out</Text>
+    <View style={styles.container}>
+      <TouchableOpacity style={styles.iconButton} onPress={handleGoBack}>
+        <Ionicons name="chevron-back" size={40} color="#fff" />
       </TouchableOpacity>
+      <Text style={styles.accountText}>Setting Screen</Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: 'center',
+    flexDirection: 'row',
     alignItems: 'center',
+    padding: 5, 
+    backgroundColor: primaryColor
   },
-  signOutButton: {
-    marginTop: 20,
-    padding: 10,
-    backgroundColor: 'rgba(255, 28, 53, 255)',
-    borderRadius: 10,
+  iconButton: {
+    marginRight: 16, 
   },
-  signOutText: {
-    color: '#fff',
+  accountText: {
+    flex: 1, 
+    textAlign: 'center',
+    color: textColor,
+    fontSize: fontSize,
+    fontWeight: fontWeight
   },
 });
 

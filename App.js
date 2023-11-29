@@ -134,7 +134,6 @@ function App() {
           drawerLabelStyle: {
             color: 'rgba(255, 28, 53, 255)',
           },
-          // drawerIcon:{focused: true, color: "red", size:20 }
         }}
       >
         <Drawer.Screen
@@ -156,16 +155,16 @@ function App() {
           name="Account"
           component={Account}
           options={{
-            // headerShown: false,
+            headerShown: false,
           }}
         />
         <Drawer.Screen name="Loans" component={Loan} 
         options={{
-          // headerShown: false,
+          headerShown: false,
         }}/>
         <Drawer.Screen name="Settings" component={Setting} 
         options={{
-          // headerShown: false,
+          headerShown: false,
         }}/>
       </Drawer.Navigator>
     </NavigationContainer>
