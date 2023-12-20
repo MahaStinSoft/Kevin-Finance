@@ -1,10 +1,26 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, Modal, StatusBar, KeyboardAvoidingView, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TextInput,
+  Modal,
+  KeyboardAvoidingView,
+  ScrollView,
+  Alert,
+  Dimensions
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
+import ButtonComponent from '../common/ButtonComponent';
 
 const Dashboard = ({ navigation }) => {
   const [showLoanModal, setShowLoanModal] = useState(false);
+
+  const deviceWidth = Dimensions.get('window').width;
+  console.log("device eWidth:" + deviceWidth);
+
+  const textColor = deviceWidth < 390 ? 'red' : 'blue';
 
   const handleHomeLoan = () => {
     navigation.navigate("HomeLoan");
@@ -20,7 +36,6 @@ const Dashboard = ({ navigation }) => {
 
   return (
     <>
-      <StatusBar barStyle="default" />
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -45,6 +60,10 @@ const Dashboard = ({ navigation }) => {
               />
             </View>
 
+            <View>
+              <Text style={[styles.deviceWidthText, { color: textColor }]}>Device Width: {deviceWidth}</Text>
+            </View>
+
             <View style={styles.plusIconScetion}>
               <TouchableOpacity style={styles.plusIcon} onPress={() => setShowLoanModal(!showLoanModal)}>
                 <Text style={styles.plusIconText}>+</Text>
@@ -59,9 +78,9 @@ const Dashboard = ({ navigation }) => {
               <View style={styles.modalBackground}>
                 <View style={styles.modalContainer}>
                   <View>
-                  <TouchableOpacity style={styles.closeButton} onPress={() => setShowLoanModal(false)}>
-                    <Ionicons name="close" size={20} color="#000" />
-                  </TouchableOpacity>
+                    <TouchableOpacity style={styles.closeButton} onPress={() => setShowLoanModal(false)}>
+                      <Ionicons name="close" size={20} color="#000" />
+                    </TouchableOpacity>
                   </View>
                   <TouchableOpacity style={[styles.loanOption, { borderBottomWidth: 1, borderBottomColor: '#ccc', marginTop: 40 }]} onPress={handleHomeLoan}>
                     <Text style={styles.loanOptionText}>Home Loan</Text>
@@ -95,6 +114,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     zIndex: 10,
+    marginTop: 24
   },
   iconButton: {
     marginHorizontal: 10,
@@ -153,7 +173,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#E5E4E2',
-    marginTop: 50
+    marginTop: 70
   },
   searchIcon: {
     padding: 10,
@@ -166,6 +186,10 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     paddingLeft: 0,
     color: '#424242',
+  },
+  deviceWidthText: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

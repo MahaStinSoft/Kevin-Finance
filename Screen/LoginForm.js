@@ -1,70 +1,83 @@
-import React, { useState, useEffect } from 'react';
-import { View, TouchableOpacity, Text, TextInput, StyleSheet, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, TouchableOpacity, Text, TextInput, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { authenticateUser } from './AuthService';
+import axios from 'axios';
+import ButtonComponent from '../common/ButtonComponent';
 
-const LoginForm = () => {
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-  });
-  const [formErrors, setFormErrors] = useState({
-    username: '',
-    password: '',
-  });
+export const LoginForm = () => {
+  const [showPassword, setShowPassword] = useState(false);
+
   const navigation = useNavigation();
 
-  useEffect(() => {
-    const clearFormOnFocus = () => {
-      setFormData({
-        username: '',
-        password: '',
-      });
-      setFormErrors({
-        username: '',
-        password: '',
-      });
-    };
+  const [kf_name, setName] = useState(null);
+  const [kf_password, setPassword] = useState(null);
 
-    const unsubscribeFocus = navigation.addListener('focus', clearFormOnFocus);
-
-    return () => {
-      unsubscribeFocus();
-    };
-  }, [navigation]);
-  
-  const handleLogin = () => {
-    // Basic form validation
-    let isValid = true;
-    const errors = {};
-
-    if (!formData.username.trim()) {
-      errors.username = 'Username is required.';
-      isValid = false;
+  const handleLogin = async () => {
+    if (!kf_name || !kf_password) {
+      Alert.alert("Error", "Please enter both firstname and password");
+      return;
     }
 
-    if (!formData.password.trim()) {
-      errors.password = 'Password is required.';
-      isValid = false;
-    }
+    try {
+      // Authenticate and get the access token from Dynamics CRM
+      const tokenResponse = await axios.post(
+        "https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token",
+        `grant_type=client_credentials&client_id=d9dcdf05-37f4-4bab-b428-323957ad2f86&client_secret=JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2&resource=https://org0f7e6203.crm5.dynamics.com&kf_name=${kf_name}&kf_password=${kf_password}`,
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
 
-    setFormErrors(errors);
+      const accessToken = tokenResponse.data.access_token;
 
-    if (isValid) {
-      const isAuthenticated = authenticateUser(formData.username, formData.password);
+      // Use the access token to make requests to Dynamics CRM API
+      const response = await axios.get(
+        "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_admins?$select=kf_name,kf_password",
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json; charset=utf-8",
+          },
+        }
+      );
 
-      if (isAuthenticated) {
-        navigation.navigate('Dashboard');
+      if (response.status === 200) {
+        // Check if the response data contains a match for firstname and adx_identity_newpassword
+        const matchedUser = response.data.value.find(
+          (user) =>
+            user.kf_name === kf_name &&
+            user.kf_password === kf_password
+        );
+
+        if (matchedUser) {
+          // Authentication successful, navigate to the Dashboard or perform other actions as needed
+          console.log("Authenticated user:", matchedUser);
+          navigation.navigate("Dashboard");
+        } else {
+          // Authentication failed, display an error message
+          console.log("Failed to authenticate. Invalid credentials.", response.data);
+          Alert.alert("Error", "Invalid credentials. Please try again.");
+        }
       } else {
-        console.log('Authentication failed');
+        // Authentication failed, display an error message
+        console.log("Failed to authenticate. Response status:", response.status);
+        Alert.alert("Error", "Invalid credentials. Please try again.");
       }
+    } catch (error) {
+      console.error("Error during login:", error);
+      if (error.response) {
+        console.error("Response data:", error.response.data);
+        console.error("Response status:", error.response.status);
+        console.error("Response headers:", error.response.headers);
+      }
+      Alert.alert(
+        "Error",
+        "An unexpected error occurred. Please try again later."
+      );
     }
-  };
-
-  const togglePasswordVisibility = () => {
-    setIsPasswordVisible(!isPasswordVisible);
   };
 
   return (
@@ -75,46 +88,30 @@ const LoginForm = () => {
           placeholder="Enter email or Username"
           autoCapitalize="none"
           style={styles.input}
-          value={formData.username}
-          onChangeText={(text) => {
-            setFormData((prevData) => ({ ...prevData, username: text }));
-            setFormErrors((prevErrors) => ({ ...prevErrors, username: '' }));
-          }}
+          value={kf_name}
+          onChangeText={(text) => setName(text)}
         />
       </View>
-      {formErrors.username ? <Text style={styles.errorText}>{formErrors.username}</Text> : null}
-
       <View style={styles.passwordContainer}>
         <Ionicons name="lock-closed" size={20} color="#888" style={styles.icon} />
         <TextInput
           placeholder="Password"
           autoCapitalize="none"
           style={styles.passwordInput}
-          secureTextEntry={!isPasswordVisible}
-          value={formData.password}
-          onChangeText={(text) => {
-            setFormData((prevData) => ({ ...prevData, password: text }));
-            setFormErrors((prevErrors) => ({ ...prevErrors, password: '' }));
-          }}
+          secureTextEntry={!showPassword}
+          value={kf_password}
+          onChangeText={(text) => setPassword(text)}
         />
-
-        <TouchableOpacity onPress={togglePasswordVisibility}>
-          <Ionicons
-            name={isPasswordVisible ? 'eye' : 'eye-off'}
-            size={24}
-            color="#888"
-            style={styles.eyeIcon}
-          />
+        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+          <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={24} color="#888" style={styles.eyeIcon} />
         </TouchableOpacity>
       </View>
-      {formErrors.password ? <Text style={styles.errorText}>{formErrors.password}</Text> : null}
-      <TouchableOpacity style={styles.Forgotpassword} onPress={() => console.log("Forgot password")}>
-           <Text style={styles.ForgotText}>Forgot Password?</Text>
-         </TouchableOpacity>
-
-         <TouchableOpacity style={styles.SignButton} onPress={handleLogin}>
-           <Text style={styles.SignText}>Sign In</Text>
-         </TouchableOpacity>       
+      <TouchableOpacity style={styles.Forgotpassword} onPress={() => console.log('Forgot password')}>
+        <Text style={styles.ForgotText}>Forgot Password?</Text>
+      </TouchableOpacity>
+      <ButtonComponent
+        title="SIGN IN"
+        onPress={handleLogin} />
     </ScrollView>
   );
 };
@@ -152,7 +149,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold"
   },
   ForgotText: {
-    color: '#rgba(255,28,53,255)', // default text color
+    color: '#rgba(255,28,53,255)',
   },
   Forgotpassword: {
     marginLeft: 175,

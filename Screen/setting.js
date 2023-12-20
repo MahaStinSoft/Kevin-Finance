@@ -1,8 +1,7 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import { primaryColor,textColor, fontSize, fontWeight } from './constant/color';
+import HeaderComponent from '../common/Header';
 
 const Setting = () => {
   const navigation = useNavigation();
@@ -12,11 +11,9 @@ const Setting = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity style={styles.iconButton} onPress={handleGoBack}>
-        <Ionicons name="chevron-back" size={40} color="#fff" />
-      </TouchableOpacity>
-      <Text style={styles.accountText}>Setting Screen</Text>
+    <View>
+      <View>
+     <HeaderComponent titleText="SettingScreen" onPress={handleGoBack}/></View>
     </View>
   );
 };
@@ -25,18 +22,19 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 5, 
-    backgroundColor: primaryColor
+    padding: 5,
+    backgroundColor: 'blue', 
   },
   iconButton: {
-    marginRight: 16, 
+    marginRight: 16,
   },
   accountText: {
-    flex: 1, 
+    flex: 1,
     textAlign: 'center',
-    color: textColor,
-    fontSize: fontSize,
-    fontWeight: fontWeight
+    color: 'white', 
+    fontSize: 20, 
+    fontWeight: 'bold', 
+    marginRight: 50,
   },
 });
 
