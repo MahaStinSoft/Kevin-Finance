@@ -7,6 +7,7 @@ import HeaderComponent from '../common/Header';
 import TextInputComponent from '../common/TextInput';
 import ButtonComponent from '../common/ButtonComponent';
 import LoanStatusPicker from '../common/LoanStatusPicker ';
+import ComponentDatePicker from '../common/ComponentDatePicker';
 
 export const HomeScreen = () => {
   const [kf_name, setkf_name] = useState(null);
@@ -22,15 +23,25 @@ export const HomeScreen = () => {
   const [kf_loanamountrequested, setkf_loanamountrequested] = useState(null);
   const [kf_status, setkf_status] = useState(null);
   const [kf_statusreason, setkf_statusreason] = useState(null);
-  const [kf_dateofapproval, setkf_dateofapproval] = useState(null);
+  const [kf_dateofapproval, setkf_dateofapproval] = useState(new Date());;
   const [kf_approver, setkf_approver] = useState(null);
-  const [kf_firstemidate, setkf_firstemidate] = useState(null);
+  const [kf_firstemidate, setkf_firstemidate] = useState(new Date());;
   const [selectedValue, setSelectedValue] = useState('');
+
+  const handleDateChange1 = (newDate) => {
+    setkf_dateofapproval(newDate);
+  };
+
+  const handleDateChange2 = (newDate) => {
+    setkf_firstemidate(newDate);
+  };
 
   console.log("Request Payload to CRM:", {
     kf_status: kf_status,
     kf_statusreason: kf_statusreason,
     kf_gender: kf_gender,
+    kf_dateofapproval: kf_dateofapproval,
+    kf_firstemidate: kf_firstemidate,
   });
 
   const handleGenderOptionset = (selectedOptionGender) => {
@@ -109,6 +120,9 @@ export const HomeScreen = () => {
       const accessToken = tokenResponse.data.access_token;
       console.log("Access Token:", accessToken);
 
+      // Ensure kf_dateofapproval and kf_firstemidate are formatted correctly
+      const formattedDateOfApproval = kf_dateofapproval ? kf_dateofapproval.toISOString() : null;
+      const formattedFirstEmiDate = kf_firstemidate ? kf_firstemidate.toISOString() : null;
       const loanAmount = parseFloat(kf_loanamountrequested);
 
       const createRecordResponse = await axios.post(
@@ -127,9 +141,9 @@ export const HomeScreen = () => {
           kf_loanamountrequested: loanAmount,
           kf_status: kf_status,
           kf_statusreason: kf_statusreason,
-          kf_dateofapproval: kf_dateofapproval,
+          kf_dateofapproval: formattedDateOfApproval,
           kf_approver: kf_approver,
-          kf_firstemidate: kf_firstemidate,
+          kf_firstemidate: formattedFirstEmiDate,
         },
         {
           headers: {
@@ -139,7 +153,7 @@ export const HomeScreen = () => {
         }
       );
       if (createRecordResponse.status === 204) {
-        console.log("Record created successfully in CRM");
+        console.log("Record created successfully in CRM", createRecordResponse);
         // navigation.navigate("Dashboard");
       } else {
         console.log("else part");
@@ -242,19 +256,9 @@ export const HomeScreen = () => {
         // initialOption="Option1"
         />
 
-        <TextInputComponent
-          placeholder="Date of Approval"
-          autoCapitalize="none"
-          value={kf_dateofapproval}
-          onChangeText={(text) => setkf_dateofapproval(text)}
-        />
+        <ComponentDatePicker selectedDate={kf_dateofapproval} onDateChange={handleDateChange1} />
 
-        <TextInputComponent
-          placeholder="Approval"
-          autoCapitalize="none"
-          value={kf_approver}
-          onChangeText={(text) => setkf_approver(text)}
-        />
+        <ComponentDatePicker selectedDate={kf_firstemidate} onDateChange={handleDateChange2} />
 
         <TextInputComponent
           placeholder="First EMI Date"
