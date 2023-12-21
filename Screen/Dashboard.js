@@ -20,6 +20,8 @@ const Dashboard = ({ navigation }) => {
   const [kfContacts, setKfContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedContact, setSelectedContact] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showClearIcon, setShowClearIcon] = useState(false);
 
   const deviceWidth = Dimensions.get('window').width;
   console.log("device eWidth:" + deviceWidth);
@@ -68,11 +70,12 @@ const Dashboard = ({ navigation }) => {
           }
         );
 
-        if (response.status === 200) {
-          setKfContacts(response.data.value);
-        } else {
-          console.log("Failed to fetch data. Response status:", response.status);
-        }
+        // Filter contacts based on the search query
+        const filteredContacts = response.data.value.filter((contact) =>
+          contact.fullname.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+
+        setKfContacts(filteredContacts);
       } catch (error) {
         console.error("Error during data fetch:", error);
       } finally {
@@ -81,11 +84,16 @@ const Dashboard = ({ navigation }) => {
     };
 
     fetchData();
-  }, []);
+  }, [searchQuery]); // Trigger fetchData when the search query changes
 
   const navigateToContactDetails = (contact) => {
     setSelectedContact(contact);
     navigation.navigate('UserDetails', { contact });
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    setShowClearIcon(false); // Set showClearIcon to false when clearing the search
   };
 
   return (
@@ -110,8 +118,21 @@ const Dashboard = ({ navigation }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Search"
-                onFocus={() => console.log('TextInput focused')}
+                value={searchQuery}
+                onChangeText={(text) => {
+                  setSearchQuery(text);
+                  setShowClearIcon(text.length > 0); // Show clear icon if there's text in the search input
+                }}
               />
+              {showClearIcon && (
+                <Ionicons
+                  style={styles.searchIcon}
+                  name="close"
+                  size={25}
+                  color="rgba(255, 28, 53, 255)"
+                  onPress={handleClearSearch}
+                />
+              )}
             </View>
 
             <View>
@@ -121,28 +142,21 @@ const Dashboard = ({ navigation }) => {
             <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
               {loading ? (
                 <ActivityIndicator size="large" color="#0000ff" />
+              ) : kfContacts.length === 0 ? (
+                <Text>No contacts found.</Text>
               ) : (
                 <ScrollView contentContainerStyle={{ width: "80%", paddingTop: 20 }}>
-                  {kfContacts.length === 0 ? (
-                    <Text>No contacts records found.</Text>
-                  ) : (
-                    kfContacts.map((kfContact, index) => (
-                      <ContactGridCard
-                        key={index}
-                        contact={kfContact}
-                        onPress={navigateToContactDetails}
-                      />
-                    ))
-                  )}
+                  {kfContacts.map((kfContact, index) => (
+                    <ContactGridCard
+                      key={index}
+                      contact={kfContact}
+                      onPress={navigateToContactDetails}
+                    />
+                  ))}
                 </ScrollView>
               )}
             </View>
 
-            <View style={styles.plusIconScetion}>
-              <TouchableOpacity style={styles.plusIcon} onPress={() => setShowLoanModal(!showLoanModal)}>
-                <Text style={styles.plusIconText}>+</Text>
-              </TouchableOpacity>
-            </View>
             <Modal
               animationType="slide"
               transparent={true}
@@ -151,22 +165,31 @@ const Dashboard = ({ navigation }) => {
             >
               <View style={styles.modalBackground}>
                 <View style={styles.modalContainer}>
-                  <View>
+                  <View style={{flexDirection: "column"}}>
+                  <Text style={styles.modalHeading}>LOAN TYPES</Text>
+
                     <TouchableOpacity style={styles.closeButton} onPress={() => setShowLoanModal(false)}>
                       <Ionicons name="close" size={20} color="#000" />
                     </TouchableOpacity>
                   </View>
+                  <View style={{marginTop: -20}}>
                   <TouchableOpacity style={[styles.loanOption, { borderBottomWidth: 1, borderBottomColor: '#ccc', marginTop: 40 }]} onPress={handleHomeLoan}>
                     <Text style={styles.loanOptionText}>Home Loan</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.loanOption} onPress={handlePersonalLoan}>
                     <Text style={styles.loanOptionText}>Personal Loan</Text>
                   </TouchableOpacity>
+                  </View>
                 </View>
               </View>
             </Modal>
           </View>
         </ScrollView>
+        <View style={styles.plusIconScetion}>
+              <TouchableOpacity style={styles.plusIcon} onPress={() => setShowLoanModal(!showLoanModal)}>
+                <Text style={styles.plusIconText}>+</Text>
+              </TouchableOpacity>
+            </View>
       </KeyboardAvoidingView>
     </>
   );
@@ -194,11 +217,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   plusIconScetion: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'flex-end',
-    marginLeft: 250,
-    marginTop: 580,
+    position: 'absolute',
+    bottom: 40,
+    right: 30,
   },
   plusIcon: {
     backgroundColor: 'rgba(255, 28, 53, 255)',
@@ -230,13 +251,13 @@ const styles = StyleSheet.create({
     right: 15,
   },
   loanOption: {
-    paddingVertical: 15,
+    paddingVertical: 10,
   },
   loanOptionText: {
     fontSize: 18,
     color: '#333',
     marginHorizontal: 70,
-    alignSelf: "flex-start"
+    marginBottom: 10
   },
   text: {
     color: "#fff",
@@ -264,6 +285,14 @@ const styles = StyleSheet.create({
   deviceWidthText: {
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  modalHeading: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 10, 
+    color: '#333',
+    textAlign: 'center',
+    marginRight: 30
   },
 });
 

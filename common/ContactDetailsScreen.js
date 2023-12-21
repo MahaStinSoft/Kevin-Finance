@@ -17,6 +17,29 @@ const ContactDetailsScreen = ({ route }) => {
     return contact.gendercode === 2 ? 'Female' : 'Male';
   };
 
+  const renderImage = () => {
+    if (contact.entityimage) {
+      return (
+        <Image
+          source={{ uri: `data:image/png;base64,${contact.entityimage}` }}
+          style={styles.cardImage}
+        />
+      );
+    } else {
+      // If entityimage is not available, display the first and last name as an image
+      const initials = contact.fullname
+        .split(' ')
+        .map((name) => name[0])
+        .join('');
+      return (
+        <View style={[styles.cardImage, styles.placeholderImage]}>
+          <Text style={styles.placeholderText}>{initials}</Text>
+        </View>
+      );
+    }
+  };
+
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <HeaderComponent titleText="User Details" onPress={handleGoBack} />
@@ -26,13 +49,15 @@ const ContactDetailsScreen = ({ route }) => {
           style={styles.contactImage}
           onError={(error) => console.error('Image load error:', error.nativeEvent.error)}
         /> */}
+        
       </View>
       <View style={[styles.card, styles.cardElevated]}>
-        <Image
+        {/* <Image
           source={{ uri: `data:image/png;base64,${contact.entityimage}` }}
           style={styles.cardImage}
           // onError={(error) => console.error('Image load error:', error.nativeEvent.error)}
-        />
+        /> */}
+        <View>{renderImage()}</View>
         <Text style={styles.cardTitle}>{contact.fullname}</Text>
         <Text style={styles.cardLabel}>Password: {contact.adx_identity_newpassword}</Text>
         <Text style={styles.cardLabel}>Gender: {getGenderLabel()}</Text>
@@ -80,9 +105,8 @@ const styles = StyleSheet.create({
   },
   cardImage: {
     width: '100%',
-    height: "60%", // Adjust the height as needed
-    resizeMode: 'contain',
-    marginBottom: 12,
+    height: "70%", // Adjust the height as needed
+    resizeMode: "contain",
     borderRadius: 6,
   },
   cardTitle: {
@@ -90,12 +114,24 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 8,
+    marginTop: -60
   },
   cardLabel: {
     color: '#000000',
     fontSize: 14,
     marginBottom: 6,
   },
+  placeholderText: {
+    fontSize: 100,
+    fontWeight: 'bold',
+    color: '#707070',
+    textAlign: 'center',
+    backgroundColor: "gray",
+    height: "100%",
+    // borderRadius: 200, 
+    color: "white", 
+    paddingTop: 35
+  }
 });
 
 export default ContactDetailsScreen;

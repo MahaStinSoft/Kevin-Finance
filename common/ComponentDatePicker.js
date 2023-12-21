@@ -1,62 +1,82 @@
-import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { Component } from 'react';
+import { SafeAreaView, View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-export const ComponentDatePicker = ({ selectedDate, onDateChange, onDateSelected, placeholder }) => {
-  const [mode, setMode] = useState('date');
-  const [show, setShow] = useState(false);
-  const [textColor, setTextColor] = useState('gray');
-  const [placeholderText, setPlaceholderText] = useState('Date of Approval');
+class ComponentDatePicker extends Component {
+  constructor(props) {
+    super(props);
 
-  useEffect(() => {
-    // Update the placeholder text when selectedDate changes
-    setPlaceholderText(selectedDate ? selectedDate.toLocaleDateString() : 'date');
-    setTextColor(selectedDate ? 'black' : 'gray');
-  }, [selectedDate]);
+    this.state = {
+      mode: 'date',
+      show: false,
+      textColor: 'gray',
+      placeholderText: props.placeholder, // Use prop or default value
+    };
+  }
 
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || selectedDate; // Use the existing date if selectedDate is null
-    setShow(false);
-    onDateChange(currentDate);
-    onDateSelected(currentDate);
-    setTextColor('black'); // Change text color to black after selecting date
+  componentDidUpdate(prevProps) {
+    if (prevProps.selectedDate !== this.props.selectedDate) {
+      this.updatePlaceholderText();
+    }
+  }
+
+  updatePlaceholderText = () => {
+    const { selectedDate } = this.props;
+    this.setState({
+      placeholderText: selectedDate ? this.formatDate(selectedDate) : this.props.placeholder,
+      textColor: selectedDate ? 'black' : 'gray',
+    });
   };
 
-  const showMode = (currentMode) => {
-    setShow(true);
-    setMode(currentMode);
+  formatDate = (date) => {
+    // Format date as MM/DD/YYYY
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const year = date.getFullYear();
+    
+    return `${month}/${day}/${year}`;
   };
 
-  const showDatepicker = () => {
-    showMode('date');
+  onChange = (event, selectedDate) => {
+    const currentDate = selectedDate || selectedDate;
+    this.setState({ show: false });
+    this.props.onDateChange(currentDate);
+    this.props.onDateSelected(currentDate);
+    this.setState({ textColor: 'black' }); 
   };
 
-  return (
-    <SafeAreaView>
-      <View>
-        <TouchableOpacity onPress={showDatepicker}>
-          <TextInput
-            style={[
-              styles.textInputContainer,
-              { color: textColor }
-            ]}
-            value={placeholderText}
-            editable={false}
-          />
-        </TouchableOpacity>
-        {show && (
-          <DateTimePicker
-            testID="dateTimePicker"
-            value={selectedDate || new Date()} // Set default value if selectedDate is null
-            mode={mode}
-            is24Hour={true}
-            onChange={onChange}
-          />
-        )}
-      </View>
-    </SafeAreaView>
-  );
-};
+  showMode = (currentMode) => {
+    this.setState({ show: true, mode: currentMode });
+  };
+
+  showDatepicker = () => {
+    this.showMode('date');
+  };
+
+  render() {
+    const { show, mode, placeholderText, textColor } = this.state;
+    const { selectedDate } = this.props;
+
+    return (
+      <SafeAreaView>
+        <View>
+          <TouchableOpacity onPress={this.showDatepicker}>
+            <Text style={[styles.textInputContainer,{color: textColor}]}>{placeholderText}</Text>
+          </TouchableOpacity>
+          {show && (
+            <DateTimePicker
+              testID="dateTimePicker"
+              value={selectedDate || new Date()} // Set default value if selectedDate is null
+              mode={mode}
+              is24Hour={true}
+              onChange={this.onChange}
+            />
+          )}
+        </View>
+      </SafeAreaView>
+    );
+  }
+}
 
 const styles = StyleSheet.create({
   textInputContainer: {

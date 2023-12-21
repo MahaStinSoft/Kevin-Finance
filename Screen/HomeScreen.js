@@ -105,7 +105,7 @@ export const HomeScreen = () => {
     let numericValue;
     switch (selectedOptionStatusReason) {
       case 'AadharNotMatching':
-        numericValue = 1239500000;
+        numericValue = 123950000;
         break;
       case 'InvalidDocuments':
         numericValue = 123950001;
@@ -283,6 +283,12 @@ export const HomeScreen = () => {
           selectedDate={kf_firstemidate}
           onDateChange={handleDateChange2}
           placeholder="First EMI Date"
+        />
+         <TextInputComponent
+          placeholder="Loan Approver"
+          autoCapitalize="none"
+          value={kf_approver}
+          onChangeText={(text) => setkf_approver(text)}
         />
 
         <ButtonComponent
