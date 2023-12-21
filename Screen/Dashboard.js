@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,14 +8,18 @@ import {
   Modal,
   KeyboardAvoidingView,
   ScrollView,
-  Alert,
-  Dimensions
+  Dimensions,
+  ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import ButtonComponent from '../common/ButtonComponent';
+import ContactGridCard from '../common/ContactGridCard';
+import axios from 'axios';
 
 const Dashboard = ({ navigation }) => {
   const [showLoanModal, setShowLoanModal] = useState(false);
+  const [kfContacts, setKfContacts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedContact, setSelectedContact] = useState(null);
 
   const deviceWidth = Dimensions.get('window').width;
   console.log("device eWidth:" + deviceWidth);
@@ -33,6 +37,56 @@ const Dashboard = ({ navigation }) => {
     console.log("Personal Selected");
     setShowLoanModal(false);
   }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        var data = {
+          grant_type: "client_credentials",
+          client_id: "d9dcdf05-37f4-4bab-b428-323957ad2f86",
+          resource: "https://org0f7e6203.crm5.dynamics.com",
+          scope: "https://org0f7e6203.crm5.dynamics.com/.default",
+          client_secret: "JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2",
+        };
+        const tokenResponse = await axios.post(
+          "https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token",
+          data,
+          { headers: { "content-type": "application/x-www-form-urlencoded" } }
+        );
+
+        console.log("tokenResponse", tokenResponse);
+        const accessToken = tokenResponse.data.access_token;
+        console.log("Access Token:", accessToken);
+
+        const response = await axios.get(
+          "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/contacts",
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          setKfContacts(response.data.value);
+        } else {
+          console.log("Failed to fetch data. Response status:", response.status);
+        }
+      } catch (error) {
+        console.error("Error during data fetch:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const navigateToContactDetails = (contact) => {
+    setSelectedContact(contact);
+    navigation.navigate('UserDetails', { contact });
+  };
 
   return (
     <>
@@ -62,6 +116,26 @@ const Dashboard = ({ navigation }) => {
 
             <View>
               <Text style={[styles.deviceWidthText, { color: textColor }]}>Device Width: {deviceWidth}</Text>
+            </View>
+
+            <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+              {loading ? (
+                <ActivityIndicator size="large" color="#0000ff" />
+              ) : (
+                <ScrollView contentContainerStyle={{ width: "80%", paddingTop: 20 }}>
+                  {kfContacts.length === 0 ? (
+                    <Text>No contacts records found.</Text>
+                  ) : (
+                    kfContacts.map((kfContact, index) => (
+                      <ContactGridCard
+                        key={index}
+                        contact={kfContact}
+                        onPress={navigateToContactDetails}
+                      />
+                    ))
+                  )}
+                </ScrollView>
+              )}
             </View>
 
             <View style={styles.plusIconScetion}>

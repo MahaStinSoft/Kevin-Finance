@@ -28,6 +28,12 @@ export const HomeScreen = () => {
   const [kf_firstemidate, setkf_firstemidate] = useState(new Date());;
   const [selectedValue, setSelectedValue] = useState('');
 
+  const navigation = useNavigation();
+
+  const handleGoBack = () => {
+    navigation.goBack();
+  };
+
   const handleDateChange1 = (newDate) => {
     setkf_dateofapproval(newDate);
   };
@@ -37,10 +43,21 @@ export const HomeScreen = () => {
   };
 
   console.log("Request Payload to CRM:", {
+    kf_name: kf_name,
+    kf_lastname: kf_lastname,
+    kf_gender: kf_gender,
+    kf_mobilenumber: kf_mobilenumber,
+    kf_email: kf_email,
+    kf_address1: kf_address1,
+    kf_address2: kf_address2,
+    kf_address3: kf_address3,
+    kf_city: kf_city,
+    kf_state: kf_state,
+    kf_loanamountrequested: kf_loanamountrequested,
     kf_status: kf_status,
     kf_statusreason: kf_statusreason,
-    kf_gender: kf_gender,
     kf_dateofapproval: kf_dateofapproval,
+    kf_approver: kf_approver,
     kf_firstemidate: kf_firstemidate,
   });
 
@@ -169,7 +186,7 @@ export const HomeScreen = () => {
   return (
     <ScrollView keyboardShouldPersistTaps="handled">
       <View style={styles.container}>
-        <HeaderComponent titleText="Home Screen" />
+        <HeaderComponent titleText="Home Screen" onPress={handleGoBack}/>
         <TextInputComponent
           placeholder="First Name"
           autoCapitalize="none"
@@ -256,15 +273,16 @@ export const HomeScreen = () => {
         // initialOption="Option1"
         />
 
-        <ComponentDatePicker selectedDate={kf_dateofapproval} onDateChange={handleDateChange1} />
+        <ComponentDatePicker
+          selectedDate={kf_dateofapproval}
+          onDateChange={handleDateChange1}
+          placeholder="Date of Approval"
+        />
 
-        <ComponentDatePicker selectedDate={kf_firstemidate} onDateChange={handleDateChange2} />
-
-        <TextInputComponent
+        <ComponentDatePicker
+          selectedDate={kf_firstemidate}
+          onDateChange={handleDateChange2}
           placeholder="First EMI Date"
-          autoCapitalize="none"
-          value={kf_firstemidate}
-          onChangeText={(text) => setkf_lastname(text)}
         />
 
         <ButtonComponent

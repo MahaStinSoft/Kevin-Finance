@@ -204,7 +204,8 @@ import HomeScreen from './Screen/HomeScreen';
 import PersonalLoan from './Screen/PersonalLoan';
 import SplashScreen from './Screen/SplashScreen';
 import LoginForm from './Screen/LoginForm';
-import DateTimePickerComponent from './common/DatePicker';
+import ComponentDatePicker from './common/ComponentDatePicker';
+import ContactDetailsScreen from './common/ContactDetailsScreen';
 
 const LogoImage = () => {
   return (
@@ -219,7 +220,7 @@ const Drawer = createDrawerNavigator();
 
 const DashboardStack = () => {
   return (
-    <Stack.Navigator initialRouteName="DatePickerScreen">
+    <Stack.Navigator initialRouteName="ToggleFormScreen">
       {/* <Stack.Screen
         name="SplashScreen"
         component={SplashScreen}
@@ -297,8 +298,8 @@ const DashboardStack = () => {
         }}
       />
       <Stack.Screen
-        name="DatePickerScreen"
-        component={DateTimePickerComponent}
+        name="UserDetails"
+        component={ContactDetailsScreen}
         options={{
           headerShown: false,
           animationEnabled: false,
