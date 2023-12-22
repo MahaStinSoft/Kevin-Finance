@@ -20,10 +20,11 @@ const LogoImage = () => {
     <Logo />
   );
 }
-
+// initialRouteName="ToggleFormScreen"
 const StackNavigatorComponent = () => {
   return (
-    <Stack.Navigator initialRouteName="Dashboard">
+    <NavigationContainer>
+    <Stack.Navigator >
       {/* <Stack.Screen
         name="SplashScreen"
         component={SplashScreen}
@@ -113,6 +114,7 @@ const StackNavigatorComponent = () => {
         }}
       />
     </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 

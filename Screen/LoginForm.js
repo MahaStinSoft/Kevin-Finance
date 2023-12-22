@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { View, TouchableOpacity, Text, TextInput, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 import axios from 'axios';
+
 import ButtonComponent from '../common/ButtonComponent';
 
 export const LoginForm = () => {
@@ -53,9 +55,15 @@ export const LoginForm = () => {
         );
 
         if (matchedUser) {
-          // Authentication successful, navigate to the Dashboard or perform other actions as needed
+          // Authentication successful, save the authentication state and navigate to the Dashboard
+          try {
+            await AsyncStorage.setItem('isLoggedIn', 'true');
+          } catch (error) {
+            console.error('Error storing authentication state:', error);
+          }
+          
           console.log("Authenticated user:", matchedUser);
-          navigation.navigate("Dashboard");
+          navigation.navigate("Dashboards");
         } else {
           // Authentication failed, display an error message
           console.log("Failed to authenticate. Invalid credentials.", response.data);

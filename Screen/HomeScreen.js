@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
+import * as ImagePicker from 'expo-image-picker';
 
 import HeaderComponent from '../common/Header';
 import TextInputComponent from '../common/TextInput';
@@ -27,6 +28,9 @@ export const HomeScreen = () => {
   const [kf_approver, setkf_approver] = useState(null);
   const [kf_firstemidate, setkf_firstemidate] = useState(new Date());;
   const [selectedValue, setSelectedValue] = useState('');
+  const [image, setImage] = useState(null);
+  const [kf_aadharcard, setkf_aadharcard] = useState(null);
+
 
   const navigation = useNavigation();
 
@@ -59,6 +63,7 @@ export const HomeScreen = () => {
     kf_dateofapproval: kf_dateofapproval,
     kf_approver: kf_approver,
     kf_firstemidate: kf_firstemidate,
+    kf_aadharcard: kf_aadharcard
   });
 
   const handleGenderOptionset = (selectedOptionGender) => {
@@ -116,11 +121,32 @@ export const HomeScreen = () => {
     setkf_statusreason(numericValue);
   };
 
-  const handleSaveRecord = async () => {
-    if (!kf_name || !kf_lastname) {
-      Alert.alert("Error", "Please enter both email and password");
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Sorry, we need camera roll permissions to make this work!');
       return;
     }
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
+  const handleSaveRecord = async () => {
+    // if (!kf_name || !kf_lastname) {
+    //   Alert.alert("Error", "Please enter both email and password");
+    //   return;
+    // }
     try {
       var data = {
         grant_type: "client_credentials",
@@ -141,6 +167,7 @@ export const HomeScreen = () => {
       const formattedDateOfApproval = kf_dateofapproval ? kf_dateofapproval.toISOString() : null;
       const formattedFirstEmiDate = kf_firstemidate ? kf_firstemidate.toISOString() : null;
       const loanAmount = parseFloat(kf_loanamountrequested);
+      const imageUrl = await uploadImageToCRM(image, accessToken);
 
       const createRecordResponse = await axios.post(
         "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications",
@@ -161,6 +188,7 @@ export const HomeScreen = () => {
           kf_dateofapproval: formattedDateOfApproval,
           kf_approver: kf_approver,
           kf_firstemidate: formattedFirstEmiDate,
+          kf_aadharcard: imageUrl
         },
         {
           headers: {
@@ -182,12 +210,48 @@ export const HomeScreen = () => {
       Alert.alert("Error", "An unexpected error occurred. Please try again later.");
     }
   };
+  
+  const uploadImageToCRM = async (imageUri, accessToken) => {
+    try {
+      // Replace 'YOUR_CRM_API_ENDPOINT' with the actual CRM API endpoint for uploading images
+      const uploadApiUrl = 'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications?$select=kf_aadharcard,kf_name';
+      
+      // Prepare the image data for upload
+      const formData = new FormData();
+      formData.append('aadharImage', {
+        uri: imageUri,
+        type: 'image/jpeg', // Adjust the content type based on your image type
+        name: 'aadhar_image.jpg',
+      });
+
+      // Make a POST request to the CRM API endpoint for image upload
+      const uploadResponse = await axios.post(uploadApiUrl, formData, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      // Check if the image upload was successful
+      if (uploadResponse.status === 200) {
+        console.log('Image uploaded successfully to CRM');
+        // Return the image URL from CRM for storage in the record
+        return uploadResponse.data.imageUrl; // Adjust the property name based on your CRM response
+      } else {
+        console.error('Failed to upload image to CRM');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error uploading image to CRM:', error);
+      return null;
+    }
+  };
 
   return (
     <ScrollView keyboardShouldPersistTaps="handled">
       <View style={styles.container}>
         <HeaderComponent titleText="Home Screen" onPress={handleGoBack}/>
-        <TextInputComponent
+        {/* <TextInputComponent
           placeholder="First Name"
           autoCapitalize="none"
           value={kf_name}
@@ -289,7 +353,12 @@ export const HomeScreen = () => {
           autoCapitalize="none"
           value={kf_approver}
           onChangeText={(text) => setkf_approver(text)}
-        />
+        /> */}
+
+<View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <ButtonComponent title="Pick an image from camera roll" onPress={pickImage} />
+      {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
+    </View>
 
         <ButtonComponent
           title="SUBMIT"
