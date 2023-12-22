@@ -63,7 +63,7 @@ export const LoginForm = () => {
           }
           
           console.log("Authenticated user:", matchedUser);
-          navigation.navigate("Dashboards");
+          navigation.navigate("Dashboard");
         } else {
           // Authentication failed, display an error message
           console.log("Failed to authenticate. Invalid credentials.", response.data);
