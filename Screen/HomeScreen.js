@@ -28,7 +28,7 @@ export const HomeScreen = () => {
   const [kf_approver, setkf_approver] = useState(null);
   const [kf_firstemidate, setkf_firstemidate] = useState(new Date());
   const [selectedValue, setSelectedValue] = useState('');
-  const [image, setImage] = useState(null);
+  // const [image, setImage] = useState(null);
 
   const [isFirstNameValid, setIsFirstNameValid] = useState(true);
   const [isLastNameValid, setIsLastNameValid] = useState(true);
@@ -38,7 +38,7 @@ export const HomeScreen = () => {
 
 
 
-  // const [kf_aadharcard, setkf_aadharcard] = useState(null);
+  const [kf_aadharcard, setkf_aadharcard] = useState(null);
 
 
   const navigation = useNavigation();
@@ -301,50 +301,35 @@ export const HomeScreen = () => {
     <ScrollView keyboardShouldPersistTaps="handled">
       <View style={styles.container}>
         <HeaderComponent titleText="Home Screen" onPress={handleGoBack}/>
-         <TextInputComponent
-          placeholder="First Name"
-          autoCapitalize="none"
-          value={kf_name}
-          onChangeText={(text) => {setkf_name(text);setIsFirstNameValid(text.trim() !== '');
-        }}
-        />
+          <TextInputComponent
+            placeholder="First Name"
+            autoCapitalize="none"
+            value={kf_name}
+            onChangeText={(text) => {
+              setkf_name(text); setIsFirstNameValid(text.trim() !== '');
+            }}
+          />
 
-{!isFirstNameValid && <Text style={styles.errorText}>Please Enter First Name</Text>}
+          {!isFirstNameValid && <Text style={styles.errorText}>Please Enter First Name</Text>}
 
-        {/* <TextInputComponent
-          placeholder="Last Name"
-          autoCapitalize="none"
-          value={kf_lastname}
-          onChangeText={(text) => setkf_lastname(text)}
-        />
-
-<Text style={styles.errorText}>Please enter Last Name</Text> */}
-
-<TextInputComponent
-        placeholder="Last Name"
-        autoCapitalize="none"
-        value={kf_lastname}
-        onChangeText={(text) => {
-          setkf_lastname(text);
-          setIsLastNameValid(text.trim() !== ''); // Update the validity based on whether the field is empty
-        }}
-      />
-      {!isLastNameValid && <Text style={styles.errorText}>Please Enter Last Name</Text>}
+          <TextInputComponent
+            placeholder="Last Name"
+            autoCapitalize="none"
+            value={kf_lastname}
+            onChangeText={(text) => {
+              setkf_lastname(text);
+              setIsLastNameValid(text.trim() !== ''); // Update the validity based on whether the field is empty
+            }}
+          />
+          {!isLastNameValid && <Text style={styles.errorText}>Please Enter Last Name</Text>}
 
 
-        <LoanStatusPicker
-          onOptionChange={handleGenderOptionset}
-          title="Gender"
-          options={['Male', 'Female']}
-        // initialOption="Option1"
-        />
-
-        {/* <TextInputComponent
-          placeholder="Mobile Number"
-          autoCapitalize="none"
-          value={kf_mobilenumber}
-          onChangeText={(text) => setkf_mobilenumber(text)}
-        /> */}
+          <LoanStatusPicker
+            onOptionChange={handleGenderOptionset}
+            title="Gender"
+            options={['Male', 'Female']}
+          // initialOption="Option1"
+          />
 
           <TextInputComponent
             placeholder="Mobile Number"
@@ -358,107 +343,104 @@ export const HomeScreen = () => {
               Please enter a valid 10-digit mobile number.
             </Text>
           )}
-       
-        <TextInputComponent
-          placeholder="Email Address"
-          autoCapitalize="none"
-          value={kf_email}
-          // onChangeText={(text) => setkf_email(text)}
-          onChangeText={(text) => {
-            setkf_email(text);
-            // Validate email and update isEmailValid state
-            setIsEmailValid(text.trim() === '' || validateEmail(text));
-          }}
-          keyboardType="email-address" // Set keyboardType to 'email-address'
-        />
-        {!isEmailValid && <Text style={styles.errorText}>Please enter a valid email address.</Text>}
 
-        <TextInputComponent
-          placeholder="Address 1"
-          autoCapitalize="none"
-          value={kf_address1}
-          onChangeText={(text) => setkf_address1(text)}
-        />
-        <TextInputComponent
-          placeholder="Address 2"
-          autoCapitalize="none"
-          value={kf_address2}
-          onChangeText={(text) => setkf_address2(text)}
-        />
+          <TextInputComponent
+            placeholder="Email Address"
+            autoCapitalize="none"
+            value={kf_email}
+            onChangeText={(text) => {
+              setkf_email(text);
+              setIsEmailValid(text.trim() === '' || validateEmail(text));
+            }}
+          />
+          {!isEmailValid && <Text style={styles.errorText}>Please enter a valid email address.</Text>}
 
-        <TextInputComponent
-          placeholder="Address 3"
-          autoCapitalize="none"
-          value={kf_address3}
-          onChangeText={(text) => setkf_address3(text)}
-        />
+          <TextInputComponent
+            placeholder="Address 1"
+            autoCapitalize="none"
+            value={kf_address1}
+            onChangeText={(text) => setkf_address1(text)}
+          />
+          <TextInputComponent
+            placeholder="Address 2"
+            autoCapitalize="none"
+            value={kf_address2}
+            onChangeText={(text) => setkf_address2(text)}
+          />
 
-        <TextInputComponent
-          placeholder="City"
-          autoCapitalize="none"
-          value={kf_city}
-          onChangeText={(text) => setkf_city(text)}
-        />
+          <TextInputComponent
+            placeholder="Address 3"
+            autoCapitalize="none"
+            value={kf_address3}
+            onChangeText={(text) => setkf_address3(text)}
+          />
 
-        <TextInputComponent
-          placeholder="State"
-          autoCapitalize="none"
-          value={kf_state}
-          onChangeText={(text) => setkf_state(text)}
-        />
-        <TextInputComponent
-          placeholder="Loan Amount Request"
-          autoCapitalize="none"
-          value={kf_loanamountrequested}
-          onChangeText={(text) => handleLoanAmountRequestedChange(text)}
-        />
+          <TextInputComponent
+            placeholder="City"
+            autoCapitalize="none"
+            value={kf_city}
+            onChangeText={(text) => setkf_city(text)}
+          />
 
-{!isLoanAmountRequestedValid && (
+          <TextInputComponent
+            placeholder="State"
+            autoCapitalize="none"
+            value={kf_state}
+            onChangeText={(text) => setkf_state(text)}
+          />
+          <TextInputComponent
+            placeholder="Loan Amount Request"
+            autoCapitalize="none"
+            value={kf_loanamountrequested}
+            onChangeText={(text) => handleLoanAmountRequestedChange(text)}
+          />
+
+          {!isLoanAmountRequestedValid && (
             <Text style={styles.errorText}>
               Please enter a valid loan amount.
             </Text>
           )}
 
-        <LoanStatusPicker onOptionChange={handleLoanStatusChange}
-          title="Select Loan Status"
-          options={['Approved', 'PendingApproval', 'Draft', 'Cancelled']}
-        // initialOption="Approved" 
-        />
+          <LoanStatusPicker onOptionChange={handleLoanStatusChange}
+            title="Select Loan Status"
+            options={['Approved', 'PendingApproval', 'Draft', 'Cancelled']}
+          // initialOption="Approved" 
+          />
 
-        <LoanStatusPicker
-          onOptionChange={handleAnotherOptionChange}
-          title="Status Reason"
-          options={['AadharNotMatching', 'InvalidDocuments']}
-        // initialOption="Option1"
-        />
+          <LoanStatusPicker
+            onOptionChange={handleAnotherOptionChange}
+            title="Status Reason"
+            options={['AadharNotMatching', 'InvalidDocuments']}
+          // initialOption="Option1"
+          />
 
-        <ComponentDatePicker
-          selectedDate={kf_dateofapproval}
-          onDateChange={handleDateChange1}
-          placeholder="Date of Approval"
-        />
+          <ComponentDatePicker
+            selectedDate={kf_dateofapproval}
+            onDateChange={handleDateChange1}
+            placeholder="Date of Approval"
+          />
 
-        <ComponentDatePicker
-          selectedDate={kf_firstemidate}
-          onDateChange={handleDateChange2}
-          placeholder="First EMI Date"
-        />
-         <TextInputComponent
-          placeholder="Loan Approver"
-          autoCapitalize="none"
-          value={kf_approver}
-          onChangeText={(text) => setkf_approver(text)}
-        /> 
+          <ComponentDatePicker
+            selectedDate={kf_firstemidate}
+            onDateChange={handleDateChange2}
+            placeholder="First EMI Date"
+          />
+          <TextInputComponent
+            placeholder="Loan Approver"
+            autoCapitalize="none"
+            value={kf_approver}
+            onChangeText={(text) => setkf_approver(text)}
+          /> 
 
           {/* <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <ButtonComponent title="Pick an image from camera roll" onPress={pickImage} />
-      {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
-    </View> */}
+            <ButtonComponent title="Pick an image from camera roll" onPress={pickImage} />
+            {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
+          </View> */}
 
           <ButtonComponent
             title="SUBMIT"
             onPress={handleSaveRecord}
-            disabled={isSignInDisabled}
+          disabled={isSignInDisabled}
           />
 
       </View>
