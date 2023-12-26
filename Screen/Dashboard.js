@@ -12,19 +12,52 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import ContactGridCard from '../common/ContactGridCard';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
-const Dashboard = ({ navigation }) => {
+import ContactGridCard from '../common/ContactGridCard';
+
+const DashboardScreen = ({ navigation, route }) => {
   const [showLoanModal, setShowLoanModal] = useState(false);
   const [kfContacts, setKfContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedContact, setSelectedContact] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showClearIcon, setShowClearIcon] = useState(false);
+  const [showClearIcon, setShowClearIcon] = useState(false); 
+  const [authenticatedUser, setAuthenticatedUser] = useState(null);
+
+    // Fetch authenticated user when component mounts
+  useEffect(() => {
+    getAuthenticatedUser();
+  }, []);
+
+  useEffect(() => {
+    if (route.params?.authenticatedUser) {
+      setAuthenticatedUser(route.params.authenticatedUser);
+    }
+  }, [route.params?.authenticatedUser]);
+
+  const getAuthenticatedUser = async () => {
+    try {
+      const userString = await AsyncStorage.getItem('authenticatedUser');
+      console.log("getAuthenticatedUser:",userString);
+
+      if (userString) {
+        const user = JSON.parse(userString);
+        setAuthenticatedUser(user);
+      }
+    } catch (error) {
+      console.error('Error getting authenticated user:', error);
+    }
+  };
+
+  // const authenticatedUser = route.params?.authenticatedUser || {};
+
+  const isFocused = useIsFocused();
 
   const deviceWidth = Dimensions.get('window').width;
-  console.log("device eWidth:" + deviceWidth);
+  // console.log("device eWidth:" + deviceWidth);
 
   const textColor = deviceWidth < 390 ? 'red' : 'blue';
 
@@ -43,6 +76,7 @@ const Dashboard = ({ navigation }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         var data = {
           grant_type: "client_credentials",
           client_id: "d9dcdf05-37f4-4bab-b428-323957ad2f86",
@@ -56,9 +90,9 @@ const Dashboard = ({ navigation }) => {
           { headers: { "content-type": "application/x-www-form-urlencoded" } }
         );
 
-        console.log("tokenResponse", tokenResponse);
+        // console.log("tokenResponse", tokenResponse);
         const accessToken = tokenResponse.data.access_token;
-        console.log("Access Token:", accessToken);
+        // console.log("Access Token:", accessToken);
 
         const response = await axios.get(
           "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/contacts",
@@ -84,7 +118,58 @@ const Dashboard = ({ navigation }) => {
     };
 
     fetchData();
-  }, [searchQuery]); // Trigger fetchData when the search query changes
+  }, [isFocused]); // Trigger fetchData when the search query changes
+
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        try {
+          setLoading(true);
+          var data = {
+            grant_type: "client_credentials",
+            client_id: "d9dcdf05-37f4-4bab-b428-323957ad2f86",
+            resource: "https://org0f7e6203.crm5.dynamics.com",
+            scope: "https://org0f7e6203.crm5.dynamics.com/.default",
+            client_secret: "JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2",
+          };
+          const tokenResponse = await axios.post(
+            "https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token",
+            data,
+            { headers: { "content-type": "application/x-www-form-urlencoded" } }
+          );
+
+          // console.log("tokenResponse", tokenResponse);
+          const accessToken = tokenResponse.data.access_token;
+          // console.log("Access Token:", accessToken);
+
+          const response = await axios.get(
+            "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/contacts",
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          // Filter contacts based on the search query
+          const filteredContacts = response.data.value.filter((contact) =>
+            contact.fullname.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+
+          setKfContacts(filteredContacts);
+        } catch (error) {
+          console.error('Error during data fetch:', error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchData();
+    }, [searchQuery, isFocused])
+  );
+
 
   const navigateToContactDetails = (contact) => {
     setSelectedContact(contact);
@@ -136,8 +221,19 @@ const Dashboard = ({ navigation }) => {
             </View>
 
             <View>
-              <Text style={[styles.deviceWidthText, { color: textColor }]}>Device Width: {deviceWidth}</Text>
+              {/* <Text>Welcome to the Dashboard</Text> */}
+              <Text>Authenticated User:</Text>
+              {authenticatedUser && (
+          <>
+            <Text>Email: {authenticatedUser.kf_name}</Text>
+            <Text>Password: {authenticatedUser.kf_password}</Text>
+          </>
+        )}
             </View>
+
+            {/* <View>
+              <Text style={[styles.deviceWidthText, { color: textColor }]}>Device Width: {deviceWidth}</Text>
+            </View> */}
 
             <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
               {loading ? (
@@ -145,7 +241,7 @@ const Dashboard = ({ navigation }) => {
               ) : kfContacts.length === 0 ? (
                 <Text>No contacts found.</Text>
               ) : (
-                <ScrollView contentContainerStyle={{ width: "80%", paddingTop: 20 }}>
+                <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 20 }}>
                   {kfContacts.map((kfContact, index) => (
                     <ContactGridCard
                       key={index}
@@ -296,4 +392,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Dashboard;
+export default DashboardScreen;

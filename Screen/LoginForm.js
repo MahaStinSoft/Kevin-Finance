@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, TouchableOpacity, Text, TextInput, StyleSheet, ScrollView, Alert } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, TouchableOpacity, Text, TextInput, StyleSheet, ScrollView, Alert, Button } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
@@ -9,11 +9,19 @@ import ButtonComponent from '../common/ButtonComponent';
 
 export const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-
-  const navigation = useNavigation();
-
   const [kf_name, setName] = useState(null);
   const [kf_password, setPassword] = useState(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  const navigation = useNavigation();
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    setIsMounted(true);
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   const handleLogin = async () => {
     if (!kf_name || !kf_password) {
@@ -47,21 +55,20 @@ export const LoginForm = () => {
       );
 
       if (response.status === 200) {
-        // Check if the response data contains a match for firstname and adx_identity_newpassword
         const matchedUser = response.data.value.find(
           (user) =>
-            user.kf_name === kf_name &&
-            user.kf_password === kf_password
+            user.kf_name === kf_name && user.kf_password === kf_password
         );
 
         if (matchedUser) {
           // Authentication successful, save the authentication state and navigate to the Dashboard
           try {
             await AsyncStorage.setItem('isLoggedIn', 'true');
+            await AsyncStorage.setItem('authenticatedUser', JSON.stringify(matchedUser));
           } catch (error) {
             console.error('Error storing authentication state:', error);
           }
-          
+
           console.log("Authenticated user:", matchedUser);
           navigation.navigate("Dashboard");
         } else {
@@ -87,6 +94,8 @@ export const LoginForm = () => {
       );
     }
   };
+
+  const isSignInDisabled = !kf_name || !kf_password;
 
   return (
     <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
@@ -117,9 +126,13 @@ export const LoginForm = () => {
       <TouchableOpacity style={styles.Forgotpassword} onPress={() => console.log('Forgot password')}>
         <Text style={styles.ForgotText}>Forgot Password?</Text>
       </TouchableOpacity>
+
       <ButtonComponent
         title="SIGN IN"
-        onPress={handleLogin} />
+        onPress={handleLogin}
+        disabled={isSignInDisabled}
+      />
+
     </ScrollView>
   );
 };

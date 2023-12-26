@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Alert, Image } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, Image, Text, TouchableOpacity, StatusBar } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
@@ -24,12 +24,21 @@ export const HomeScreen = () => {
   const [kf_loanamountrequested, setkf_loanamountrequested] = useState(null);
   const [kf_status, setkf_status] = useState(null);
   const [kf_statusreason, setkf_statusreason] = useState(null);
-  const [kf_dateofapproval, setkf_dateofapproval] = useState(new Date());;
+  const [kf_dateofapproval, setkf_dateofapproval] = useState(new Date());
   const [kf_approver, setkf_approver] = useState(null);
-  const [kf_firstemidate, setkf_firstemidate] = useState(new Date());;
+  const [kf_firstemidate, setkf_firstemidate] = useState(new Date());
   const [selectedValue, setSelectedValue] = useState('');
   const [image, setImage] = useState(null);
-  const [kf_aadharcard, setkf_aadharcard] = useState(null);
+
+  const [isFirstNameValid, setIsFirstNameValid] = useState(true);
+  const [isLastNameValid, setIsLastNameValid] = useState(true);
+  const [isEmailValid, setIsEmailValid] = useState(true);
+  const [isMobileNumberValid, setIsMobileNumberValid] = useState(true);
+  const [isLoanAmountRequestedValid, setIsLoanAmountRequestedValid] = useState(true);
+
+
+
+  // const [kf_aadharcard, setkf_aadharcard] = useState(null);
 
 
   const navigation = useNavigation();
@@ -46,25 +55,25 @@ export const HomeScreen = () => {
     setkf_firstemidate(newDate);
   };
 
-  console.log("Request Payload to CRM:", {
-    kf_name: kf_name,
-    kf_lastname: kf_lastname,
-    kf_gender: kf_gender,
-    kf_mobilenumber: kf_mobilenumber,
-    kf_email: kf_email,
-    kf_address1: kf_address1,
-    kf_address2: kf_address2,
-    kf_address3: kf_address3,
-    kf_city: kf_city,
-    kf_state: kf_state,
-    kf_loanamountrequested: kf_loanamountrequested,
-    kf_status: kf_status,
-    kf_statusreason: kf_statusreason,
-    kf_dateofapproval: kf_dateofapproval,
-    kf_approver: kf_approver,
-    kf_firstemidate: kf_firstemidate,
-    kf_aadharcard: kf_aadharcard
-  });
+  // console.log("Request Payload to CRM:", {
+    // kf_name: kf_name,
+    // kf_lastname: kf_lastname,
+    // kf_gender: kf_gender,
+    // kf_mobilenumber: kf_mobilenumber,
+    // kf_email: kf_email,
+    // kf_address1: kf_address1,
+    // kf_address2: kf_address2,
+    // kf_address3: kf_address3,
+    // kf_city: kf_city,
+    // kf_state: kf_state,
+    // kf_loanamountrequested: kf_loanamountrequested,
+    // kf_status: kf_status,
+    // kf_statusreason: kf_statusreason,
+    // kf_dateofapproval: kf_dateofapproval,
+    // kf_approver: kf_approver,
+    // kf_firstemidate: kf_firstemidate,
+    // kf_aadharcard: kf_aadharcard
+  // });
 
   const handleGenderOptionset = (selectedOptionGender) => {
     let numericValue;
@@ -121,32 +130,29 @@ export const HomeScreen = () => {
     setkf_statusreason(numericValue);
   };
 
-  const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      alert('Sorry, we need camera roll permissions to make this work!');
-      return;
-    }
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+  // const pickImage = async () => {
+  //   const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  //   if (status !== 'granted') {
+  //     alert('Sorry, we need camera roll permissions to make this work!');
+  //     return;
+  //   }
+  //   // No permissions request is necessary for launching the image library
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.All,
+  //     allowsEditing: true,
+  //     aspect: [4, 3],
+  //     quality: 1,
+  //   });
 
-    console.log(result);
+  //   console.log(result);
 
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-    }
-  };
+  //   if (!result.canceled) {
+  //     setImage(result.assets[0].uri);
+  //   }
+  // };
 
   const handleSaveRecord = async () => {
-    // if (!kf_name || !kf_lastname) {
-    //   Alert.alert("Error", "Please enter both email and password");
-    //   return;
-    // }
+
     try {
       var data = {
         grant_type: "client_credentials",
@@ -159,15 +165,15 @@ export const HomeScreen = () => {
         data,
         { headers: { "content-type": "application/x-www-form-urlencoded" } }
       );
-      console.log("tokenResponse", tokenResponse);
+      // console.log("tokenResponse", tokenResponse);
       const accessToken = tokenResponse.data.access_token;
-      console.log("Access Token:", accessToken);
+      // console.log("Access Token:", accessToken);
 
       // Ensure kf_dateofapproval and kf_firstemidate are formatted correctly
       const formattedDateOfApproval = kf_dateofapproval ? kf_dateofapproval.toISOString() : null;
       const formattedFirstEmiDate = kf_firstemidate ? kf_firstemidate.toISOString() : null;
       const loanAmount = parseFloat(kf_loanamountrequested);
-      const imageUrl = await uploadImageToCRM(image, accessToken);
+      // const imageUrl = await uploadImageToCRM(image, accessToken);
 
       const createRecordResponse = await axios.post(
         "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications",
@@ -188,7 +194,7 @@ export const HomeScreen = () => {
           kf_dateofapproval: formattedDateOfApproval,
           kf_approver: kf_approver,
           kf_firstemidate: formattedFirstEmiDate,
-          kf_aadharcard: imageUrl
+          // kf_aadharcard: imageUrl
         },
         {
           headers: {
@@ -198,8 +204,9 @@ export const HomeScreen = () => {
         }
       );
       if (createRecordResponse.status === 204) {
-        console.log("Record created successfully in CRM", createRecordResponse);
+        console.log("Record created successfully in CRM" ); //createRecordResponse
         // navigation.navigate("Dashboard");
+        console.log("Created New Record Details:",createRecordResponse);
       } else {
         console.log("else part");
         Alert.alert("Error", "Failed to create a record in CRM.");
@@ -211,59 +218,119 @@ export const HomeScreen = () => {
     }
   };
   
-  const uploadImageToCRM = async (imageUri, accessToken) => {
-    try {
-      // Replace 'YOUR_CRM_API_ENDPOINT' with the actual CRM API endpoint for uploading images
-      const uploadApiUrl = 'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications?$select=kf_aadharcard,kf_name';
+  // const uploadImageToCRM = async (imageUri, accessToken) => {
+  //   try {
+  //     // Replace 'YOUR_CRM_API_ENDPOINT' with the actual CRM API endpoint for uploading images
+  //     const uploadApiUrl = 'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications?$select=kf_aadharcard,kf_name';
       
-      // Prepare the image data for upload
-      const formData = new FormData();
-      formData.append('aadharImage', {
-        uri: imageUri,
-        type: 'image/jpeg', // Adjust the content type based on your image type
-        name: 'aadhar_image.jpg',
-      });
+  //     // Prepare the image data for upload
+  //     const formData = new FormData();
+  //     formData.append('aadharImage', {
+  //       uri: imageUri,
+  //       type: 'image/jpeg', // Adjust the content type based on your image type
+  //       name: 'aadhar_image.jpg',
+  //     });
 
-      // Make a POST request to the CRM API endpoint for image upload
-      const uploadResponse = await axios.post(uploadApiUrl, formData, {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+  //     // Make a POST request to the CRM API endpoint for image upload
+  //     const uploadResponse = await axios.post(uploadApiUrl, formData, {
+  //       headers: {
+  //         'Authorization': `Bearer ${accessToken}`,
+  //         'Content-Type': 'multipart/form-data',
+  //       },
+  //     });
 
-      // Check if the image upload was successful
-      if (uploadResponse.status === 200) {
-        console.log('Image uploaded successfully to CRM');
-        // Return the image URL from CRM for storage in the record
-        return uploadResponse.data.imageUrl; // Adjust the property name based on your CRM response
-      } else {
-        console.error('Failed to upload image to CRM');
-        return null;
-      }
-    } catch (error) {
-      console.error('Error uploading image to CRM:', error);
-      return null;
+  //     // Check if the image upload was successful
+  //     if (uploadResponse.status === 200) {
+  //       console.log('Image uploaded successfully to CRM');
+  //       // Return the image URL from CRM for storage in the record
+  //       // return uploadResponse.data.imageUrl; // Adjust the property name based on your CRM response
+  //     } else {
+  //       console.error('Failed to upload image to CRM');
+  //       return null;
+  //     }
+  //   } catch (error) {
+  //     console.error('Error uploading image to CRM:', error);
+  //     return null;
+  //   }
+  // };
+
+  // const validateEmail = (email) => {
+  //   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  //   return regex.test(email);
+  // };
+
+  const validateEmail = (email) => {
+    const trimmedEmail = email.trim(); // Remove leading and trailing whitespaces
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    const isValid = regex.test(trimmedEmail);
+    
+    if (!isValid) {
+      // console.log('Invalid email:', trimmedEmail);
+    }
+  
+    return isValid;
+  };
+  
+
+  const handleMobileNumberChange = (text) => {
+    // Check if the entered value has exactly 10 digits
+    if (/^\d{10}$/.test(text)) {
+      setIsMobileNumberValid(true);
+      setkf_mobilenumber(text);
+    } else {
+      setIsMobileNumberValid(false);
     }
   };
 
+  const handleLoanAmountRequestedChange = (text) => {
+    // Check if the entered value is a sequence of digits
+    if (/^\d+$/.test(text)) {
+      setIsLoanAmountRequestedValid(true);
+      setkf_loanamountrequested(text);
+    } else {
+      setIsLoanAmountRequestedValid(false);
+    }
+  };
+  
+  const isSignInDisabled = !kf_name || !kf_lastname || !kf_mobilenumber || !kf_email || !kf_loanamountrequested ;
+
   return (
+    <>
+    <StatusBar/>
     <ScrollView keyboardShouldPersistTaps="handled">
       <View style={styles.container}>
         <HeaderComponent titleText="Home Screen" onPress={handleGoBack}/>
-        {/* <TextInputComponent
+         <TextInputComponent
           placeholder="First Name"
           autoCapitalize="none"
           value={kf_name}
-          onChangeText={(text) => setkf_name(text)}
+          onChangeText={(text) => {setkf_name(text);setIsFirstNameValid(text.trim() !== '');
+        }}
         />
 
-        <TextInputComponent
+{!isFirstNameValid && <Text style={styles.errorText}>Please Enter First Name</Text>}
+
+        {/* <TextInputComponent
           placeholder="Last Name"
           autoCapitalize="none"
           value={kf_lastname}
           onChangeText={(text) => setkf_lastname(text)}
         />
+
+<Text style={styles.errorText}>Please enter Last Name</Text> */}
+
+<TextInputComponent
+        placeholder="Last Name"
+        autoCapitalize="none"
+        value={kf_lastname}
+        onChangeText={(text) => {
+          setkf_lastname(text);
+          setIsLastNameValid(text.trim() !== ''); // Update the validity based on whether the field is empty
+        }}
+      />
+      {!isLastNameValid && <Text style={styles.errorText}>Please Enter Last Name</Text>}
+
 
         <LoanStatusPicker
           onOptionChange={handleGenderOptionset}
@@ -272,18 +339,40 @@ export const HomeScreen = () => {
         // initialOption="Option1"
         />
 
-        <TextInputComponent
+        {/* <TextInputComponent
           placeholder="Mobile Number"
           autoCapitalize="none"
           value={kf_mobilenumber}
           onChangeText={(text) => setkf_mobilenumber(text)}
-        />
+        /> */}
+
+          <TextInputComponent
+            placeholder="Mobile Number"
+            autoCapitalize="none"
+            value={kf_mobilenumber}
+            onChangeText={(text) => handleMobileNumberChange(text)}
+            keyboardType="numeric"
+          />
+          {!isMobileNumberValid && (
+            <Text style={styles.errorText}>
+              Please enter a valid 10-digit mobile number.
+            </Text>
+          )}
+       
         <TextInputComponent
           placeholder="Email Address"
           autoCapitalize="none"
           value={kf_email}
-          onChangeText={(text) => setkf_email(text)}
+          // onChangeText={(text) => setkf_email(text)}
+          onChangeText={(text) => {
+            setkf_email(text);
+            // Validate email and update isEmailValid state
+            setIsEmailValid(text.trim() === '' || validateEmail(text));
+          }}
+          keyboardType="email-address" // Set keyboardType to 'email-address'
         />
+        {!isEmailValid && <Text style={styles.errorText}>Please enter a valid email address.</Text>}
+
         <TextInputComponent
           placeholder="Address 1"
           autoCapitalize="none"
@@ -321,8 +410,14 @@ export const HomeScreen = () => {
           placeholder="Loan Amount Request"
           autoCapitalize="none"
           value={kf_loanamountrequested}
-          onChangeText={(text) => setkf_loanamountrequested(text)}
+          onChangeText={(text) => handleLoanAmountRequestedChange(text)}
         />
+
+{!isLoanAmountRequestedValid && (
+            <Text style={styles.errorText}>
+              Please enter a valid loan amount.
+            </Text>
+          )}
 
         <LoanStatusPicker onOptionChange={handleLoanStatusChange}
           title="Select Loan Status"
@@ -353,19 +448,22 @@ export const HomeScreen = () => {
           autoCapitalize="none"
           value={kf_approver}
           onChangeText={(text) => setkf_approver(text)}
-        /> */}
+        /> 
 
-<View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          {/* <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       <ButtonComponent title="Pick an image from camera roll" onPress={pickImage} />
       {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
-    </View>
+    </View> */}
 
-        <ButtonComponent
-          title="SUBMIT"
-          onPress={handleSaveRecord}
-        />
+          <ButtonComponent
+            title="SUBMIT"
+            onPress={handleSaveRecord}
+            disabled={isSignInDisabled}
+          />
+
       </View>
     </ScrollView>
+    </>
   );
 };
 
@@ -373,6 +471,34 @@ const styles = StyleSheet.create({
   container: {
     // marginHorizontal: 10,
   },
+  errorText:{
+    color:'red',
+    fontSize: 15,
+    marginHorizontal: 25,
+  },
+  SignButton: {
+    backgroundColor: '#rgba(255,28,53,255)',
+    width: '60%',
+    alignSelf: 'center',
+    borderRadius: 25,
+    marginTop: 25,
+    padding: 5,
+    marginBottom: 25
+  },
+  SignText: {
+    color: '#fff',
+    padding: 12,
+    textAlign: 'center',
+    fontWeight: "bold"
+  },
+  disabledButton:{
+    backgroundColor: 'gray',
+    width: '60%',
+    alignSelf: 'center',
+    borderRadius: 25,
+    marginTop: 25,
+    padding: 5,
+  }
 });
 
 export default HomeScreen;

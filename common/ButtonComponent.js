@@ -2,10 +2,10 @@ import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 
 const ButtonComponent = (props) => {
-  const { onPress, title } = props;
+  const { onPress, title, disabled } = props;
 
   return (
-    <TouchableOpacity onPress={onPress} style={styles.SignButton}>
+    <TouchableOpacity onPress={onPress} style={[styles.SignButton, disabled && styles.disabledButton]} disabled={disabled}>
       <Text style={styles.SignText}>{title}</Text>
     </TouchableOpacity>
   );
@@ -26,6 +26,9 @@ const styles = StyleSheet.create({
         padding: 12,
         textAlign: 'center',
         fontWeight: "bold"
+      },
+      disabledButton: {
+        backgroundColor: '#d3d3d3', // Change the color for a disabled look
       },
 });
 
