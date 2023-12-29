@@ -17,7 +17,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
 import LoanStatusPicker from '../common/LoanStatusPicker ';
-import ContactGridCard from '../common/ContactGridCard';
+import HomeLoanCard from './card/HomeLoanCard';
+import PersonalLoanCard from './card/PersonalLoanCard';
 
 const DashboardScreen = ({ navigation, route }) => {
   const [showLoanModal, setShowLoanModal] = useState(false);
@@ -71,7 +72,7 @@ const DashboardScreen = ({ navigation, route }) => {
   }
 
   const handlePersonalLoan = () => {
-    navigation.navigate("PersonalScreen");
+    navigation.navigate("PersonalLoan");
     console.log("Personal Selected");
     setShowLoanModal(false);
   }
@@ -198,9 +199,14 @@ const DashboardScreen = ({ navigation, route }) => {
   );
 
 
-  const navigateToContactDetails = (loanApplication) => {
+  const navigateToHomeDetails = (loanApplication) => {
     setSelectedContact(loanApplication);
-    navigation.navigate('UserDetails', { loanApplication });
+    navigation.navigate('HomeLoanDetailsScreen', { loanApplication });
+  };
+
+  const navigateToPersonalDetails = (personalLoan) => {
+    setSelectedContact(personalLoan);
+    navigation.navigate('PersonalLoanDetailsScreen', { personalLoan });
   };
 
   const handleClearSearch = () => {
@@ -282,15 +288,54 @@ const DashboardScreen = ({ navigation, route }) => {
             ) : kfContacts.length === 0 ? (
               <Text>No contacts found.</Text>
             ) : (
+
+            //   <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 20 }}>
+            //   {kfContacts.map((kfContact, index) => (
+            //     <HomeLoanCard
+            //       key={index}
+            //       loanApplication={kfContact}
+            //       onPress={navigateToHomeDetails}
+            //     />
+            //   ))}
+            // </ScrollView>
+            
               <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 20 }}>
-                {kfContacts.map((kfContact, index) => (
-                  <ContactGridCard
+              {kfContacts
+                .filter((PersonalLoan) => PersonalLoan)
+                .map((personalLoan, index) => (
+                  <PersonalLoanCard
                     key={index}
-                    loanApplication={kfContact}
-                    onPress={navigateToContactDetails}
+                    personalLoan={personalLoan}
+                    onPress={navigateToPersonalDetails}
                   />
-                ))}
-              </ScrollView>
+                ))
+              }
+            </ScrollView>
+
+                  // <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 20 }}>
+                  //   {kfContacts.map((loanApplication, index) => {
+                  //     if (loanApplication.kf_firstname && loanApplication.kf_lastname) {
+                  //       // Assume it's a PersonalLoan if it has firstname and lastname properties
+                  //       return (
+                  //         <PersonalLoanCard
+                  //           key={index}
+                  //           personalLoan={loanApplication}
+                  //           onPress={navigateToContactDetails}
+                  //         />
+                  //       );
+                  //     } else if (loanApplication.kf_homeaddress) {
+                  //       return (
+                  //         <HomeLoanCard
+                  //           key={index}
+                  //           loanApplication={loanApplication}
+                  //           onPress={navigateToContactDetails}
+                  //         />
+                  //       );
+                  //     }
+                  //     return null; // If there are other loan types or unknown types, handle them accordingly or remove this line
+                  //   })}
+                  // </ScrollView>
+
             )}
           </View>
 

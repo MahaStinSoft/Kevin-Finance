@@ -1,39 +1,24 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 
-const ContactGridCard = ({ loanApplication, onPress }) => {
-
-  const getLoanStatusLabel = () => {
-    switch (loanApplication.kf_status) {
-      case 123950000:
-        return 'Approved';
-      case 123950001:
-        return 'Pending Approval';
-      case 123950002:
-        return 'Draft';
-      case 123950003:
-        return 'Cancelled';
-      case 123950004:
-        return 'Expired';
-      default:
-        return 'Unknown'; 
-    }
-  };
+const PersonalLoanCard = ({ personalLoan, onPress }) => {
+  // Check if personalLoan is defined and has required properties
+  if (!personalLoan || !personalLoan.kf_firstname || !personalLoan.kf_lastname) {
+    return null; // If not, return null or a default component
+  }
 
   const renderImage = () => {
-    if (loanApplication.entityimage) {
+    if (personalLoan.entityimage) {
       return (
         <Image
-          source={{ uri: `data:image/png;base64,${loanApplication.entityimage}` }}
+          source={{ uri: `data:image/png;base64,${personalLoan.entityimage}` }}
           style={styles.cardImage}
           onError={(error) => console.error('Image load error:', error.nativeEvent.error)}
         />
       );
     } else {
       // If entityimage is not available, display the first and last name initials as an image
-      const initials = loanApplication.kf_name && loanApplication.kf_lastname
-        ? `${loanApplication.kf_name[0]}${loanApplication.kf_lastname[0]}`
-        : '';
+      const initials = `${personalLoan.kf_firstname[0]}${personalLoan.kf_lastname[0]}`;
       return (
         <View style={[styles.cardImage, styles.placeholderImage]}>
           <Text style={styles.placeholderText}>{initials}</Text>
@@ -43,12 +28,10 @@ const ContactGridCard = ({ loanApplication, onPress }) => {
   };
 
   return (
-    <TouchableOpacity style={styles.card} onPress={() => onPress(loanApplication)}>
+    <TouchableOpacity style={styles.card} onPress={() => onPress(personalLoan)}>
       {renderImage()}
       <View style={styles.cardContent}>
-        <Text style={styles.cardTitle}>{`${loanApplication.kf_name} ${loanApplication.kf_lastname}`}</Text>
-        <Text style={styles.cardLabel}>{`Loan Amount: ${loanApplication.kf_loanamountrequested}`}</Text>
-        <Text style={styles.cardLabel}>{`Status: ${getLoanStatusLabel()}`}</Text>
+        <Text style={styles.cardTitle}>{`${personalLoan.kf_firstname} ${personalLoan.kf_lastname}`}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -94,4 +77,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ContactGridCard;
+export default PersonalLoanCard;

@@ -3,9 +3,9 @@ import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Alert } fr
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 
-import HeaderComponent from './Header';
+import HeaderComponent from '../../common/Header';
 
-const ContactDetailsScreen = ({ route }) => {
+const HomeLoanDetailsScreen = ({ route }) => {
   const navigation = useNavigation();
   const [loanApplication, setLoanApplication] = useState(route.params.loanApplication);
 
@@ -70,7 +70,7 @@ const ContactDetailsScreen = ({ route }) => {
   };
 
   const handleEdit = () => {
-    navigation.navigate('EditScreen', {
+    navigation.navigate('EditHomeLoan', {
       loanApplication,
       updateLoanApplicationDetails: updatedLoanApplication => setLoanApplication(updatedLoanApplication),
     });
@@ -93,13 +93,15 @@ const ContactDetailsScreen = ({ route }) => {
       );
     }
   };
+  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <HeaderComponent titleText="Loan Application Details" onPress={handleGoBack} />
-      <TouchableOpacity onPress={handleEdit}>
-        <Ionicons name="list-sharp" size={25} color="red" />
-      </TouchableOpacity>
+      <HeaderComponent 
+      titleText="HomeLoan Details" 
+      onPress={handleGoBack} 
+      onIconPress={handleEdit}
+      screenIcon="create-outline"/>
 
       <View style={styles.contactImageContainer}>{renderImage()}</View>
 
@@ -144,7 +146,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginTop: -130,
-    marginLeft: 10
+    marginLeft: 10, 
+    marginBottom:10
   },
   card: {
     width: '90%',
@@ -186,4 +189,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ContactDetailsScreen;
+export default HomeLoanDetailsScreen;

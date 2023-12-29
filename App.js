@@ -9,10 +9,12 @@ import DashboardScreen from './Screen/Dashboard';
 import Account from './Screen/Account';
 import Loan from './Screen/Loan';
 import Setting from './Screen/setting';
-import ContactDetailsScreen from './common/ContactDetailsScreen';
+import HomeLoanDetailsScreen from './Screen/userDetails/HomeLoanDetailsScreen';
+import PersonalLoanDetailsScreen from './Screen/userDetails/PersonalLoanDetailScreen';
 import HomeScreen from './Screen/HomeScreen';
 import PersonalLoan from './Screen/PersonalLoan';
-import EditScreen from './Screen/EditScreen';
+import EditHomeLoan from './Screen/Loan/EditHomeLoan';
+import EditPersonalLoan from './Screen/Loan/EditPersonalLoan';
 import DocPicker from './common/DocPicker';
 
 const Drawer = createDrawerNavigator();
@@ -69,10 +71,12 @@ function App() {
             <Drawer.Screen name="Loans" component={Loan} options={{ headerShown: false }} />
             <Drawer.Screen name="Settings" component={Setting} options={{ headerShown: false }} />
             <Drawer.Screen name="ToggleFormScreen" component={ToggleFormScreen} options={{ headerShown: false }} />
-            <Drawer.Screen name="UserDetails" component={ContactDetailsScreen} options={{ headerShown: false }} />
-            <Drawer.Screen name="PersonalScreen" component={PersonalLoan} options={{ headerShown: false }} />
+            <Drawer.Screen name="HomeLoanDetailsScreen" component={HomeLoanDetailsScreen} options={{ headerShown: false }} />
+            <Drawer.Screen name="PersonalLoanDetailsScreen" component={PersonalLoanDetailsScreen} options={{ headerShown: false }} />
+            <Drawer.Screen name="PersonalLoan" component={PersonalLoan} options={{ headerShown: false }} />
             <Drawer.Screen name="HomeLoan" component={HomeScreen} options={{ headerShown: false }} />
-            <Drawer.Screen name="EditScreen" component={EditScreen} options={{ headerShown: false }} />
+            <Drawer.Screen name="EditHomeLoan" component={EditHomeLoan} options={{ headerShown: false }} />
+            <Drawer.Screen name="EditPersonalLoan" component={EditPersonalLoan} options={{ headerShown: false }} />
           </>
         ) : (
           <Drawer.Screen name="ToggleFormScreen" component={ToggleFormScreen} options={{ headerShown: false }} initialParams={{ handleLogin }} />

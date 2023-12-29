@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, Alert, StyleSheet, ScrollView, Text } from 'react-native';
 import axios from 'axios';
 
-import HeaderComponent from '../common/Header';
-import ButtonComponent from '../common/ButtonComponent';
-import LoanStatusPicker from '../common/LoanStatusPicker ';
+import HeaderComponent from '../../common/Header';
+import ButtonComponent from '../../common/ButtonComponent';
+import LoanStatusPicker from '../../common/LoanStatusPicker ';
 
-const EditScreen = ({ route, navigation }) => {
+const EditHomeLoan = ({ route, navigation }) => {
   const { loanApplication, onUpdateSuccess } = route.params || {};
   const [firstname, setFirstname] = useState(loanApplication?.kf_name || ''); 
   const [lastname, setLastname] = useState(loanApplication?.kf_lastname || ''); 
@@ -38,6 +38,7 @@ const EditScreen = ({ route, navigation }) => {
     navigation.goBack();
   };
 
+
   useEffect(() => {
     // Update state and variables when the route parameters change
     setFirstname(loanApplication.kf_name);
@@ -63,6 +64,8 @@ const EditScreen = ({ route, navigation }) => {
 
   const handleUpdateRecord = async () => {
     try {
+      // Your authentication logic here
+
       const tokenResponse = await axios.post(
         'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
         {
@@ -145,7 +148,8 @@ const EditScreen = ({ route, navigation }) => {
             text: 'OK',
             onPress: () => {
               // Navigate back after the alert is confirmed
-              navigation.goBack();
+              // navigation.goBack();
+              navigation.navigate('HomeLoanDetailsScreen', { loanApplication: loanApplication });
             },
           },
         ]);
@@ -367,4 +371,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EditScreen;
+export default EditHomeLoan;
+
