@@ -13,6 +13,7 @@ import ContactDetailsScreen from './common/ContactDetailsScreen';
 import HomeScreen from './Screen/HomeScreen';
 import PersonalLoan from './Screen/PersonalLoan';
 import EditScreen from './Screen/EditScreen';
+import DocPicker from './common/DocPicker';
 
 const Drawer = createDrawerNavigator();
 
@@ -55,10 +56,15 @@ function App() {
 
   return (
     <NavigationContainer>
-      <Drawer.Navigator drawerContent={props => <DrawerContent {...props} />}>
+      <Drawer.Navigator drawerContent={props => <DrawerContent {...props} />} screenOptions={{
+          drawerStyle: {
+            // backgroundColor: '#c6cbef',
+            width: 210,
+          },
+        }}>
         {isLoggedIn ? (
           <>
-            <Drawer.Screen name="Dashboard" component={DashboardScreen} options={{ headerShown: false }} />
+            <Drawer.Screen name="Dashboards" component={DashboardScreen} options={{ headerShown: false }} />
             <Drawer.Screen name="Accounts" component={Account} options={{ headerShown: false }} />
             <Drawer.Screen name="Loans" component={Loan} options={{ headerShown: false }} />
             <Drawer.Screen name="Settings" component={Setting} options={{ headerShown: false }} />

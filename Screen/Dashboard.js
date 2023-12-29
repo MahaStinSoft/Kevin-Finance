@@ -16,6 +16,7 @@ import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
+import LoanStatusPicker from '../common/LoanStatusPicker ';
 import ContactGridCard from '../common/ContactGridCard';
 
 const DashboardScreen = ({ navigation, route }) => {
@@ -24,10 +25,12 @@ const DashboardScreen = ({ navigation, route }) => {
   const [loading, setLoading] = useState(true);
   const [selectedContact, setSelectedContact] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showClearIcon, setShowClearIcon] = useState(false); 
+  const [showClearIcon, setShowClearIcon] = useState(false);
   const [authenticatedUser, setAuthenticatedUser] = useState(null);
+  const [kf_status, setkf_status] = useState('');
 
-    // Fetch authenticated user when component mounts
+
+  // Fetch authenticated user when component mounts
   useEffect(() => {
     getAuthenticatedUser();
   }, []);
@@ -41,7 +44,7 @@ const DashboardScreen = ({ navigation, route }) => {
   const getAuthenticatedUser = async () => {
     try {
       const userString = await AsyncStorage.getItem('authenticatedUser');
-      console.log("getAuthenticatedUser:",userString);
+      console.log("getAuthenticatedUser:", userString);
 
       if (userString) {
         const user = JSON.parse(userString);
@@ -77,7 +80,7 @@ const DashboardScreen = ({ navigation, route }) => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        var data = {
+        const data = {
           grant_type: "client_credentials",
           client_id: "d9dcdf05-37f4-4bab-b428-323957ad2f86",
           resource: "https://org0f7e6203.crm5.dynamics.com",
@@ -90,12 +93,10 @@ const DashboardScreen = ({ navigation, route }) => {
           { headers: { "content-type": "application/x-www-form-urlencoded" } }
         );
 
-        // console.log("tokenResponse", tokenResponse);
         const accessToken = tokenResponse.data.access_token;
-        // console.log("Access Token:", accessToken);
 
         const response = await axios.get(
-          "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/contacts",
+          "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications",
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -104,9 +105,22 @@ const DashboardScreen = ({ navigation, route }) => {
           }
         );
 
+        const response1 = await axios.get(
+          "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans",
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        // Combine both sets of contacts
+        const allContacts = [...response.data.value, ...response1.data.value];
+
         // Filter contacts based on the search query
-        const filteredContacts = response.data.value.filter((contact) =>
-          contact.fullname.toLowerCase().includes(searchQuery.toLowerCase())
+        const filteredContacts = allContacts.filter((loanApplication) =>
+          loanApplication.kf_name && loanApplication.kf_name.toUpperCase().includes(searchQuery.toUpperCase())
         );
 
         setKfContacts(filteredContacts);
@@ -118,7 +132,7 @@ const DashboardScreen = ({ navigation, route }) => {
     };
 
     fetchData();
-  }, [isFocused]); // Trigger fetchData when the search query changes
+  }, [searchQuery, isFocused]);// Trigger fetchData when the search query changes
 
 
   useFocusEffect(
@@ -144,7 +158,17 @@ const DashboardScreen = ({ navigation, route }) => {
           // console.log("Access Token:", accessToken);
 
           const response = await axios.get(
-            "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/contacts",
+            "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications",
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          const response1 = await axios.get(
+            "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans",
             {
               headers: {
                 Authorization: `Bearer ${accessToken}`,
@@ -154,10 +178,13 @@ const DashboardScreen = ({ navigation, route }) => {
           );
 
           // Filter contacts based on the search query
-          const filteredContacts = response.data.value.filter((contact) =>
-            contact.fullname.toLowerCase().includes(searchQuery.toLowerCase())
-          );
+          // Combine both sets of contacts
+          const allContacts = [...response.data.value, ...response1.data.value];
 
+          // Filter contacts based on the search query
+          const filteredContacts = allContacts.filter((loanApplication) =>
+            loanApplication.kf_name && loanApplication.kf_name.toUpperCase().includes(searchQuery.toUpperCase())
+          );
           setKfContacts(filteredContacts);
         } catch (error) {
           console.error('Error during data fetch:', error);
@@ -171,14 +198,19 @@ const DashboardScreen = ({ navigation, route }) => {
   );
 
 
-  const navigateToContactDetails = (contact) => {
-    setSelectedContact(contact);
-    navigation.navigate('UserDetails', { contact });
+  const navigateToContactDetails = (loanApplication) => {
+    setSelectedContact(loanApplication);
+    navigation.navigate('UserDetails', { loanApplication });
   };
 
   const handleClearSearch = () => {
     setSearchQuery('');
     setShowClearIcon(false); // Set showClearIcon to false when clearing the search
+  };
+
+  const handleLoanStatusChange = (selectedStatus) => {
+    setkf_status(selectedStatus);
+    console.log('Selected Loan Status:', selectedStatus);
   };
 
   return (
@@ -187,105 +219,113 @@ const DashboardScreen = ({ navigation, route }) => {
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <ScrollView style={{ flex: 1 }}>
-          <View style={styles.container}>
-            <View style={styles.navBar}>
-              <TouchableOpacity style={styles.iconButton} onPress={() => navigation.openDrawer()}>
-                <Ionicons name="list-sharp" size={25} color="#fff" />
-              </TouchableOpacity>
-              <Text style={styles.text}>Kevin Small Finance</Text>
-              <TouchableOpacity style={styles.iconButton} onPress={() => console.log('notification icon pressed')}>
-                <Ionicons name="notifications" size={25} color="#fff" />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.searchSection}>
-              <Ionicons style={styles.searchIcon} name="search" size={25} color="rgba(255, 28, 53, 255)" />
-              <TextInput
-                style={styles.input}
-                placeholder="Search"
-                value={searchQuery}
-                onChangeText={(text) => {
-                  setSearchQuery(text);
-                  setShowClearIcon(text.length > 0); // Show clear icon if there's text in the search input
-                }}
+        <View style={styles.container}>
+          <View style={styles.navBar}>
+            <TouchableOpacity style={styles.iconButton} onPress={() => navigation.openDrawer()}>
+              <Ionicons name="list-sharp" size={25} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.text}>Kevin Small Finance</Text>
+            <TouchableOpacity style={styles.iconButton} onPress={() => console.log('notification icon pressed')}>
+              <Ionicons name="notifications" size={25} color="#fff" />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.searchSection}>
+            <Ionicons style={styles.searchIcon} name="search" size={25} color="rgba(255, 28, 53, 255)" />
+            <TextInput
+              style={styles.input}
+              placeholder="Search"
+              value={searchQuery}
+              onChangeText={(text) => {
+                setSearchQuery(text);
+                setShowClearIcon(text.length > 0); // Show clear icon if there's text in the search input
+              }}
+            />
+            {showClearIcon && (
+              <Ionicons
+                style={styles.searchIcon}
+                name="close"
+                size={25}
+                color="rgba(255, 28, 53, 255)"
+                onPress={handleClearSearch}
               />
-              {showClearIcon && (
-                <Ionicons
-                  style={styles.searchIcon}
-                  name="close"
-                  size={25}
-                  color="rgba(255, 28, 53, 255)"
-                  onPress={handleClearSearch}
-                />
-              )}
-            </View>
+            )}
+          </View>
 
-            <View>
-              {/* <Text>Welcome to the Dashboard</Text> */}
-              <Text>Authenticated User:</Text>
-              {authenticatedUser && (
-          <>
-            <Text>Email: {authenticatedUser.kf_name}</Text>
-            <Text>Password: {authenticatedUser.kf_password}</Text>
-          </>
-        )}
-            </View>
+          <View>
+            <LoanStatusPicker
+              onOptionChange={handleLoanStatusChange}
+              title="Select Loan Status"
+              options={['Approved', 'PendingApproval', 'Draft', 'Cancelled']}
+            // initialOption="Approved" 
+            />
+          </View>
 
-            {/* <View>
+          <View>
+            {/* <Text>Welcome to the Dashboard</Text> */}
+            <Text>Authenticated User:</Text>
+            {authenticatedUser && (
+              <>
+                <Text>Email: {authenticatedUser.kf_name}</Text>
+                <Text>Password: {authenticatedUser.kf_password}</Text>
+              </>
+            )}
+          </View>
+
+          {/* <View>
               <Text style={[styles.deviceWidthText, { color: textColor }]}>Device Width: {deviceWidth}</Text>
             </View> */}
 
-            <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-              {loading ? (
-                <ActivityIndicator size="large" color="#0000ff" />
-              ) : kfContacts.length === 0 ? (
-                <Text>No contacts found.</Text>
-              ) : (
-                <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 20 }}>
-                  {kfContacts.map((kfContact, index) => (
-                    <ContactGridCard
-                      key={index}
-                      contact={kfContact}
-                      onPress={navigateToContactDetails}
-                    />
-                  ))}
-                </ScrollView>
-              )}
-            </View>
+          <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+            {loading ? (
+              <ActivityIndicator size="large" color="#0000ff" />
+            ) : kfContacts.length === 0 ? (
+              <Text>No contacts found.</Text>
+            ) : (
+              <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 20 }}>
+                {kfContacts.map((kfContact, index) => (
+                  <ContactGridCard
+                    key={index}
+                    loanApplication={kfContact}
+                    onPress={navigateToContactDetails}
+                  />
+                ))}
+              </ScrollView>
+            )}
+          </View>
 
-            <Modal
-              animationType="slide"
-              transparent={true}
-              visible={showLoanModal}
-              onRequestClose={() => setShowLoanModal(false)}
-            >
-              <View style={styles.modalBackground}>
-                <View style={styles.modalContainer}>
-                  <View style={{flexDirection: "column"}}>
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={showLoanModal}
+            onRequestClose={() => setShowLoanModal(false)}
+          >
+            <View style={styles.modalBackground}>
+              <View style={styles.modalContainer}>
+                <View style={{ flexDirection: "column" }}>
                   <Text style={styles.modalHeading}>LOAN TYPES</Text>
 
-                    <TouchableOpacity style={styles.closeButton} onPress={() => setShowLoanModal(false)}>
-                      <Ionicons name="close" size={20} color="#000" />
-                    </TouchableOpacity>
-                  </View>
-                  <View style={{marginTop: -20}}>
+                  <TouchableOpacity style={styles.closeButton} onPress={() => setShowLoanModal(false)}>
+                    <Ionicons name="close" size={20} color="#000" />
+                  </TouchableOpacity>
+                </View>
+                <View style={{ marginTop: -20 }}>
                   <TouchableOpacity style={[styles.loanOption, { borderBottomWidth: 1, borderBottomColor: '#ccc', marginTop: 40 }]} onPress={handleHomeLoan}>
                     <Text style={styles.loanOptionText}>Home Loan</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.loanOption} onPress={handlePersonalLoan}>
                     <Text style={styles.loanOptionText}>Personal Loan</Text>
                   </TouchableOpacity>
-                  </View>
                 </View>
               </View>
-            </Modal>
-          </View>
-        </ScrollView>
-        <View style={styles.plusIconScetion}>
-              <TouchableOpacity style={styles.plusIcon} onPress={() => setShowLoanModal(!showLoanModal)}>
-                <Text style={styles.plusIconText}>+</Text>
-              </TouchableOpacity>
             </View>
+          </Modal>
+        </View>
+        <View style={styles.plusIconScetion}>
+          <TouchableOpacity style={styles.plusIcon} onPress={() => setShowLoanModal(!showLoanModal)}>
+            <Text style={styles.plusIconText}>+</Text>
+          </TouchableOpacity>
+        </View>
       </KeyboardAvoidingView>
     </>
   );
@@ -307,7 +347,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     zIndex: 10,
-    marginTop: 24
   },
   iconButton: {
     marginHorizontal: 10,
@@ -364,7 +403,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#E5E4E2',
-    marginTop: 70
+    marginTop: 45
   },
   searchIcon: {
     padding: 10,
@@ -385,7 +424,7 @@ const styles = StyleSheet.create({
   modalHeading: {
     fontSize: 16,
     fontWeight: 'bold',
-    marginTop: 10, 
+    marginTop: 10,
     color: '#333',
     textAlign: 'center',
     marginRight: 30

@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     // padding: 16,
-    marginTop: 30
+    marginTop: 30,
   },
   logoutContainer: {
     position: 'absolute',

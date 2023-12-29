@@ -1,163 +1,334 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  ImageBackground,
-} from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, Image, Text, TouchableOpacity, StatusBar } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
+import * as ImagePicker from 'expo-image-picker';
 
-const PersonalLoan = () => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [mobileNumber, setMobileNumber] = useState('');
-  const [city, setCity] = useState('');
-  const [state, setState] = useState('');
-  const [pincode, setPincode] = useState('');
+import HeaderComponent from '../common/Header';
+import TextInputComponent from '../common/TextInput';
+import ButtonComponent from '../common/ButtonComponent';
+import LoanStatusPicker from '../common/LoanStatusPicker ';
+import ComponentDatePicker from '../common/ComponentDatePicker';
 
-  const validateInputs = () => {
-    // Add your validation logic here
-    // For example, checking if fields are not empty
-    if (!firstName || !lastName || !mobileNumber || !city || !state || !pincode) {
-      alert('Please fill in all fields');
-      return false;
-    }
+export const PersonalLoan = () => {
+  const [kf_firstname, setkf_firstname] = useState(null);
+  const [kf_lastname, setkf_lastname] = useState(null);
+  const [kf_name, setkf_name] = useState(null);
+  const [kf_gender, setkf_gender] = useState(null);
+  const [kf_mobile, setkf_mobile] = useState(null);
+  const [kf_email, setkf_email] = useState(null);
+  const [kf_address1, setkf_address1] = useState(null);
+  const [kf_address2, setkf_address2] = useState(null);
+  const [kf_address3, setkf_address3] = useState(null);
+  const [kf_city, setkf_city] = useState(null);
+  const [kf_state, setkf_state] = useState(null);
+  const [kf_pincode, setkf_loanamountrequested] = useState(null);
+  const [kf_loanstatus, setkf_loanstatus] = useState(null);
+  const [kf_statusreason, setkf_statusreason] = useState(null);
+  const [createdon, setkf_dateofapproval] = useState(new Date());
+  // const [kf_approver, setkf_approver] = useState(null);
+  // const [kf_firstemidate, setkf_firstemidate] = useState(new Date());
+  // const [selectedValue, setSelectedValue] = useState('');
+  const [image, setImage] = useState(null);
+  const [isEmailValid, setIsEmailValid] = useState(true);
+  const [isMobileNumberValid, setIsMobileNumberValid] = useState(true);
 
-    // You can add more specific validation rules here
+  const navigation = useNavigation();
 
-    return true;
+  const handleGoBack = () => {
+    console.log("Navigating back to CardViewScreen");
+    navigation.goBack();
   };
+  
+  // const handleDateChange1 = (newDate) => {
+  //   setkf_dateofapproval(newDate);
+  // };
 
-  const handleTextChange = (field, text) => {
-    switch (field) {
-      case 'firstName':
-        setFirstName(text);
+  // const handleDateChange2 = (newDate) => {
+  //   setkf_firstemidate(newDate);
+  // };
+
+  console.log("Request Payload to CRM:", {
+    kf_mobile: kf_mobile,
+  });
+
+  const handleGenderOptionset = (selectedOptionGender) => {
+    let numericValue;
+    switch (selectedOptionGender) {
+      case 'Male':
+        numericValue = 123950000;
         break;
-      case 'lastName':
-        setLastName(text);
-        break;
-      case 'mobileNumber':
-        setMobileNumber(text);
-        break;
-      case 'city':
-        setCity(text);
-        break;
-      case 'state':
-        setState(text);
-        break;
-      case 'pincode':
-        setPincode(text);
+      case 'Female':
+        numericValue = 123950001;
         break;
       default:
+        numericValue = null;
+    }
+    setkf_gender(numericValue);
+  };
+
+  const handleLoanStatusChange = (selectedOptionLoan) => {
+    let numericValue;
+    switch (selectedOptionLoan) {
+      case 'Approved':
+        numericValue = 123950000;
         break;
+      case 'PendingApproval':
+        numericValue = 123950001;
+        break;
+      case 'Draft':
+        numericValue = 123950002;
+        break;
+      case 'Cancelled':
+        numericValue = 123950003;
+        break;
+      case 'Expired':
+        numericValue = 123950004;
+        break;
+      default:
+        numericValue = null;
+    }
+    setkf_loanstatus(numericValue);
+  };
+
+  const handleAnotherOptionChange = (selectedOptionStatusReason) => {
+    let numericValue;
+    switch (selectedOptionStatusReason) {
+      case 'AadharNotMatching':
+        numericValue = 123950000;
+        break;
+      case 'InvalidDocuments':
+        numericValue = 123950001;
+        break;
+      default:
+        numericValue = null;
+    }
+    setkf_statusreason(numericValue);
+  };
+
+  const handleSaveRecord = async () => {
+    try {
+      var data = {
+        grant_type: "client_credentials",
+        client_id: "d9dcdf05-37f4-4bab-b428-323957ad2f86",
+        resource: "https://org0f7e6203.crm5.dynamics.com",
+        client_secret: "JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2",
+      };
+      const tokenResponse = await axios.post(
+        "https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token",
+        data,
+        { headers: { "content-type": "application/x-www-form-urlencoded" } }
+      );
+      const accessToken = tokenResponse.data.access_token;
+
+      // const formattedDateOfApproval = kf_dateofapproval ? kf_dateofapproval.toISOString() : null;
+      // const formattedFirstEmiDate = kf_firstemidate ? kf_firstemidate.toISOString() : null;
+      // const loanAmount = parseFloat(kf_loanamountrequested);
+
+      const createRecordResponse = await axios.post(
+        "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans",  // Updated entity name
+        {
+          kf_firstname: kf_firstname,
+          kf_lastname: kf_lastname,
+          kf_name: kf_name,
+          kf_gender: kf_gender,
+          kf_mobile: kf_mobile,
+          kf_email: kf_email,
+          kf_address1: kf_address1,
+          kf_address2: kf_address2,
+          kf_address3: kf_address3,
+          kf_city: kf_city,
+          kf_state: kf_state,
+          // kf_loanamountrequested: loanAmount,
+          kf_loanstatus: kf_loanstatus,
+          kf_statusreason: kf_statusreason,
+          // kf_dateofapproval: formattedDateOfApproval,
+          // kf_approver: kf_approver,
+          // kf_firstemidate: formattedFirstEmiDate,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (createRecordResponse.status === 204) {
+        console.log("Record created successfully in CRM");
+      } else {
+        console.log("Failed to create a record in CRM.");
+        Alert.alert("Error", "Failed to create a record in CRM.");
+      }
+    } catch (error) {
+      console.error("Error during record creation:", error);
+      console.log("Detailed Error Response:", error.response);
+      Alert.alert("Error", "An unexpected error occurred. Please try again later.");
     }
   };
 
-  const renderTouchableInput = (placeholder, value, field) => (
-    <TouchableOpacity
-      onPress={() => console.log(`${placeholder} field pressed`)}
-      style={[styles.inputContainer, {borderColor: "#A9A9A9", borderWidth: 1}]}
-    >
-      <TextInput
-        style={styles.input}
-        placeholder={placeholder}
-        value={value}
-        onChangeText={(text) => handleTextChange(field, text)}
-      />
-    </TouchableOpacity>
-  );
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email)
+;
+  };
 
-  const handleSubmit = () => {
-    if (validateInputs()) {
-      console.log('Form submitted:', {
-        firstName,
-        lastName,
-        mobileNumber,
-        city,
-        state,
-        pincode,
-      });
-
+  const handleMobileNumberChange = (text) => {
+    if (/^\d{10}$/.test(text)) {
+      setIsMobileNumberValid(true);
+      setkf_mobile(text);
+    } else {
+      setIsMobileNumberValid(false);
     }
   };
+
+  const isSignInDisabled = !kf_mobile || !kf_email;
 
   return (
-    // <ImageBackground source={require('../assets/splash81.png')} style={styles.backgroundImage}>
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>User Information</Text>
+    <>
+    <StatusBar/>
+    <ScrollView keyboardShouldPersistTaps="handled">
+    <View style={styles.container}>
+          <HeaderComponent titleText="Personal Loan" onPress={handleGoBack} />
+         <TextInputComponent
+          placeholder="First Name"
+          autoCapitalize="none"
+          value={kf_firstname}
+          onChangeText={(text) => setkf_firstname(text)}
+        />
+           <TextInputComponent
+          placeholder="Full Name"
+          autoCapitalize="none"
+          value={kf_name}
+          onChangeText={(text) => setkf_name(text)}
+        />
 
-      {renderTouchableInput('First Name', firstName, 'firstName')}
-      {renderTouchableInput('Last Name', lastName, 'lastName')}
-      {renderTouchableInput('Mobile Number', mobileNumber, 'mobileNumber')}
-      {renderTouchableInput('City', city, 'city')}
-      {renderTouchableInput('State', state, 'state')}
-      {renderTouchableInput('Pincode', pincode, 'pincode')}
+        <TextInputComponent
+          placeholder="Last Name"
+          autoCapitalize="none"
+          value={kf_lastname}
+          onChangeText={(text) => setkf_lastname(text)}
+        />
 
-      {/* <Button title="Submit" onPress={handleSubmit} /> */}
-      <TouchableOpacity  style={styles.submit} onPress ={handleSubmit}>
-        <Text style={styles.submitText}>SUBMIT</Text>
-      </TouchableOpacity>
+ {/* <Text style={styles.errorText}>Please enter Last Name</Text>  */}
+
+        <LoanStatusPicker
+          onOptionChange={handleGenderOptionset}
+          title="Gender"
+          options={['Male', 'Female']}
+        />
+
+          <TextInputComponent
+            placeholder="Mobile Number"
+            autoCapitalize="none"
+            value={kf_mobile}
+            onChangeText={(text) => handleMobileNumberChange(text)}
+            keyboardType="numeric"
+          />
+          {!isMobileNumberValid && (
+            <Text style={styles.errorText}>
+              Please enter a valid 10-digit mobile number.
+            </Text>
+          )}
+       
+        <TextInputComponent
+          placeholder="Email Address"
+          autoCapitalize="none"
+          value={kf_email}
+          onChangeText={(text) => {
+            setkf_email(text);
+            setIsEmailValid(text.trim() === '' || validateEmail(text));
+          }}
+          keyboardType="email-address"
+        />
+        {!isEmailValid && <Text style={styles.errorText}>Please enter a valid email address.</Text>}
+
+        <TextInputComponent
+          placeholder="Address 1"
+          autoCapitalize="none"
+          value={kf_address1}
+          onChangeText={(text) => setkf_address1(text)}
+        />
+        <TextInputComponent
+          placeholder="Address 2"
+          autoCapitalize="none"
+          value={kf_address2}
+          onChangeText={(text) => setkf_address2(text)}
+        />
+
+        <TextInputComponent
+          placeholder="Address 3"
+          autoCapitalize="none"
+          value={kf_address3}
+          onChangeText={(text) => setkf_address3(text)}
+        />
+
+        <TextInputComponent
+          placeholder="City"
+          autoCapitalize="none"
+          value={kf_city}
+          onChangeText={(text) => setkf_city(text)}
+        />
+
+        <TextInputComponent
+          placeholder="State"
+          autoCapitalize="none"
+          value={kf_state}
+          onChangeText={(text) => setkf_state(text)}
+        />
+        {/* <TextInputComponent
+          placeholder="Loan Amount Request"
+          autoCapitalize="none"
+          value={kf_loanamountrequested}
+          onChangeText={(text) => setkf_loanamountrequested(text)}
+        /> */}
+
+        <LoanStatusPicker onOptionChange={handleLoanStatusChange}
+          title="Select Loan Status"
+          options={['Approved', 'PendingApproval', 'Draft', 'Cancelled']}
+        />
+
+        <LoanStatusPicker
+          onOptionChange={handleAnotherOptionChange}
+          title="Status Reason"
+          options={['AadharNotMatching', 'InvalidDocuments']}
+        />
+
+        {/* <ComponentDatePicker
+          selectedDate={kf_dateofapproval}
+          onDateChange={handleDateChange1}
+          placeholder="Date of Approval"
+        /> */}
+
+        {/* <ComponentDatePicker
+          selectedDate={kf_firstemidate}
+          onDateChange={handleDateChange2}
+          placeholder="First EMI Date"
+        /> */}
+         {/* <TextInputComponent
+          placeholder="Loan Approver"
+          autoCapitalize="none"
+          value={kf_approver}
+          onChangeText={(text) => setkf_approver(text)}
+        />  */}
+
+          <ButtonComponent
+            title="SUBMIT"
+            onPress={handleSaveRecord}
+            disabled={isSignInDisabled}
+          />
+
+      </View>
     </ScrollView>
-    // </ImageBackground>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    padding: 20,
-    backgroundColor: '#EAECEE',
-  },
-  header: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  inputContainer: {
-    marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-    borderRadius: 8,
-    backgroundColor: '#FBFCFC',
-    padding: 10,
-  },
-  input: {
-    height: 30,
-    // borderColor: 'gray',
-    // borderWidth: 1,
-    paddingHorizontal: 10,
-  },
-  backgroundImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover', 
-  },
-  submit: {
-    marginTop: 20,
-    width: '40%',
-    borderRadius: 25,
-    backgroundColor: 'rgba(255, 28, 53, 255)',
-    borderWidth: 2,
-    borderColor: 'red',
-    alignSelf: "center",
-    padding: 8
-  },
-
-  submitText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign:"center"
+  container: {},
+  errorText:{
+    color:'red',
+    fontSize: 15,
+    marginHorizontal: 25,
   },
 });
 

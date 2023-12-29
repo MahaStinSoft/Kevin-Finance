@@ -13,18 +13,48 @@ const Loan = () => {
     navigation.goBack();
   };
 
+  const handleSavedRecordHomeLoan = () => {
+    navigation.navigate("HomeLoan");
+    console.log("Home Loan Selected");
+  };
+
+  const handleSavedRecord = () => {
+    navigation.navigate("PersonalScreen");
+    console.log("Personal loan Selected");
+  };
+
   return (
     <View style={styles.container}>
       <View>
         <HeaderComponent titleText="LoanScreen" onPress={handleGoBack} />
       </View>
+      <TouchableOpacity
+        style={[styles.loanOption, { borderBottomWidth: 1, borderBottomColor: '#ccc' }]}
+        onPress={handleSavedRecordHomeLoan}
+      >
+        <Text style={styles.loanOptionText}>Home Loan</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.loanOption} onPress={handleSavedRecord}>
+        <Text style={styles.loanOptionText}>Personal Loan</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-
+    // flex: 1,
+    // justifyContent: 'center',
+    // paddingHorizontal: 20,
+  },
+  loanOption: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    paddingVertical: 20,
+  },
+  loanOptionText: {
+    fontSize: 18,
+    textAlign: 'center',
   },
 });
 

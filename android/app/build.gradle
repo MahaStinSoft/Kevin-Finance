@@ -81,7 +81,7 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.kevinfinance"
+    namespace 'com.anonymous.KevinFinance'
     defaultConfig {
         applicationId 'com.anonymous.KevinFinance'
         minSdkVersion rootProject.ext.minSdkVersion

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Alert, Image, Text, TouchableOpacity, StatusBar } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, Image, Text, TouchableOpacity, StatusBar, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
@@ -27,6 +27,8 @@ export const HomeScreen = () => {
   const [kf_dateofapproval, setkf_dateofapproval] = useState(new Date());
   const [kf_approver, setkf_approver] = useState(null);
   const [kf_firstemidate, setkf_firstemidate] = useState(new Date());
+  const [kf_aadharnumber,setkf_aadharnumber] = useState(null); 
+  const [kf_aadharcard, setkf_aadharcard] = useState({ fileName: null, fileContent: null });
   const [selectedValue, setSelectedValue] = useState('');
   // const [image, setImage] = useState(null);
 
@@ -34,12 +36,8 @@ export const HomeScreen = () => {
   const [isLastNameValid, setIsLastNameValid] = useState(true);
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [isMobileNumberValid, setIsMobileNumberValid] = useState(true);
+  const [isAadharnumberValidation,setIsAadharnumberValidation] = useState(true); 
   const [isLoanAmountRequestedValid, setIsLoanAmountRequestedValid] = useState(true);
-
-
-
-  const [kf_aadharcard, setkf_aadharcard] = useState(null);
-
 
   const navigation = useNavigation();
 
@@ -55,7 +53,7 @@ export const HomeScreen = () => {
     setkf_firstemidate(newDate);
   };
 
-  // console.log("Request Payload to CRM:", {
+  console.log("Request Payload to CRM:", {
     // kf_name: kf_name,
     // kf_lastname: kf_lastname,
     // kf_gender: kf_gender,
@@ -72,8 +70,9 @@ export const HomeScreen = () => {
     // kf_dateofapproval: kf_dateofapproval,
     // kf_approver: kf_approver,
     // kf_firstemidate: kf_firstemidate,
-    // kf_aadharcard: kf_aadharcard
-  // });
+    // kf_aadharnumber:kf_aadharnumber,
+    // kf_aadharcard:  'base64 content'
+  });
 
   const handleGenderOptionset = (selectedOptionGender) => {
     let numericValue;
@@ -130,26 +129,34 @@ export const HomeScreen = () => {
     setkf_statusreason(numericValue);
   };
 
-  // const pickImage = async () => {
-  //   const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  //   if (status !== 'granted') {
-  //     alert('Sorry, we need camera roll permissions to make this work!');
-  //     return;
-  //   }
-  //   // No permissions request is necessary for launching the image library
-  //   let result = await ImagePicker.launchImageLibraryAsync({
-  //     mediaTypes: ImagePicker.MediaTypeOptions.All,
-  //     allowsEditing: true,
-  //     aspect: [4, 3],
-  //     quality: 1,
-  //   });
+  const pickImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+        base64: true,
+      });
+  
+      if (result.canceled) {
+        return;
+      }
+  
+      const byteArray = result.base64; // Use result.base64 directly
+      const fileName = result.uri.split('/').pop(); // Extracting filename from URI
+      console.log("result",result);
 
-  //   console.log(result);
-
-  //   if (!result.canceled) {
-  //     setImage(result.assets[0].uri);
-  //   }
-  // };
+  
+      setkf_aadharcard({
+        fileName: fileName, // Extracting filename from URI
+        fileContent: byteArray,
+      });
+    } catch (error) {
+      console.error('Error picking or processing the image:', error);
+      Alert.alert('Error', 'Failed to pick or process the image.');
+    }
+  };
 
   const handleSaveRecord = async () => {
 
@@ -173,7 +180,6 @@ export const HomeScreen = () => {
       const formattedDateOfApproval = kf_dateofapproval ? kf_dateofapproval.toISOString() : null;
       const formattedFirstEmiDate = kf_firstemidate ? kf_firstemidate.toISOString() : null;
       const loanAmount = parseFloat(kf_loanamountrequested);
-      // const imageUrl = await uploadImageToCRM(image, accessToken);
 
       const createRecordResponse = await axios.post(
         "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications",
@@ -194,7 +200,8 @@ export const HomeScreen = () => {
           kf_dateofapproval: formattedDateOfApproval,
           kf_approver: kf_approver,
           kf_firstemidate: formattedFirstEmiDate,
-          // kf_aadharcard: imageUrl
+          kf_aadharnumber:kf_aadharnumber,
+          kf_aadharcard: kf_aadharcard.fileContent
         },
         {
           headers: {
@@ -217,47 +224,6 @@ export const HomeScreen = () => {
       Alert.alert("Error", "An unexpected error occurred. Please try again later.");
     }
   };
-  
-  // const uploadImageToCRM = async (imageUri, accessToken) => {
-  //   try {
-  //     // Replace 'YOUR_CRM_API_ENDPOINT' with the actual CRM API endpoint for uploading images
-  //     const uploadApiUrl = 'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications?$select=kf_aadharcard,kf_name';
-      
-  //     // Prepare the image data for upload
-  //     const formData = new FormData();
-  //     formData.append('aadharImage', {
-  //       uri: imageUri,
-  //       type: 'image/jpeg', // Adjust the content type based on your image type
-  //       name: 'aadhar_image.jpg',
-  //     });
-
-  //     // Make a POST request to the CRM API endpoint for image upload
-  //     const uploadResponse = await axios.post(uploadApiUrl, formData, {
-  //       headers: {
-  //         'Authorization': `Bearer ${accessToken}`,
-  //         'Content-Type': 'multipart/form-data',
-  //       },
-  //     });
-
-  //     // Check if the image upload was successful
-  //     if (uploadResponse.status === 200) {
-  //       console.log('Image uploaded successfully to CRM');
-  //       // Return the image URL from CRM for storage in the record
-  //       // return uploadResponse.data.imageUrl; // Adjust the property name based on your CRM response
-  //     } else {
-  //       console.error('Failed to upload image to CRM');
-  //       return null;
-  //     }
-  //   } catch (error) {
-  //     console.error('Error uploading image to CRM:', error);
-  //     return null;
-  //   }
-  // };
-
-  // const validateEmail = (email) => {
-  //   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  //   return regex.test(email);
-  // };
 
   const validateEmail = (email) => {
     const trimmedEmail = email.trim(); // Remove leading and trailing whitespaces
@@ -292,6 +258,16 @@ export const HomeScreen = () => {
       setIsLoanAmountRequestedValid(false);
     }
   };
+
+  const handleAadharCardNumberValidation = (text) => {
+      // Check if the entered value has exactly 10 digits
+      if (/^\d{12}$/.test(text)) {
+        setIsAadharnumberValidation(true);
+        setkf_aadharnumber(text);
+      } else {
+        setIsAadharnumberValidation(false);
+      }
+    };
   
   const isSignInDisabled = !kf_name || !kf_lastname || !kf_mobilenumber || !kf_email || !kf_loanamountrequested ;
 
@@ -432,10 +408,42 @@ export const HomeScreen = () => {
             onChangeText={(text) => setkf_approver(text)}
           /> 
 
-          {/* <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <ButtonComponent title="Pick an image from camera roll" onPress={pickImage} />
-            {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
-          </View> */}
+          <TextInputComponent
+            placeholder="Aadharcard Number"
+            autoCapitalize="none"
+            value={kf_aadharnumber}
+            onChangeText={(text) => handleAadharCardNumberValidation(text)}
+          />
+
+          {!isAadharnumberValidation && (
+            <Text style={styles.errorText}>
+              Please enter a valid 12-digit AadharCard number.
+            </Text>
+          )}
+
+
+          <View style={{ flexDirection: "row", marginTop: 15 }}>
+            <View style={{ marginHorizontal: 25, marginTop: 10 }}>
+              <TouchableOpacity onPress={pickImage}>
+                <Text>AadharCard</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{ backgroundColor: "gray", padding: 10, borderRadius: 20, width: 160, marginLeft: 30 }}>
+              {kf_aadharcard.fileContent ? (
+                <>
+                  <Text style={{ marginTop: 10, textAlign: "center" }}>{kf_aadharcard.fileName}</Text>
+                  {/* <Image
+          style={{ width: 100, height: 100 }}
+          source={{ uri: `data:image/jpeg;base64,${kf_aadharcard.fileContent}` }}
+        /> */}
+                </>
+              ) : (
+                <TouchableOpacity onPress={() => console.log()}>
+                  <Text style={{ color: "white", textAlign: "center" }}>Upload</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
 
           <ButtonComponent
             title="SUBMIT"
