@@ -9,7 +9,8 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Dimensions,
-  ActivityIndicator
+  ActivityIndicator,
+  StatusBar
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -29,6 +30,8 @@ const DashboardScreen = ({ navigation, route }) => {
   const [showClearIcon, setShowClearIcon] = useState(false);
   const [authenticatedUser, setAuthenticatedUser] = useState(null);
   const [kf_status, setkf_status] = useState('');
+  const [homeLoanContacts, setHomeLoanContacts] = useState([]);
+  const [personalLoanContacts, setPersonalLoanContacts] = useState([]);
 
 
   // Fetch authenticated user when component mounts
@@ -116,15 +119,23 @@ const DashboardScreen = ({ navigation, route }) => {
           }
         );
 
-        // Combine both sets of contacts
-        const allContacts = [...response.data.value, ...response1.data.value];
+        const homeLoans = response.data.value;
+        const personalLoans = response1.data.value;
+
+        setHomeLoanContacts(homeLoans);
+        setPersonalLoanContacts(personalLoans);
 
         // Filter contacts based on the search query
-        const filteredContacts = allContacts.filter((loanApplication) =>
-          loanApplication.kf_name && loanApplication.kf_name.toUpperCase().includes(searchQuery.toUpperCase())
+        const filteredHomeLoans = homeLoans.filter((homeLoan) =>
+          homeLoan.kf_name && homeLoan.kf_name.toUpperCase().includes(searchQuery.toUpperCase())
         );
 
-        setKfContacts(filteredContacts);
+        const filteredPersonalLoans = personalLoans.filter((personalLoan) =>
+          personalLoan.kf_name && personalLoan.kf_name.toUpperCase().includes(searchQuery.toUpperCase())
+        );
+
+        setHomeLoanContacts(filteredHomeLoans);
+        setPersonalLoanContacts(filteredPersonalLoans);
       } catch (error) {
         console.error("Error during data fetch:", error);
       } finally {
@@ -178,15 +189,23 @@ const DashboardScreen = ({ navigation, route }) => {
             }
           );
 
-          // Filter contacts based on the search query
-          // Combine both sets of contacts
-          const allContacts = [...response.data.value, ...response1.data.value];
+          const homeLoans = response.data.value;
+          const personalLoans = response1.data.value;
+
+          setHomeLoanContacts(homeLoans);
+          setPersonalLoanContacts(personalLoans);
 
           // Filter contacts based on the search query
-          const filteredContacts = allContacts.filter((loanApplication) =>
-            loanApplication.kf_name && loanApplication.kf_name.toUpperCase().includes(searchQuery.toUpperCase())
+          const filteredHomeLoans = homeLoans.filter((homeLoan) =>
+            homeLoan.kf_name && homeLoan.kf_name.toUpperCase().includes(searchQuery.toUpperCase())
           );
-          setKfContacts(filteredContacts);
+
+          const filteredPersonalLoans = personalLoans.filter((personalLoan) =>
+            personalLoan.kf_name && personalLoan.kf_name.toUpperCase().includes(searchQuery.toUpperCase())
+          );
+
+          setHomeLoanContacts(filteredHomeLoans);
+          setPersonalLoanContacts(filteredPersonalLoans);
         } catch (error) {
           console.error('Error during data fetch:', error);
         } finally {
@@ -197,7 +216,6 @@ const DashboardScreen = ({ navigation, route }) => {
       fetchData();
     }, [searchQuery, isFocused])
   );
-
 
   const navigateToHomeDetails = (loanApplication) => {
     setSelectedContact(loanApplication);
@@ -221,6 +239,7 @@ const DashboardScreen = ({ navigation, route }) => {
 
   return (
     <>
+      <StatusBar />
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -278,64 +297,31 @@ const DashboardScreen = ({ navigation, route }) => {
             )}
           </View>
 
-          {/* <View>
-              <Text style={[styles.deviceWidthText, { color: textColor }]}>Device Width: {deviceWidth}</Text>
-            </View> */}
-
           <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
             {loading ? (
               <ActivityIndicator size="large" color="#0000ff" />
-            ) : kfContacts.length === 0 ? (
-              <Text>No contacts found.</Text>
             ) : (
-
-            //   <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 20 }}>
-            //   {kfContacts.map((kfContact, index) => (
-            //     <HomeLoanCard
-            //       key={index}
-            //       loanApplication={kfContact}
-            //       onPress={navigateToHomeDetails}
-            //     />
-            //   ))}
-            // </ScrollView>
-            
               <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 20 }}>
-              {kfContacts
-                .filter((PersonalLoan) => PersonalLoan)
-                .map((personalLoan, index) => (
+                {/* Display Home Loans */}
+                <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Home Loans</Text>
+                {homeLoanContacts.map((homeLoan, index) => (
+                  <HomeLoanCard
+                    key={index}
+                    loanApplication={homeLoan}
+                    onPress={() => navigateToHomeDetails(homeLoan)}
+                  />
+                ))}
+
+                {/* Display Personal Loans */}
+                <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 20, marginBottom: 10 }}>Personal Loans</Text>
+                {personalLoanContacts.map((personalLoan, index) => (
                   <PersonalLoanCard
                     key={index}
                     personalLoan={personalLoan}
-                    onPress={navigateToPersonalDetails}
+                    onPress={() => navigateToPersonalDetails(personalLoan)}
                   />
-                ))
-              }
-            </ScrollView>
-
-                  // <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 20 }}>
-                  //   {kfContacts.map((loanApplication, index) => {
-                  //     if (loanApplication.kf_firstname && loanApplication.kf_lastname) {
-                  //       // Assume it's a PersonalLoan if it has firstname and lastname properties
-                  //       return (
-                  //         <PersonalLoanCard
-                  //           key={index}
-                  //           personalLoan={loanApplication}
-                  //           onPress={navigateToContactDetails}
-                  //         />
-                  //       );
-                  //     } else if (loanApplication.kf_homeaddress) {
-                  //       return (
-                  //         <HomeLoanCard
-                  //           key={index}
-                  //           loanApplication={loanApplication}
-                  //           onPress={navigateToContactDetails}
-                  //         />
-                  //       );
-                  //     }
-                  //     return null; // If there are other loan types or unknown types, handle them accordingly or remove this line
-                  //   })}
-                  // </ScrollView>
-
+                ))}
+              </ScrollView>
             )}
           </View>
 

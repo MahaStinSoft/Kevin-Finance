@@ -66,7 +66,7 @@ function App() {
         }}>
         {isLoggedIn ? (
           <>
-            <Drawer.Screen name="Dashboards" component={DashboardScreen} options={{ headerShown: false }} />
+            <Drawer.Screen name="Dashboard" component={DashboardScreen} options={{ headerShown: false }} />
             <Drawer.Screen name="Accounts" component={Account} options={{ headerShown: false }} />
             <Drawer.Screen name="Loans" component={Loan} options={{ headerShown: false }} />
             <Drawer.Screen name="Settings" component={Setting} options={{ headerShown: false }} />
