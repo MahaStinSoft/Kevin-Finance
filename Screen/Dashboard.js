@@ -10,12 +10,14 @@ import {
   ScrollView,
   Dimensions,
   ActivityIndicator,
-  StatusBar
+  StatusBar,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { BarChart } from 'react-native-chart-kit';
 
 import LoanStatusPicker from '../common/LoanStatusPicker ';
 import HomeLoanCard from './card/HomeLoanCard';
@@ -23,18 +25,19 @@ import PersonalLoanCard from './card/PersonalLoanCard';
 
 const DashboardScreen = ({ navigation, route }) => {
   const [showLoanModal, setShowLoanModal] = useState(false);
-  const [kfContacts, setKfContacts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loanData, setLoanData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [selectedContact, setSelectedContact] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showClearIcon, setShowClearIcon] = useState(false);
   const [authenticatedUser, setAuthenticatedUser] = useState(null);
   const [kf_status, setkf_status] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState(null);
   const [homeLoanContacts, setHomeLoanContacts] = useState([]);
   const [personalLoanContacts, setPersonalLoanContacts] = useState([]);
+  const [lastMonthData, setLastMonthData] = useState([]);
+  const [selectedLoanStatus, setSelectedLoanStatus] = useState(null);
 
-
-  // Fetch authenticated user when component mounts
   useEffect(() => {
     getAuthenticatedUser();
   }, []);
@@ -59,26 +62,22 @@ const DashboardScreen = ({ navigation, route }) => {
     }
   };
 
-  // const authenticatedUser = route.params?.authenticatedUser || {};
-
   const isFocused = useIsFocused();
 
   const deviceWidth = Dimensions.get('window').width;
-  // console.log("device eWidth:" + deviceWidth);
-
   const textColor = deviceWidth < 390 ? 'red' : 'blue';
 
   const handleHomeLoan = () => {
     navigation.navigate("HomeLoan");
     console.log("Home Selected");
     setShowLoanModal(false);
-  }
+  };
 
   const handlePersonalLoan = () => {
     navigation.navigate("PersonalLoan");
     console.log("Personal Selected");
     setShowLoanModal(false);
-  }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -99,7 +98,7 @@ const DashboardScreen = ({ navigation, route }) => {
 
         const accessToken = tokenResponse.data.access_token;
 
-        const response = await axios.get(
+        const responseLoanApplications = await axios.get(
           "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications",
           {
             headers: {
@@ -109,7 +108,7 @@ const DashboardScreen = ({ navigation, route }) => {
           }
         );
 
-        const response1 = await axios.get(
+        const responsePersonalLoans = await axios.get(
           "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans",
           {
             headers: {
@@ -119,13 +118,12 @@ const DashboardScreen = ({ navigation, route }) => {
           }
         );
 
-        const homeLoans = response.data.value;
-        const personalLoans = response1.data.value;
+        const homeLoans = responseLoanApplications.data.value;
+        const personalLoans = responsePersonalLoans.data.value;
 
         setHomeLoanContacts(homeLoans);
         setPersonalLoanContacts(personalLoans);
 
-        // Filter contacts based on the search query
         const filteredHomeLoans = homeLoans.filter((homeLoan) =>
           homeLoan.kf_name && homeLoan.kf_name.toUpperCase().includes(searchQuery.toUpperCase())
         );
@@ -144,42 +142,31 @@ const DashboardScreen = ({ navigation, route }) => {
     };
 
     fetchData();
-  }, [searchQuery, isFocused]);// Trigger fetchData when the search query changes
-
+  }, [searchQuery, isFocused]);
 
   useFocusEffect(
     React.useCallback(() => {
-      const fetchData = async () => {
+      const fetchLoanData = async () => {
         try {
           setLoading(true);
-          var data = {
+  
+          const data = {
             grant_type: "client_credentials",
             client_id: "d9dcdf05-37f4-4bab-b428-323957ad2f86",
             resource: "https://org0f7e6203.crm5.dynamics.com",
             scope: "https://org0f7e6203.crm5.dynamics.com/.default",
             client_secret: "JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2",
           };
+  
           const tokenResponse = await axios.post(
             "https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token",
-            data,
-            { headers: { "content-type": "application/x-www-form-urlencoded" } }
+            new URLSearchParams(data).toString(),
+            { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
           );
-
-          // console.log("tokenResponse", tokenResponse);
+  
           const accessToken = tokenResponse.data.access_token;
-          // console.log("Access Token:", accessToken);
-
-          const response = await axios.get(
-            "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications",
-            {
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
-
-          const response1 = await axios.get(
+  
+          const responsePersonalLoans = await axios.get(
             "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans",
             {
               headers: {
@@ -188,35 +175,68 @@ const DashboardScreen = ({ navigation, route }) => {
               },
             }
           );
-
-          const homeLoans = response.data.value;
-          const personalLoans = response1.data.value;
-
-          setHomeLoanContacts(homeLoans);
-          setPersonalLoanContacts(personalLoans);
-
-          // Filter contacts based on the search query
-          const filteredHomeLoans = homeLoans.filter((homeLoan) =>
-            homeLoan.kf_name && homeLoan.kf_name.toUpperCase().includes(searchQuery.toUpperCase())
+  
+          const responseLoanApplications = await axios.get(
+            "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications",
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+              },
+            }
           );
-
-          const filteredPersonalLoans = personalLoans.filter((personalLoan) =>
-            personalLoan.kf_name && personalLoan.kf_name.toUpperCase().includes(searchQuery.toUpperCase())
-          );
-
-          setHomeLoanContacts(filteredHomeLoans);
-          setPersonalLoanContacts(filteredPersonalLoans);
+  
+          const combinedData = [
+            ...responsePersonalLoans.data.value,
+            ...responseLoanApplications.data.value,
+          ];
+  
+          setLoanData(combinedData);
+  
+          const today = new Date();
+          const lastMonth = new Date(today);
+          lastMonth.setMonth(today.getMonth() - 1);
+        
+          const lastMonthRecords = loanData.filter((item) => {
+            const createdDate = new Date(item.createdon);
+            return createdDate >= lastMonth && createdDate <= today;
+          });
+  
+ 
+          setLastMonthData(lastMonthRecords);
         } catch (error) {
-          console.error('Error during data fetch:', error);
+          console.error("Error fetching loan data:", error);
+          console.log("API Response:", error.response?.data);
         } finally {
           setLoading(false);
         }
       };
-
-      fetchData();
-    }, [searchQuery, isFocused])
+  
+      fetchLoanData();
+    }, [])
   );
 
+  const filteredData = loanData.filter(
+    (item) =>
+      item.kf_status !== null &&
+      (selectedLoanStatus ? item.kf_status === selectedLoanStatus : true)
+  );
+
+  const statusCounts = {
+    approved: filteredData.filter((item) => item.kf_status === 123950000).length,
+    draft: filteredData.filter((item) => item.kf_status === 123950002).length,
+    pending: filteredData.filter((item) => item.kf_status === 123950001).length,
+    canceled: filteredData.filter((item) => item.kf_status === 123950003).length,
+    expired: filteredData.filter((item) => item.kf_status === 123950004).length,
+  };
+  const handleStatusClick = (status) => {
+    if (selectedStatus === status) {
+      // If the same status is clicked again, reset the filter
+      setSelectedLoanStatus(null);
+    } else {
+      setSelectedLoanStatus(status);
+    }
+  };
   const navigateToHomeDetails = (loanApplication) => {
     setSelectedContact(loanApplication);
     navigation.navigate('HomeLoanDetailsScreen', { loanApplication });
@@ -227,24 +247,47 @@ const DashboardScreen = ({ navigation, route }) => {
     navigation.navigate('PersonalLoanDetailsScreen', { personalLoan });
   };
 
-  const handleClearSearch = () => {
-    setSearchQuery('');
-    setShowClearIcon(false); // Set showClearIcon to false when clearing the search
-  };
-
   const handleLoanStatusChange = (selectedStatus) => {
     setkf_status(selectedStatus);
     console.log('Selected Loan Status:', selectedStatus);
   };
 
+  const handleLoanStatusFilter = (index) => {
+    switch (index) {
+      case 0: // Approved
+        setSelectedLoanStatus(123950000);
+        break;
+      case 1: // Pending
+        setSelectedLoanStatus(123950001);
+        break;
+      case 2: // Draft
+        setSelectedLoanStatus(123950002);
+        break;
+      case 3: // Cancelled
+        setSelectedLoanStatus(123950003);
+        break;
+      default:
+        setSelectedLoanStatus(null);
+    }
+  };
+
+    const handleClearSearch = () => {
+    setSearchQuery('');
+    setShowClearIcon(false); // Set showClearIcon to false when clearing the search
+  };
+
   return (
     <>
-      <StatusBar />
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
-        <View style={styles.container}>
+    <StatusBar />
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+          <ScrollView>
+
+  <View style={styles.container}>
+
+   {/* NavBar Content  */}
           <View style={styles.navBar}>
             <TouchableOpacity style={styles.iconButton} onPress={() => navigation.openDrawer()}>
               <Ionicons name="list-sharp" size={25} color="#fff" />
@@ -255,15 +298,15 @@ const DashboardScreen = ({ navigation, route }) => {
             </TouchableOpacity>
           </View>
 
+           {/* Search Content  */}
           <View style={styles.searchSection}>
             <Ionicons style={styles.searchIcon} name="search" size={25} color="rgba(255, 28, 53, 255)" />
             <TextInput
-              style={styles.input}
-              placeholder="Search"
+              style={styles.input} placeholder="Search"
               value={searchQuery}
               onChangeText={(text) => {
                 setSearchQuery(text);
-                setShowClearIcon(text.length > 0); // Show clear icon if there's text in the search input
+                setShowClearIcon(text.length > 0);
               }}
             />
             {showClearIcon && (
@@ -277,25 +320,75 @@ const DashboardScreen = ({ navigation, route }) => {
             )}
           </View>
 
-          <View>
-            <LoanStatusPicker
-              onOptionChange={handleLoanStatusChange}
-              title="Select Loan Status"
-              options={['Approved', 'PendingApproval', 'Draft', 'Cancelled']}
-            // initialOption="Approved" 
-            />
-          </View>
-
-          <View>
+          <View style={{marginLeft: 15}}>
             {/* <Text>Welcome to the Dashboard</Text> */}
-            <Text>Authenticated User:</Text>
+            {/* <Text>Authenticated User:</Text> */}
             {authenticatedUser && (
               <>
-                <Text>Email: {authenticatedUser.kf_name}</Text>
-                <Text>Password: {authenticatedUser.kf_password}</Text>
+                <Text>Admin: {authenticatedUser.kf_name}</Text>
+                {/* <Text>Password: {authenticatedUser.kf_password}</Text> */}
               </>
             )}
           </View>
+
+        <View style={styles.chart}>
+          <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 20, marginBottom: 10 }}>Loan Status Chart</Text>
+          <Text style={styles.totalLoans}>Total Loans: {filteredData.length}</Text>
+
+      {/* Display status counters */}
+      <View style={styles.statusContainer}>
+          <TouchableOpacity onPress={() => handleStatusClick(123950000)}>
+            <Text style={styles.statusText}>Approved: {statusCounts.approved}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleStatusClick(123950002)}>
+            <Text style={styles.statusText}>Draft: {statusCounts.draft}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleStatusClick(123950001)}>
+            <Text style={styles.statusText}>Pending: {statusCounts.pending}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleStatusClick(123950003)}>
+            <Text style={styles.statusText}>Canceled: {statusCounts.canceled}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleStatusClick(123950004)}>
+            <Text style={styles.statusText}>expired: {statusCounts.expired}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleStatusClick(null)}>
+            <Text style={styles.statusText}>All: {filteredData.length}</Text>
+          </TouchableOpacity>
+        </View>
+
+        <BarChart
+          data={{
+            labels: ['Approved', 'Pending', 'Draft', 'Cancelled', 'expired' ],
+            datasets: [
+              {
+                data: [
+                  statusCounts.approved,
+                  statusCounts.pending,
+                  statusCounts.draft,
+                  statusCounts.canceled,
+                  statusCounts.expired,
+                ],
+              },
+            ],
+          }}
+          width={deviceWidth - 20}
+          height={220}
+          yAxisLabel=""
+          chartConfig={{
+            backgroundGradientFrom: '#fff',
+            backgroundGradientTo: '#fff',
+            color: (opacity = 1) => `rgba(255, 28, 53, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+          }}
+          bezier
+          style={{
+            marginVertical: 8,
+            borderRadius: 16,
+          }}
+        />
+      </View>
+        </View>
 
           <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
             {loading ? (
@@ -351,12 +444,13 @@ const DashboardScreen = ({ navigation, route }) => {
               </View>
             </View>
           </Modal>
-        </View>
+  
         <View style={styles.plusIconScetion}>
           <TouchableOpacity style={styles.plusIcon} onPress={() => setShowLoanModal(!showLoanModal)}>
             <Text style={styles.plusIconText}>+</Text>
           </TouchableOpacity>
         </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </>
   );
@@ -378,6 +472,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     zIndex: 10,
+  },
+  statusContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+  statusText: {
+    fontSize: 12,
+    color: "#007bff",
   },
   iconButton: {
     marginHorizontal: 10,

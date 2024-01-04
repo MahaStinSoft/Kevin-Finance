@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Alert, Image, Text, TouchableOpacity, StatusBar, Button } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused   } from '@react-navigation/native';
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -213,7 +213,16 @@ export const HomeScreen = () => {
       if (createRecordResponse.status === 204) {
         console.log("Record created successfully in CRM" ); //createRecordResponse
         // navigation.navigate("Dashboard");
-        console.log("Created New Record Details:",createRecordResponse);
+        Alert.alert('Created record Successfully.', '', [
+          {
+            text: 'OK',
+            onPress: () => {
+              // Navigate back after the alert is confirmed
+              // navigation.goBack();
+              navigation.navigate('Dashboard');
+            },
+          },
+        ]);
       } else {
         console.log("else part");
         Alert.alert("Error", "Failed to create a record in CRM.");

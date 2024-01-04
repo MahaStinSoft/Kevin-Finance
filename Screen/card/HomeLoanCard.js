@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   placeholderText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#707070', // Placeholder text color
+    color: '#707070', 
   },
   cardContent: {
     flex: 1,

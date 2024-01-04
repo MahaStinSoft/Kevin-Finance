@@ -31,6 +31,7 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [isLastNameValid, setIsLastNameValid] = useState(true);
   const [isMobileNumberValid, setIsMobileNumberValid] = useState(true);
   const [isEmailValid, setIsEmailValid] = useState(true);
+  const [isLoanAmountRequested, setIsLoanAmountRequested] = useState(true);
 
   const [recordId, setRecordId] = useState(loanApplication.kf_loanapplicationid);
 
@@ -93,7 +94,7 @@ const EditHomeLoan = ({ route, navigation }) => {
           kf_address3: address3,
           kf_city: city,
           kf_state: state,
-          kf_loanamountrequested: loanAmountRequested,
+          kf_loanamountrequested: parseInt(loanAmountRequested),
           kf_status: status,
           kf_statusreason: statusReason,
           kf_dateofapproval: approvalDate,
@@ -101,7 +102,6 @@ const EditHomeLoan = ({ route, navigation }) => {
           kf_firstemidate: firstEMIDate,
           kf_aadharnumber: aadharcardNumber,
           kf_pannumber: pancardNumber,
-          // Include other fields as needed
         },
         {
           headers: {
@@ -140,8 +140,6 @@ const EditHomeLoan = ({ route, navigation }) => {
           });
         }
 
-        console.log(loanAmountRequested)
-
         // Optionally, navigate to another screen or perform other actions
         Alert.alert('Updated the record Successfully.', '', [
           {
@@ -170,9 +168,22 @@ const EditHomeLoan = ({ route, navigation }) => {
     return regex.test(trimmedEmail);
   };
 
+  const handleLoanAmountRequestedChange = (text) => {
+    // Check if the entered value is a valid whole number
+    const isValid = /^\d+$/.test(text);
+    
+    if (isValid) {
+      setLoanAmountRequested(parseInt(text));
+      setIsLoanAmountRequested(true);
+    } else {
+      setIsLoanAmountRequested(false);
+    }
+  };
+  
+
   return (
     <> 
-    <HeaderComponent titleText="Home Screen" onPress={handleGoBack}/>
+    <HeaderComponent titleText="Home Loan" onPress={handleGoBack}/>
     <ScrollView>
     <View style={styles.container}>
       <View style={styles.wrapper}>
@@ -289,12 +300,19 @@ const EditHomeLoan = ({ route, navigation }) => {
           placeholder="State"
           onChangeText={(text) => setState(text)}
         />
-       <TextInput
+       {/* <TextInput
           style={styles.input}
           value={loanAmountRequested}
           placeholder="Loan Amount Requested"
           onChangeText={(text) => setLoanAmountRequested(text)}
-        />
+        /> */}
+
+            <TextInput
+              style={styles.input}
+              placeholder="Loan Amount Request"
+              value={loanAmountRequested.toString()}
+              onChangeText={(text) => handleLoanAmountRequestedChange(text)}
+            />
 
         {/* <TextInput
           style={styles.input}

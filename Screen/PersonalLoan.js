@@ -22,7 +22,7 @@ export const PersonalLoan = () => {
   const [kf_address3, setkf_address3] = useState(null);
   const [kf_city, setkf_city] = useState(null);
   const [kf_state, setkf_state] = useState(null);
-  const [kf_pincode, setkf_loanamountrequested] = useState(null);
+  const [kf_loanamountrequested, setkf_loanamountrequested] = useState(null);
   const [kf_loanstatus, setkf_loanstatus] = useState(null);
   const [kf_statusreason, setkf_statusreason] = useState(null);
   const [createdon, setkf_dateofapproval] = useState(new Date());
@@ -123,7 +123,7 @@ export const PersonalLoan = () => {
 
       // const formattedDateOfApproval = kf_dateofapproval ? kf_dateofapproval.toISOString() : null;
       // const formattedFirstEmiDate = kf_firstemidate ? kf_firstemidate.toISOString() : null;
-      // const loanAmount = parseFloat(kf_loanamountrequested);
+      const loanAmount = parseFloat(kf_loanamountrequested);
 
       const createRecordResponse = await axios.post(
         "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans",  // Updated entity name
@@ -139,7 +139,7 @@ export const PersonalLoan = () => {
           kf_address3: kf_address3,
           kf_city: kf_city,
           kf_state: kf_state,
-          // kf_loanamountrequested: loanAmount,
+          kf_loanamountrequested: loanAmount,
           kf_loanstatus: kf_loanstatus,
           kf_statusreason: kf_statusreason,
           // kf_dateofapproval: formattedDateOfApproval,
@@ -155,6 +155,17 @@ export const PersonalLoan = () => {
       );
       if (createRecordResponse.status === 204) {
         console.log("Record created successfully in CRM");
+         // Optionally, navigate to another screen or perform other actions
+         Alert.alert('Created record Successfully.', '', [
+          {
+            text: 'OK',
+            onPress: () => {
+              // Navigate back after the alert is confirmed
+              // navigation.goBack();
+              navigation.navigate('Dashboard');
+            },
+          },
+        ]);
       } else {
         console.log("Failed to create a record in CRM.");
         Alert.alert("Error", "Failed to create a record in CRM.");
@@ -181,8 +192,8 @@ export const PersonalLoan = () => {
     }
   };
 
-  const isSignInDisabled = !kf_mobile || !kf_email;
-
+  const isSignInDisabled = !kf_name || !kf_lastname || !kf_mobile || !kf_email || !kf_loanamountrequested ;
+  
   return (
     <>
     <StatusBar/>
@@ -195,21 +206,20 @@ export const PersonalLoan = () => {
           value={kf_firstname}
           onChangeText={(text) => setkf_firstname(text)}
         />
-           <TextInputComponent
-          placeholder="Full Name"
-          autoCapitalize="none"
-          value={kf_name}
-          onChangeText={(text) => setkf_name(text)}
-        />
 
         <TextInputComponent
           placeholder="Last Name"
           autoCapitalize="none"
           value={kf_lastname}
           onChangeText={(text) => setkf_lastname(text)}
-        />
+        /> 
 
- {/* <Text style={styles.errorText}>Please enter Last Name</Text>  */}
+ <TextInputComponent
+          placeholder="Full Name"
+          autoCapitalize="none"
+          value={kf_name}
+          onChangeText={(text) => setkf_name(text)}
+        />
 
         <LoanStatusPicker
           onOptionChange={handleGenderOptionset}
@@ -275,12 +285,12 @@ export const PersonalLoan = () => {
           value={kf_state}
           onChangeText={(text) => setkf_state(text)}
         />
-        {/* <TextInputComponent
+        <TextInputComponent
           placeholder="Loan Amount Request"
           autoCapitalize="none"
           value={kf_loanamountrequested}
           onChangeText={(text) => setkf_loanamountrequested(text)}
-        /> */}
+        />
 
         <LoanStatusPicker onOptionChange={handleLoanStatusChange}
           title="Select Loan Status"

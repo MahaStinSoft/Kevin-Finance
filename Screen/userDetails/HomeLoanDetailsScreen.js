@@ -61,7 +61,7 @@ const HomeLoanDetailsScreen = ({ route }) => {
     const unsubscribe = navigation.addListener('focus', () => {
       setLoanApplication(route.params.loanApplication);
     });
-
+  
     return unsubscribe;
   }, [navigation, route.params.loanApplication]);
 
@@ -72,9 +72,9 @@ const HomeLoanDetailsScreen = ({ route }) => {
   const handleEdit = () => {
     navigation.navigate('EditHomeLoan', {
       loanApplication,
-      updateLoanApplicationDetails: updatedLoanApplication => setLoanApplication(updatedLoanApplication),
+      onUpdateSuccess: updatedLoanApplication => setLoanApplication(updatedLoanApplication),
     });
-  };
+  }; 
 
   const renderImage = () => {
     if (loanApplication.entityimage) {
@@ -117,15 +117,11 @@ const HomeLoanDetailsScreen = ({ route }) => {
         <Text style={styles.cardLabel}>Address 3: {loanApplication.kf_address3}</Text>
         <Text style={styles.cardLabel}>City: {loanApplication.kf_city}</Text>
         <Text style={styles.cardLabel}>State: {loanApplication.kf_state}</Text>
-        <Text style={styles.cardLabel}>Loan Amount Requested: {loanApplication.kf_loanamountrequested}</Text>
-        {/* <Text style={styles.cardLabel}>Loan Status: {getLoanStatus()}</Text>
-        <Text style={styles.cardLabel}>Status Reason: {getStatusReason()}</Text> */}
-        {/* <Text style={styles.cardLabel}>{loanApplication.kf_dateofapproval}</Text> */}
-        <Text style={styles.cardLabel}>Approver: {loanApplication.kf_approver}</Text>
-        <Text style={styles.cardLabel}>AadharCard Number: {loanApplication.kf_aadharnumber}</Text>
-        <Text style={styles.cardLabel}>Pancard Number: {loanApplication.kf_pannumber}</Text>
-        <Text style={styles.cardLabel}>Created by: {loanApplication.createdby}</Text>
-      </View>
+        <Text style={styles.cardLabel}>Loan Amount Requested: {loanApplication.kf_loanamountrequested}</Text>  
+        <Text style={styles.cardLabel}>Aadhar Number: {loanApplication.kf_aadharnumber}</Text>
+        <Text style={styles.cardLabel}>PANcard Number: {loanApplication.kf_pannumber}</Text>
+        <Text style={styles.cardLabel}>Approver: {loanApplication.kf_approver}</Text>        
+        </View>
     </ScrollView>
   );
 };

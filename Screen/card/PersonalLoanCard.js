@@ -6,6 +6,22 @@ const PersonalLoanCard = ({ personalLoan, onPress }) => {
   if (!personalLoan || !personalLoan.kf_firstname || !personalLoan.kf_lastname) {
     return null; // If not, return null or a default component
   }
+  const getLoanStatusLabel = () => {
+    switch (personalLoan.kf_status) {
+      case 123950000:
+        return 'Approved';
+      case 123950001:
+        return 'Pending Approval';
+      case 123950002:
+        return 'Draft';
+      case 123950003:
+        return 'Cancelled';
+      case 123950004:
+        return 'Expired';
+      default:
+        return 'Unknown'; 
+    }
+  };
 
   const renderImage = () => {
     if (personalLoan.entityimage) {
@@ -32,6 +48,8 @@ const PersonalLoanCard = ({ personalLoan, onPress }) => {
       {renderImage()}
       <View style={styles.cardContent}>
         <Text style={styles.cardTitle}>{`${personalLoan.kf_firstname} ${personalLoan.kf_lastname}`}</Text>
+        <Text style={styles.cardLabel}>{`Loan Amount: ${personalLoan.kf_loanamountrequested}`}</Text>
+         <Text style={styles.cardLabel}>{`Status: ${getLoanStatusLabel()}`}</Text>
       </View>
     </TouchableOpacity>
   );

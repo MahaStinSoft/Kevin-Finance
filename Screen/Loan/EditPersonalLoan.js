@@ -4,22 +4,22 @@ import axios from 'axios';
 
 import HeaderComponent from '../../common/Header';
 import ButtonComponent from '../../common/ButtonComponent';
-import LoanStatusPicker from '../../common/LoanStatusPicker ';
+// import LoanStatusPicker from '../../common/LoanStatusPicker ';
 
 const EditpersonalLoan = ({ route, navigation }) => {
   const { personalLoan, onUpdateSuccess } = route.params || {};
   const [firstname, setfirstname] = useState(personalLoan?.kf_firstname || ''); 
   const [lastname, setLastname] = useState(personalLoan?.kf_lastname || ''); 
   // const [gender, setGender] = useState(personalLoan?.kf_gender || '');
-  const [mobileNumber, setMobileNumber] = useState(personalLoan?.kf_mobilenumber || '');
+  const [mobileNumber, setMobileNumber] = useState(personalLoan?.kf_mobile || '');
   const [email, setEmail] = useState(personalLoan?.kf_email || '');
   const [address1, setAddress1] = useState(personalLoan?.kf_address1 || '');
   const [address2, setAddress2] = useState(personalLoan?.kf_address2 || '');
   const [address3, setAddress3] = useState(personalLoan?.kf_address3 || '');
   const [city, setCity] = useState(personalLoan?.kf_city || '');
   const [state, setState] = useState(personalLoan?.kf_state || '');
-  // const [loanAmountRequested, setLoanAmountRequested] = useState(personalLoan?.kf_loanamountrequested || '');
-  // const [status, setStatus] = useState(personalLoan?.kf_status || '');
+  const [loanAmountRequested, setLoanAmountRequested] = useState(personalLoan?.kf_loanamountrequested || '');
+  // const [status, setStatus] = useState(personalLoan?.kf_loanstatus || '');
   // const [statusReason, setstatusReason] = useState(personalLoan?.kf_statusreason || '');
   // const [approvalDate, setApprovalDate] = useState(personalLoan?.kf_dateofapproval || '');
   // const [approver, setApprover] = useState(personalLoan?.kf_dateofapproval || '');
@@ -31,6 +31,7 @@ const EditpersonalLoan = ({ route, navigation }) => {
   const [isLastNameValid, setIsLastNameValid] = useState(true);
   const [isMobileNumberValid, setIsMobileNumberValid] = useState(true);
   const [isEmailValid, setIsEmailValid] = useState(true);
+  const [isLoanAmountRequested, setIsLoanAmountRequested] = useState(true);
 
   const [recordId, setRecordId] = useState(personalLoan.kf_personalloanid);
 
@@ -44,15 +45,15 @@ const EditpersonalLoan = ({ route, navigation }) => {
     setfirstname(personalLoan.kf_firstname);
     setLastname(personalLoan.kf_lastname);
     // setGender(personalLoan.kf_gender);
-    setMobileNumber(personalLoan.kf_mobilenumber);
+    setMobileNumber(personalLoan.kf_mobile);
     setEmail(personalLoan.kf_email);
     setAddress1(personalLoan.kf_address1);
     setAddress2(personalLoan.kf_address2);
     setAddress3(personalLoan.kf_address3);
     setCity(personalLoan.kf_city);
     setState(personalLoan.kf_state);
-    // setLoanAmountRequested(personalLoan.kf_loanamountrequested);
-    // setStatus(personalLoan.kf_status);
+    setLoanAmountRequested(personalLoan.kf_loanamountrequested);
+    // setStatus(personalLoan.kf_loanstatus);
     // setstatusReason(personalLoan.kf_statusreason);
     // setApprovalDate(personalLoan.kf_dateofapproval);
     // setApprover(personalLoan.kf_approver);
@@ -86,15 +87,15 @@ const EditpersonalLoan = ({ route, navigation }) => {
           kf_firstname: firstname,
           kf_lastname: lastname,
           // kf_gender: gender,
-          kf_mobilenumber: mobileNumber,
+          kf_mobile: mobileNumber,
           kf_email: email,
           kf_address1: address1,
           kf_address2: address2,
           kf_address3: address3,
           kf_city: city,
           kf_state: state,
-          // kf_loanamountrequested: loanAmountRequested,
-          // kf_status: status,
+          kf_loanamountrequested: loanAmountRequested,
+          // kf_loanstatus: status,
           // kf_statusreason: statusReason,
           // kf_dateofapproval: approvalDate,
           // kf_approver: approver,
@@ -120,15 +121,15 @@ const EditpersonalLoan = ({ route, navigation }) => {
             kf_firstname: firstname,
             kf_lastname: lastname,
             // kf_gender: gender,
-            kf_mobilenumber: mobileNumber,
+            kf_mobile: mobileNumber,
             kf_email: email,
             kf_address1: address1,
             kf_address2: address2,
             kf_address3: address3,
             kf_city: city,
             kf_state: state,
-            // kf_loanamountrequested: loanAmountRequested,
-            // kf_status: status,
+            kf_loanamountrequested: parseInt(loanAmountRequested),
+            // kf_loanstatus: status,
             // kf_statusreason: statusReason,
             // kf_dateofapproval: approvalDate,
             // kf_approver: approver,
@@ -137,7 +138,7 @@ const EditpersonalLoan = ({ route, navigation }) => {
             // kf_pannumber: pancardNumber,
           });
         }
-        // console.log(loanAmountRequested)
+        console.log(loanAmountRequested)
 
         // Optionally, navigate to another screen or perform other actions
         Alert.alert('Updated the record Successfully.', '', [
@@ -168,9 +169,22 @@ const EditpersonalLoan = ({ route, navigation }) => {
     return regex.test(trimmedEmail);
   };
 
+  const handleLoanAmountRequestedChange = (text) => {
+    // Check if the entered value is a valid whole number
+    const isValid = /^\d+$/.test(text);
+    
+    if (isValid) {
+      setLoanAmountRequested(parseInt(text, 10));
+      setIsLoanAmountRequested(true);
+    } else {
+      setIsLoanAmountRequested(false);
+    }
+  };
+  
+
   return (
     <> 
-    <HeaderComponent titleText="Home Screen" onPress={handleGoBack}/>
+    <HeaderComponent titleText="Personal Loan" onPress={handleGoBack}/>
     <ScrollView>
     <View style={styles.container}>
       <View style={styles.wrapper}>
@@ -286,27 +300,28 @@ const EditpersonalLoan = ({ route, navigation }) => {
           value={state}
           placeholder="State"
           onChangeText={(text) => setState(text)}
-        />
-       {/* <TextInput
-          style={styles.input}
-          value={loanAmountRequested}
-          placeholder="Loan Amount Requested"
-          onChangeText={(text) => setLoanAmountRequested(text)}
-        /> */}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Loan Amount Request"
+              value={loanAmountRequested.toString()}
+              onChangeText={(text) => handleLoanAmountRequestedChange(text)}
+            />
+
 
         {/* <TextInput
           style={styles.input}
           value={status}
           placeholder="Status"
           onChangeText={(text) => setStatus(text)}
-        />
-        <TextInput
+        /> */}
+        {/* <TextInput
           style={styles.input}
           value={statusReason}
           placeholder="Status Reason"
           onChangeText={(text) => setstatusReason(text)}
-        />
-        <TextInput
+        /> */}
+        {/* <TextInput
           style={styles.input}
           value={approvalDate}
           placeholder="Approval Date"
@@ -370,4 +385,3 @@ const styles = StyleSheet.create({
 });
 
 export default EditpersonalLoan;
-

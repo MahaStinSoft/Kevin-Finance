@@ -23,7 +23,7 @@ const DrawerContent = () => {
   };
   return (
     <View style={styles.container}>
-    <TouchableOpacity onPress={() => handleDrawerItem('Dashboards')} style={styles.drawersection}>
+    <TouchableOpacity onPress={() => handleDrawerItem('Dashboard')} style={styles.drawersection}>
       <Ionicons name='home' color="#888" size={20}/>
       <Text style={styles.drawerText}>Dashboard</Text>
     </TouchableOpacity>

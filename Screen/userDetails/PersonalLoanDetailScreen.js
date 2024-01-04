@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import HeaderComponent from '../../common/Header';
 
-const HomeLoanDetailsScreen = ({ route }) => {
+const PersonalLoanDetailsScreen = ({ route }) => {
   const navigation = useNavigation();
   const [personalLoan, setpersonalLoan] = useState(route.params.personalLoan);
 
@@ -111,21 +111,21 @@ const HomeLoanDetailsScreen = ({ route }) => {
         <Text style={styles.cardTitle}>Name: {`${personalLoan.kf_firstname} ${personalLoan.kf_lastname}`}</Text>
         {/* <Text style={styles.cardLabel}>Loan Type: {personalLoan.loanType}</Text> */}
         <Text style={styles.cardLabel}>Gender: {getGenderLabel()}</Text>
-        <Text style={styles.cardLabel}>Mobile Number: {personalLoan.kf_mobilenumber}</Text>
+        <Text style={styles.cardLabel}>Mobile Number: {personalLoan.kf_mobile}</Text>
         <Text style={styles.cardLabel}>Email Address: {personalLoan.kf_email}</Text>
         <Text style={styles.cardLabel}>Address 1: {personalLoan.kf_address1}</Text>
         <Text style={styles.cardLabel}>Address 2: {personalLoan.kf_address2}</Text>
         <Text style={styles.cardLabel}>Address 3: {personalLoan.kf_address3}</Text>
         <Text style={styles.cardLabel}>City: {personalLoan.kf_city}</Text>
         <Text style={styles.cardLabel}>State: {personalLoan.kf_state}</Text>
-        {/* <Text style={styles.cardLabel}>Loan Amount Requested: {personalLoan.kf_loanamountrequested}</Text> */}
+        <Text style={styles.cardLabel}>Loan Amount Requested: {personalLoan.kf_loanamountrequested}</Text>
         {/* <Text style={styles.cardLabel}>Loan Status: {getLoanStatus()}</Text>
         <Text style={styles.cardLabel}>Status Reason: {getStatusReason()}</Text> */}
         {/* <Text style={styles.cardLabel}>{personalLoan.kf_dateofapproval}</Text> */}
-        <Text style={styles.cardLabel}>Approver: {personalLoan.kf_approver}</Text>
         {/* <Text style={styles.cardLabel}>AadharCard Number: {personalLoan.kf_aadharnumber}</Text>
-        <Text style={styles.cardLabel}>Pancard Number: {personalLoan.kf_pannumber}</Text>
-        <Text style={styles.cardLabel}>Created by: {personalLoan.createdby}</Text> */}
+        <Text style={styles.cardLabel}>Pancard Number: {personalLoan.kf_pannumber}</Text> */}
+        {/* <Text style={styles.cardLabel}>Approver: {personalLoan.kf_approver}</Text> */}
+        {/* <Text style={styles.cardLabel}>Created by: {personalLoan.createdby}</Text> */}
       </View>
     </ScrollView>
   );
@@ -189,4 +189,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeLoanDetailsScreen;
+export default PersonalLoanDetailsScreen;

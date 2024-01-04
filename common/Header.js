@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginTop: 5,
-    // marginRight: 50,
+    marginRight: 50,
   },
 });
 
