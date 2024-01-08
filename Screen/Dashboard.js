@@ -12,6 +12,7 @@ import {
   ActivityIndicator,
   StatusBar,
   Platform,
+  RefreshControl
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -37,23 +38,23 @@ const DashboardScreen = ({ navigation, route }) => {
   const [personalLoanContacts, setPersonalLoanContacts] = useState([]);
   const [lastMonthData, setLastMonthData] = useState([]);
   const [selectedLoanStatus, setSelectedLoanStatus] = useState(null);
-  const [kf_adminname, setKfAdminName] = useState(null);
+  const [refresh, setRefresh] = useState(false);
 
   const [displayedHomeLoans, setDisplayedHomeLoans] = useState([]);
   const [displayedPersonalLoans, setDisplayedPersonalLoans] = useState([]);
   const [showAllLoans, setShowAllLoans] = useState(false);
 
-  useEffect(() => {
-    getAuthenticatedUser();
-  }, []);
+  const handleRefresh = () => {
+    // This function will be called when you want to refresh the page
+    setRefresh(!refresh);
+  };
 
-  useEffect(() => {
-    console.log("Params received in Dashboard:", route.params);
-    if (route.params?.kf_adminname) {
-      console.log("kf_adminname received in Dashboard:", route.params.kf_adminname);
-      setKfAdminName(route.params.kf_adminname);
-    }
-  }, [route.params?.kf_adminname]);
+  useFocusEffect(
+    React.useCallback(() => {
+      // Call getAuthenticatedUser when the screen gains focus
+      getAuthenticatedUser();
+    }, [])
+  );
 
   useEffect(() => {
     // Update displayed loans based on showAllLoans state
@@ -213,9 +214,7 @@ const DashboardScreen = ({ navigation, route }) => {
           const lastMonthRecords = loanData.filter((item) => {
             const createdDate = new Date(item.createdon);
             return createdDate >= lastMonth && createdDate <= today;
-          });
-  
- 
+          });  
           setLastMonthData(lastMonthRecords);
         } catch (error) {
           console.error("Error fetching loan data:", error);
@@ -224,7 +223,6 @@ const DashboardScreen = ({ navigation, route }) => {
           setLoading(false);
         }
       };
-  
       fetchLoanData();
     }, [])
   );
@@ -284,21 +282,20 @@ const DashboardScreen = ({ navigation, route }) => {
     }
   };
 
-    const handleClearSearch = () => {
+  const handleClearSearch = () => {
     setSearchQuery('');
-    setShowClearIcon(false); 
+    setShowClearIcon(false); // Set showClearIcon to false when clearing the search
   };
 
   return (
     <>
-    <StatusBar />
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-          <ScrollView>
+      <StatusBar />
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
 
-  <View style={styles.container}>
+        <View style={styles.container}>
 
           <View style={styles.navBar}>
             <TouchableOpacity style={styles.iconButton} onPress={() => navigation.openDrawer()}>
@@ -331,134 +328,148 @@ const DashboardScreen = ({ navigation, route }) => {
             )}
           </View>
 
-          <View style={{marginLeft: 15}}>
-            {authenticatedUser && (
-                <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 2}}>Created By: {kf_adminname}</Text>
-            )}
-          </View>
+          {/* <ScrollView contentContainerStyle={{ width: "100%" }}> */}
+          <ScrollView
+            contentContainerStyle={{ width: '100%' }}
+            refreshControl={
+              <RefreshControl
+                refreshing={loading}
+                onRefresh={handleRefresh}
+              />
+            }
+          >
 
-        <View style={styles.chart}>
-          <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 10, marginBottom: 10 }}>Loan Status Chart</Text>
-          {/* <Text style={styles.totalLoans}>Total Loans: {filteredData.length}</Text> */}
-
-      <View style={styles.statusContainer}>
-          <TouchableOpacity onPress={() => handleStatusClick(123950000)}>
-            <Text style={styles.statusText}>Approved: {statusCounts.approved}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleStatusClick(123950002)}>
-            <Text style={styles.statusText}>Draft: {statusCounts.draft}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleStatusClick(123950001)}>
-            <Text style={styles.statusText}>Pending: {statusCounts.pending}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleStatusClick(123950003)}>
-            <Text style={styles.statusText}>Canceled: {statusCounts.canceled}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleStatusClick(123950004)}>
-            <Text style={styles.statusText}>expired: {statusCounts.expired}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleStatusClick(null)}>
-            <Text style={styles.statusText}>All: {filteredData.length}</Text>
-          </TouchableOpacity>
-        </View>
-
-        <BarChart
-          data={{
-            labels: ['Approved', 'Pending', 'Draft', 'Cancelled', 'expired' ],
-            datasets: [
-              {
-                data: [
-                  statusCounts.approved,
-                  statusCounts.pending,
-                  statusCounts.draft,
-                  statusCounts.canceled,
-                  statusCounts.expired,
-                ],
-              },
-            ],
-          }}
-          width={deviceWidth - 20}
-          height={220}
-          yAxisLabel=""
-          chartConfig={{
-            backgroundGradientFrom: '#fff',
-            backgroundGradientTo: '#fff',
-            color: (opacity = 1) => `rgba(255, 28, 53, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-          }}
-          bezier
-          style={{
-            marginVertical: 8,
-            borderRadius: 16,
-          }}
-        />
-      </View>
-        </View>
-<View style={{ marginTop: 10, padding: 5, backgroundColor: 'rgba(255, 28, 53, 255)', borderRadius: 5, width: 100, marginLeft: 270 }}>
-        <TouchableOpacity
-              onPress={() => setShowAllLoans(!showAllLoans)}
-            >
-              <Text style={{ color: '#fff', textAlign: 'center', fontWeight: 'bold' }}>
-                {showAllLoans ? 'View Less' : 'View More'}
-              </Text>
-            </TouchableOpacity>
+            <View>
+              {authenticatedUser && (
+                <Text style={{ color: 'rgba(255, 28, 53, 255)', fontSize: 15, fontWeight: 'bold', textAlign: 'center' }}>Created by: {authenticatedUser.kf_adminname}</Text>
+              )}
             </View>
 
-          <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10 }}>
-            {loading ? (
-              <ActivityIndicator size="large" color="#0000ff" />
-            ) : (
-              <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Home Loans</Text>
-            {displayedHomeLoans.map((homeLoan, index) => (
-              <HomeLoanCard
-                key={index}
-                loanApplication={homeLoan}
-                onPress={() => navigateToHomeDetails(homeLoan)}
+            <View>
+              <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 10, marginBottom: 10 }}>Loan Status Chart</Text>
+              {/* <Text style={styles.totalLoans}>Total Loans: {filteredData.length}</Text> */}
+
+              {/* Display status counters */}
+              <View style={styles.statusContainer}>
+                <TouchableOpacity onPress={() => handleStatusClick(123950000)}>
+                  <Text style={styles.statusText}>Approved: {statusCounts.approved}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleStatusClick(123950002)}>
+                  <Text style={styles.statusText}>Draft: {statusCounts.draft}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleStatusClick(123950001)}>
+                  <Text style={styles.statusText}>Pending: {statusCounts.pending}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleStatusClick(123950003)}>
+                  <Text style={styles.statusText}>Canceled: {statusCounts.canceled}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleStatusClick(123950004)}>
+                  <Text style={styles.statusText}>expired: {statusCounts.expired}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleStatusClick(null)}>
+                  <Text style={styles.statusText}>All: {filteredData.length}</Text>
+                </TouchableOpacity>
+              </View>
+
+              <BarChart
+                data={{
+                  labels: ['Approved', 'Pending', 'Draft', 'Cancelled', 'expired'],
+                  datasets: [
+                    {
+                      data: [
+                        statusCounts.approved,
+                        statusCounts.pending,
+                        statusCounts.draft,
+                        statusCounts.canceled,
+                        statusCounts.expired,
+                      ],
+                    },
+                  ],
+                }}
+                width={deviceWidth - 15}
+                height={220}
+                yAxisLabel=""
+                chartConfig={{
+                  backgroundGradientFrom: '#fff',
+                  backgroundGradientTo: '#fff',
+                  color: (opacity = 1) => `rgba(255, 28, 53, ${opacity})`,
+                  labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                }}
+                bezier
+                style={{
+                  borderRadius: 16,
+                }}
               />
-            ))}
+            </View>
 
-            <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 20, marginBottom: 10 }}>Personal Loans</Text>
-            {displayedPersonalLoans.map((personalLoan, index) => (
-              <PersonalLoanCard
-                key={index}
-                personalLoan={personalLoan}
-                onPress={() => navigateToPersonalDetails(personalLoan)}
-              />
-            ))}
+            <View style={{ marginTop: 10, padding: 5, backgroundColor: 'rgba(255, 28, 53, 255)', borderRadius: 5, width: 100, marginLeft: 270 }}>
+              <TouchableOpacity
+                onPress={() => setShowAllLoans(!showAllLoans)}
+              >
+                <Text style={{ color: '#fff', textAlign: 'center', fontWeight: 'bold' }}>
+                  {showAllLoans ? 'View Less' : 'View More'}
+                </Text>
+              </TouchableOpacity>
+            </View>
 
-              </ScrollView>
-            )}
-          </View>
+            <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+              {loading ? (
+                <ActivityIndicator size="large" color="#0000ff" />
+              ) : (
+                <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
 
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={showLoanModal}
-            onRequestClose={() => setShowLoanModal(false)}
-          >
-            <View style={styles.modalBackground}>
-              <View style={styles.modalContainer}>
-                <View style={{ flexDirection: "column" }}>
-                  <Text style={styles.modalHeading}>LOAN TYPES</Text>
+                  {/* Display Home Loans */}
+                  <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Home Loans</Text>
+                  {displayedHomeLoans.map((homeLoan, index) => (
+                    <HomeLoanCard
+                      key={index}
+                      loanApplication={homeLoan}
+                      onPress={() => navigateToHomeDetails(homeLoan)}
+                    />
+                  ))}
 
-                  <TouchableOpacity style={styles.closeButton} onPress={() => setShowLoanModal(false)}>
-                    <Ionicons name="close" size={20} color="#000" />
-                  </TouchableOpacity>
-                </View>
-                <View style={{ marginTop: -20 }}>
-                  <TouchableOpacity style={[styles.loanOption, { borderBottomWidth: 1, borderBottomColor: '#ccc', marginTop: 40 }]} onPress={handleHomeLoan}>
-                    <Text style={styles.loanOptionText}>Home Loan</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.loanOption} onPress={handlePersonalLoan}>
-                    <Text style={styles.loanOptionText}>Personal Loan</Text>
-                  </TouchableOpacity>
-                </View>
+                  <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 20, marginBottom: 10 }}>Personal Loans</Text>
+                  {displayedPersonalLoans.map((personalLoan, index) => (
+                    <PersonalLoanCard
+                      key={index}
+                      personalLoan={personalLoan}
+                      onPress={() => navigateToPersonalDetails(personalLoan)}
+                    />
+                  ))}
+
+                </ScrollView>
+              )}
+            </View>
+          </ScrollView>
+        </View>
+
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={showLoanModal}
+          onRequestClose={() => setShowLoanModal(false)}
+        >
+          <View style={styles.modalBackground}>
+            <View style={styles.modalContainer}>
+              <View style={{ flexDirection: "column" }}>
+                <Text style={styles.modalHeading}>LOAN TYPES</Text>
+
+                <TouchableOpacity style={styles.closeButton} onPress={() => setShowLoanModal(false)}>
+                  <Ionicons name="close" size={20} color="#000" />
+                </TouchableOpacity>
+              </View>
+              <View style={{ marginTop: -20 }}>
+                <TouchableOpacity style={[styles.loanOption, { borderBottomWidth: 1, borderBottomColor: '#ccc', marginTop: 40 }]} onPress={handleHomeLoan}>
+                  <Text style={styles.loanOptionText}>Home Loan</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.loanOption} onPress={handlePersonalLoan}>
+                  <Text style={styles.loanOptionText}>Personal Loan</Text>
+                </TouchableOpacity>
               </View>
             </View>
-          </Modal>      
-        </ScrollView>
-          <View style={styles.plusIconScetion}>
+          </View>
+        </Modal>
+        <View style={styles.plusIconScetion}>
           <TouchableOpacity style={styles.plusIcon} onPress={() => setShowLoanModal(!showLoanModal)}>
             <Text style={styles.plusIconText}>+</Text>
           </TouchableOpacity>
@@ -472,7 +483,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   navBar: {
     flexDirection: 'row',
@@ -549,7 +560,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#E5E4E2',
-    marginTop: 45
+    marginTop: 45,
+    marginBottom: 5
   },
   searchIcon: {
     padding: 10,
