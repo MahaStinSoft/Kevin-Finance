@@ -37,6 +37,7 @@ const DashboardScreen = ({ navigation, route }) => {
   const [personalLoanContacts, setPersonalLoanContacts] = useState([]);
   const [lastMonthData, setLastMonthData] = useState([]);
   const [selectedLoanStatus, setSelectedLoanStatus] = useState(null);
+  const [kf_adminname, setKfAdminName] = useState(null);
 
   const [displayedHomeLoans, setDisplayedHomeLoans] = useState([]);
   const [displayedPersonalLoans, setDisplayedPersonalLoans] = useState([]);
@@ -47,10 +48,12 @@ const DashboardScreen = ({ navigation, route }) => {
   }, []);
 
   useEffect(() => {
-    if (route.params?.authenticatedUser) {
-      setAuthenticatedUser(route.params.authenticatedUser);
+    console.log("Params received in Dashboard:", route.params);
+    if (route.params?.kf_adminname) {
+      console.log("kf_adminname received in Dashboard:", route.params.kf_adminname);
+      setKfAdminName(route.params.kf_adminname);
     }
-  }, [route.params?.authenticatedUser]);
+  }, [route.params?.kf_adminname]);
 
   useEffect(() => {
     // Update displayed loans based on showAllLoans state
@@ -283,7 +286,7 @@ const DashboardScreen = ({ navigation, route }) => {
 
     const handleClearSearch = () => {
     setSearchQuery('');
-    setShowClearIcon(false); // Set showClearIcon to false when clearing the search
+    setShowClearIcon(false); 
   };
 
   return (
@@ -297,7 +300,6 @@ const DashboardScreen = ({ navigation, route }) => {
 
   <View style={styles.container}>
 
-   {/* NavBar Content  */}
           <View style={styles.navBar}>
             <TouchableOpacity style={styles.iconButton} onPress={() => navigation.openDrawer()}>
               <Ionicons name="list-sharp" size={25} color="#fff" />
@@ -308,7 +310,6 @@ const DashboardScreen = ({ navigation, route }) => {
             </TouchableOpacity>
           </View>
 
-           {/* Search Content  */}
           <View style={styles.searchSection}>
             <Ionicons style={styles.searchIcon} name="search" size={25} color="rgba(255, 28, 53, 255)" />
             <TextInput
@@ -331,21 +332,15 @@ const DashboardScreen = ({ navigation, route }) => {
           </View>
 
           <View style={{marginLeft: 15}}>
-            {/* <Text>Welcome to the Dashboard</Text> */}
-            {/* <Text>Authenticated User:</Text> */}
             {authenticatedUser && (
-              <>
-                <Text>Admin: {authenticatedUser.kf_name}</Text>
-                {/* <Text>Password: {authenticatedUser.kf_password}</Text> */}
-              </>
+                <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 2}}>Created By: {kf_adminname}</Text>
             )}
           </View>
 
         <View style={styles.chart}>
-          <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 20, marginBottom: 10 }}>Loan Status Chart</Text>
+          <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 10, marginBottom: 10 }}>Loan Status Chart</Text>
           {/* <Text style={styles.totalLoans}>Total Loans: {filteredData.length}</Text> */}
 
-      {/* Display status counters */}
       <View style={styles.statusContainer}>
           <TouchableOpacity onPress={() => handleStatusClick(123950000)}>
             <Text style={styles.statusText}>Approved: {statusCounts.approved}</Text>
@@ -409,29 +404,11 @@ const DashboardScreen = ({ navigation, route }) => {
             </TouchableOpacity>
             </View>
 
-          <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+          <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10 }}>
             {loading ? (
               <ActivityIndicator size="large" color="#0000ff" />
             ) : (
               <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
-                {/* <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Home Loans</Text>
-                {homeLoanContacts.map((homeLoan, index) => (
-                  <HomeLoanCard
-                    key={index}
-                    loanApplication={homeLoan}
-                    onPress={() => navigateToHomeDetails(homeLoan)}
-                  />
-                ))}
-
-                <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 20, marginBottom: 10 }}>Personal Loans</Text>
-                {personalLoanContacts.map((personalLoan, index) => (
-                  <PersonalLoanCard
-                    key={index}
-                    personalLoan={personalLoan}
-                    onPress={() => navigateToPersonalDetails(personalLoan)}
-                  />
-                ))} */}
-                {/* Display Home Loans */}
             <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Home Loans</Text>
             {displayedHomeLoans.map((homeLoan, index) => (
               <HomeLoanCard
@@ -481,7 +458,7 @@ const DashboardScreen = ({ navigation, route }) => {
             </View>
           </Modal>      
         </ScrollView>
-        <View style={styles.plusIconScetion}>
+          <View style={styles.plusIconScetion}>
           <TouchableOpacity style={styles.plusIcon} onPress={() => setShowLoanModal(!showLoanModal)}>
             <Text style={styles.plusIconText}>+</Text>
           </TouchableOpacity>

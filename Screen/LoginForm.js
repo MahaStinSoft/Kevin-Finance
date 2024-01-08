@@ -10,6 +10,7 @@ import ButtonComponent from '../common/ButtonComponent';
 export const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [kf_name, setName] = useState(null);
+  const [kf_adminname, setkf_adminname] = useState(null);
   const [kf_password, setPassword] = useState(null);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -24,7 +25,7 @@ export const LoginForm = () => {
   }, []);
 
   const handleLogin = async () => {
-    if (!kf_name || !kf_password) {
+    if (!kf_name || !kf_password || !kf_adminname) {
       Alert.alert("Error", "Please enter both firstname and password");
       return;
     }
@@ -33,7 +34,7 @@ export const LoginForm = () => {
       // Authenticate and get the access token from Dynamics CRM
       const tokenResponse = await axios.post(
         "https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token",
-        `grant_type=client_credentials&client_id=d9dcdf05-37f4-4bab-b428-323957ad2f86&client_secret=JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2&resource=https://org0f7e6203.crm5.dynamics.com&kf_name=${kf_name}&kf_password=${kf_password}`,
+        `grant_type=client_credentials&client_id=d9dcdf05-37f4-4bab-b428-323957ad2f86&client_secret=JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2&resource=https://org0f7e6203.crm5.dynamics.com&kf_name=${kf_name}||kf_adminname=${kf_adminname}&kf_password=${kf_password}`,
         {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
@@ -45,7 +46,7 @@ export const LoginForm = () => {
 
       // Use the access token to make requests to Dynamics CRM API
       const response = await axios.get(
-        "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_admins?$select=kf_name,kf_password",
+        "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_admins?$select=kf_name,kf_password,kf_adminname",
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -57,7 +58,7 @@ export const LoginForm = () => {
       if (response.status === 200) {
         const matchedUser = response.data.value.find(
           (user) =>
-            user.kf_name === kf_name && user.kf_password === kf_password
+            user.kf_name === kf_name ||kf_adminname && user.kf_password === kf_password 
         );
 
         if (matchedUser) {
@@ -70,7 +71,8 @@ export const LoginForm = () => {
           }
 
           console.log("Authenticated user:", matchedUser);
-          navigation.navigate("Dashboard");
+          const { kf_adminname } = matchedUser;
+          navigation.navigate("Dashboard" ,{ authenticatedUser: matchedUser,kf_adminname  });
         } else {
           // Authentication failed, display an error message
           console.log("Failed to authenticate. Invalid credentials.", response.data);
@@ -105,8 +107,8 @@ export const LoginForm = () => {
           placeholder="Enter email or Username"
           autoCapitalize="none"
           style={styles.input}
-          value={kf_name}
-          onChangeText={(text) => setName(text)}
+          value={kf_name ||kf_adminname}
+          onChangeText={(text) => setName(text) ||setkf_adminname(text)}
         />
       </View>
       <View style={styles.passwordContainer}>

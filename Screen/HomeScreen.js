@@ -29,6 +29,7 @@ export const HomeScreen = () => {
   const [kf_firstemidate, setkf_firstemidate] = useState(new Date());
   const [kf_aadharnumber,setkf_aadharnumber] = useState(null); 
   const [kf_aadharcard, setkf_aadharcard] = useState({ fileName: null, fileContent: null });
+  const [kf_adminname, setkf_adminname] = useState(null);
   const [selectedValue, setSelectedValue] = useState('');
   // const [image, setImage] = useState(null);
 
@@ -71,7 +72,8 @@ export const HomeScreen = () => {
     // kf_approver: kf_approver,
     // kf_firstemidate: kf_firstemidate,
     // kf_aadharnumber:kf_aadharnumber,
-    // kf_aadharcard:  'base64 content'
+    // kf_aadharcard:  'base64 content',
+    // kf_adminname:kf_adminname
   });
 
   const handleGenderOptionset = (selectedOptionGender) => {
@@ -201,7 +203,8 @@ export const HomeScreen = () => {
           kf_approver: kf_approver,
           kf_firstemidate: formattedFirstEmiDate,
           kf_aadharnumber:kf_aadharnumber,
-          kf_aadharcard: kf_aadharcard.fileContent
+          kf_aadharcard: kf_aadharcard.fileContent,
+          kf_adminname: kf_adminname
         },
         {
           headers: {
@@ -278,7 +281,7 @@ export const HomeScreen = () => {
       }
     };
   
-  const isSignInDisabled = !kf_name || !kf_lastname || !kf_mobilenumber || !kf_email || !kf_loanamountrequested ;
+  const isSignInDisabled = !kf_name || !kf_lastname || !kf_mobilenumber || !kf_email || !kf_loanamountrequested || !kf_adminname ;
 
   return (
     <>
@@ -286,6 +289,16 @@ export const HomeScreen = () => {
     <ScrollView keyboardShouldPersistTaps="handled">
       <View style={styles.container}>
         <HeaderComponent titleText="Home Screen" onPress={handleGoBack}/>
+
+        <TextInputComponent
+            placeholder="Created by"
+            autoCapitalize="none"
+            value={kf_adminname}
+            onChangeText={(text) => {
+              setkf_adminname(text)
+            }}
+          />
+          
           <TextInputComponent
             placeholder="First Name"
             autoCapitalize="none"
