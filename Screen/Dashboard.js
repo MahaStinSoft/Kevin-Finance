@@ -326,9 +326,6 @@ const DashboardScreen = ({ navigation, route }) => {
   const handleSearch = (query) => {
     setSearchQuery(query);
     setShowClearIcon(query.length > 0);
-    // Implement your search logic here
-    // For example, you can filter your data based on the search query
-    // and update the displayed results accordingly.
   };
 
   const handleClearSearch = () => {
