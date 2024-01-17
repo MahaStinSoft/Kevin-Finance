@@ -25,7 +25,7 @@ export const LoginForm = () => {
   }, []);
 
   const handleLogin = async () => {
-    if (!kf_name || !kf_password || !kf_adminname) {
+    if (!kf_name || !kf_password ) {
       Alert.alert("Error", "Please enter both firstname and password");
       return;
     }
@@ -57,10 +57,9 @@ export const LoginForm = () => {
 
       if (response.status === 200) {
         const matchedUser = response.data.value.find(
-          (user) =>
-            user.kf_name === kf_name ||kf_adminname && user.kf_password === kf_password 
+          (user) => user.kf_name === kf_name && user.kf_password === kf_password
         );
-
+  
         if (matchedUser) {
           // Authentication successful, save the authentication state and navigate to the Dashboard
           try {
@@ -69,10 +68,10 @@ export const LoginForm = () => {
           } catch (error) {
             console.error('Error storing authentication state:', error);
           }
-
+  
           console.log("Authenticated user:", matchedUser);
-          const { kf_adminname } = matchedUser;
-          navigation.navigate("Dashboard" ,{ authenticatedUser: matchedUser,kf_adminname  });
+          console.log("response.data", response.data);
+          navigation.navigate("Dashboard", { authenticatedUser: matchedUser });
         } else {
           // Authentication failed, display an error message
           console.log("Failed to authenticate. Invalid credentials.", response.data);
@@ -107,8 +106,8 @@ export const LoginForm = () => {
           placeholder="Enter email or Username"
           autoCapitalize="none"
           style={styles.input}
-          value={kf_name ||kf_adminname}
-          onChangeText={(text) => setName(text) ||setkf_adminname(text)}
+          value={kf_name}
+          onChangeText={(text) => setName(text)}
         />
       </View>
       <View style={styles.passwordContainer}>

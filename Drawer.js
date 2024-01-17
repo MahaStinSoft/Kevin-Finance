@@ -13,6 +13,7 @@ import HomeScreen from './Screen/HomeScreen';
 import PersonalLoan from './Screen/PersonalLoan';
 import EditHomeLoan from './Screen/Loan/EditHomeLoan';
 import EditpersonalLoan from './Screen/Loan/EditPersonalLoan';
+import DynamicDashboardScreen from './Screen/DynamicDashboardScreen';
 const Drawer = createDrawerNavigator();
 
 const DrawerNavigator = () => {
@@ -33,6 +34,14 @@ const DrawerNavigator = () => {
             <Drawer.Screen name="HomeLoan" component={HomeScreen} options={{ headerShown: false }} />
             <Drawer.Screen name="EditHomeLoan" component={EditHomeLoan} options={{ headerShown: false }} />
             <Drawer.Screen name="EditPersonalLoan" component={EditpersonalLoan} options={{ headerShown: false }} />
+             <Drawer.Screen
+        name="DynamicDashboardScreen"
+        component={DynamicDashboardScreen}
+        options={{
+          headerShown: false,
+          unmountOnBlur: true,  // Add this option to prevent reloading
+        }}
+      />
     </Drawer.Navigator>
   );
 };
