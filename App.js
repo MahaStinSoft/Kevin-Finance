@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import DrawerNavigator from './Drawer';
+
+import AuthNavigator from './common/StackNavigatorComponent';
 import ToggleFormScreen from './Screen/ToggleFormScreen';
 
 const App = () => {
@@ -39,7 +40,7 @@ const App = () => {
   return (
     <NavigationContainer>
       {isLoggedIn ? (
-        <DrawerNavigator />
+        <AuthNavigator />
       ) : (
         <ToggleFormScreen handleLogin={handleLogin} />
       )}

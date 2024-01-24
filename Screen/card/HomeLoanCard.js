@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
-const HomeLoanCard = ({ loanApplication, onPress }) => {
-
+const HomeLoanCard = ({ loanApplication, onPress, onDelete }) => {
   const getLoanStatusLabel = () => {
     switch (loanApplication.kf_status) {
       case 123950000:
@@ -16,7 +16,7 @@ const HomeLoanCard = ({ loanApplication, onPress }) => {
       case 123950004:
         return 'Expired';
       default:
-        return 'Unknown'; 
+        return '';
     }
   };
 
@@ -30,7 +30,6 @@ const HomeLoanCard = ({ loanApplication, onPress }) => {
         />
       );
     } else {
-      // If entityimage is not available, display the first and last name initials as an image
       const initials = loanApplication.kf_name && loanApplication.kf_lastname
         ? `${loanApplication.kf_name[0]}${loanApplication.kf_lastname[0]}`
         : '';
@@ -42,15 +41,28 @@ const HomeLoanCard = ({ loanApplication, onPress }) => {
     }
   };
 
+  
+
   return (
-    <TouchableOpacity style={styles.card} onPress={() => onPress(loanApplication)}>
-      {renderImage()}
-      <View style={styles.cardContent}>
+      <View style={{width: "100%"}}>
+        <View style={styles.card}>
+        {renderImage()}
+        <TouchableOpacity  style={styles.cardContent} onPress={() => onPress(loanApplication)}>
         <Text style={styles.cardTitle}>{`${loanApplication.kf_name} ${loanApplication.kf_lastname}`}</Text>
-        <Text style={styles.cardLabel}>{`Loan Amount: ${loanApplication.kf_loanamountrequested}`}</Text>
+        {/* <Text style={styles.cardLabel}>{`Loan Amount: ${loanApplication.kf_loanamountrequested}`}</Text> */}
+        {/* <Text style={styles.cardLabel}>{`Loan Amount: ${loanApplication.kf_loanamountrequested || ''}`}</Text> */}
+        <Text style={styles.cardLabel}>{`Application Number: ${loanApplication.kf_applicationnumber || ''}`}</Text>
         <Text style={styles.cardLabel}>{`Status: ${getLoanStatusLabel()}`}</Text>
+        </TouchableOpacity>
+        </View>
+
+        {/* <View style={{}}>
+        <TouchableOpacity onPress={() => onDelete(loanApplication)} style={styles.trashIcon}>
+          <Ionicons name="trash" size={25} color="red" />
+        </TouchableOpacity>
+        </View> */}
+        
       </View>
-    </TouchableOpacity>
   );
 };
 
@@ -71,14 +83,14 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   placeholderImage: {
-    backgroundColor: '#e0e0e0', // Placeholder background color
+    backgroundColor: '#e0e0e0',
     justifyContent: 'center',
     alignItems: 'center',
   },
   placeholderText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#707070', 
+    color: '#707070',
   },
   cardContent: {
     flex: 1,
@@ -91,6 +103,11 @@ const styles = StyleSheet.create({
   cardLabel: {
     fontSize: 14,
     color: '#707070',
+  },
+  trashIcon: {
+    position: 'absolute',
+    bottom: 20,
+    right: 10,
   },
 });
 

@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
-const PersonalLoanCard = ({ personalLoan, onPress }) => {
-  // Check if personalLoan is defined and has required properties
+const PersonalLoanCard = ({ personalLoan, onPress, onDelete }) => {
   if (!personalLoan || !personalLoan.kf_firstname || !personalLoan.kf_lastname) {
-    return null; // If not, return null or a default component
+    return null;
   }
+
   const getLoanStatusLabel = () => {
     switch (personalLoan.kf_status) {
       case 123950000:
@@ -19,7 +20,7 @@ const PersonalLoanCard = ({ personalLoan, onPress }) => {
       case 123950004:
         return 'Expired';
       default:
-        return 'Unknown'; 
+        return '';
     }
   };
 
@@ -33,7 +34,6 @@ const PersonalLoanCard = ({ personalLoan, onPress }) => {
         />
       );
     } else {
-      // If entityimage is not available, display the first and last name initials as an image
       const initials = `${personalLoan.kf_firstname[0]}${personalLoan.kf_lastname[0]}`;
       return (
         <View style={[styles.cardImage, styles.placeholderImage]}>
@@ -44,14 +44,22 @@ const PersonalLoanCard = ({ personalLoan, onPress }) => {
   };
 
   return (
-    <TouchableOpacity style={styles.card} onPress={() => onPress(personalLoan)}>
-      {renderImage()}
-      <View style={styles.cardContent}>
-        <Text style={styles.cardTitle}>{`${personalLoan.kf_firstname} ${personalLoan.kf_lastname}`}</Text>
-        <Text style={styles.cardLabel}>{`Loan Amount: ${personalLoan.kf_loanamountrequested}`}</Text>
-         <Text style={styles.cardLabel}>{`Status: ${getLoanStatusLabel()}`}</Text>
-      </View>
-    </TouchableOpacity>
+    <View style={{width: "100%"}}>
+      <TouchableOpacity style={styles.card} onPress={() => onPress(personalLoan)}>
+        {renderImage()}
+        <View style={styles.cardContent}>
+          <Text style={styles.cardTitle}>{`${personalLoan.kf_firstname} ${personalLoan.kf_lastname}`}</Text>
+          {/* <Text style={styles.cardLabel}>{`Loan Amount: ${personalLoan.kf_loanamountrequested}`}</Text> */}
+          <Text style={styles.cardLabel}>{`Application Number: ${personalLoan.kf_applicationnumber || ''}`}</Text>
+          <Text style={styles.cardLabel}>{`Status: ${getLoanStatusLabel()}`}</Text>
+        </View>
+      </TouchableOpacity>
+      {/* <View style={styles.deleteIconContainer}>
+        <TouchableOpacity onPress={() => onDelete(personalLoan)}>
+          <Ionicons name="trash" size={25} color="red" />
+        </TouchableOpacity>
+      </View> */}
+    </View>
   );
 };
 
@@ -72,14 +80,14 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   placeholderImage: {
-    backgroundColor: '#e0e0e0', // Placeholder background color
+    backgroundColor: '#e0e0e0',
     justifyContent: 'center',
     alignItems: 'center',
   },
   placeholderText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#707070', // Placeholder text color
+    color: '#707070',
   },
   cardContent: {
     flex: 1,
@@ -92,6 +100,11 @@ const styles = StyleSheet.create({
   cardLabel: {
     fontSize: 14,
     color: '#707070',
+  },
+  deleteIconContainer: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
   },
 });
 

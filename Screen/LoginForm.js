@@ -46,7 +46,7 @@ export const LoginForm = () => {
 
       // Use the access token to make requests to Dynamics CRM API
       const response = await axios.get(
-        "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_admins?$select=kf_name,kf_password,kf_adminname",
+        "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/contacts?$select=kf_name,kf_password,kf_adminname",
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,

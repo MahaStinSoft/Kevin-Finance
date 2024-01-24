@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Alert, Image, Text, TouchableOpacity, StatusBar, Button } from 'react-native';
-import { useNavigation, useIsFocused ,useFocusEffect  } from '@react-navigation/native';
+import { View, StyleSheet, ScrollView, Alert, Image, Text, TouchableOpacity, StatusBar, TextInput } from 'react-native';
+import { useNavigation, useIsFocused, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
@@ -11,10 +11,12 @@ import ButtonComponent from '../common/ButtonComponent';
 import LoanStatusPicker from '../common/LoanStatusPicker ';
 import ComponentDatePicker from '../common/ComponentDatePicker';
 
-export const HomeScreen = ({route}) => {
+export const HomeScreen = ({ route }) => {
   const [kf_name, setkf_name] = useState(null);
   const [kf_lastname, setkf_lastname] = useState(null);
   const [kf_gender, setkf_gender] = useState(null);
+  const [kf_dateofbirth, setkf_dateofbirth] = useState(null);
+  const [kf_age, setkf_age] = useState(null);
   const [kf_mobilenumber, setkf_mobilenumber] = useState(null);
   const [kf_email, setkf_email] = useState(null);
   const [kf_address1, setkf_address1] = useState(null);
@@ -28,28 +30,32 @@ export const HomeScreen = ({route}) => {
   const [kf_dateofapproval, setkf_dateofapproval] = useState(new Date());
   const [kf_approver, setkf_approver] = useState(null);
   const [kf_firstemidate, setkf_firstemidate] = useState(new Date());
-  const [kf_aadharnumber,setkf_aadharnumber] = useState(null); 
+  const [kf_aadharnumber, setkf_aadharnumber] = useState(null);
   const [kf_aadharcard, setkf_aadharcard] = useState({ fileName: null, fileContent: null });
+  const [kf_pannumber, setkf_pannumber] = useState(null);
   const [kf_createdby, setkf_createdby] = useState(null);
+  const [kf_adminname, setkf_adminname] = useState(null);
   const [selectedValue, setSelectedValue] = useState('');
   // const [image, setImage] = useState(null);
   const [authenticatedUser, setAuthenticatedUser] = useState(null);
   const [resetFormKey, setResetFormKey] = useState(0);
 
-  const [isFirstNameValid, setIsFirstNameValid] = useState(true);
-  const [isLastNameValid, setIsLastNameValid] = useState(true);
-  const [isEmailValid, setIsEmailValid] = useState(true);
-  const [isMobileNumberValid, setIsMobileNumberValid] = useState(true);
-  const [isAadharnumberValidation,setIsAadharnumberValidation] = useState(true); 
-  const [isLoanAmountRequestedValid, setIsLoanAmountRequestedValid] = useState(true);
-
   const navigation = useNavigation();
   const isFocused = useIsFocused();
 
+  const [errorMessages, setErrorMessages] = useState({
+    firstName: '',
+    lastName: '',
+    dateOfBirth: '',
+    mobileNumber: '',
+    email: '',
+    loanAmountRequested: '',
+    aadharCardNumber: '',
+    panCardNumber: '',
+  });
 
   useFocusEffect(
     React.useCallback(() => {
-      // Call getAuthenticatedUser when the screen gains focus
       getAuthenticatedUser();
     }, [])
   );
@@ -73,19 +79,9 @@ export const HomeScreen = ({route}) => {
     setkf_firstemidate(new Date());
     setkf_aadharnumber(null);
     setkf_aadharcard({ fileName: null, fileContent: null });
-    // Do not reset kf_createdby if you want to keep its value
-    // setkf_createdby(null);
     setSelectedValue('');
-    setIsFirstNameValid(true);
-    setIsLastNameValid(true);
-    setIsEmailValid(true);
-    setIsMobileNumberValid(true);
-    setIsAadharnumberValidation(true);
-    setIsLoanAmountRequestedValid(true);
-    
     setResetFormKey((prevKey) => prevKey + 1);
   };
-
 
   const handleGoBack = () => {
     Alert.alert(
@@ -99,7 +95,7 @@ export const HomeScreen = ({route}) => {
         {
           text: 'Discard',
           onPress: () => {
-            key={resetFormKey}
+            key = { resetFormKey }
             navigation.navigate('Dashboard', { resetState: true }); // Pass the parameter
           },
         },
@@ -108,16 +104,12 @@ export const HomeScreen = ({route}) => {
     );
   };
 
-
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       resetForm();
     });
-
     return unsubscribe;
   }, [navigation]);
-
-
 
   const handleDateChange1 = (newDate) => {
     setkf_dateofapproval(newDate);
@@ -127,7 +119,31 @@ export const HomeScreen = ({route}) => {
     setkf_firstemidate(newDate);
   };
 
-  
+  // console.log("Request Payload to CRM:", {
+  //   kf_name: kf_name,
+  //   kf_lastname: kf_lastname,
+  //   kf_gender: kf_gender,
+  //   kf_dateofbirth:kf_dateofbirth,
+  //   kf_age: kf_age,
+  //   kf_mobilenumber: kf_mobilenumber,
+  //   kf_email: kf_email,
+  //   kf_address1: kf_address1,
+  //   kf_address2: kf_address2,
+  //   kf_address3: kf_address3,
+  //   kf_city: kf_city,
+  //   kf_state: kf_state,
+  //   kf_loanamountrequested: kf_loanamountrequested,
+  //   kf_status: kf_status,
+  //   kf_statusreason: kf_statusreason,
+  //   kf_dateofapproval: kf_dateofapproval,
+  //   kf_approver: kf_approver,
+  //   kf_firstemidate: kf_firstemidate,
+  //   kf_aadharnumber:kf_aadharnumber,
+  //   kf_aadharcard:  'base64 content',
+  //   kf_adminname:kf_adminname,
+  //   kf_pannumber:kf_pannumber,
+  // });
+
   const handleGenderOptionset = (selectedOptionGender) => {
     let numericValue;
     switch (selectedOptionGender) {
@@ -162,9 +178,8 @@ export const HomeScreen = ({route}) => {
         numericValue = 123950004;
         break;
       default:
-        numericValue = null; 
+        numericValue = null;
     }
-
     setkf_status(numericValue);
   };
 
@@ -192,16 +207,15 @@ export const HomeScreen = ({route}) => {
         quality: 1,
         base64: true,
       });
-  
+
       if (result.canceled) {
         return;
       }
-  
       const byteArray = result.base64; // Use result.base64 directly
       const fileName = result.uri.split('/').pop(); // Extracting filename from URI
-      console.log("result",result);
+      console.log("result", result);
 
-  
+
       setkf_aadharcard({
         fileName: fileName, // Extracting filename from URI
         fileContent: byteArray,
@@ -212,8 +226,190 @@ export const HomeScreen = ({route}) => {
     }
   };
 
-  const handleSaveRecord = async () => {
+  const handleFirstNameChange = (text) => {
+    if (text.trim() !== '') {
+      setkf_name(text);
+      setErrorMessages({ ...errorMessages, firstName: '' });
+    } else {
+      setkf_name('');
+      setErrorMessages({ ...errorMessages, firstName: 'Enter First Name' });
+    }
+  };
 
+  const handleLastNameChange = (text) => {
+    if (text.trim() !== '') {
+      setkf_lastname(text);
+      setErrorMessages({ ...errorMessages, lastName: '' });
+    } else {
+      setkf_lastname('');
+      setErrorMessages({ ...errorMessages, lastName: 'Enter Last Name' });
+    }
+  }
+
+  const handleDateOfBirth = (newDate) => {
+    if (!newDate) {
+      setErrorMessages({
+        ...errorMessages,
+        dateOfBirth: 'Enter Date of Birth.',
+      });
+    } else {
+      const birthDate = new Date(newDate);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+
+      const hasBirthdayOccurred =
+        today.getMonth() > birthDate.getMonth() ||
+        (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
+
+      if (!hasBirthdayOccurred) {
+        age--;
+      }
+      setErrorMessages({
+        ...errorMessages,
+        dateOfBirth: '',
+      });
+
+      setkf_age(age.toString());
+      setkf_dateofbirth(newDate);
+    }
+  };
+
+  const handleMobileNumberChange = (text) => {
+    if (!text.trim()) {
+      setErrorMessages({
+        ...errorMessages,
+        mobileNumber: 'Enter Mobile Number.',
+      });
+    } else if (/^\d{10}$/.test(text)) {
+      setkf_mobilenumber(text);
+      setErrorMessages({
+        ...errorMessages,
+        mobileNumber: '',
+      });
+    } else {
+      setErrorMessages({
+        ...errorMessages,
+        mobileNumber: 'Enter a valid 10-digit mobile number.',
+      });
+    }
+  };
+
+  const handleEmailChange = (email) => {
+    const trimmedEmail = email.trim();
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!trimmedEmail) {
+      setErrorMessages({
+        ...errorMessages,
+        email: 'Enter Email Address.',
+      });
+    } else if (!regex.test(trimmedEmail)) {
+      setkf_email(email);
+      setErrorMessages({
+        ...errorMessages,
+        email: 'Enter a valid email address.',
+      });
+    } else {
+      setkf_email(email);
+      setErrorMessages({
+        ...errorMessages,
+        email: '',
+      });
+    }
+  };
+
+  const handleAadharCardNumberValidation = (text) => {
+    if (!text.trim()) {
+      setErrorMessages({
+        ...errorMessages,
+        aadharCardNumber: 'Enter Aadhar number.',
+      });
+    } else if (/^\d{12}$/.test(text)) {
+      setErrorMessages({
+        ...errorMessages,
+        aadharCardNumber: '',
+      });
+      setkf_aadharnumber(text);
+    } else {
+      setErrorMessages({
+        ...errorMessages,
+        aadharCardNumber: 'Enter a valid 12-digit Aadhar number.',
+      });
+    }
+  };
+
+  const handlePancardNumberValidation = (text) => {
+    if (!text.trim()) {
+      setErrorMessages({
+        ...errorMessages,
+        panCardNumber: 'Enter PAN card number.',
+      });
+    } else {
+      const panRegex = /^[A-Za-z]{5}[0-9]{4}[A-Z]{1}/;
+      if (panRegex.test(text)) {
+        setErrorMessages({
+          ...errorMessages,
+          panCardNumber: '',
+        });
+        setkf_pannumber(text);
+      } else {
+        setErrorMessages({
+          ...errorMessages,
+          panCardNumber: 'Enter a valid PAN card number.',
+        });
+      }
+    }
+  };
+
+  const handleLoanAmountRequestedChange = (text) => {
+    if (text.trim() === '') {
+      setErrorMessages({
+        ...errorMessages,
+        loanAmountRequested: 'Enter loan amount.',
+      });
+    } else if (!/^\d+$/.test(text)) {
+      setErrorMessages({
+        ...errorMessages,
+        loanAmountRequested: 'Enter a valid loan amount.',
+      });
+    } else {
+      setErrorMessages({
+        ...errorMessages,
+        loanAmountRequested: '',
+      });
+      setkf_loanamountrequested(text);
+    }
+  };
+
+  const getAuthenticatedUser = async () => {
+    try {
+      const userString = await AsyncStorage.getItem('authenticatedUser');
+      console.log("getAuthenticatedUser:", userString);
+
+      if (userString) {
+        const user = JSON.parse(userString);
+        setAuthenticatedUser(user);
+      }
+    } catch (error) {
+      console.error('Error getting authenticated user:', error);
+    }
+  };
+
+  const handleSaveRecord = async () => {
+    const newErrorMessages = {
+      firstName: !kf_name ? ' Enter First Name' : '',
+      lastName: !kf_lastname ? ' Enter Last Name' : '',
+      dateOfBirth: !kf_dateofbirth ? ' Enter Date of Birth' : '',
+      mobileNumber: !kf_mobilenumber ? ' Enter Mobile Number' : '',
+      email: !kf_email ? ' Enter Email Address' : '',
+      loanAmountRequested: !kf_loanamountrequested ? ' Enter Loan Amount Requested' : '',
+      aadharCardNumber: !kf_aadharnumber ? ' Enter Aadhar Card Number' : '',
+      panCardNumber: !kf_pannumber ? ' Enter PAN Card Number' : '',
+    };
+    setErrorMessages(newErrorMessages);
+    if (Object.values(newErrorMessages).some(message => message !== '')) {
+      return;
+    }
     try {
       var data = {
         grant_type: "client_credentials",
@@ -230,11 +426,11 @@ export const HomeScreen = ({route}) => {
       const accessToken = tokenResponse.data.access_token;
       // console.log("Access Token:", accessToken);
 
-      // Ensure kf_dateofapproval and kf_firstemidate are formatted correctly
       const formattedDateOfApproval = kf_dateofapproval ? kf_dateofapproval.toISOString() : null;
       const formattedFirstEmiDate = kf_firstemidate ? kf_firstemidate.toISOString() : null;
+      const formattedDateOfBirth = kf_dateofbirth ? kf_dateofbirth.toISOString() : null;
       const loanAmount = parseFloat(kf_loanamountrequested);
-      const userAdminName = authenticatedUser ? authenticatedUser.kf_adminname:'';
+      const userAdminName = authenticatedUser ? authenticatedUser.kf_adminname : '';
       console.log("Detailed Error Response:", userAdminName);
       const createRecordResponse = await axios.post(
         "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications",
@@ -242,6 +438,8 @@ export const HomeScreen = ({route}) => {
           kf_name: kf_name,
           kf_lastname: kf_lastname,
           kf_gender: kf_gender,
+          kf_dateofbirth: formattedDateOfBirth,
+          kf_age: kf_age,
           kf_mobilenumber: kf_mobilenumber,
           kf_email: kf_email,
           kf_address1: kf_address1,
@@ -252,11 +450,12 @@ export const HomeScreen = ({route}) => {
           kf_loanamountrequested: loanAmount,
           kf_status: kf_status,
           kf_statusreason: kf_statusreason,
-          kf_dateofapproval: formattedDateOfApproval,
-          kf_approver: kf_approver,
-          kf_firstemidate: formattedFirstEmiDate,
-          kf_aadharnumber:kf_aadharnumber,
-          kf_aadharcard: kf_aadharcard.fileContent,
+          // kf_dateofapproval: formattedDateOfApproval,
+          // kf_approver: kf_approver,
+          // kf_firstemidate: formattedFirstEmiDate,
+          kf_aadharnumber: kf_aadharnumber,
+          kf_pannumber: kf_pannumber,
+          // kf_aadharcard: kf_aadharcard.fileContent,
           kf_createdby: userAdminName
         },
         {
@@ -267,15 +466,12 @@ export const HomeScreen = ({route}) => {
         }
       );
       if (createRecordResponse.status === 204) {
-        console.log("Record created successfully in CRM" ); //createRecordResponse
-        // navigation.navigate("Dashboard");
+        console.log("Record created successfully in CRM"); //createRecordResponse
         Alert.alert('Created record Successfully.', '', [
           {
             text: 'OK',
             onPress: () => {
-              // Navigate back after the alert is confirmed
-              // navigation.goBack();
-              navigation.navigate('Dashboard',{ resetState: true });
+              navigation.navigate('Dashboard', { resetState: true });
             },
           },
         ]);
@@ -286,115 +482,73 @@ export const HomeScreen = ({route}) => {
     } catch (error) {
       console.error("Error during record creation:", error);
       console.log("Detailed Error Response:", error.response); // Log the detailed error response
-      Alert.alert("Error", "An unexpected error occurred. Please try again later.");
+      Alert.alert("Error", "An unexpected error occurred.  try again later.");
     }
   };
-
-  const validateEmail = (email) => {
-    const trimmedEmail = email.trim(); // Remove leading and trailing whitespaces
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    
-    const isValid = regex.test(trimmedEmail);
-    
-    if (!isValid) {
-      // console.log('Invalid email:', trimmedEmail);
-    }
-  
-    return isValid;
-  };
-  
-
-  const handleMobileNumberChange = (text) => {
-    // Check if the entered value has exactly 10 digits
-    if (/^\d{10}$/.test(text)) {
-      setIsMobileNumberValid(true);
-      setkf_mobilenumber(text);
-    } else {
-      setIsMobileNumberValid(false);
-    }
-  };
-
-  const handleLoanAmountRequestedChange = (text) => {
-    // Check if the entered value is a sequence of digits
-    if (/^\d+$/.test(text)) {
-      setIsLoanAmountRequestedValid(true);
-      setkf_loanamountrequested(text);
-    } else {
-      setIsLoanAmountRequestedValid(false);
-    }
-  };
-
-  const handleAadharCardNumberValidation = (text) => {
-      // Check if the entered value has exactly 10 digits
-      if (/^\d{12}$/.test(text)) {
-        setIsAadharnumberValidation(true);
-        setkf_aadharnumber(text);
-      } else {
-        setIsAadharnumberValidation(false);
-      }
-    };
-
-    const getAuthenticatedUser = async () => {
-      try {
-        const userString = await AsyncStorage.getItem('authenticatedUser');
-        console.log("getAuthenticatedUser:", userString);
-  
-        if (userString) {
-          const user = JSON.parse(userString);
-          setAuthenticatedUser(user);
-        }
-      } catch (error) {
-        console.error('Error getting authenticated user:', error);
-      }
-    };
-  
-  //  const isSignInDisabled = !kf_name || !kf_lastname || !kf_mobilenumber || !kf_email || !kf_loanamountrequested || !kf_adminname ;
 
   return (
     <>
-    <StatusBar/>
-    <HeaderComponent titleText="Home Screen" onPress={handleGoBack}/>
+      <StatusBar />
+      <HeaderComponent titleText="Home Screen" onPress={handleGoBack} />
 
-    <ScrollView key={resetFormKey} keyboardShouldPersistTaps="handled">
-      <View style={styles.container}>
+      <ScrollView key={resetFormKey} keyboardShouldPersistTaps="handled">
+        <View style={styles.container}>
 
-        {/* <View>
+          {/* <View>
               {authenticatedUser && (
                 <Text style={{ color: 'rgba(255, 28, 53, 255)', fontSize: 15, fontWeight: 'bold', textAlign: 'center' }}>Created by: {authenticatedUser.kf_adminname}</Text>
               )}
             </View> */}
 
-        <TextInputComponent
+          <TextInput style={[styles.textInputContainer, { marginTop: 20, color: "gray" }]}
             placeholder="Created by"
             autoCapitalize="none"
-            value={kf_createdby}
+            value={authenticatedUser ? authenticatedUser.kf_adminname : ''}
             onChangeText={(text) => {
               setkf_createdby(text)
             }}
+            editable={false}
           />
-          
+
           <TextInputComponent
             placeholder="First Name"
             autoCapitalize="none"
             value={kf_name}
-            onChangeText={(text) => {
-              setkf_name(text); setIsFirstNameValid(text.trim() !== '');
-            }}
+            onChangeText={handleFirstNameChange}
           />
-
-          {!isFirstNameValid && <Text style={styles.errorText}>Please Enter First Name</Text>}
+          {errorMessages.firstName !== '' && (
+            <Text style={styles.errorText}>{errorMessages.firstName}</Text>
+          )}
 
           <TextInputComponent
             placeholder="Last Name"
             autoCapitalize="none"
             value={kf_lastname}
-            onChangeText={(text) => {
-              setkf_lastname(text);
-              setIsLastNameValid(text.trim() !== ''); // Update the validity based on whether the field is empty
-            }}
+            onChangeText={handleLastNameChange}
           />
-          {!isLastNameValid && <Text style={styles.errorText}>Please Enter Last Name</Text>}
+          {errorMessages.lastName !== '' && (
+            <Text style={styles.errorText}>{errorMessages.lastName}</Text>
+          )}
 
+          <ComponentDatePicker
+            style={{ height: 48, marginBottom: 20 }}
+            selectedDate={kf_dateofbirth}
+            onDateChange={handleDateOfBirth}
+            placeholder="Date of Birth"
+          />
+
+          {errorMessages.dateOfBirth !== '' && (
+            <Text style={[styles.errorText, { marginTop: -10, marginBottom: 15 }]}>
+              {errorMessages.dateOfBirth}
+            </Text>
+          )}
+
+          <TextInput style={[styles.textInputContainer, { color: "gray" }]}
+            placeholder="Age"
+            value={kf_age}
+            onChangeText={(text) => setkf_age(text)}
+            editable={false}
+          />
 
           <LoanStatusPicker
             onOptionChange={handleGenderOptionset}
@@ -407,25 +561,22 @@ export const HomeScreen = ({route}) => {
             placeholder="Mobile Number"
             autoCapitalize="none"
             value={kf_mobilenumber}
-            onChangeText={(text) => handleMobileNumberChange(text)}
+            onChangeText={handleMobileNumberChange}
             keyboardType="numeric"
           />
-          {!isMobileNumberValid && (
-            <Text style={styles.errorText}>
-              Please enter a valid 10-digit mobile number.
-            </Text>
+          {errorMessages.mobileNumber !== '' && (
+            <Text style={styles.errorText}>{errorMessages.mobileNumber}</Text>
           )}
 
           <TextInputComponent
             placeholder="Email Address"
             autoCapitalize="none"
             value={kf_email}
-            onChangeText={(text) => {
-              setkf_email(text);
-              setIsEmailValid(text.trim() === '' || validateEmail(text));
-            }}
+            onChangeText={handleEmailChange}
           />
-          {!isEmailValid && <Text style={styles.errorText}>Please enter a valid email address.</Text>}
+          {errorMessages.email !== '' && (
+            <Text style={styles.errorText}>{errorMessages.email}</Text>
+          )}
 
           <TextInputComponent
             placeholder="Address 1"
@@ -460,23 +611,44 @@ export const HomeScreen = ({route}) => {
             value={kf_state}
             onChangeText={(text) => setkf_state(text)}
           />
+
+          <TextInputComponent
+            placeholder="Aadharcard Number"
+            autoCapitalize="none"
+            value={kf_aadharnumber}
+            onChangeText={handleAadharCardNumberValidation}
+          />
+
+          {errorMessages.aadharCardNumber !== '' && (
+            <Text style={styles.errorText}>{errorMessages.aadharCardNumber}</Text>
+          )}
+
+          <TextInputComponent
+            placeholder="PAN Card Number"
+            autoCapitalize="none"
+            value={kf_pannumber}
+            onChangeText={handlePancardNumberValidation}
+          />
+
+          {errorMessages.panCardNumber !== '' && (
+            <Text style={styles.errorText}>{errorMessages.panCardNumber}</Text>
+          )}
+
           <TextInputComponent
             placeholder="Loan Amount Request"
             autoCapitalize="none"
             value={kf_loanamountrequested}
-            onChangeText={(text) => handleLoanAmountRequestedChange(text)}
+            onChangeText={handleLoanAmountRequestedChange}
           />
 
-          {!isLoanAmountRequestedValid && (
-            <Text style={styles.errorText}>
-              Please enter a valid loan amount.
-            </Text>
+          {errorMessages.loanAmountRequested !== '' && (
+            <Text style={styles.errorText}>{errorMessages.loanAmountRequested}</Text>
           )}
 
           <LoanStatusPicker onOptionChange={handleLoanStatusChange}
             title="Select Loan Status"
             options={['Approved', 'PendingApproval', 'Draft', 'Cancelled']}
-          // initialOption="Approved" 
+            initialOption="PendingApproval"
           />
 
           <LoanStatusPicker
@@ -486,7 +658,7 @@ export const HomeScreen = ({route}) => {
           // initialOption="Option1"
           />
 
-          <ComponentDatePicker
+          {/* <ComponentDatePicker
             selectedDate={kf_dateofapproval}
             onDateChange={handleDateChange1}
             placeholder="Date of Approval"
@@ -497,28 +669,16 @@ export const HomeScreen = ({route}) => {
             onDateChange={handleDateChange2}
             placeholder="First EMI Date"
           />
+          
           <TextInputComponent
             placeholder="Loan Approver"
             autoCapitalize="none"
             value={kf_approver}
             onChangeText={(text) => setkf_approver(text)}
-          /> 
-
-          <TextInputComponent
-            placeholder="Aadharcard Number"
-            autoCapitalize="none"
-            value={kf_aadharnumber}
-            onChangeText={(text) => handleAadharCardNumberValidation(text)}
-          />
-
-          {!isAadharnumberValidation && (
-            <Text style={styles.errorText}>
-              Please enter a valid 12-digit AadharCard number.
-            </Text>
-          )}
+          />  */}
 
 
-          <View style={{ flexDirection: "row", marginTop: 15 }}>
+          {/* <View style={{ flexDirection: "row", marginTop: 15 }}>
             <View style={{ marginHorizontal: 25, marginTop: 10 }}>
               <TouchableOpacity onPress={pickImage}>
                 <Text>AadharCard</Text>
@@ -528,10 +688,10 @@ export const HomeScreen = ({route}) => {
               {kf_aadharcard.fileContent ? (
                 <>
                   <Text style={{ marginTop: 10, textAlign: "center" }}>{kf_aadharcard.fileName}</Text>
-                  {/* <Image
+                  <Image
           style={{ width: 100, height: 100 }}
           source={{ uri: `data:image/jpeg;base64,${kf_aadharcard.fileContent}` }}
-        /> */}
+        /> 
                 </>
               ) : (
                 <TouchableOpacity onPress={() => console.log()}>
@@ -539,16 +699,15 @@ export const HomeScreen = ({route}) => {
                 </TouchableOpacity>
               )}
             </View>
-          </View>
+          </View> */}
 
           <ButtonComponent
             title="SUBMIT"
             onPress={handleSaveRecord}
-          // disabled={isSignInDisabled}
           />
 
-      </View>
-    </ScrollView>
+        </View>
+      </ScrollView>
     </>
   );
 };
@@ -557,8 +716,8 @@ const styles = StyleSheet.create({
   container: {
     // marginHorizontal: 10,
   },
-  errorText:{
-    color:'red',
+  errorText: {
+    color: 'red',
     fontSize: 15,
     marginHorizontal: 25,
   },
@@ -577,14 +736,29 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: "bold"
   },
-  disabledButton:{
+  disabledButton: {
     backgroundColor: 'gray',
     width: '60%',
     alignSelf: 'center',
     borderRadius: 25,
     marginTop: 25,
     padding: 5,
-  }
+  },
+  textInputContainer: {
+    // marginBottom: 5,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    borderRadius: 8,
+    backgroundColor: '#FBFCFC',
+    padding: 10,
+    marginHorizontal: 20,
+  },
 });
 
 export default HomeScreen;

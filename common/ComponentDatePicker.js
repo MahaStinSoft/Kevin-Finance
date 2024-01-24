@@ -10,7 +10,8 @@ class ComponentDatePicker extends Component {
       mode: 'date',
       show: false,
       textColor: 'gray',
-      placeholderText: props.placeholder, // Use prop or default value
+      placeholderText: props.placeholder,
+       // Use prop or default value
     };
   }
 
@@ -55,13 +56,13 @@ class ComponentDatePicker extends Component {
 
   render() {
     const { show, mode, placeholderText, textColor } = this.state;
-    const { selectedDate } = this.props;
+    const { selectedDate, style } = this.props;
 
     return (
       <SafeAreaView>
         <View>
           <TouchableOpacity onPress={this.showDatepicker}>
-            <Text style={[styles.textInputContainer,{color: textColor}]}>{placeholderText}</Text>
+            <Text style={[styles.textInputContainer, { color: textColor }, style]}>{placeholderText}</Text>
           </TouchableOpacity>
           {show && (
             <DateTimePicker
