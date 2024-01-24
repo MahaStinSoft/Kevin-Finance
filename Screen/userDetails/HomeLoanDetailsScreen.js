@@ -47,26 +47,26 @@
     };
 
     const getLoanStatus = () => {
-      let numericValue; // Add this line to declare the variable
       switch (loanApplication.kf_status) {
-        case 123950000:
+        case 123950000 :
           numericValue = 'Approved';
           break;
-        case 123950001:
+        case 123950001 :
           numericValue = 'PendingApproval';
           break;
-        case 123950002:
+        case 123950002 :
           numericValue = 'Draft';
           break;
-        case 123950003:
+        case 123950003 :
           numericValue = 'Cancelled';
           break;
-        case 123950004:
+        case 123950004 :
           numericValue = 'Expired';
           break;
         default:
-          return ''; 
+          return 'PendingApproval';
       }
+      return numericValue;
     };
 
     const getStatusReason = () => {
