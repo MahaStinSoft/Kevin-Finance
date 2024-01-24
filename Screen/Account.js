@@ -119,7 +119,7 @@ const AccountScreen = () => {
           />
           <View style={{ width: '50%', paddingTop: 35, paddingLeft: 10 }}>
             <Text style={{ color: 'rgba(249,249,249,255)', fontWeight: 'bold', fontSize: 25, letterSpacing: 1, paddingBottom: 8 }}>{user.kf_adminname}</Text>
-            <Text style={{ color: 'rgba(249,249,249,255)', letterSpacing: 1 }}>{user.kf_employeeid}</Text>
+            <Text style={{ color: 'rgba(249,249,249,255)', letterSpacing: 1,fontWeight: 'bold', marginLeft:1 }}>{user.kf_employeeid}</Text>
           </View>
         </View>
       )}
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   input: {
-    fontSize: 18,
+    fontSize: 15,
     marginVertical: 5,
     borderRadius: 10,
     borderWidth: 1,
