@@ -33,7 +33,6 @@ const App = () => {
   };
 
   if (isLoggedIn === null) {
-    // Loading or Splash screen while checking authentication state
     return null;
   }
 
