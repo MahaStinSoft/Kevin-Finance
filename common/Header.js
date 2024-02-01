@@ -51,7 +51,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { textColor } from '../Screen/constant/color';
 
 const HeaderComponent = (props) => {
-  const { onPress, titleText, onIconPress, screenIcon } = props;
+  const { onPress, titleText, onIconPress, screenIcon, screenIconStyle  } = props;
 
   return (
     <>
@@ -63,7 +63,7 @@ const HeaderComponent = (props) => {
         <Text style={styles.accountText}>{titleText}</Text>
 
         {onIconPress && (
-          <TouchableOpacity style={styles.iconButton} onPress={onIconPress}>
+          <TouchableOpacity style={[styles.iconButton, screenIconStyle]} onPress={onIconPress}>
             <Ionicons name={screenIcon} size={30} color="#fff" />
           </TouchableOpacity>
         )}

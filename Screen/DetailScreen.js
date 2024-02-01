@@ -67,7 +67,6 @@ const DetailScreen = ({ route }) => {
             </View>
           )}
 
-          {/ Back button /}
           <TouchableOpacity onPress={handleBackButton} style={styles.backButton}>
             <Text style={styles.backButtonText}>Back to Personal Loan</Text>
           </TouchableOpacity>
