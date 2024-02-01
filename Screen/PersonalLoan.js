@@ -27,14 +27,9 @@ export const PersonalLoan = () => {
   const [kf_aadharnumber, setkf_aadharnumber] = useState(null);
   const [kf_pannumber, setkf_pannumber] = useState(null);
   const [kf_loanamountrequested, setkf_loanamountrequested] = useState(null);
-  const [kf_status, setkf_status] = useState(null);
-  const [kf_statusreason, setkf_statusreason] = useState(null);
-  const [createdon, setkf_dateofapproval] = useState(new Date());
   const [kf_createdby, setkf_createdby] = useState(true);
   const [authenticatedUser, setAuthenticatedUser] = useState(null);
   const [resetFormKey, setResetFormKey] = useState(0);
-  // const [kf_approver, setkf_approver] = useState(null);
-  // const [kf_firstemidate, setkf_firstemidate] = useState(new Date());
   const [image, setImage] = useState(null);
   const [placeholderName, setPlaceholderName] = useState('Full Name');
 
@@ -42,6 +37,7 @@ export const PersonalLoan = () => {
     firstName: '',
     lastName: '',
     dateOfBirth: '',
+    age: '',
     mobileNumber: '',
     email: '',
     loanAmountRequested: '',
@@ -70,12 +66,6 @@ export const PersonalLoan = () => {
     setkf_city(null);
     setkf_state(null);
     setkf_loanamountrequested(null);
-    setkf_status(null);
-    setkf_statusreason(null);
-    setkf_dateofapproval(new Date());
-    // setkf_approver(null);
-    // setkf_aadharnumber(null);
-    // setkf_aadharcard({ fileName: null, fileContent: null });    
     setResetFormKey((prevKey) => prevKey + 1);
   };
 
@@ -107,27 +97,9 @@ export const PersonalLoan = () => {
     return unsubscribe;
   }, [navigation]);
 
-  useEffect(() => {
-    const fullName = `${kf_firstname} ${kf_lastname}`;
-    setkf_name(fullName);
-  }, [kf_firstname, kf_lastname]);
-
-  useEffect(() => {
-    if (kf_name) {
-      setPlaceholderName(kf_name);
-    }
-  }, [kf_name]);
-
-  // const handleDateChange1 = (newDate) => {
-  //   setkf_dateofapproval(newDate);
-  // };
-
-  // const handleDateChange2 = (newDate) => {
-  //   setkf_firstemidate(newDate);
-  // };
-
   console.log("Request Payload to CRM:", {
     kf_mobile: kf_mobile,
+    kf_name: kf_name
   });
 
   const handleGenderOptionset = (selectedOptionGender) => {
@@ -143,45 +115,6 @@ export const PersonalLoan = () => {
         numericValue = null;
     }
     setkf_gender(numericValue);
-  };
-
-  const handleLoanStatusChange = (selectedOptionLoan) => {
-    let numericValue;
-    switch (selectedOptionLoan) {
-      case 'Approved':
-        numericValue = 123950000;
-        break;
-      case 'PendingApproval':
-        numericValue = 123950001;
-        break;
-      case 'Draft':
-        numericValue = 123950002;
-        break;
-      case 'Cancelled':
-        numericValue = 123950003;
-        break;
-      case 'Expired':
-        numericValue = 123950004;
-        break;
-      default:
-        numericValue = null;
-    }
-    setkf_status(numericValue);
-  };
-
-  const handleAnotherOptionChange = (selectedOptionStatusReason) => {
-    let numericValue;
-    switch (selectedOptionStatusReason) {
-      case 'AadharNotMatching':
-        numericValue = 123950000;
-        break;
-      case 'InvalidDocuments':
-        numericValue = 123950001;
-        break;
-      default:
-        numericValue = null;
-    }
-    setkf_statusreason(numericValue);
   };
 
   const handleFirstNameChange = (text) => {
@@ -204,39 +137,81 @@ export const PersonalLoan = () => {
     }
   }
 
+  // const handleDateOfBirth = (newDate) => {
+  //   if (!newDate) {
+  //     setErrorMessages({
+  //       ...errorMessages,
+  //       dateOfBirth: 'Enter Date of Birth.',
+  //     });
+  //   } else {
+  //     const birthDate = new Date(newDate);
+  //     const today = new Date();
+  //     let age = today.getFullYear() - birthDate.getFullYear();
+  //     const hasBirthdayOccurred =
+  //       today.getMonth() > birthDate.getMonth() ||
+  //       (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
+  //     if (!hasBirthdayOccurred) {
+  //       age--;
+  //     }
+  //     setErrorMessages({
+  //       ...errorMessages,
+  //       dateOfBirth: '',
+  //     });
+  //     setkf_age(age.toString());
+  //     setkf_dateofbirth(newDate);
+  //   }
+  // };
+
   const handleDateOfBirth = (newDate) => {
     if (!newDate) {
       setErrorMessages({
         ...errorMessages,
         dateOfBirth: 'Enter Date of Birth.',
+        age: ''
       });
     } else {
       const birthDate = new Date(newDate);
       const today = new Date();
       let age = today.getFullYear() - birthDate.getFullYear();
+  
       const hasBirthdayOccurred =
         today.getMonth() > birthDate.getMonth() ||
         (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
+  
       if (!hasBirthdayOccurred) {
         age--;
       }
-      setErrorMessages({
-        ...errorMessages,
-        dateOfBirth: '',
-      });
-      setkf_age(age.toString());
-      setkf_dateofbirth(newDate);
+  
+      if (age < 18) {
+        setErrorMessages({
+          ...errorMessages,        
+          dateOfBirth: 'Please select a valid date of birth.',
+          age: 'You must be at least 18 years old.',
+        }); 
+      } else {
+        setErrorMessages({
+          ...errorMessages,
+          dateOfBirth: '',
+          age: ''
+        });
+  
+        setkf_age(age.toString());
+        setkf_dateofbirth(newDate);
+      }
     }
   };
 
   const handleMobileNumberChange = (text) => {
+    // Remove any non-digit characters
+    const cleanedText = text.replace(/^\d$/, '');
+  
     if (!text.trim()) {
       setErrorMessages({
         ...errorMessages,
         mobileNumber: 'Enter Mobile Number.',
       });
-    } else if (/^\d{10}$/.test(text)) {
-      setkf_mobile(text);
+    } else if (/^[6-9]\d{9}$/.test(cleanedText)) {
+      setkf_mobile(cleanedText);
       setErrorMessages({
         ...errorMessages,
         mobileNumber: '',
@@ -293,19 +268,22 @@ export const PersonalLoan = () => {
   };
 
   const handlePancardNumberValidation = (text) => {
-    if (!text.trim()) {
+    // Remove any non-alphanumeric characters
+    const cleanedText = text.replace(/[^a-z][@#$%^&*!()?/<>.,;:'"{}+=_-|]/g, '');
+
+    if (cleanedText.length !== 10) {
       setErrorMessages({
         ...errorMessages,
-        panCardNumber: 'Enter PAN card number.',
+        panCardNumber: 'Enter a 10-character PAN card number.',
       });
     } else {
-      const panRegex = /^[A-Za-z]{5}[0-9]{4}[A-Z]{1}/;
-      if (panRegex.test(text)) {
+      const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+        if (panRegex.test(cleanedText)) {
         setErrorMessages({
           ...errorMessages,
           panCardNumber: '',
         });
-        setkf_pannumber(text);
+        setkf_pannumber(cleanedText);
       } else {
         setErrorMessages({
           ...errorMessages,
@@ -384,7 +362,7 @@ export const PersonalLoan = () => {
       const loanAmount = parseFloat(kf_loanamountrequested);
 
       const userAdminname = authenticatedUser ? authenticatedUser.kf_adminname : '';
-      console.log("Detailed Error Response:", userAdminname);
+      console.log("created by", userAdminname);
 
       const createRecordResponse = await axios.post(
         "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans",  // Updated entity name
@@ -405,11 +383,6 @@ export const PersonalLoan = () => {
           kf_aadharnumber: kf_aadharnumber,
           kf_pannumber: kf_pannumber,
           kf_loanamountrequested: loanAmount,
-          kf_status: kf_status,
-          kf_statusreason: kf_statusreason,
-          // kf_dateofapproval: formattedDateOfApproval,
-          // kf_approver: kf_approver,
-          // kf_firstemidate: formattedFirstEmiDate,
           kf_createdby: userAdminname,
         },
         {
@@ -476,14 +449,10 @@ export const PersonalLoan = () => {
           {errorMessages.lastName !== '' && (
             <Text style={styles.errorText}>{errorMessages.lastName}</Text>
           )}
-
-          <TextInput
-            style={[styles.textInputContainer, { marginTop: 20, color: "gray" }]}
-            placeholder={placeholderName ? placeholderName : "Full Name"}
-            value={kf_name}
-            onChangeText={(text) => setkf_name(text)}
-            editable={false}
-          />
+        
+          <Text style={[styles.textInputContainer, { marginTop: 15, marginBottom: 5  , color: "gray", height: 50 }]}>
+            {(!kf_firstname && !kf_lastname) ? "Full Name" : `${kf_firstname} ${kf_lastname}`}
+          </Text>
 
           <LoanStatusPicker
             onOptionChange={handleGenderOptionset}
@@ -492,7 +461,7 @@ export const PersonalLoan = () => {
           />
 
           <ComponentDatePicker
-            style={{ height: 48, marginBottom: 20 }}
+            style={{ height: 48, marginBottom: 15 }}
             selectedDate={kf_dateofbirth}
             onDateChange={handleDateOfBirth}
             placeholder="Date of Birth"
@@ -503,12 +472,18 @@ export const PersonalLoan = () => {
             </Text>
           )}
 
-          <TextInput style={[styles.textInputContainer, { color: "gray" }]}
+          <TextInput style={[styles.textInputContainer, { color: "gray", margin: 5 }]}
             placeholder="Age"
             value={kf_age}
             onChangeText={(text) => setkf_age(text)}
             editable={false}
           />
+
+          {errorMessages.age !== '' && (
+            <Text style={styles.errorText}>
+              {errorMessages.age}
+            </Text>
+          )}
 
           <TextInputComponent
             placeholder="Mobile Number"
@@ -596,36 +571,6 @@ export const PersonalLoan = () => {
           {errorMessages.loanAmountRequested !== '' && (
             <Text style={styles.errorText}>{errorMessages.loanAmountRequested}</Text>
           )}
-
-          <LoanStatusPicker onOptionChange={handleLoanStatusChange}
-            title="Select Loan Status"
-            options={['Approved', 'PendingApproval', 'Draft', 'Cancelled']}
-            initialOption="PendingApproval" 
-          />
-
-          <LoanStatusPicker
-            onOptionChange={handleAnotherOptionChange}
-            title="Status Reason"
-            options={['AadharNotMatching', 'InvalidDocuments']}
-          />
-
-          {/* <ComponentDatePicker
-          selectedDate={kf_dateofapproval}
-          onDateChange={handleDateChange1}
-          placeholder="Date of Approval"
-        /> */}
-
-          {/* <ComponentDatePicker
-          selectedDate={kf_firstemidate}
-          onDateChange={handleDateChange2}
-          placeholder="First EMI Date"
-        /> */}
-          {/* <TextInputComponent
-          placeholder="Loan Approver"
-          autoCapitalize="none"
-          value={kf_approver}
-          onChangeText={(text) => setkf_approver(text)}
-        />  */}
 
           <ButtonComponent
             title="SUBMIT"

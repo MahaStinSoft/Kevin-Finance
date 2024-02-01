@@ -144,7 +144,11 @@ const AccountScreen = () => {
               {renderFieldWithTitle('Country', user.address1_country)}
             </View>
           ) : (
-            <Text style={styles.label}>No user information available</Text>
+            user === null ? (
+              <Text style={styles.label}>Loading...</Text>
+            ) : (
+              <Text style={styles.label}>No user information available</Text>
+            )
           )}
         </View>
       </ScrollView>
@@ -174,9 +178,13 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   label: {
-    fontSize: 18,
+    fontSize: 20,
     marginBottom: 10,
-  },
+    justifyContent: 'center',
+    textAlign: "center",
+    color: "red",
+    marginVertical: "100%"
+},
   input: {
     fontSize: 15,
     marginVertical: 5,
@@ -184,7 +192,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     paddingVertical: 8,
-    color: 'black',
+    color: 'gray',
     padding: 10,
     backgroundColor: '#FBFCFC',
     elevation: 2,

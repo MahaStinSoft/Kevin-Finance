@@ -25,17 +25,10 @@ export const HomeScreen = ({ route }) => {
   const [kf_city, setkf_city] = useState(null);
   const [kf_state, setkf_state] = useState(null);
   const [kf_loanamountrequested, setkf_loanamountrequested] = useState(null);
-  const [kf_status, setkf_status] = useState(null);
-  const [kf_statusreason, setkf_statusreason] = useState(null);
-  const [kf_dateofapproval, setkf_dateofapproval] = useState(new Date());
-  const [kf_approver, setkf_approver] = useState(null);
-  const [kf_firstemidate, setkf_firstemidate] = useState(new Date());
   const [kf_aadharnumber, setkf_aadharnumber] = useState(null);
   const [kf_aadharcard, setkf_aadharcard] = useState({ fileName: null, fileContent: null });
   const [kf_pannumber, setkf_pannumber] = useState(null);
   const [kf_createdby, setkf_createdby] = useState(null);
-  const [kf_adminname, setkf_adminname] = useState(null);
-  const [selectedValue, setSelectedValue] = useState('');
   // const [image, setImage] = useState(null);
   const [authenticatedUser, setAuthenticatedUser] = useState(null);
   const [resetFormKey, setResetFormKey] = useState(0);
@@ -43,10 +36,13 @@ export const HomeScreen = ({ route }) => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
 
+  console.log("mobile", kf_mobilenumber);
+
   const [errorMessages, setErrorMessages] = useState({
     firstName: '',
     lastName: '',
     dateOfBirth: '',
+    age: '',
     mobileNumber: '',
     email: '',
     loanAmountRequested: '',
@@ -72,14 +68,8 @@ export const HomeScreen = ({ route }) => {
     setkf_city(null);
     setkf_state(null);
     setkf_loanamountrequested(null);
-    setkf_status(null);
-    setkf_statusreason(null);
-    setkf_dateofapproval(new Date());
-    setkf_approver(null);
-    setkf_firstemidate(new Date());
     setkf_aadharnumber(null);
     setkf_aadharcard({ fileName: null, fileContent: null });
-    setSelectedValue('');
     setResetFormKey((prevKey) => prevKey + 1);
   };
 
@@ -111,14 +101,6 @@ export const HomeScreen = ({ route }) => {
     return unsubscribe;
   }, [navigation]);
 
-  const handleDateChange1 = (newDate) => {
-    setkf_dateofapproval(newDate);
-  };
-
-  const handleDateChange2 = (newDate) => {
-    setkf_firstemidate(newDate);
-  };
-
   // console.log("Request Payload to CRM:", {
   //   kf_name: kf_name,
   //   kf_lastname: kf_lastname,
@@ -133,11 +115,6 @@ export const HomeScreen = ({ route }) => {
   //   kf_city: kf_city,
   //   kf_state: kf_state,
   //   kf_loanamountrequested: kf_loanamountrequested,
-  //   kf_status: kf_status,
-  //   kf_statusreason: kf_statusreason,
-  //   kf_dateofapproval: kf_dateofapproval,
-  //   kf_approver: kf_approver,
-  //   kf_firstemidate: kf_firstemidate,
   //   kf_aadharnumber:kf_aadharnumber,
   //   kf_aadharcard:  'base64 content',
   //   kf_adminname:kf_adminname,
@@ -157,45 +134,6 @@ export const HomeScreen = ({ route }) => {
         numericValue = null;
     }
     setkf_gender(numericValue);
-  };
-
-  const handleLoanStatusChange = (selectedOptionLoan) => {
-    let numericValue;
-    switch (selectedOptionLoan) {
-      case 'Approved':
-        numericValue = 123950000;
-        break;
-      case 'PendingApproval':
-        numericValue = 123950001;
-        break;
-      case 'Draft':
-        numericValue = 123950002;
-        break;
-      case 'Cancelled':
-        numericValue = 123950003;
-        break;
-      case 'Expired':
-        numericValue = 123950004;
-        break;
-      default:
-        numericValue = null;
-    }
-    setkf_status(numericValue);
-  };
-
-  const handleAnotherOptionChange = (selectedOptionStatusReason) => {
-    let numericValue;
-    switch (selectedOptionStatusReason) {
-      case 'AadharNotMatching':
-        numericValue = 123950000;
-        break;
-      case 'InvalidDocuments':
-        numericValue = 123950001;
-        break;
-      default:
-        numericValue = null;
-    }
-    setkf_statusreason(numericValue);
   };
 
   const pickImage = async () => {
@@ -244,44 +182,56 @@ export const HomeScreen = ({ route }) => {
       setkf_lastname('');
       setErrorMessages({ ...errorMessages, lastName: 'Enter Last Name' });
     }
-  }
+  };
 
   const handleDateOfBirth = (newDate) => {
     if (!newDate) {
       setErrorMessages({
         ...errorMessages,
-        dateOfBirth: 'Enter Date of Birth.',
+        dateOfBirth: 'Enter Date of Birth.'
       });
     } else {
       const birthDate = new Date(newDate);
       const today = new Date();
       let age = today.getFullYear() - birthDate.getFullYear();
-
+  
       const hasBirthdayOccurred =
         today.getMonth() > birthDate.getMonth() ||
         (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
-
+  
       if (!hasBirthdayOccurred) {
         age--;
       }
-      setErrorMessages({
-        ...errorMessages,
-        dateOfBirth: '',
-      });
-
-      setkf_age(age.toString());
-      setkf_dateofbirth(newDate);
+  
+      if (age < 18) {
+        setErrorMessages({
+          ...errorMessages,        
+          dateOfBirth: 'Please select a valid date of birth.',
+          age: '',
+        }); 
+      } else {
+        setErrorMessages({
+          ...errorMessages,
+          dateOfBirth: '',
+          age: ''
+        });
+  
+        setkf_age(age.toString());
+        setkf_dateofbirth(newDate);
+      }
     }
   };
 
   const handleMobileNumberChange = (text) => {
+    const cleanedText = text.replace(/^\d$/, '');
+  
     if (!text.trim()) {
       setErrorMessages({
         ...errorMessages,
         mobileNumber: 'Enter Mobile Number.',
       });
-    } else if (/^\d{10}$/.test(text)) {
-      setkf_mobilenumber(text);
+    } else if (/^[6-9]\d{9}$/.test(cleanedText)) {
+      setkf_mobilenumber(cleanedText);
       setErrorMessages({
         ...errorMessages,
         mobileNumber: '',
@@ -339,19 +289,22 @@ export const HomeScreen = ({ route }) => {
   };
 
   const handlePancardNumberValidation = (text) => {
-    if (!text.trim()) {
+    // Remove any non-alphanumeric characters
+    const cleanedText = text.replace(/[^a-z][@#$%^&*!()?/<>.,;:'"{}+=_-|]/g, '');
+      
+    if (cleanedText.length !== 10) {
       setErrorMessages({
         ...errorMessages,
-        panCardNumber: 'Enter PAN card number.',
+        panCardNumber: 'Enter a 10-character PAN card number.',
       });
     } else {
-      const panRegex = /^[A-Za-z]{5}[0-9]{4}[A-Z]{1}/;
-      if (panRegex.test(text)) {
+      const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+        if (panRegex.test(cleanedText)) {
         setErrorMessages({
           ...errorMessages,
           panCardNumber: '',
         });
-        setkf_pannumber(text);
+        setkf_pannumber(cleanedText);
       } else {
         setErrorMessages({
           ...errorMessages,
@@ -396,6 +349,7 @@ export const HomeScreen = ({ route }) => {
   };
 
   const handleSaveRecord = async () => {
+
     const newErrorMessages = {
       firstName: !kf_name ? ' Enter First Name' : '',
       lastName: !kf_lastname ? ' Enter Last Name' : '',
@@ -410,6 +364,7 @@ export const HomeScreen = ({ route }) => {
     if (Object.values(newErrorMessages).some(message => message !== '')) {
       return;
     }
+
     try {
       var data = {
         grant_type: "client_credentials",
@@ -426,12 +381,12 @@ export const HomeScreen = ({ route }) => {
       const accessToken = tokenResponse.data.access_token;
       // console.log("Access Token:", accessToken);
 
-      const formattedDateOfApproval = kf_dateofapproval ? kf_dateofapproval.toISOString() : null;
-      const formattedFirstEmiDate = kf_firstemidate ? kf_firstemidate.toISOString() : null;
       const formattedDateOfBirth = kf_dateofbirth ? kf_dateofbirth.toISOString() : null;
       const loanAmount = parseFloat(kf_loanamountrequested);
       const userAdminName = authenticatedUser ? authenticatedUser.kf_adminname : '';
+
       console.log("Detailed Error Response:", userAdminName);
+
       const createRecordResponse = await axios.post(
         "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications",
         {
@@ -448,11 +403,6 @@ export const HomeScreen = ({ route }) => {
           kf_city: kf_city,
           kf_state: kf_state,
           kf_loanamountrequested: loanAmount,
-          kf_status: kf_status,
-          kf_statusreason: kf_statusreason,
-          // kf_dateofapproval: formattedDateOfApproval,
-          // kf_approver: kf_approver,
-          // kf_firstemidate: formattedFirstEmiDate,
           kf_aadharnumber: kf_aadharnumber,
           kf_pannumber: kf_pannumber,
           // kf_aadharcard: kf_aadharcard.fileContent,
@@ -531,7 +481,7 @@ export const HomeScreen = ({ route }) => {
           )}
 
           <ComponentDatePicker
-            style={{ height: 48, marginBottom: 20 }}
+            style={{ height: 48, marginBottom: 15 }}
             selectedDate={kf_dateofbirth}
             onDateChange={handleDateOfBirth}
             placeholder="Date of Birth"
@@ -543,7 +493,7 @@ export const HomeScreen = ({ route }) => {
             </Text>
           )}
 
-          <TextInput style={[styles.textInputContainer, { color: "gray" }]}
+          <TextInput style={[styles.textInputContainer, { color: "gray" ,margin: 5}]}
             placeholder="Age"
             value={kf_age}
             onChangeText={(text) => setkf_age(text)}
@@ -644,39 +594,6 @@ export const HomeScreen = ({ route }) => {
           {errorMessages.loanAmountRequested !== '' && (
             <Text style={styles.errorText}>{errorMessages.loanAmountRequested}</Text>
           )}
-
-          <LoanStatusPicker onOptionChange={handleLoanStatusChange}
-            title="Select Loan Status"
-            options={['Approved', 'PendingApproval', 'Draft', 'Cancelled']}
-            initialOption="PendingApproval"
-          />
-
-          <LoanStatusPicker
-            onOptionChange={handleAnotherOptionChange}
-            title="Status Reason"
-            options={['AadharNotMatching', 'InvalidDocuments']}
-          // initialOption="Option1"
-          />
-
-          {/* <ComponentDatePicker
-            selectedDate={kf_dateofapproval}
-            onDateChange={handleDateChange1}
-            placeholder="Date of Approval"
-          />
-
-          <ComponentDatePicker
-            selectedDate={kf_firstemidate}
-            onDateChange={handleDateChange2}
-            placeholder="First EMI Date"
-          />
-          
-          <TextInputComponent
-            placeholder="Loan Approver"
-            autoCapitalize="none"
-            value={kf_approver}
-            onChangeText={(text) => setkf_approver(text)}
-          />  */}
-
 
           {/* <View style={{ flexDirection: "row", marginTop: 15 }}>
             <View style={{ marginHorizontal: 25, marginTop: 10 }}>

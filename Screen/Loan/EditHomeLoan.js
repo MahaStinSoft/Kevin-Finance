@@ -4,11 +4,8 @@ import axios from 'axios';
 
 import HeaderComponent from '../../common/Header';
 import ButtonComponent from '../../common/ButtonComponent';
-// import ComponentDatePicker from '../common/ComponentDatePicker';
 import ComponentDatePicker from '../../common/ComponentDatePicker';
 import LoanStatusPicker from '../../common/LoanStatusPicker ';
-// import TextInputComponent from '../common/TextInput'; 
-import TextInputComponents from '../../common/TextInput';
 
 const EditHomeLoan = ({ route, navigation }) => {
   const { loanApplication, onUpdateSuccess } = route.params || {};
@@ -29,8 +26,8 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [loanAmountRequested, setLoanAmountRequested] = useState(loanApplication?.kf_loanamountrequested || '');
   const [status, setStatus] = useState(loanApplication?.kf_status ? loanApplication.kf_status.toString() : '');
   const [statusReason, setstatusReason] = useState(loanApplication?.kf_statusreason ? loanApplication.kf_statusreason.toString() : '');
-  const [approvalDate, setApprovalDate] = useState(loanApplication?.kf_dateofapproval || '');
-  const [approver, setApprover] = useState(loanApplication?.kf_dateofapproval || '');
+  const [approvalDate, setApprovalDate] = useState(loanApplication?.kf_approvaldate || '');
+  const [approver, setApprover] = useState(loanApplication?.kf_approvaldate || '');
   const [firstEMIDate, setfirstEMIDate] = useState(loanApplication?.kf_firstemidate || '');
   const [aadharcardNumber, setAadharcardNumber] = useState(loanApplication?.kf_aadharnumber || '');
   const [pancardNumber, setPancardNumber] = useState(loanApplication?.kf_pannumber || '');
@@ -46,7 +43,7 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [recordId, setRecordId] = useState(loanApplication.kf_loanapplicationid);
 
   const handleGoBack = () => {
-    navigation.goBack();
+    navigation.navigate("HomeLoanDetailsScreen", {loanApplication});
   };
 
   useEffect(() => {
@@ -67,7 +64,7 @@ const EditHomeLoan = ({ route, navigation }) => {
     setLoanAmountRequested(loanApplication.kf_loanamountrequested);
     setStatus(loanApplication.kf_status);
     setstatusReason(loanApplication.kf_statusreason);
-    setApprovalDate(loanApplication.kf_dateofapproval);
+    setApprovalDate(loanApplication.kf_approvaldate);
     setApprover(loanApplication.kf_approver);
     setfirstEMIDate(loanApplication.kf_firstemidate);
     setAadharcardNumber(loanApplication.kf_aadharnumber);
@@ -123,12 +120,11 @@ const EditHomeLoan = ({ route, navigation }) => {
           kf_loanamountrequested: parseInt(loanAmountRequested),
           kf_status: status,
           kf_statusreason: statusReason,
-          kf_dateofapproval: approvalDate,
+          kf_approvaldate: approvalDate,
           kf_approver: approver,
           kf_firstemidate: firstEMIDate,
           kf_aadharnumber: aadharcardNumber,
           kf_pannumber: pancardNumber,
-          // Include other fields as needed
         },
         {
           headers: {
@@ -162,7 +158,7 @@ const EditHomeLoan = ({ route, navigation }) => {
             kf_loanamountrequested: loanAmountRequested,
             kf_status: status,
             kf_statusreason: statusReason,
-            kf_dateofapproval: approvalDate,
+            kf_approvaldate: approvalDate,
             kf_approver: approver,
             kf_firstemidate: firstEMIDate,
             kf_aadharnumber: aadharcardNumber,
@@ -290,7 +286,7 @@ const EditHomeLoan = ({ route, navigation }) => {
       case 123950000:
         return 'Approved';
       case 123950001:
-        return 'PendingApproval';
+        return 'Pending Approval';
       case 123950002:
         return 'Draft';
       case 123950003:
@@ -298,7 +294,7 @@ const EditHomeLoan = ({ route, navigation }) => {
       case 123950004:
         return 'Expired';
       default:
-        return '';
+        return 'Pending Approval';
     }
   };
 
@@ -330,7 +326,11 @@ const EditHomeLoan = ({ route, navigation }) => {
 
   return (
     <>
-      <HeaderComponent titleText="Edit Home Screen" onPress={handleGoBack} />
+      <HeaderComponent titleText="Edit Home Screen" 
+      onPress={handleGoBack} 
+      onIconPress={handleUpdateRecord}
+      screenIcon="md-save" 
+      screenIconStyle={{ marginTop: 5 }}/>
       <ScrollView>
         <View style={styles.container}>
           <View style={styles.wrapper}>
@@ -363,14 +363,17 @@ const EditHomeLoan = ({ route, navigation }) => {
                 setIsfirstnameValid(text.trim() !== '');
               }}
             />
-            {!isfirstnameValid && <Text style={styles.errorText}>Please enter a valid first name.</Text>}
+            {!isfirstnameValid && <Text style={styles.errorText}>Please Enter a Valid First Name.</Text>}
 
             <TextInput
               style={styles.textInputContainer}
               value={lastname}
               placeholder="Last Name"
-              onChangeText={(text) => setLastname(text)}
+              onChangeText={(text) => {setLastname(text);
+                setIsLastNameValid(text.trim() !== '')
+              }}
             />
+            {!isLastNameValid && <Text style={styles.errorText}>Please Enter a Valid Last Name.</Text>}
             
             <LoanStatusPicker
               onOptionChange={handleGenderOptionset}
@@ -406,7 +409,7 @@ const EditHomeLoan = ({ route, navigation }) => {
               keyboardType="numeric"
             />
             {!isMobileNumberValid && (
-              <Text style={styles.errorText}>Please enter a valid 10-digit mobile number.</Text>
+              <Text style={styles.errorText}>Please Enter a Valid 10-digit mobile number.</Text>
             )}
 
             <TextInput
@@ -418,7 +421,7 @@ const EditHomeLoan = ({ route, navigation }) => {
                 setIsEmailValid(text.trim() === '' || validateEmail(text));
               }}
             />
-            {!isEmailValid && <Text style={styles.errorText}>Please enter a valid email address.</Text>}
+            {!isEmailValid && <Text style={styles.errorText}>Please Enter a Valid email address.</Text>}
             <TextInput
               style={styles.textInputContainer}
               value={address1}
@@ -450,20 +453,6 @@ const EditHomeLoan = ({ route, navigation }) => {
               onChangeText={(text) => setState(text)}
             />
 
-         {/*<TextInput
-          style={styles.textInputContainer}
-          value={approvalDate}
-          placeholder="Approval Date"
-          onChangeText={(text) => setApprovalDate(text)}
-        /> */}
-
-            {/* <TextInput
-          style={styles.textInputContainer}
-          value={firstEMIDate}
-          placeholder="First EMI Date"
-          onChangeText={(text) => setfirstEMIDate(text)}
-        /> */}
-
             <TextInput
               style={styles.textInputContainer}
               value={aadharcardNumber}
@@ -472,7 +461,7 @@ const EditHomeLoan = ({ route, navigation }) => {
             />
             {!isaadharNumberValid && (
               <Text style={styles.errorText}>
-                Please enter a valid Aadhar card number.
+                Please Enter a Valid Aadhar card number.
               </Text>
             )}
 
@@ -484,7 +473,7 @@ const EditHomeLoan = ({ route, navigation }) => {
             />
             {!isPancardNumberValid && (
               <Text style={styles.errorText}>
-                Please enter a valid PAN card number.
+                Please Enter a Valid PAN card number.
               </Text>
             )}
 
@@ -499,19 +488,58 @@ const EditHomeLoan = ({ route, navigation }) => {
               onOptionChange={handleLoanStatusChange}
               title="Select Loan Status"
               options={['Approved', 'PendingApproval', 'Draft', 'Cancelled']}
-              initialOption={status ? getStatusStringFromNumericValue(status) : ''}
+              initialOption={getStatusStringFromNumericValue(status)}
               style={{width: "100%", marginLeft: 0, marginTop: 5}}
             />
+            
+            {statusReason && (
+              <LoanStatusPicker
+                onOptionChange={handleAnotherOptionChange}
+                title="Status Reason"
+                options={['AadharNotMatching', 'InvalidDocuments']}
+                initialOption={statusReason ? getAnotherOptionStringFromNumericValue(statusReason) : ''}
+                style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
+              />
+            )}
 
-            <LoanStatusPicker
-              onOptionChange={handleAnotherOptionChange}
-              title="Status Reason"
-              options={['AadharNotMatching', 'InvalidDocuments']}
-              initialOption={statusReason ? getAnotherOptionStringFromNumericValue(statusReason) : ''}
-              style={{width: "100%", marginLeft: 0, marginTop: 5}}
-            />
+            {approver && (
+              <TextInput
+                style={[styles.textInputContainer, { color: "gray" }]}
+                value={approver}
+                placeholder="Approver"
+                onChangeText={(text) => {
+                  setApprover(text);
+                }}
+                editable={false}
+              />
+            )}
 
-            <ButtonComponent title="Update" onPress={handleUpdateRecord} />
+            {approvalDate && (
+              <TextInput
+                style={[styles.textInputContainer, { color: "gray" }]}
+                value={approvalDate}
+                placeholder="Approval Date"
+                onChangeText={(text) => {
+                  setApprovalDate(text);
+                }}
+                editable={false}
+              />
+            )}
+
+
+            {firstEMIDate && (
+              <TextInput
+                style={[styles.textInputContainer, { color: "gray" }]}
+                value={firstEMIDate}
+                placeholder="First EMI Date"
+                onChangeText={(text) => {
+                  setfirstEMIDate(text);
+                }}
+                editable={false}
+              />
+            )}
+
+            {/* <ButtonComponent title="Update" onPress={handleUpdateRecord} /> */}
           </View>
         </View>
       </ScrollView>

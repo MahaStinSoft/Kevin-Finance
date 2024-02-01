@@ -10,7 +10,7 @@ const Loan = () => {
   const navigation = useNavigation();
 
   const handleGoBack = () => {
-    navigation.goBack();
+    navigation.navigate("Dashboard");
   };
 
   const handleSavedRecordHomeLoan = () => {

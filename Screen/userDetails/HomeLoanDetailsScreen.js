@@ -1,16 +1,17 @@
   import React, { useState, useEffect, useCallback  } from 'react';
-  import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+  import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Alert, LogBox } from 'react-native';
   import { useNavigation } from '@react-navigation/native';
-  import { Ionicons } from '@expo/vector-icons';
   import HeaderComponent from '../../common/Header';
 
   const HomeLoanDetailsScreen = ({ route }) => {
     const navigation = useNavigation();
     const [loanApplication, setLoanApplication] = useState(route.params.loanApplication);
+    LogBox.ignoreLogs([
+      'Non-serializable values were found in the navigation state',
+    ]);
 
     const fetchData = useCallback(async () => {
       console.log('Fetching data...');
-      // Fetch data logic here
       const simulatedUpdatedData = { ...loanApplication };
       setLoanApplication(simulatedUpdatedData);
     }, [loanApplication]);
@@ -25,10 +26,8 @@
     }, [fetchData]);
 
     useEffect(() => {
-      // Set up the focus event listener
       const unsubscribeFocus = navigation.addListener('focus', fetchDataOnFocus);
 
-      // Clean up the focus event listener when the component unmounts
       return () => {
         console.log('Cleaning up focus listener');
         unsubscribeFocus();
@@ -81,7 +80,6 @@
     };
 
     useEffect(() => {
-      // Update loanApplication state when the screen is focused
       const unsubscribe = navigation.addListener('focus', () => {
         setLoanApplication(route.params.loanApplication);
       });
@@ -119,8 +117,8 @@
     };
     
 
-    return (
-      <ScrollView contentContainerStyle={styles.container}>
+    return ( 
+      <View style= {styles.container}>
         <HeaderComponent 
         titleText="HomeLoan Details" 
         onPress={handleGoBack} 
@@ -132,13 +130,11 @@
         <View style={[styles.card, styles.cardElevated]}>
           <View>{renderImage()}</View>
           <Text style={styles.cardTitle}>Application Number: {loanApplication.kf_applicationnumber}</Text>
+          <ScrollView>
           <Text style={styles.cardLabel}>Created: {loanApplication.kf_createdby}</Text>
           <Text style={styles.cardLabel}>Name: {`${loanApplication.kf_name} ${loanApplication.kf_lastname}`}</Text>
-          {/* <Text style={styles.cardLabel}>Loan Type: {loanApplication.loanType}</Text> */}
           <Text style={styles.cardLabel}>Gender: {getGenderLabel()}</Text>
-          {/* <Text style={styles.cardLabel}>First Name: {loanApplication.kf_name}</Text>
-          <Text style={styles.cardLabel}>Last Name: {loanApplication.kf_lastname}</Text> */}
-          <Text style={styles.cardLabel}>Date of Birth: {loanApplication.kf_dateofbirth}</Text>
+          <Text style={styles.cardLabel}>Date of Birth: {loanApplication.kf_dateofbirth ? new Date(loanApplication.kf_dateofbirth).toLocaleDateString() : ''}</Text>         
           <Text style={styles.cardLabel}>Age: {loanApplication.kf_age}</Text>
           <Text style={styles.cardLabel}>Mobile Number: {loanApplication.kf_mobilenumber}</Text>
           <Text style={styles.cardLabel}>Email Address: {loanApplication.kf_email}</Text>
@@ -151,10 +147,13 @@
           <Text style={styles.cardLabel}>PANcard Number: {loanApplication.kf_pannumber}</Text>
           <Text style={styles.cardLabel}>Loan Amount Requested: {loanApplication.kf_loanamountrequested}</Text>
           <Text style={styles.cardLabel}>Loan Status: {getLoanStatus()}</Text>
-          <Text style={styles.cardLabel}>Status Reason: {getStatusReason()}</Text>
-          {/* <Text style={styles.cardLabel}>Approver: {loanApplication.kf_approver}</Text> */}
+          {loanApplication.kf_statusreason && (<Text style={styles.cardLabel}>Loan Status: {getLoanStatus()}</Text>)}
+          {loanApplication.kf_approver && (<Text style={styles.cardLabel}>Approver: {loanApplication.kf_approver}</Text>)}      
+          {loanApplication.kf_approvaldate && (<Text style={styles.cardLabel}>Approval Date: {loanApplication.kf_approvaldate}</Text>)}
+           {/* {loanApplication.kf_firstemidate && (<Text style={styles.cardLabel}>First EMI Date: {loanApplication.kf_firstemidate}</Text>)} */}
+          </ScrollView>
         </View>
-      </ScrollView>
+        </View>
     );
   };
 

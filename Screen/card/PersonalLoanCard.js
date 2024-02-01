@@ -3,10 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, Alert } from 'react-na
 import { Ionicons } from '@expo/vector-icons';
 
 const PersonalLoanCard = ({ personalLoan, onPress, onDelete }) => {
-  if (!personalLoan || !personalLoan.kf_firstname || !personalLoan.kf_lastname) {
-    return null;
-  }
-
+  
   const getLoanStatusLabel = () => {
     switch (personalLoan.kf_status) {
       case 123950000:
@@ -20,7 +17,7 @@ const PersonalLoanCard = ({ personalLoan, onPress, onDelete }) => {
       case 123950004:
         return 'Expired';
       default:
-        return '';
+        return 'Pending Approval';
     }
   };
 

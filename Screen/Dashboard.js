@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
   StatusBar,
   Platform,
-RefreshControl
+  RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -22,9 +22,9 @@ import { BarChart } from 'react-native-chart-kit';
 
 import HomeLoanCard from './card/HomeLoanCard';
 import PersonalLoanCard from './card/PersonalLoanCard';
-import DynamicDashboardScreen from './DynamicDashboardScreen';
 
 const DashboardScreen = ({ navigation, route }) => {
+  // const { authenticatedUser } = route.params;
   const [showLoanModal, setShowLoanModal] = useState(false);
   const [loanData, setLoanData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -54,7 +54,6 @@ const DashboardScreen = ({ navigation, route }) => {
     getAuthenticatedUser();
   }, [isFocused, getAuthenticatedUser]);
 
-  // Update displayed loans based on showAllLoans state
   useEffect(() => {
     setDisplayedHomeLoans(showAllLoans ? HomeLoanRecords : HomeLoanRecords.slice(0, 3));
     setDisplayedPersonalLoans(showAllLoans ? PersonalLoanRecords : PersonalLoanRecords.slice(0, 3));
@@ -74,7 +73,7 @@ const DashboardScreen = ({ navigation, route }) => {
 
       if (userString) {
         const user = JSON.parse(userString);
-        console.log('Authenticated user:', user);
+        console.log('Authenticated user Dashboard:', user);
         setAuthenticatedUser(user);
         // Update kf_adminname if available in the user object
         if (user.kf_adminname) {
@@ -267,8 +266,6 @@ const DashboardScreen = ({ navigation, route }) => {
       }
     }, [authenticatedUser])
   );
-  
-  
 
   const filteredData = loanData.filter(
     (item) =>
@@ -286,7 +283,6 @@ const DashboardScreen = ({ navigation, route }) => {
 
   const handleStatusClick = (status) => {
     if (selectedStatus === status) {
-      // If the same status is clicked again, reset the filter
       setSelectedLoanStatus(null);
     } else {
       setSelectedLoanStatus(status);
@@ -311,20 +307,11 @@ const DashboardScreen = ({ navigation, route }) => {
   const handleClearSearch = () => {
     setSearchQuery('');
     setShowClearIcon(false);
-    // Optionally, you can reset or re-fetch your data here
   };
   const handleRefresh = () => {
     // This function will be called when you want to refresh the page
-    setRefresh(!refresh);
+    setRefresh(refresh);
   };
-
-const handleDynamicDashboard = () => {
- try {
-  navigation.navigate('DynamicDashboardScreen');
-} catch (error) {
-  console.error('Error navigating to DynamicDashboardScreen:', error);
-}
-}
 
   return (
     <>
@@ -439,11 +426,6 @@ const handleDynamicDashboard = () => {
               />
             </View>
 
-              {/* Dynamic Dashboard Button */}
-              {/* <TouchableOpacity style={styles.dynamicDashboardButton} onPress={handleDynamicDashboard}>
-                <Text style={styles.dynamicDashboardButtonText}>Dynamic Dashboard</Text>
-              </TouchableOpacity> */}
-
               <View style={{ marginLeft: 0 }}>
                 <TouchableOpacity
                   onPress={() => setShowAllLoans(!showAllLoans)}
@@ -454,34 +436,6 @@ const handleDynamicDashboard = () => {
                   </Text>
                 </TouchableOpacity>
               </View>
-
-
-            {/* <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10 }}>
-            {loading ? (
-              <ActivityIndicator size="large" color="#0000ff" />
-            ) : (
-              <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Home Loans</Text>
-            {displayedHomeLoans.map((homeLoan, index) => (
-              <HomeLoanCard
-                key={index}
-                loanApplication={homeLoan}
-                onPress={() => navigateToHomeDetails(homeLoan)}
-              />
-            ))}
-
-            <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 20, marginBottom: 10 }}>Personal Loans</Text>
-            {displayedPersonalLoans.map((personalLoan, index) => (
-              <PersonalLoanCard
-                key={index}
-                personalLoan={personalLoan}
-                onPress={() => navigateToPersonalDetails(personalLoan)}
-              />
-            ))}
-
-              </ScrollView>
-            )}
-          </View> */}
 
             <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10 }}>
             {initialLoading ? (

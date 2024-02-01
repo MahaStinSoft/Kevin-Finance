@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, Alert } from 'react-na
 import { Ionicons } from '@expo/vector-icons';
 
 const HomeLoanCard = ({ loanApplication, onPress, onDelete }) => {
+
   const getLoanStatusLabel = () => {
     switch (loanApplication.kf_status) {
       case 123950000:
@@ -16,7 +17,7 @@ const HomeLoanCard = ({ loanApplication, onPress, onDelete }) => {
       case 123950004:
         return 'Expired';
       default:
-        return '';
+        return 'Pending Approval';
     }
   };
 

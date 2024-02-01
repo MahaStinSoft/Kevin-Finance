@@ -1,7 +1,6 @@
 import React, { useState, useEffect,useCallback } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
 import HeaderComponent from '../../common/Header';
 
 const PersonalLoanDetailsScreen = ({ route }) => {
@@ -78,7 +77,6 @@ const PersonalLoanDetailsScreen = ({ route }) => {
   
 
   useEffect(() => {
-    // Update loanApplication state when the screen is focused
     const unsubscribe = navigation.addListener('focus', () => {
       setpersonalLoan(route.params.personalLoan);
     });
@@ -116,7 +114,7 @@ const PersonalLoanDetailsScreen = ({ route }) => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View style={styles.container}>
       <HeaderComponent
         titleText="Personal Loan Details"
         onPress={handleGoBack}
@@ -129,13 +127,11 @@ const PersonalLoanDetailsScreen = ({ route }) => {
       <View style={[styles.card, styles.cardElevated]}>
         <View>{renderImage()}</View>
         <Text style={styles.cardTitle}>Application Number: {personalLoan.kf_applicationnumber}</Text>
+        <ScrollView>
         <Text style={styles.cardLabel}>Created By: {personalLoan.kf_createdby}</Text>
         <Text style={styles.cardLabel}>Name: {`${personalLoan.kf_firstname} ${personalLoan.kf_lastname}`}</Text>
         <Text style={styles.cardLabel}>Gender: {getGenderLabel()}</Text>
-        {/* <Text style={styles.cardLabel}>Loan Type: {personalLoan.loanType}</Text> */}
-        {/* <Text style={styles.cardLabel}>First Name: {personalLoan.kf_name}</Text>
-        <Text style={styles.cardLabel}>Last Name: {personalLoan.kf_lastname}</Text> */}
-        <Text style={styles.cardLabel}>Date of Birth: {personalLoan.kf_dateofbirth}</Text>
+        <Text style={styles.cardLabel}>Date of Birth: {personalLoan.kf_dateofbirth ? new Date(personalLoan.kf_dateofbirth).toLocaleDateString() : ''}</Text>
         <Text style={styles.cardLabel}>Age: {personalLoan.kf_age}</Text>
         <Text style={styles.cardLabel}>Mobile Number: {personalLoan.kf_mobile}</Text>
         <Text style={styles.cardLabel}>Email Address: {personalLoan.kf_email}</Text>
@@ -148,12 +144,13 @@ const PersonalLoanDetailsScreen = ({ route }) => {
         <Text style={styles.cardLabel}>PANcard Number: {personalLoan.kf_pannumber}</Text>
         <Text style={styles.cardLabel}>Loan Amount Requested: {personalLoan.kf_loanamountrequested}</Text>
          <Text style={styles.cardLabel}>Loan Status: {getLoanStatus()}</Text>
-        <Text style={styles.cardLabel}>Status Reason: {getStatusReason()}</Text>
-        {/* <Text style={styles.cardLabel}>{personalLoan.kf_dateofapproval}</Text> */}
-        {/* <Text style={styles.cardLabel}>Approver: {personalLoan.kf_approver}</Text> */}
-        {/* <Text style={styles.cardLabel}>Created by: {personalLoan.createdby}</Text> */}
+        {personalLoan.kf_statusR && (<Text style={styles.cardLabel}>Status Reason: {getStatusReason()}</Text>)}
+        {personalLoan.kf_approvaldate && (<Text style={styles.cardLabel}>Approver: {personalLoan.kf_approver}</Text>)}
+        {personalLoan.kf_approvaldate && (<Text style={styles.cardLabel}>Approval Date: {personalLoan.kf_approvaldate}</Text>)}
+        {/* {personalLoan.kf_firstemidate && (<Text style={styles.cardLabel}>First EMI Date: {personalLoan.kf_firstemidate}</Text>)} */}
+        </ScrollView>
       </View>
-    </ScrollView>
+    </View>
   );
 };
 

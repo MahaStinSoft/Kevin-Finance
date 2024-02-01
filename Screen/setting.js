@@ -7,7 +7,7 @@ const Setting = () => {
   const navigation = useNavigation();
 
   const handleGoBack = () => {
-    navigation.goBack();
+    navigation.navigate("Dashboard");
   };
 
   return (

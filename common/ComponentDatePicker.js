@@ -39,11 +39,15 @@ class ComponentDatePicker extends Component {
   };
 
   onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || selectedDate;
-    this.setState({ show: false });
-    this.props.onDateChange(currentDate);
-    this.props.onDateSelected(currentDate);
-    this.setState({ textColor: 'black' }); 
+    if (event.type === 'dismissed') {
+      this.setState({ show: false });
+    } else {
+      const currentDate = selectedDate || selectedDate;
+      this.setState({ show: false });
+      this.props.onDateChange(currentDate);
+      this.props.onDateSelected(currentDate);
+      this.setState({ textColor: 'black' });
+    }
   };
 
   showMode = (currentMode) => {
@@ -67,7 +71,7 @@ class ComponentDatePicker extends Component {
           {show && (
             <DateTimePicker
               testID="dateTimePicker"
-              value={selectedDate || new Date()} // Set default value if selectedDate is null
+              value={selectedDate || new Date()}
               mode={mode}
               is24Hour={true}
               onChange={this.onChange}

@@ -29,9 +29,9 @@ const EditPersonalLoan = ({ route, navigation }) => {
   const [loanAmountRequested, setLoanAmountRequested] = useState(personalLoan?.kf_loanamountrequested || '');
   const [status, setStatus] = useState(personalLoan?.kf_status ? personalLoan.kf_status.toString() : '');
   const [statusReason, setstatusReason] = useState(personalLoan?.kf_statusreason ? personalLoan.kf_statusreason.toString() : '');
-  // const [approvalDate, setApprovalDate] = useState(personalLoan?.kf_dateofapproval || '');
-  // const [approver, setApprover] = useState(personalLoan?.kf_dateofapproval || '');
-  // const [firstEMIDate, setfirstEMIDate] = useState(personalLoan?.kf_firstemidate || '');
+  const [approvalDate, setApprovalDate] = useState(personalLoan?.kf_approvaldate || '');
+  const [approver, setApprover] = useState(personalLoan?.kf_approver || '');
+  const [firstEMIDate, setfirstEMIDate] = useState(personalLoan?.kf_firstemidate || '');
   const [aadharcardNumber, setAadharcardNumber] = useState(personalLoan?.kf_aadharnumber || '');
   const [pancardNumber, setPancardNumber] = useState(personalLoan?.kf_pannumber || '');
 
@@ -47,9 +47,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
 
 
   const handleGoBack = () => {
-    navigation.goBack();
+    navigation.navigate("PersonalLoanDetailsScreen",{personalLoan});
   };
-
 
   useEffect(() => {
     // Update state and variables when the route parameters change
@@ -70,9 +69,9 @@ const EditPersonalLoan = ({ route, navigation }) => {
     setLoanAmountRequested(personalLoan.kf_loanamountrequested);
     setStatus(personalLoan.kf_status);
     setstatusReason(personalLoan.kf_statusreason);
-    // setApprovalDate(personalLoan.kf_dateofapproval);
-    // setApprover(personalLoan.kf_approver);
-    // setfirstEMIDate(personalLoan.kf_firstemidate);
+    setApprovalDate(personalLoan.kf_approvaldate);
+    setApprover(personalLoan.kf_approver);
+    setfirstEMIDate(personalLoan.kf_firstemidate);
     setAadharcardNumber(personalLoan.kf_aadharnumber);
     setPancardNumber(personalLoan.kf_pannumber);
     setRecordId(personalLoan.kf_personalloanid);
@@ -126,9 +125,9 @@ const EditPersonalLoan = ({ route, navigation }) => {
           kf_loanamountrequested: loanAmountRequested,
           kf_status: status,
           kf_statusreason: statusReason,
-          // kf_dateofapproval: approvalDate,
-          // kf_approver: approver,
-          // kf_firstemidate: firstEMIDate,
+          kf_approvaldate: approvalDate,
+          kf_approver: approver,
+          kf_firstemidate: firstEMIDate,
           kf_aadharnumber: aadharcardNumber,
           kf_pannumber: pancardNumber,
         },
@@ -163,9 +162,9 @@ const EditPersonalLoan = ({ route, navigation }) => {
             kf_loanamountrequested: parseInt(loanAmountRequested),
             kf_status: status,
             kf_statusreason: statusReason,
-            // kf_dateofapproval: approvalDate,
-            // kf_approver: approver,
-            // kf_firstemidate: firstEMIDate,
+            kf_approvaldate: approvalDate,
+            kf_approver: approver,
+            kf_firstemidate: firstEMIDate,
             kf_aadharnumber: aadharcardNumber,
             kf_pannumber: pancardNumber,
           });
@@ -276,7 +275,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
       case 123950000:
         return 'Approved';
       case 123950001:
-        return 'PendingApproval';
+        return 'Pending Approval';
       case 123950002:
         return 'Draft';
       case 123950003:
@@ -384,32 +383,6 @@ const EditPersonalLoan = ({ route, navigation }) => {
               onChangeText={(text) => setage(text)}
             />
 
-            {/* <TextInput
-          style={styles.textInputContainer}
-          value={gender}
-          placeholder="Gender"
-          onChangeText={(text) => setGender(text)}
-        /> */}
-
-            {/* <LoanStatusPicker
-              onOptionChange={handleGenderOptionset}
-              title="Gender"
-              options={['Male', 'Female']}
-            // initialOption="Option1"
-            /> */}
-            {/* <TextInput
-          style={styles.textInputContainer}
-          value={mobileNumber}
-          placeholder="Mobile Number"
-          onChangeText={(text) => setMobileNumber(text)}
-        />
-        <TextInput
-          style={styles.textInputContainer}
-          value={email}
-          placeholder="Email"
-          onChangeText={(text) => setEmail(text)}
-        /> */}
-
             <TextInput
               style={styles.textInputContainer}
               value={mobileNumber}
@@ -476,7 +449,6 @@ const EditPersonalLoan = ({ route, navigation }) => {
               </Text>
             )}
 
-
             <TextInput
               style={styles.textInputContainer}
               value={pancardNumber}
@@ -496,64 +468,59 @@ const EditPersonalLoan = ({ route, navigation }) => {
               onChangeText={(text) => handleLoanAmountRequestedChange(text)}
             />
 
-            {/* <TextInput
-          style={styles.textInputContainer}
-          value={status}
-          placeholder="Status"
-          onChangeText={(text) => setStatus(text)}
-        /> */}
-            {/* <TextInput
-          style={styles.textInputContainer}
-          value={statusReason}
-          placeholder="Status Reason"
-          onChangeText={(text) => setstatusReason(text)}
-        /> */}
-            {/* <TextInput
-          style={styles.textInputContainer}
-          value={approvalDate}
-          placeholder="Approval Date"
-          onChangeText={(text) => setApprovalDate(text)}
-        /> */}
-            {/* <TextInput
-          style={styles.textInputContainer}
-          value={approver}
-          placeholder="Approver"
-          onChangeText={(text) => setApprover(text)}
-        /> */}
-            {/* <TextInput
-          style={styles.textInputContainer}
-          value={firstEMIDate}
-          placeholder="First EMI Date"
-          onChangeText={(text) => setfirstEMIDate(text)}
-        /> */}
-            {/* <TextInput
-          style={styles.textInputContainer}
-          value={aadharcardNumber}
-          placeholder="Aadharcard Number"
-          onChangeText={(text) => setAadharcardNumber(text)}
-        />
-        <TextInput
-          style={styles.textInputContainer}
-          value={pancardNumber}
-          placeholder="Pancard Number"
-          onChangeText={(text) => setPancardNumber(text)}
-        /> */}
-
-<LoanStatusPicker
+            <LoanStatusPicker
               onOptionChange={handleLoanStatusChange}
               title="Select Loan Status"
               options={['Approved', 'PendingApproval', 'Draft', 'Cancelled']}
-              initialOption={status ? getStatusStringFromNumericValue(status) : ''}
-              style={{width: "100%", marginLeft: 0, marginTop: 5}}
+              initialOption={getStatusStringFromNumericValue(status)}
+              style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
             />
 
-            <LoanStatusPicker
-              onOptionChange={handleAnotherOptionChange}
-              title="Status Reason"
-              options={['AadharNotMatching', 'InvalidDocuments']}
-              initialOption={statusReason ? getAnotherOptionStringFromNumericValue(statusReason) : ''}
-              style={{width: "100%", marginLeft: 0, marginTop: 5}}
-            />
+            {statusReason && (
+              <LoanStatusPicker
+                onOptionChange={handleAnotherOptionChange}
+                title="Status Reason"
+                options={['AadharNotMatching', 'InvalidDocuments']}
+                initialOption={statusReason ? getAnotherOptionStringFromNumericValue(statusReason) : ''}
+                style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
+              />
+            )}
+
+            {approver && (
+              <TextInput
+                style={[styles.textInputContainer, { color: "gray" }]}
+                value={approver}
+                placeholder="Approver"
+                onChangeText={(text) => {
+                  setApprover(text);
+                }}
+                editable={false}
+              />
+            )}
+
+            {approvalDate && (
+              <TextInput
+                style={[styles.textInputContainer, { color: "gray" }]}
+                value={approvalDate}
+                placeholder="Approval Date"
+                onChangeText={(text) => {
+                  setApprovalDate(text);
+                }}
+                editable={false}
+              />
+            )}
+
+            {firstEMIDate && (
+              <TextInput
+                style={[styles.textInputContainer, { color: "gray" }]}
+                value={firstEMIDate}
+                placeholder="First EMI Date"
+                onChangeText={(text) => {
+                  setfirstEMIDate(text);
+                }}
+                editable={false}
+              />
+            )}     
 
             <ButtonComponent title="Update" onPress={handleUpdateRecord} />
           </View>

@@ -15,14 +15,6 @@ export const LoginForm = () => {
   const [isMounted, setIsMounted] = useState(false);
 
   const navigation = useNavigation();
-  const mountedRef = useRef(true);
-
-  useEffect(() => {
-    setIsMounted(true);
-    return () => {
-      mountedRef.current = false;
-    };
-  }, []);
 
   const handleLogin = async () => {
     if (!kf_name || !kf_password ) {

@@ -37,50 +37,60 @@ const StackNavigator = () => (
     <Stack.Screen name="EditHomeLoan" component={EditHomeLoan} options={{ headerShown: false }} />
     <Stack.Screen name="EditPersonalLoan" component={EditPersonalLoan} options={{ headerShown: false }} />
     <Stack.Screen name="DynamicDashboardScreen" component={DynamicDashboardScreen} options={{
-          headerShown: false,
-          unmountOnBlur: true,  
-        }} />
+      headerShown: false,
+      unmountOnBlur: true,
+    }} />
   </Stack.Navigator>
 );
 
 const DrawerNavigator = () => (
   <Drawer.Navigator
-    drawerContent={(props) => <CustomDrawerContent {...props} />}
+  initialRouteName='Dashboards'
+  drawerContent={(props) => <CustomDrawerContent {...props} />}
     screenOptions={{
       drawerStyle: {
         width: 210,
+        height: "100%"
       },
       drawerLabelStyle: {
-        color: 'red', 
+        color: 'red',
         fontSize: 15
       },
       drawerItemStyle: {
-        borderBottomColor: 'gray', 
-        borderBottomWidth: 1, 
+        borderBottomColor: 'gray',
+        borderBottomWidth: 1,
       },
     }}>
-    <Drawer.Screen
+       <Drawer.Screen
       name="Dashboards"
       component={StackNavigator}
       options={{
         headerShown: false,
-        drawerIcon: DashboardIcon, 
+        drawerIcon: DashboardIcon,
       }}
     />
-    <Drawer.Screen
-      name="Accounts"
+      <Drawer.Screen
+      name="Profile"
       component={Account}
       options={{
         headerShown: false,
-        drawerIcon: AccountIcon, 
+        drawerIcon: AccountIcon,
       }}
     />
+    {/* <Drawer.Screen
+      name="Dashboards"
+      component={StackNavigator}
+      options={{
+        headerShown: false,
+        drawerIcon: DashboardIcon,
+      }}
+    /> */}
     <Drawer.Screen
       name="Loans"
       component={Loan}
       options={{
         headerShown: false,
-        drawerIcon: LoanIcon, 
+        drawerIcon: LoanIcon,
       }}
     />
     <Drawer.Screen
@@ -88,19 +98,19 @@ const DrawerNavigator = () => (
       component={Setting}
       options={{
         headerShown: false,
-        drawerIcon: SettingIcon, 
-      drawerItemStyle: {
-        marginBottom: 500
-      },
+        drawerIcon: SettingIcon,
+        drawerItemStyle: {
+          marginBottom: 500
+        },
       }}
     />
   </Drawer.Navigator>
 );
 
-const AuthNavigator = () => (
+const AllStackScreens = () => (
   <Drawer.Navigator>
-    <Drawer.Screen name="Main" component={DrawerNavigator} options={{ headerShown: false }} />
+    <Drawer.Screen name="MainScreen" component={DrawerNavigator} options={{ headerShown: false }} />
   </Drawer.Navigator>
 );
 
-export default AuthNavigator;
+export default AllStackScreens;
