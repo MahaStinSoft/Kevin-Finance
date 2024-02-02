@@ -38,12 +38,24 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [isaadharNumberValid, setIsaadharcardNumberValid] = useState(true);
   const [isPancardNumberValid, setIsPancardNumberValid] = useState(true);
+  const [isLoanAmountValid, setIsLoanAmountValid] = useState(true);
 
 
   const [recordId, setRecordId] = useState(loanApplication.kf_loanapplicationid);
 
+  const [errorMessages, setErrorMessages] = useState({
+    firstNameEdit: '',
+    lastNameEdit: '',
+    dateOfBirthEdit: '',
+    mobileNumberEdit: '',
+    emailEdit: '',
+    loanAmountRequestedEdit: '',
+    aadharCardNumberEdit: '',
+    panCardNumberEdit: '',
+  });
+
   const handleGoBack = () => {
-    navigation.navigate("HomeLoanDetailsScreen", {loanApplication});
+    navigation.navigate("HomeLoanDetailsScreen", { loanApplication });
   };
 
   useEffect(() => {
@@ -52,7 +64,7 @@ const EditHomeLoan = ({ route, navigation }) => {
     setfirstname(loanApplication.kf_name);
     setLastname(loanApplication.kf_lastname);
     setdateofbirth(loanApplication.kf_dateofbirth ? new Date(loanApplication.kf_dateofbirth) : null);
-    setage(loanApplication.kf_age || ''); 
+    setage(loanApplication.kf_age || '');
     setGender(loanApplication.kf_gender);
     setMobileNumber(loanApplication.kf_mobilenumber);
     setEmail(loanApplication.kf_email);
@@ -81,6 +93,58 @@ const EditHomeLoan = ({ route, navigation }) => {
   }, [loanApplication]);
 
   const handleUpdateRecord = async () => {
+
+    // Check if the age is greater than 18
+    if (calculateAge(dateofbirth) < 18) {
+      setErrorMessages({
+        ...errorMessages,
+        dateOfBirthEdit: 'You must be at least 18 years old to proceed.',
+      });
+      return; // Stop the update process
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setErrorMessages({
+        ...errorMessages,
+        emailEdit: 'Enter a Valid Email Address',
+      });
+      return; // Stop the update process if email is invalid
+    }
+
+    const minLoanAmount = 25000;
+    const maxLoanAmount = 1500000;
+
+    if (loanAmountRequested < minLoanAmount || loanAmountRequested > maxLoanAmount) {
+      setErrorMessages({
+        ...errorMessages,
+        loanAmountRequestedEdit: `Loan amount should be between ${minLoanAmount} and ${maxLoanAmount} INR.`,
+      });
+      return;
+    }
+
+    if (!isPancardNumberValid) {
+      setErrorMessages({
+        ...errorMessages,
+        panCardNumberEdit: 'Enter Valid PAN Card',
+      });
+      return;
+    }
+
+    const newErrorMessages = {
+      firstNameEdit: !firstname ? 'Enter First Name' : '',
+      lastNameEdit: !lastname ? 'Enter Last Name' : '',
+      dateOfBirthEdit: !dateofbirth ? 'Enter Date of Birth' : '',
+      mobileNumberEdit: /^\d{10}$/.test(mobileNumber) ? '' : 'Please Enter a Valid 10-digit mobile number.',
+      emailEdit: !email ? 'Enter Email Address' : '',
+      loanAmountRequestedEdit: /^\d{5,7}$/.test(loanAmountRequested) ? '' : 'Enter Loan Amount',
+      aadharCardNumberEdit: /^\d{12}$/.test(aadharcardNumber) ? '' : 'Please Enter Valid Aadharcard Number',
+      panCardNumberEdit: !pancardNumber ? 'Enter PAN Card Number' : '',
+    };
+    setErrorMessages(newErrorMessages);
+
+    if (Object.values(newErrorMessages).some(message => message !== '')) {
+      return;
+    }
     try {
       // Your authentication logic here
 
@@ -184,11 +248,27 @@ const EditHomeLoan = ({ route, navigation }) => {
     }
   };
 
-  const validateEmail = (email) => {
-    const trimmedEmail = email.trim();
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(trimmedEmail);
+  const handleEmailChange = (text) => {
+    setEmail(text);
+  
+    if (text.trim() === '') {
+      setErrorMessages({
+        ...errorMessages,
+        emailEdit: 'Enter Email Address',
+      });
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text)) {
+      setErrorMessages({
+        ...errorMessages,
+        emailEdit: 'Enter a Valid Email Address',
+      });
+    } else {
+      setErrorMessages({
+        ...errorMessages,
+        emailEdit: '',
+      });
+    }
   };
+  
 
   const calculateAge = (birthDate) => {
     const today = new Date();
@@ -206,29 +286,55 @@ const EditHomeLoan = ({ route, navigation }) => {
   const handleDateOfBirth = (newDate) => {
     if (!newDate) {
       setdateofbirth(null);
-      setage(''); 
+      setage('');
+      setErrorMessages({
+        ...errorMessages,
+        dateOfBirthEdit: '',
+      });
       return;
     }
-    setdateofbirth(newDate);
-    setage(calculateAge(newDate).toString());
-  };
 
-  const handleaadharcardNumberValid = (text) => {
-    setAadharcardNumber(text);
-    const aadharRegex = /^\d{12}$/;
-    setIsaadharcardNumberValid(aadharRegex.test(text));
+    const calculatedAge = calculateAge(newDate);
+    setdateofbirth(newDate);
+    setage(calculatedAge.toString());
+
+    if (calculatedAge <= 18) {
+      setErrorMessages({
+        ...errorMessages,
+        dateOfBirthEdit: 'You must be at least 18 years old.',
+      });
+    } else {
+      setErrorMessages({
+        ...errorMessages,
+        dateOfBirthEdit: '',
+      });
+    }
   };
 
   const handlePancardNumberValid = (text) => {
     setPancardNumber(text);
-    const panRegex = /^[A-Za-z]{5}[0-9]{4}[A-Za-z]$/;
-    setIsPancardNumberValid(panRegex.test(text));
+
+    if (text.trim() === '') {
+      setErrorMessages({
+        ...errorMessages,
+        panCardNumberEdit: 'Enter PAN Card',
+      });
+      setIsPancardNumberValid(false);
+    } else if (/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(text)) {
+      setErrorMessages({
+        ...errorMessages,
+        panCardNumberEdit: '',
+      });
+      setIsPancardNumberValid(true);
+    } else {
+      setErrorMessages({
+        ...errorMessages,
+        panCardNumberEdit: 'Enter Valid PAN Card',
+      });
+      setIsPancardNumberValid(false);
+    }
   };
 
-  const handleLoanAmountRequestedChange = (text) => {
-    const amountRequested = text.trim() !== '' ? parseFloat(text) : null;
-    setLoanAmountRequested(amountRequested);
-  };
 
   const handleGenderOptionset = (selectedOptionGender) => {
     let numericValue;
@@ -324,18 +430,85 @@ const EditHomeLoan = ({ route, navigation }) => {
     }
   };
 
+  const handleMobileNumberChange = (text) => {
+    setMobileNumber(text);
+
+    if (text.trim() === '') {
+      setIsMobileNumberValid(false);
+      setErrorMessages({
+        ...errorMessages,
+        mobileNumberEdit: 'Enter Mobile Number',
+      });
+    } else {
+      setIsMobileNumberValid(/^\d{10}$/.test(text));
+      setErrorMessages({
+        ...errorMessages,
+        mobileNumberEdit: /^\d{10}$/.test(text) ? '' : 'Please Enter a Valid 10-digit mobile number.',
+      });
+    }
+  };
+
+  const handleAadharCardNumberChange = (text) => {
+    setAadharcardNumber(text);
+    
+    if (text.trim() === '') {
+      setIsaadharcardNumberValid(false);
+      setErrorMessages({
+        ...errorMessages,
+        aadharCardNumberEdit: 'Enter Aadhar Card Number',
+      });
+    } else {
+      const aadharRegex = /^\d{12}$/;
+      const isValid = aadharRegex.test(text);
+  
+      setIsaadharcardNumberValid(isValid);
+      setErrorMessages({
+        ...errorMessages,
+        aadharCardNumberEdit: isValid ? '' : 'Aadhar Card Number must be exactly 12 digits',
+      });
+    }
+  };
+  
+
+  const handleLoanAmountRequestedChange = (text) => {
+    const amountRequested = text.trim() !== '' ? parseFloat(text) : null;
+    setLoanAmountRequested(amountRequested);
+
+    const minLoanAmount = 25000;
+    const maxLoanAmount = 1500000;
+
+    if (text.trim() === '') {
+      setErrorMessages({
+        ...errorMessages,
+        loanAmountRequestedEdit: 'Enter Loan Amount',
+      });
+    } else if (/^\d{5,7}$/.test(text) && amountRequested !== null && amountRequested >= minLoanAmount && amountRequested <= maxLoanAmount) {
+      setErrorMessages({
+        ...errorMessages,
+        loanAmountRequestedEdit: '',
+      });
+    } else {
+      setErrorMessages({
+        ...errorMessages,
+        loanAmountRequestedEdit: `Enter Loan Amount (${minLoanAmount} to ${maxLoanAmount} INR)`,
+      });
+    }
+  };
+
+
   return (
     <>
-      <HeaderComponent titleText="Edit Home Screen" 
-      onPress={handleGoBack} 
-      onIconPress={handleUpdateRecord}
-      screenIcon="md-save" 
-      screenIconStyle={{ marginTop: 5 }}/>
+      <HeaderComponent titleText="Edit Home Screen"
+        onPress={handleGoBack}
+        onIconPress={handleUpdateRecord}
+        screenIcon="md-save"
+        screenIconStyle={{ marginTop: 5 }} 
+        />
       <ScrollView>
         <View style={styles.container}>
           <View style={styles.wrapper}>
-          <TextInput
-              style={[styles.textInputContainer, {color: "gray"}]}
+            <TextInput
+              style={[styles.textInputContainer, { color: "gray" }]}
               value={applicationnumber}
               placeholder="Application No"
               onChangeText={(text) => {
@@ -361,26 +534,38 @@ const EditHomeLoan = ({ route, navigation }) => {
               onChangeText={(text) => {
                 setfirstname(text);
                 setIsfirstnameValid(text.trim() !== '');
+
+                // Update error message
+                setErrorMessages({
+                  ...errorMessages,
+                  firstNameEdit: text.trim() !== '' ? '' : 'Enter First Name',
+                });
               }}
             />
-            {!isfirstnameValid && <Text style={styles.errorText}>Please Enter a Valid First Name.</Text>}
+            {errorMessages.firstNameEdit !== '' && <Text style={styles.errorText}>{errorMessages.firstNameEdit}</Text>}
 
             <TextInput
               style={styles.textInputContainer}
               value={lastname}
               placeholder="Last Name"
-              onChangeText={(text) => {setLastname(text);
+              onChangeText={(text) => {
+                setLastname(text);
                 setIsLastNameValid(text.trim() !== '')
+
+                setErrorMessages({
+                  ...errorMessages,
+                  lastNameEdit: text.trim() !== '' ? '' : 'Enter Last Name',
+                });
               }}
             />
-            {!isLastNameValid && <Text style={styles.errorText}>Please Enter a Valid Last Name.</Text>}
-            
+            {errorMessages.lastNameEdit !== '' && <Text style={styles.errorText}>{errorMessages.lastNameEdit}</Text>}
+
             <LoanStatusPicker
               onOptionChange={handleGenderOptionset}
               title="Gender"
               options={['Male', 'Female']}
               initialOption={gender ? getGenderOptionsetStringFromNumericValue(gender) : ''}
-              style={{width: "100%", marginLeft: 0, marginTop: 5}}
+              style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
             />
 
             <ComponentDatePicker
@@ -389,9 +574,11 @@ const EditHomeLoan = ({ route, navigation }) => {
               placeholder="Date of Birth"
               style={{ width: "100%", height: 45, marginTop: 5, marginLeft: 0 }}
             />
+            {errorMessages.dateOfBirthEdit !== '' && <Text style={styles.errorText}>{errorMessages.dateOfBirthEdit}</Text>}
+
 
             <TextInput
-              style={[styles.textInputContainer, {color: "gray"}]}
+              style={[styles.textInputContainer, { color: "gray" }]}
               value={age.toString()}
               placeholder="Age"
               onChangeText={(text) => setage(text)}
@@ -402,26 +589,23 @@ const EditHomeLoan = ({ route, navigation }) => {
               style={styles.textInputContainer}
               value={mobileNumber}
               placeholder="Mobile Number"
-              onChangeText={(text) => {
-                setMobileNumber(text);
-                setIsMobileNumberValid(/^\d{10}$/.test(text));
-              }}
+              onChangeText={handleMobileNumberChange}
               keyboardType="numeric"
             />
-            {!isMobileNumberValid && (
-              <Text style={styles.errorText}>Please Enter a Valid 10-digit mobile number.</Text>
+            {errorMessages.mobileNumberEdit !== '' && (
+              <Text style={styles.errorText}>{errorMessages.mobileNumberEdit}</Text>
             )}
 
             <TextInput
               style={styles.textInputContainer}
               value={email}
               placeholder="Email"
-              onChangeText={(text) => {
-                setEmail(text);
-                setIsEmailValid(text.trim() === '' || validateEmail(text));
-              }}
+              onChangeText={handleEmailChange}
             />
-            {!isEmailValid && <Text style={styles.errorText}>Please Enter a Valid email address.</Text>}
+            {errorMessages.emailEdit !== '' && (
+              <Text style={styles.errorText}>{errorMessages.emailEdit}</Text>
+            )}
+
             <TextInput
               style={styles.textInputContainer}
               value={address1}
@@ -457,41 +641,41 @@ const EditHomeLoan = ({ route, navigation }) => {
               style={styles.textInputContainer}
               value={aadharcardNumber}
               placeholder="Aadharcard Number"
-              onChangeText={(text) => handleaadharcardNumberValid(text)}
+              onChangeText={handleAadharCardNumberChange}
             />
-            {!isaadharNumberValid && (
-              <Text style={styles.errorText}>
-                Please Enter a Valid Aadhar card number.
-              </Text>
+            {errorMessages.aadharCardNumberEdit !== '' && (
+              <Text style={styles.errorText}>{errorMessages.aadharCardNumberEdit}</Text>
             )}
+
 
             <TextInput
               style={styles.textInputContainer}
               value={pancardNumber}
               placeholder="PAN Card Number"
-              onChangeText={(text) => handlePancardNumberValid(text)}
+              onChangeText={handlePancardNumberValid}
             />
-            {!isPancardNumberValid && (
-              <Text style={styles.errorText}>
-                Please Enter a Valid PAN card number.
-              </Text>
+            {errorMessages.panCardNumberEdit !== '' && (
+              <Text style={styles.errorText}>{errorMessages.panCardNumberEdit}</Text>
             )}
 
             <TextInput
               style={styles.textInputContainer}
               placeholder="Loan Amount Request"
               value={loanAmountRequested ? loanAmountRequested.toString() : ''}
-              onChangeText={(text) => handleLoanAmountRequestedChange(text)}
+              onChangeText={handleLoanAmountRequestedChange}
             />
+            {errorMessages.loanAmountRequestedEdit !== '' && (
+              <Text style={styles.errorText}>{errorMessages.loanAmountRequestedEdit}</Text>
+            )}
 
             <LoanStatusPicker
               onOptionChange={handleLoanStatusChange}
               title="Select Loan Status"
               options={['Approved', 'PendingApproval', 'Draft', 'Cancelled']}
               initialOption={getStatusStringFromNumericValue(status)}
-              style={{width: "100%", marginLeft: 0, marginTop: 5}}
+              style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
             />
-            
+
             {statusReason && (
               <LoanStatusPicker
                 onOptionChange={handleAnotherOptionChange}

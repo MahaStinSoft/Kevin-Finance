@@ -10,6 +10,7 @@ import TextInputComponent from '../common/TextInput';
 import ButtonComponent from '../common/ButtonComponent';
 import LoanStatusPicker from '../common/LoanStatusPicker ';
 import ComponentDatePicker from '../common/ComponentDatePicker';
+import CardImage from '../common/CardImage';
 
 export const HomeScreen = ({ route }) => {
   const [kf_name, setkf_name] = useState(null);
@@ -27,16 +28,18 @@ export const HomeScreen = ({ route }) => {
   const [kf_loanamountrequested, setkf_loanamountrequested] = useState(null);
   const [kf_aadharnumber, setkf_aadharnumber] = useState(null);
   const [kf_aadharcard, setkf_aadharcard] = useState({ fileName: null, fileContent: null });
+  const [kf_pancard, setkf_pancard] = useState({ fileName: null, fileContent: null });
   const [kf_pannumber, setkf_pannumber] = useState(null);
   const [kf_createdby, setkf_createdby] = useState(null);
-  // const [image, setImage] = useState(null);
+  const [ModalVisible, setModalVisible] = useState(null);  
+const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fileContent: null });
   const [authenticatedUser, setAuthenticatedUser] = useState(null);
   const [resetFormKey, setResetFormKey] = useState(0);
 
   const navigation = useNavigation();
   const isFocused = useIsFocused();
 
-  console.log("mobile", kf_mobilenumber);
+  console.log("pan", kf_pannumber);
 
   const [errorMessages, setErrorMessages] = useState({
     firstName: '',
@@ -70,6 +73,8 @@ export const HomeScreen = ({ route }) => {
     setkf_loanamountrequested(null);
     setkf_aadharnumber(null);
     setkf_aadharcard({ fileName: null, fileContent: null });
+    setkf_pancard({ fileName: null, fileContent: null });
+    setkf_applicantimage({ fileName: null, fileContent: null });
     setResetFormKey((prevKey) => prevKey + 1);
   };
 
@@ -136,7 +141,40 @@ export const HomeScreen = ({ route }) => {
     setkf_gender(numericValue);
   };
 
-  const pickImage = async () => {
+  // const pickImage = async () => {
+  //   try {
+  //     const result = await ImagePicker.launchImageLibraryAsync({
+  //       mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  //       allowsEditing: true,
+  //       aspect: [4, 3],
+  //       quality: 1,
+  //       base64: true,
+  //     });
+
+  //     if (result.canceled) {
+  //       return;
+  //     }
+  //     const byteArray = result.base64; // Use result.base64 directly
+  //     const fileName = result.uri.split('/').pop(); // Extracting filename from URI
+  //     console.log("result", result);
+
+
+  //     setkf_aadharcard({
+  //       fileName: fileName, // Extracting filename from URI
+  //       fileContent: byteArray,
+  //     });
+  //     setkf_pancard({
+  //       fileName: fileName, // Extracting filename from URI
+  //       fileContent: byteArray,
+  //     });
+  //   } catch (error) {
+  //     console.error('Error picking or processing the image:', error);
+  //     Alert.alert('Error', 'Failed to pick or process the image.');
+  //   }
+  // };
+
+
+  const pickImage = async (cardType) => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -145,25 +183,37 @@ export const HomeScreen = ({ route }) => {
         quality: 1,
         base64: true,
       });
-
+  
       if (result.canceled) {
         return;
       }
-      const byteArray = result.base64; // Use result.base64 directly
-      const fileName = result.uri.split('/').pop(); // Extracting filename from URI
-      console.log("result", result);
-
-
-      setkf_aadharcard({
-        fileName: fileName, // Extracting filename from URI
-        fileContent: byteArray,
-      });
+      
+      const byteArray = result.base64;
+      const fileName = result.uri.split('/').pop();
+  
+      if (cardType === 'aadhar') {
+        setkf_aadharcard({
+          fileName: fileName,
+          fileContent: byteArray,
+        });
+      } else if (cardType === 'pan') {
+        setkf_pancard({
+          fileName: fileName,
+          fileContent: byteArray,
+        });
+      } else if (cardType === 'applicantimage') {
+        setkf_applicantimage({
+          fileName:  fileName,
+          fileContent:  byteArray
+        })
+      }
+  
     } catch (error) {
       console.error('Error picking or processing the image:', error);
       Alert.alert('Error', 'Failed to pick or process the image.');
     }
   };
-
+  
   const handleFirstNameChange = (text) => {
     if (text.trim() !== '') {
       setkf_name(text);
@@ -348,6 +398,10 @@ export const HomeScreen = ({ route }) => {
     }
   };
 
+  const onViewImage = () => {
+    setModalVisible(true);
+  };
+
   const handleSaveRecord = async () => {
 
     const newErrorMessages = {
@@ -384,8 +438,11 @@ export const HomeScreen = ({ route }) => {
       const formattedDateOfBirth = kf_dateofbirth ? kf_dateofbirth.toISOString() : null;
       const loanAmount = parseFloat(kf_loanamountrequested);
       const userAdminName = authenticatedUser ? authenticatedUser.kf_adminname : '';
+    //   const aadharcardImageData = await prepareImageData(kf_aadharcard);
+    // const pancardImageData = await prepareImageData(kf_pancard);
+    // const applicantImageData = await prepareImageData(kf_applicantimage);
 
-      console.log("Detailed Error Response:", userAdminName);
+      console.log("userAdminName", userAdminName);
 
       const createRecordResponse = await axios.post(
         "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications",
@@ -405,7 +462,9 @@ export const HomeScreen = ({ route }) => {
           kf_loanamountrequested: loanAmount,
           kf_aadharnumber: kf_aadharnumber,
           kf_pannumber: kf_pannumber,
-          // kf_aadharcard: kf_aadharcard.fileContent,
+          // kf_aadharcard: aadharcardImageData,
+          // kf_pancard: pancardImageData,
+          // kf_applicantimage: applicantImageData,
           kf_createdby: userAdminName
         },
         {
@@ -415,6 +474,9 @@ export const HomeScreen = ({ route }) => {
           },
         }
       );
+      console.log("aadhar:"+kf_aadharcard);
+      console.log("pan:"+kf_pancard);
+
       if (createRecordResponse.status === 204) {
         console.log("Record created successfully in CRM"); //createRecordResponse
         Alert.alert('Created record Successfully.', '', [
@@ -431,8 +493,10 @@ export const HomeScreen = ({ route }) => {
       }
     } catch (error) {
       console.error("Error during record creation:", error);
-      console.log("Detailed Error Response:", error.response); // Log the detailed error response
-      Alert.alert("Error", "An unexpected error occurred.  try again later.");
+      if (error.response) {
+        console.log("Detailed Error Response:", error.response.data);
+      }
+      Alert.alert("Error", "An unexpected error occurred. Try again later.");
     }
   };
 
@@ -595,28 +659,29 @@ export const HomeScreen = ({ route }) => {
             <Text style={styles.errorText}>{errorMessages.loanAmountRequested}</Text>
           )}
 
-          {/* <View style={{ flexDirection: "row", marginTop: 15 }}>
-            <View style={{ marginHorizontal: 25, marginTop: 10 }}>
-              <TouchableOpacity onPress={pickImage}>
-                <Text>AadharCard</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={{ backgroundColor: "gray", padding: 10, borderRadius: 20, width: 160, marginLeft: 30 }}>
-              {kf_aadharcard.fileContent ? (
-                <>
-                  <Text style={{ marginTop: 10, textAlign: "center" }}>{kf_aadharcard.fileName}</Text>
-                  <Image
-          style={{ width: 100, height: 100 }}
-          source={{ uri: `data:image/jpeg;base64,${kf_aadharcard.fileContent}` }}
-        /> 
-                </>
-              ) : (
-                <TouchableOpacity onPress={() => console.log()}>
-                  <Text style={{ color: "white", textAlign: "center" }}>Upload</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          </View> */}
+          {/* <CardImage
+            title="AadharCard"
+            imageContent={kf_aadharcard}
+            onViewImage={onViewImage}
+            pickImage={() => pickImage('aadhar')}
+            setModalVisible={setModalVisible}
+          />
+
+          <CardImage
+            title="PANCard"
+            imageContent={kf_pancard}
+            onViewImage={onViewImage}
+            pickImage={() => pickImage('pan')}
+            setModalVisible={setModalVisible}
+          />
+
+          <CardImage
+            title="Applicant"
+            imageContent={kf_applicantimage}
+            onViewImage={onViewImage}
+            pickImage={() => pickImage('applicantimage')}
+            setModalVisible={setModalVisible}
+          />  */}
 
           <ButtonComponent
             title="SUBMIT"

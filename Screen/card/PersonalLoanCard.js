@@ -45,9 +45,10 @@ const PersonalLoanCard = ({ personalLoan, onPress, onDelete }) => {
       <TouchableOpacity style={styles.card} onPress={() => onPress(personalLoan)}>
         {renderImage()}
         <View style={styles.cardContent}>
-          <Text style={styles.cardTitle}>{`${personalLoan.kf_firstname} ${personalLoan.kf_lastname}`}</Text>
-          {/* <Text style={styles.cardLabel}>{`Loan Amount: ${personalLoan.kf_loanamountrequested}`}</Text> */}
-          <Text style={styles.cardLabel}>{`Application Number: ${personalLoan.kf_applicationnumber || ''}`}</Text>
+          <Text style={styles.cardTitle}>{`${personalLoan.kf_firstname} ${personalLoan.kf_lastname} - ${personalLoan.kf_applicationnumber }`}</Text>
+           {/* <Text style={styles.cardLabel}>{`Application Number: ${personalLoan.kf_applicationnumber || ''}`}</Text> */}
+          <Text style={styles.cardLabel}>{`Mobile Number: ${personalLoan.kf_mobile || ''}`}</Text>
+          <Text style={styles.cardLabel}>{`Aadhar Number: ${personalLoan.kf_aadharnumber || ''}`}</Text>
           <Text style={styles.cardLabel}>{`Status: ${getLoanStatusLabel()}`}</Text>
         </View>
       </TouchableOpacity>

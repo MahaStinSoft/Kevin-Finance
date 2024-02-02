@@ -12,16 +12,18 @@ import {
   ActivityIndicator,
   StatusBar,
   Platform,
-  RefreshControl,
+RefreshControl
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { BarChart } from 'react-native-chart-kit';
+import LogoutButton from '../common/CustomDrawer';
 
 import HomeLoanCard from './card/HomeLoanCard';
 import PersonalLoanCard from './card/PersonalLoanCard';
+import DynamicDashboardScreen from './DynamicDashboardScreen';
 
 const DashboardScreen = ({ navigation, route }) => {
   // const { authenticatedUser } = route.params;
@@ -54,6 +56,7 @@ const DashboardScreen = ({ navigation, route }) => {
     getAuthenticatedUser();
   }, [isFocused, getAuthenticatedUser]);
 
+  // Update displayed loans based on showAllLoans state
   useEffect(() => {
     setDisplayedHomeLoans(showAllLoans ? HomeLoanRecords : HomeLoanRecords.slice(0, 3));
     setDisplayedPersonalLoans(showAllLoans ? PersonalLoanRecords : PersonalLoanRecords.slice(0, 3));
@@ -147,13 +150,21 @@ const DashboardScreen = ({ navigation, route }) => {
         const homeLoanRecords = homeLoans.filter(
           (homeLoan) => 
             homeLoan.kf_createdby === userAdmin &&
-            homeLoan.kf_name && homeLoan.kf_name.toUpperCase().includes(searchQuery.toUpperCase())
-        );
-    
+            (
+              homeLoan.kf_name && homeLoan.kf_name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+              (homeLoan.kf_mobilenumber && homeLoan.kf_mobilenumber.toLowerCase().includes(searchQuery.toLowerCase())) ||
+              (homeLoan.kf_aadharnumber && homeLoan.kf_aadharnumber.toLowerCase().includes(searchQuery.toLowerCase()))
+            )
+        );        
+        
         const personalLoanRecords = personalLoans.filter(
           (personalLoan) => 
             personalLoan.kf_createdby === userAdmin &&
-            personalLoan.kf_name && personalLoan.kf_name.toUpperCase().includes(searchQuery.toUpperCase())
+            (
+              personalLoan.kf_name && personalLoan.kf_name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+              (personalLoan.kf_mobile && personalLoan.kf_mobile.toLowerCase().includes(searchQuery.toLowerCase())) ||
+              (personalLoan.kf_aadharnumber && personalLoan.kf_aadharnumber.toLowerCase().includes(searchQuery.toLowerCase()))
+            )
         );
     
         setHomeLoanRecords(homeLoanRecords);
@@ -266,6 +277,8 @@ const DashboardScreen = ({ navigation, route }) => {
       }
     }, [authenticatedUser])
   );
+  
+  
 
   const filteredData = loanData.filter(
     (item) =>
@@ -283,6 +296,7 @@ const DashboardScreen = ({ navigation, route }) => {
 
   const handleStatusClick = (status) => {
     if (selectedStatus === status) {
+      // If the same status is clicked again, reset the filter
       setSelectedLoanStatus(null);
     } else {
       setSelectedLoanStatus(status);
@@ -307,11 +321,20 @@ const DashboardScreen = ({ navigation, route }) => {
   const handleClearSearch = () => {
     setSearchQuery('');
     setShowClearIcon(false);
+    // Optionally, you can reset or re-fetch your data here
   };
   const handleRefresh = () => {
     // This function will be called when you want to refresh the page
-    setRefresh(refresh);
+    setRefresh(!refresh);
   };
+
+const handleDynamicDashboard = () => {
+ try {
+  navigation.navigate('DynamicDashboardScreen');
+} catch (error) {
+  console.error('Error navigating to DynamicDashboardScreen:', error);
+}
+}
 
   return (
     <>
@@ -368,6 +391,7 @@ const DashboardScreen = ({ navigation, route }) => {
                 <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 2, textAlign: "center" }}>Created By: {authenticatedUser.kf_adminname}</Text>
               )}
             </View>
+            {/* <LogoutButton navigation={navigation}/> */}
 
             <View style={styles.chart}>
               <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 10, marginBottom: 10 }}>Loan Status Chart</Text>
@@ -426,6 +450,11 @@ const DashboardScreen = ({ navigation, route }) => {
               />
             </View>
 
+              {/* Dynamic Dashboard Button */}
+              {/* <TouchableOpacity style={styles.dynamicDashboardButton} onPress={handleDynamicDashboard}>
+                <Text style={styles.dynamicDashboardButtonText}>Dynamic Dashboard</Text>
+              </TouchableOpacity> */}
+
               <View style={{ marginLeft: 0 }}>
                 <TouchableOpacity
                   onPress={() => setShowAllLoans(!showAllLoans)}
@@ -436,6 +465,34 @@ const DashboardScreen = ({ navigation, route }) => {
                   </Text>
                 </TouchableOpacity>
               </View>
+
+
+            {/* <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10 }}>
+            {loading ? (
+              <ActivityIndicator size="large" color="#0000ff" />
+            ) : (
+              <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
+            <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Home Loans</Text>
+            {displayedHomeLoans.map((homeLoan, index) => (
+              <HomeLoanCard
+                key={index}
+                loanApplication={homeLoan}
+                onPress={() => navigateToHomeDetails(homeLoan)}
+              />
+            ))}
+
+            <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 20, marginBottom: 10 }}>Personal Loans</Text>
+            {displayedPersonalLoans.map((personalLoan, index) => (
+              <PersonalLoanCard
+                key={index}
+                personalLoan={personalLoan}
+                onPress={() => navigateToPersonalDetails(personalLoan)}
+              />
+            ))}
+
+              </ScrollView>
+            )}
+          </View> */}
 
             <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10 }}>
             {initialLoading ? (
