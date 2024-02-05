@@ -44,7 +44,7 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
   const [isaadharNumberValid, setIsaadharcardNumberValid] = useState(true);
   const [isPancardNumberValid, setIsPancardNumberValid] = useState(true);
   const [isLoanAmountValid, setIsLoanAmountValid] = useState(true);
-  const [isRecordCreated, setIsRecordCreated] = useState(true);
+
 
   const navigation = useNavigation();
   const isFocused = useIsFocused();
@@ -512,8 +512,7 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
         }
       );
       if (createRecordResponse.status === 204) {
-        console.log("Record created successfully in CRM"); 
-        setIsRecordCreated(true);//createRecordResponse
+        console.log("Record created successfully in CRM"); //createRecordResponse
         Alert.alert('Created record Successfully.', '', [
           {
           text: 'Cancel',
@@ -573,13 +572,12 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
           {errorMessages.loanAmountRequested !== '' && (
             <Text style={styles.errorText}>{errorMessages.loanAmountRequested}</Text>
           )}
-
+          
           <TextInputComponent
             placeholder="First Name"
             autoCapitalize="none"
             value={kf_name}
             onChangeText={handleFirstNameChange}
-            editable={isRecordCreated}
           />
           {errorMessages.firstName !== '' && (
             <Text style={styles.errorText}>{errorMessages.firstName}</Text>
