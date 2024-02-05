@@ -10,7 +10,8 @@ import TextInputComponent from '../common/TextInput';
 import ButtonComponent from '../common/ButtonComponent';
 import LoanStatusPicker from '../common/LoanStatusPicker ';
 import ComponentDatePicker from '../common/ComponentDatePicker';
-import CardImage from '../common/CardImage';
+// import CardImage from '../common/CardImage';
+import { setLocale } from 'yup';
 
 export const HomeScreen = ({ route }) => {
   const [kf_name, setkf_name] = useState(null);
@@ -35,6 +36,15 @@ export const HomeScreen = ({ route }) => {
 const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fileContent: null });
   const [authenticatedUser, setAuthenticatedUser] = useState(null);
   const [resetFormKey, setResetFormKey] = useState(0);
+
+  const [isfirstnameValid, setIsfirstnameValid] = useState(true);
+  const [isLastNameValid, setIsLastNameValid] = useState(true);
+  const [isMobileNumberValid, setIsMobileNumberValid] = useState(true);
+  const [isEmailValid, setIsEmailValid] = useState(true);
+  const [isaadharNumberValid, setIsaadharcardNumberValid] = useState(true);
+  const [isPancardNumberValid, setIsPancardNumberValid] = useState(true);
+  const [isLoanAmountValid, setIsLoanAmountValid] = useState(true);
+  const [isRecordCreated, setIsRecordCreated] = useState(true);
 
   const navigation = useNavigation();
   const isFocused = useIsFocused();
@@ -234,153 +244,161 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
     }
   };
 
+  const calculateAge = (birthDate) => {
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+
+    return age;
+  };
+
   const handleDateOfBirth = (newDate) => {
     if (!newDate) {
+      setkf_dateofbirth(null);
+      setkf_age('');
       setErrorMessages({
         ...errorMessages,
-        dateOfBirth: 'Enter Date of Birth.'
+        dateOfBirth: '',
+      });
+      return;
+    }
+
+    const calculatedAge = calculateAge(newDate);
+    setkf_dateofbirth(newDate);
+    setkf_age(calculatedAge.toString());
+
+    if (calculatedAge < 18) {
+      setErrorMessages({
+        ...errorMessages,
+        dateOfBirth: 'You must be at least 18 years old.',
       });
     } else {
-      const birthDate = new Date(newDate);
-      const today = new Date();
-      let age = today.getFullYear() - birthDate.getFullYear();
-  
-      const hasBirthdayOccurred =
-        today.getMonth() > birthDate.getMonth() ||
-        (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
-  
-      if (!hasBirthdayOccurred) {
-        age--;
-      }
-  
-      if (age < 18) {
-        setErrorMessages({
-          ...errorMessages,        
-          dateOfBirth: 'Please select a valid date of birth.',
-          age: '',
-        }); 
-      } else {
-        setErrorMessages({
-          ...errorMessages,
-          dateOfBirth: '',
-          age: ''
-        });
-  
-        setkf_age(age.toString());
-        setkf_dateofbirth(newDate);
-      }
+      setErrorMessages({
+        ...errorMessages,
+        dateOfBirth: '',
+      });
     }
   };
 
   const handleMobileNumberChange = (text) => {
-    const cleanedText = text.replace(/^\d$/, '');
-  
-    if (!text.trim()) {
+    setkf_mobilenumber(text);
+
+    if (text.trim() === '') {
+      setIsMobileNumberValid(false);
       setErrorMessages({
         ...errorMessages,
-        mobileNumber: 'Enter Mobile Number.',
+        mobileNumber: 'Enter Mobile Number',
       });
-    } else if (/^[6-9]\d{9}$/.test(cleanedText)) {
-      setkf_mobilenumber(cleanedText);
+    } else if (/^[6-9]\d{9}$/.test(text)){
+      setIsMobileNumberValid();
       setErrorMessages({
         ...errorMessages,
         mobileNumber: '',
       });
     } else {
+      setIsMobileNumberValid();
       setErrorMessages({
         ...errorMessages,
-        mobileNumber: 'Enter a valid 10-digit mobile number.',
+        mobileNumber: 'Enter a Valid 10-digit mobile number.',
       });
     }
   };
 
-  const handleEmailChange = (email) => {
-    const trimmedEmail = email.trim();
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!trimmedEmail) {
+  const handleEmailChange = (text) => {
+    setkf_email(text);
+  
+    if (text.trim() === '') {
       setErrorMessages({
         ...errorMessages,
-        email: 'Enter Email Address.',
+        email: 'Enter Email Address',
       });
-    } else if (!regex.test(trimmedEmail)) {
-      setkf_email(email);
-      setErrorMessages({
-        ...errorMessages,
-        email: 'Enter a valid email address.',
-      });
-    } else {
-      setkf_email(email);
+    } else if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text)) {
       setErrorMessages({
         ...errorMessages,
         email: '',
+      });
+      setIsEmailValid(true)
+    } else {
+      setErrorMessages({
+        ...errorMessages,
+        email: 'Enter a Valid Email Address',
       });
     }
   };
 
   const handleAadharCardNumberValidation = (text) => {
-    if (!text.trim()) {
+    setkf_aadharnumber(text);
+    
+    if (text.trim() === '') {
+      setIsaadharcardNumberValid(false);
       setErrorMessages({
         ...errorMessages,
-        aadharCardNumber: 'Enter Aadhar number.',
+        aadharCardNumber: 'Enter Aadhar Card Number',
       });
-    } else if (/^\d{12}$/.test(text)) {
+    } else if  (/^\d{12}$/.test(text)) {
       setErrorMessages({
         ...errorMessages,
         aadharCardNumber: '',
       });
-      setkf_aadharnumber(text);
+      setIsaadharcardNumberValid(false);
     } else {
       setErrorMessages({
         ...errorMessages,
-        aadharCardNumber: 'Enter a valid 12-digit Aadhar number.',
+        aadharCardNumber: 'Enter Valid Aadharcard Number',
       });
+      setIsaadharcardNumberValid(true);
     }
   };
 
   const handlePancardNumberValidation = (text) => {
-    // Remove any non-alphanumeric characters
-    const cleanedText = text.replace(/[^a-z][@#$%^&*!()?/<>.,;:'"{}+=_-|]/g, '');
-      
-    if (cleanedText.length !== 10) {
+    setkf_pannumber(text);
+
+    if (text.trim() === '') {
       setErrorMessages({
         ...errorMessages,
-        panCardNumber: 'Enter a 10-character PAN card number.',
+        panCardNumber: 'Enter PAN Card',
+      });
+      setIsPancardNumberValid(false);
+    } else if (/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(text)) {
+      setErrorMessages({
+        ...errorMessages,
+        panCardNumber: '',
       });
     } else {
-      const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
-        if (panRegex.test(cleanedText)) {
-        setErrorMessages({
-          ...errorMessages,
-          panCardNumber: '',
-        });
-        setkf_pannumber(cleanedText);
-      } else {
-        setErrorMessages({
-          ...errorMessages,
-          panCardNumber: 'Enter a valid PAN card number.',
-        });
-      }
+      setErrorMessages({
+        ...errorMessages,
+        panCardNumber: 'Enter Valid PAN Card Number',
+      });
     }
   };
 
   const handleLoanAmountRequestedChange = (text) => {
+    const amountRequested = text.trim() !== '' ? parseFloat(text) : null;
+    setkf_loanamountrequested(amountRequested);
+
+    const minLoanAmount = 25000;
+    const maxLoanAmount = 1500000;
+
     if (text.trim() === '') {
       setErrorMessages({
         ...errorMessages,
-        loanAmountRequested: 'Enter loan amount.',
+        loanAmountRequested: 'Enter Loan Amount',
       });
-    } else if (!/^\d+$/.test(text)) {
-      setErrorMessages({
-        ...errorMessages,
-        loanAmountRequested: 'Enter a valid loan amount.',
-      });
-    } else {
+    } else if (/^\d{5,7}$/.test(text) && amountRequested !== null && amountRequested >= minLoanAmount && amountRequested <= maxLoanAmount) {
       setErrorMessages({
         ...errorMessages,
         loanAmountRequested: '',
       });
-      setkf_loanamountrequested(text);
+    } else {
+      setErrorMessages({
+        ...errorMessages,
+        loanAmountRequested: `Loan amount should be between ${minLoanAmount} and ${maxLoanAmount} INR.`,
+      });
     }
   };
 
@@ -404,15 +422,34 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
 
   const handleSaveRecord = async () => {
 
+     if (calculateAge(kf_dateofbirth) < 18) {
+      setErrorMessages({
+        ...errorMessages,
+        dateOfBirth: 'You must be at least 18 years old.',
+      });
+      return; 
+    }
+
+    const minLoanAmount = 25000;
+    const maxLoanAmount = 1500000;
+
+    if (kf_loanamountrequested < minLoanAmount || kf_loanamountrequested > maxLoanAmount) {
+      setErrorMessages({
+        ...errorMessages,
+        loanAmountRequested: `Loan amount should be between ${minLoanAmount} and ${maxLoanAmount} INR.`,
+      });
+      return;
+    }
+
     const newErrorMessages = {
       firstName: !kf_name ? ' Enter First Name' : '',
       lastName: !kf_lastname ? ' Enter Last Name' : '',
       dateOfBirth: !kf_dateofbirth ? ' Enter Date of Birth' : '',
-      mobileNumber: !kf_mobilenumber ? ' Enter Mobile Number' : '',
-      email: !kf_email ? ' Enter Email Address' : '',
+      mobileNumber: /^[6-9]\d{9}$/.test(kf_mobilenumber) ? '' : 'Enter a Valid 10-digit mobile number.',
+      email: !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(kf_email) ? 'Enter a Valid Email Address' : '',
       loanAmountRequested: !kf_loanamountrequested ? ' Enter Loan Amount Requested' : '',
-      aadharCardNumber: !kf_aadharnumber ? ' Enter Aadhar Card Number' : '',
-      panCardNumber: !kf_pannumber ? ' Enter PAN Card Number' : '',
+      aadharCardNumber: !/^\d{12}$/.test(kf_aadharnumber) ? 'Enter Valid Aadharcard Number' : '',
+      panCardNumber: !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(kf_pannumber) ? 'Enter Valid PAN Card Number' : '',
     };
     setErrorMessages(newErrorMessages);
     if (Object.values(newErrorMessages).some(message => message !== '')) {
@@ -474,12 +511,14 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
           },
         }
       );
-      console.log("aadhar:"+kf_aadharcard);
-      console.log("pan:"+kf_pancard);
-
       if (createRecordResponse.status === 204) {
-        console.log("Record created successfully in CRM"); //createRecordResponse
+        console.log("Record created successfully in CRM"); 
+        setIsRecordCreated(true);//createRecordResponse
         Alert.alert('Created record Successfully.', '', [
+          {
+          text: 'Cancel',
+          style: 'cancel',
+        },
           {
             text: 'OK',
             onPress: () => {
@@ -525,10 +564,22 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
           />
 
           <TextInputComponent
+            placeholder="Loan Amount Request"
+            autoCapitalize="none"
+            value={kf_loanamountrequested}
+            onChangeText={handleLoanAmountRequestedChange}
+          />
+
+          {errorMessages.loanAmountRequested !== '' && (
+            <Text style={styles.errorText}>{errorMessages.loanAmountRequested}</Text>
+          )}
+
+          <TextInputComponent
             placeholder="First Name"
             autoCapitalize="none"
             value={kf_name}
             onChangeText={handleFirstNameChange}
+            editable={isRecordCreated}
           />
           {errorMessages.firstName !== '' && (
             <Text style={styles.errorText}>{errorMessages.firstName}</Text>
@@ -646,17 +697,6 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
 
           {errorMessages.panCardNumber !== '' && (
             <Text style={styles.errorText}>{errorMessages.panCardNumber}</Text>
-          )}
-
-          <TextInputComponent
-            placeholder="Loan Amount Request"
-            autoCapitalize="none"
-            value={kf_loanamountrequested}
-            onChangeText={handleLoanAmountRequestedChange}
-          />
-
-          {errorMessages.loanAmountRequested !== '' && (
-            <Text style={styles.errorText}>{errorMessages.loanAmountRequested}</Text>
           )}
 
           {/* <CardImage

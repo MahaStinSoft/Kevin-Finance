@@ -135,7 +135,7 @@ const EditHomeLoan = ({ route, navigation }) => {
       lastNameEdit: !lastname ? 'Enter Last Name' : '',
       dateOfBirthEdit: !dateofbirth ? 'Enter Date of Birth' : '',
       mobileNumberEdit: /^\d{10}$/.test(mobileNumber) ? '' : 'Please Enter a Valid 10-digit mobile number.',
-      emailEdit: !email ? 'Enter Email Address' : '',
+      emailEdit: !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? 'Enter Email Address' : '',
       loanAmountRequestedEdit: /^\d{5,7}$/.test(loanAmountRequested) ? '' : 'Enter Loan Amount',
       aadharCardNumberEdit: /^\d{12}$/.test(aadharcardNumber) ? '' : 'Please Enter Valid Aadharcard Number',
       panCardNumberEdit: !pancardNumber ? 'Enter PAN Card Number' : '',
