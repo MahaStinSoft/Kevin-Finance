@@ -43,7 +43,8 @@ export const HomeScreen = ({ route }) => {
   const [kf_emischedule, setKf_emischedule] = useState('');
   const [kf_numberofemi, setKf_numberofemi] = useState('');
   const [kf_emi, setKf_emi] = useState('');
-
+  const [formDisabled, setFormDisabled] = useState(false);
+  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
 
   const [isfirstnameValid, setIsfirstnameValid] = useState(true);
   const [isLastNameValid, setIsLastNameValid] = useState(true);
@@ -599,7 +600,7 @@ export const HomeScreen = ({ route }) => {
   };
 
   const handleSaveRecord = async () => {
-
+    setIsFormSubmitted(true);
      if (calculateAge(kf_dateofbirth) < 18) {
       setErrorMessages({
         ...errorMessages,
@@ -700,6 +701,7 @@ export const HomeScreen = ({ route }) => {
         }
       );
       if (createRecordResponse.status === 204) {
+        setFormDisabled(true);
         console.log("Record created successfully in CRM"); //createRecordResponse
         Alert.alert('Created record Successfully.', '', [
           {
@@ -964,7 +966,8 @@ export const HomeScreen = ({ route }) => {
           <ButtonComponent
             title="SUBMIT"
             onPress={handleSaveRecord}
-          />
+            disabled={formDisabled}
+            />
 
         </View>
       </ScrollView>
