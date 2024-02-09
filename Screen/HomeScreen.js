@@ -33,9 +33,17 @@ export const HomeScreen = ({ route }) => {
   const [kf_pannumber, setkf_pannumber] = useState(null);
   const [kf_createdby, setkf_createdby] = useState(null);
   const [ModalVisible, setModalVisible] = useState(null);  
-const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fileContent: null });
+  const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fileContent: null });
   const [authenticatedUser, setAuthenticatedUser] = useState(null);
   const [resetFormKey, setResetFormKey] = useState(0);
+  const [kf_othercharges, setKf_othercharges] = useState(null);
+  const [kf_emicollectiondate, setKf_emicollectiondate] = useState(null);
+  // const [kf_loanamountrequested, setkf_loanamountrequested] = useState('');
+  const [kf_interestrate, setKf_interestrate] = useState('');
+  const [kf_emischedule, setKf_emischedule] = useState('');
+  const [kf_numberofemi, setKf_numberofemi] = useState('');
+  const [kf_emi, setKf_emi] = useState('');
+
 
   const [isfirstnameValid, setIsfirstnameValid] = useState(true);
   const [isLastNameValid, setIsLastNameValid] = useState(true);
@@ -44,7 +52,7 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
   const [isaadharNumberValid, setIsaadharcardNumberValid] = useState(true);
   const [isPancardNumberValid, setIsPancardNumberValid] = useState(true);
   const [isLoanAmountValid, setIsLoanAmountValid] = useState(true);
-
+  const [isEmiCollectionDateTouched, setIsEmiCollectionDateTouched] = useState(false);
 
   const navigation = useNavigation();
   const isFocused = useIsFocused();
@@ -61,6 +69,10 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
     loanAmountRequested: '',
     aadharCardNumber: '',
     panCardNumber: '',
+    interestRate: '',
+    emiSchedule: '',
+    NoOfEMIs: '',
+    emiCollectionDate: ''
   });
 
   useFocusEffect(
@@ -85,6 +97,11 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
     setkf_aadharcard({ fileName: null, fileContent: null });
     setkf_pancard({ fileName: null, fileContent: null });
     setkf_applicantimage({ fileName: null, fileContent: null });
+    setKf_emicollectiondate(null);
+    setKf_emi(null);
+    setKf_numberofemi(null);
+    setKf_emischedule(null);
+    setKf_interestrate(null);
     setResetFormKey((prevKey) => prevKey + 1);
   };
 
@@ -230,7 +247,7 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
       setErrorMessages({ ...errorMessages, firstName: '' });
     } else {
       setkf_name('');
-      setErrorMessages({ ...errorMessages, firstName: 'Enter First Name' });
+      setErrorMessages({ ...errorMessages, firstName: 'Enter a First Name' });
     }
   };
 
@@ -240,7 +257,7 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
       setErrorMessages({ ...errorMessages, lastName: '' });
     } else {
       setkf_lastname('');
-      setErrorMessages({ ...errorMessages, lastName: 'Enter Last Name' });
+      setErrorMessages({ ...errorMessages, lastName: 'Enter a Last Name' });
     }
   };
 
@@ -292,7 +309,7 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
       setIsMobileNumberValid(false);
       setErrorMessages({
         ...errorMessages,
-        mobileNumber: 'Enter Mobile Number',
+        mobileNumber: 'Enter a Mobile Number',
       });
     } else if (/^[6-9]\d{9}$/.test(text)){
       setIsMobileNumberValid();
@@ -304,7 +321,7 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
       setIsMobileNumberValid();
       setErrorMessages({
         ...errorMessages,
-        mobileNumber: 'Enter a Valid 10-digit mobile number.',
+        mobileNumber: 'Enter a a Valid 10-digit mobile number.',
       });
     }
   };
@@ -315,7 +332,7 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
     if (text.trim() === '') {
       setErrorMessages({
         ...errorMessages,
-        email: 'Enter Email Address',
+        email: 'Enter a Email Address',
       });
     } else if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text)) {
       setErrorMessages({
@@ -326,7 +343,7 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
     } else {
       setErrorMessages({
         ...errorMessages,
-        email: 'Enter a Valid Email Address',
+        email: 'Enter a a Valid Email Address',
       });
     }
   };
@@ -338,7 +355,7 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
       setIsaadharcardNumberValid(false);
       setErrorMessages({
         ...errorMessages,
-        aadharCardNumber: 'Enter Aadhar Card Number',
+        aadharCardNumber: 'Enter a Aadhar Card Number',
       });
     } else if  (/^\d{12}$/.test(text)) {
       setErrorMessages({
@@ -349,7 +366,7 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
     } else {
       setErrorMessages({
         ...errorMessages,
-        aadharCardNumber: 'Enter Valid Aadharcard Number',
+        aadharCardNumber: 'Enter a Valid Aadharcard Number',
       });
       setIsaadharcardNumberValid(true);
     }
@@ -361,7 +378,7 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
     if (text.trim() === '') {
       setErrorMessages({
         ...errorMessages,
-        panCardNumber: 'Enter PAN Card',
+        panCardNumber: 'Enter a PAN Card',
       });
       setIsPancardNumberValid(false);
     } else if (/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(text)) {
@@ -372,7 +389,7 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
     } else {
       setErrorMessages({
         ...errorMessages,
-        panCardNumber: 'Enter Valid PAN Card Number',
+        panCardNumber: 'Enter a Valid PAN Card Number',
       });
     }
   };
@@ -387,7 +404,7 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
     if (text.trim() === '') {
       setErrorMessages({
         ...errorMessages,
-        loanAmountRequested: 'Enter Loan Amount',
+        loanAmountRequested: 'Enter a Loan Amount',
       });
     } else if (/^\d{5,7}$/.test(text) && amountRequested !== null && amountRequested >= minLoanAmount && amountRequested <= maxLoanAmount) {
       setErrorMessages({
@@ -402,6 +419,65 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
     }
   };
 
+  const handleInterestRate = (text) => {
+    setKf_interestrate(text);
+
+    if (text.trim() === '') {
+      setErrorMessages({
+        ...errorMessages,
+        interestRate: 'Enter a Interest Amount',
+      });
+    } else if (/^\d+$/.test(text)) {
+      setErrorMessages({
+        ...errorMessages,
+        interestRate: '',
+      });
+    } else {
+      setErrorMessages({
+        ...errorMessages,
+        interestRate: `Enter a Valid Interest Rate`,
+      });
+    }
+  };
+
+  const handleNoOfEMIs = (text) => {
+    setKf_numberofemi(text);
+
+    if (text.trim() === '') {
+      setErrorMessages({
+        ...errorMessages,
+        NoOfEMIs: 'Enter a No of EMI payment',
+      });
+    } else if (/^\d+$/.test(text)) {
+      setErrorMessages({
+        ...errorMessages,
+        NoOfEMIs: '',
+      });
+    } else {
+      setErrorMessages({
+        ...errorMessages,
+        NoOfEMIs: `Enter a Valid No of EMI payment`,
+      });
+    }
+  };
+
+  const handleEmiCollectionDateChange = (date) => {
+    setKf_emicollectiondate(date);
+    setIsEmiCollectionDateTouched(true); // Mark the field as touched when a date is selected
+
+    if (!date) {
+      setErrorMessages({
+        ...errorMessages,
+        emiCollectionDate: 'Select an EMI Collection Date',
+      });
+    } else {
+      setErrorMessages({
+        ...errorMessages,
+        emiCollectionDate: '',
+      });
+    }
+  };
+  
   const getAuthenticatedUser = async () => {
     try {
       const userString = await AsyncStorage.getItem('authenticatedUser');
@@ -418,6 +494,108 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
 
   const onViewImage = () => {
     setModalVisible(true);
+  };
+
+
+  const calculateEMI = () => {
+    const P = parseFloat(kf_loanamountrequested); // Principal loan amount
+    const r = parseFloat(kf_interestrate) / 100; // Annual interest rate (expressed as a decimal)
+    let n = null; // Number of payments per year
+    let N = null; // Total number of payments over the loan tenure
+    let t = null; // Loan tenure in years
+
+    // Determine the number of payments per year based on the selected EMI schedule
+    switch (kf_emischedule) {
+      case 1: // Daily
+        n = 365;
+        break;
+      case 2: // Weekly
+        n = 52;
+        break;
+      case 3: // Monthly
+        n = 12;
+        break;
+      default:
+        n = 12; // Default to monthly
+    }
+
+    // Total number of payments over the loan tenure
+    N = parseInt(kf_numberofemi);
+
+    // Loan tenure in years
+    t = N / n;
+
+    // Calculate EMI
+    const R = r / n; // Monthly interest rate
+    const EMI = (P * R * Math.pow((1 + R), N)) / (Math.pow((1 + R), N) - 1);
+
+    // Update state with calculated EMI
+    setKf_emi(EMI.toFixed(2));
+  };
+
+  // Function to handle changes in loan amount requested or interest rate
+  const handleLoanChange = () => {
+    // Check if loan amount and interest rate are provided
+    if (kf_loanamountrequested && kf_interestrate) {
+      calculateEMI(); // Calculate EMI
+    }
+  };
+
+  // Function to handle changes in EMI schedule or number of EMIs
+  const handleEMIScheduleChange = () => {
+    // Check if EMI schedule and number of EMIs are provided
+    if (kf_emischedule && kf_numberofemi) {
+      calculateEMI(); // Calculate EMI
+    }
+  };
+
+  const handleEmiScheduleOptionset = (EMIschedule) => {
+    let numericValue;
+    switch (EMIschedule) {
+      case 'Daily':
+        numericValue = 1;
+        break;
+      case 'Weekly':
+        numericValue = 2;
+        break;
+      case 'Monthly':
+        numericValue = 3;
+        break;
+      default:
+        numericValue = null;
+    }
+    setKf_emischedule(numericValue);
+  };
+
+  const handleEmiSchedule = (emischedule) => {
+    setKf_emischedule(emischedule);
+    handleEmiScheduleOptionset(emischedule); // Call handleEmiScheduleOptionset here
+  
+    if (emischedule.trim() === '') {
+      setErrorMessages({
+        ...errorMessages,
+        emiSchedule: 'Select an EMI Schedule',
+      });
+    } else {
+      setErrorMessages({
+        ...errorMessages,
+        emiSchedule: '',
+      });
+    }
+  }  
+
+  const handleInterestRateChange = (text) => {
+    // Check if the input is a Valid decimal number
+    const isValidDecimal = /^\d*\.?\d*$/.test(text);
+  
+    if (isValidDecimal || text === '') {
+      // If the input is a Valid decimal number or empty, update the state
+      setKf_interestrate(text);
+      setErrorMessages({ ...errorMessages, interestRate: '' });
+    } else {
+      // If the input is not a Valid decimal number, show an error message
+      // setErrorMessages({ ...errorMessages, interestRate: 'Enter a a Valid decimal number' });
+    }
   };
 
   const handleSaveRecord = async () => {
@@ -442,14 +620,18 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
     }
 
     const newErrorMessages = {
-      firstName: !kf_name ? ' Enter First Name' : '',
-      lastName: !kf_lastname ? ' Enter Last Name' : '',
-      dateOfBirth: !kf_dateofbirth ? ' Enter Date of Birth' : '',
-      mobileNumber: /^[6-9]\d{9}$/.test(kf_mobilenumber) ? '' : 'Enter a Valid 10-digit mobile number.',
-      email: !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(kf_email) ? 'Enter a Valid Email Address' : '',
-      loanAmountRequested: !kf_loanamountrequested ? ' Enter Loan Amount Requested' : '',
-      aadharCardNumber: !/^\d{12}$/.test(kf_aadharnumber) ? 'Enter Valid Aadharcard Number' : '',
-      panCardNumber: !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(kf_pannumber) ? 'Enter Valid PAN Card Number' : '',
+      firstName: !kf_name ? ' Enter a First Name' : '',
+      lastName: !kf_lastname ? ' Enter a Last Name' : '',
+      dateOfBirth: !kf_dateofbirth ? ' Enter a Date of Birth' : '',
+      mobileNumber: /^[6-9]\d{9}$/.test(kf_mobilenumber) ? '' : 'Enter a a Valid 10-digit mobile number.',
+      email: !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(kf_email) ? 'Enter a a Valid Email Address' : '',
+      loanAmountRequested: !kf_loanamountrequested ? ' Enter a Loan Amount Requested' : '',
+      aadharCardNumber: !/^\d{12}$/.test(kf_aadharnumber) ? 'Enter a Valid Aadharcard Number' : '',
+      panCardNumber: !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(kf_pannumber) ? 'Enter a Valid PAN Card Number' : '',
+      interestRate: !/^\d+$/.test(kf_interestrate) ? 'Enter a Valid Interest Rate' : '',
+      emiSchedule: !kf_emischedule ? 'select a EMISchedule' : '',
+      NoOfEMIs: !/^\d+$/.test(kf_numberofemi) ? 'Enter a Valid No of EMI payment' : '',
+      emiCollectionDate: !kf_emicollectiondate ? 'select a EMI Collection Date' : ''  
     };
     setErrorMessages(newErrorMessages);
     if (Object.values(newErrorMessages).some(message => message !== '')) {
@@ -502,6 +684,12 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
           // kf_aadharcard: aadharcardImageData,
           // kf_pancard: pancardImageData,
           // kf_applicantimage: applicantImageData,
+          kf_emischedule: kf_emischedule,
+          kf_interestrate: kf_interestrate,
+          kf_emi: kf_emi,
+          kf_numberofemi: kf_numberofemi,
+          kf_emicollectiondate: kf_emicollectiondate,
+          kf_othercharges: kf_othercharges,
           kf_createdby: userAdminName
         },
         {
@@ -561,17 +749,6 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
             }}
             editable={false}
           />
-
-          <TextInputComponent
-            placeholder="Loan Amount Request"
-            autoCapitalize="none"
-            value={kf_loanamountrequested}
-            onChangeText={handleLoanAmountRequestedChange}
-          />
-
-          {errorMessages.loanAmountRequested !== '' && (
-            <Text style={styles.errorText}>{errorMessages.loanAmountRequested}</Text>
-          )}
           
           <TextInputComponent
             placeholder="First Name"
@@ -720,6 +897,69 @@ const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fil
             pickImage={() => pickImage('applicantimage')}
             setModalVisible={setModalVisible}
           />  */}
+
+<TextInputComponent
+            placeholder="Loan Amount Request"
+            autoCapitalize="none"
+            value={kf_loanamountrequested}
+            onChangeText={handleLoanAmountRequestedChange}
+          />
+
+          {errorMessages.loanAmountRequested !== '' && (
+            <Text style={styles.errorText}>{errorMessages.loanAmountRequested}</Text>
+          )}
+
+<TextInput
+            style={[styles.textInputContainer, { marginVertical: 10 }]}
+            placeholder="Interest Rate"
+            value={kf_interestrate}
+            onChangeText={handleInterestRate}
+            onBlur={handleLoanChange}
+          // keyboardType="numeric" 
+          />
+          {errorMessages.interestRate !== '' && (
+            <Text style={styles.errorText}>{errorMessages.interestRate}</Text>
+          )}
+
+          <LoanStatusPicker
+            onOptionChange={handleEmiSchedule}
+            title="EMI Schedule"
+            options={['Daily', 'Weekly', 'Monthly']}
+          />
+          {errorMessages.emiSchedule !== '' && (
+            <Text style={styles.errorText}>{errorMessages.emiSchedule}</Text>
+          )}
+
+          <TextInput
+            style={[styles.textInputContainer, { marginVertical: 10 }]}
+            placeholder="Number of EMIs"
+            value={kf_numberofemi}
+            onChangeText={handleNoOfEMIs}
+            onBlur={handleEMIScheduleChange}
+          // keyboardType="numeric"
+          />
+          {errorMessages.NoOfEMIs !== '' && (
+            <Text style={styles.errorText}>{errorMessages.NoOfEMIs}</Text>
+          )}
+
+          <Text style={[styles.textInputContainer, { marginVertical: 10, height: 48, color: "gray" }]}>EMI: {kf_emi}</Text>
+
+          <ComponentDatePicker
+            style={{ height: 48, marginBottom: 15 }}
+            selectedDate={kf_emicollectiondate}
+            onDateChange={handleEmiCollectionDateChange}
+            placeholder="EMI Collection Date"  
+          />
+          {errorMessages.emiCollectionDate !== '' && (
+            <Text style={styles.errorText}>{errorMessages.emiCollectionDate}</Text>
+          )}
+
+          {/* <TextInputComponent
+            placeholder="Other Charges"
+            autoCapitalize="none"
+            value={kf_othercharges}
+            onChangeText={(text) => setKf_othercharges(parseFloat(text))}
+          /> */}
 
           <ButtonComponent
             title="SUBMIT"

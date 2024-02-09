@@ -31,6 +31,12 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [firstEMIDate, setfirstEMIDate] = useState(loanApplication?.kf_firstemidate || '');
   const [aadharcardNumber, setAadharcardNumber] = useState(loanApplication?.kf_aadharnumber || '');
   const [pancardNumber, setPancardNumber] = useState(loanApplication?.kf_pannumber || '');
+  const [otherCharges, setOtherCharges] = useState(loanApplication?.kf_othercharges || '');
+  const [emiCollectionDate, setEmiCollectionDate] = useState(loanApplication?.kf_emicollectiondate || '');
+  const [interestRate, setInterestRate] = useState(loanApplication?.kf_interestrate || '');
+  const [emiSchedule, setEmiSchedule] = useState(loanApplication?.kf_emischedule || '');
+  const [numberOfEMI, setNumberOfEMI] = useState(loanApplication?.kf_numberofemi || '');
+  const [eminAmount, setEmiAmount] = useState(loanApplication?.kf_emi || '');
 
   const [isfirstnameValid, setIsfirstnameValid] = useState(true);
   const [isLastNameValid, setIsLastNameValid] = useState(true);
@@ -81,6 +87,12 @@ const EditHomeLoan = ({ route, navigation }) => {
     setfirstEMIDate(loanApplication.kf_firstemidate);
     setAadharcardNumber(loanApplication.kf_aadharnumber);
     setPancardNumber(loanApplication.kf_pannumber);
+    setOtherCharges(loanApplication.kf_othercharges);
+    setEmiCollectionDate(loanApplication.kf_emicollectiondate);
+    setEmiSchedule(loanApplication.kf_emischedule);
+    setEmiAmount(loanApplication.kf_emi);
+    setInterestRate(loanApplication.kf_interestrate);
+    setNumberOfEMI(loanApplication.kf_numberofemi);
     setRecordId(loanApplication.kf_loanapplicationid);
     console.log('State updated:', {
       applicationnumber,
@@ -146,8 +158,6 @@ const EditHomeLoan = ({ route, navigation }) => {
       return;
     }
     try {
-      // Your authentication logic here
-
       const tokenResponse = await axios.post(
         'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
         {
@@ -189,6 +199,12 @@ const EditHomeLoan = ({ route, navigation }) => {
           kf_firstemidate: firstEMIDate,
           kf_aadharnumber: aadharcardNumber,
           kf_pannumber: pancardNumber,
+          kf_interestrate: interestRate,
+          kf_emi: eminAmount,
+          kf_emicollectiondate: emiCollectionDate,
+          kf_emischedule: emiSchedule,
+          kf_othercharges: otherCharges,
+          kf_numberofemi: numberOfEMI,
         },
         {
           headers: {
@@ -227,14 +243,23 @@ const EditHomeLoan = ({ route, navigation }) => {
             kf_firstemidate: firstEMIDate,
             kf_aadharnumber: aadharcardNumber,
             kf_pannumber: pancardNumber,
+            kf_interestrate: interestRate,
+            kf_emi: eminAmount,
+            kf_emicollectiondate: emiCollectionDate,
+            kf_emischedule: emiSchedule,
+            kf_othercharges: otherCharges,
+            kf_numberofemi: numberOfEMI,
           });
         }
         console.log(loanAmountRequested)
         Alert.alert('Updated the record Successfully.', '', [
+          // {
+          //   text: 'cancel'
+          // },
           {
             text: 'OK',
             onPress: () => {
-              navigation.navigate('HomeLoanDetailsScreen', { loanApplication: loanApplication });
+              // navigation.navigate('HomeLoanDetailsScreen', { loanApplication: loanApplication });
             },
           },
         ]);
@@ -250,7 +275,7 @@ const EditHomeLoan = ({ route, navigation }) => {
 
   const handleEmailChange = (text) => {
     setEmail(text);
-  
+
     if (text.trim() === '') {
       setErrorMessages({
         ...errorMessages,
@@ -268,7 +293,7 @@ const EditHomeLoan = ({ route, navigation }) => {
       });
     }
   };
-  
+
 
   const calculateAge = (birthDate) => {
     const today = new Date();
@@ -362,6 +387,35 @@ const EditHomeLoan = ({ route, navigation }) => {
     }
   };
 
+  const handleEMISchedule = (selectedOptionSchedule) => {
+    let numericValue;
+    switch (selectedOptionSchedule) {
+      case 'Daily':
+        numericValue = 1;
+        break;
+      case 'Weekly':
+        numericValue = 2;
+        break;
+      case 'Monthly':
+        numericValue = 3
+      default:
+        numericValue = null;
+    }
+    setEmiSchedule(numericValue);
+  };
+
+  const getEmiSchedule = (numericValue) => {
+    switch (numericValue) {
+      case 1:
+        return 'Daily';
+      case 2:
+        return 'Weekly';
+      case 3:
+        return 'Monthly';
+      default:
+        return '';
+    }
+  };
 
   const handleLoanStatusChange = (selectedOptionLoan) => {
     let numericValue;
@@ -450,7 +504,7 @@ const EditHomeLoan = ({ route, navigation }) => {
 
   const handleAadharCardNumberChange = (text) => {
     setAadharcardNumber(text);
-    
+
     if (text.trim() === '') {
       setIsaadharcardNumberValid(false);
       setErrorMessages({
@@ -460,7 +514,7 @@ const EditHomeLoan = ({ route, navigation }) => {
     } else {
       const aadharRegex = /^\d{12}$/;
       const isValid = aadharRegex.test(text);
-  
+
       setIsaadharcardNumberValid(isValid);
       setErrorMessages({
         ...errorMessages,
@@ -468,7 +522,7 @@ const EditHomeLoan = ({ route, navigation }) => {
       });
     }
   };
-  
+
 
   const handleLoanAmountRequestedChange = (text) => {
     const amountRequested = text.trim() !== '' ? parseFloat(text) : null;
@@ -495,6 +549,8 @@ const EditHomeLoan = ({ route, navigation }) => {
     }
   };
 
+  const date = emiCollectionDate ? new Date(emiCollectionDate) : null;
+  const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
 
   return (
     <>
@@ -502,8 +558,8 @@ const EditHomeLoan = ({ route, navigation }) => {
         onPress={handleGoBack}
         onIconPress={handleUpdateRecord}
         screenIcon="md-save"
-        screenIconStyle={{ marginTop: 5 }} 
-        />
+        screenIconStyle={{ marginTop: 5 }}
+      />
       <ScrollView>
         <View style={styles.container}>
           <View style={styles.wrapper}>
@@ -668,6 +724,45 @@ const EditHomeLoan = ({ route, navigation }) => {
               <Text style={styles.errorText}>{errorMessages.loanAmountRequestedEdit}</Text>
             )}
 
+            <Text style={[styles.textInputContainer, { color: "gray", height: 45 }]}>{getEmiSchedule(emiSchedule)}</Text>
+
+            <TextInput
+              style={[styles.textInputContainer, { color: "gray" }]}
+              placeholder="No of EMIs"
+              value={numberOfEMI.toString()}
+              // onChangeText={(text) => setEmiSchedule(text)}
+              editable={false}
+            />
+
+            <TextInput
+              style={[styles.textInputContainer, { color: "gray" }]}
+              placeholder="Interest Rate%"
+              value={interestRate}
+              editable={false}
+            />
+
+            <TextInput
+              style={[styles.textInputContainer, { color: "gray" }]}
+              placeholder="EMI Collection Date"
+              // value={emiCollectionDate}
+              value={formattedDate}
+              editable={false}
+            />
+
+            <TextInput
+              style={[styles.textInputContainer, { color: "gray" }]}
+              placeholder="EMI Amount "
+              value={eminAmount.toString()}
+              editable={false}
+            />
+
+            <TextInput
+              style={styles.textInputContainer}
+              placeholder="Other Charges"
+              value={otherCharges? otherCharges.toString(): ""}
+            onChangeText={(text) => setOtherCharges(text)}
+            />
+
             <LoanStatusPicker
               onOptionChange={handleLoanStatusChange}
               title="Select Loan Status"
@@ -675,53 +770,6 @@ const EditHomeLoan = ({ route, navigation }) => {
               initialOption={getStatusStringFromNumericValue(status)}
               style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
             />
-
-            {statusReason && (
-              <LoanStatusPicker
-                onOptionChange={handleAnotherOptionChange}
-                title="Status Reason"
-                options={['AadharNotMatching', 'InvalidDocuments']}
-                initialOption={statusReason ? getAnotherOptionStringFromNumericValue(statusReason) : ''}
-                style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
-              />
-            )}
-
-            {approver && (
-              <TextInput
-                style={[styles.textInputContainer, { color: "gray" }]}
-                value={approver}
-                placeholder="Approver"
-                onChangeText={(text) => {
-                  setApprover(text);
-                }}
-                editable={false}
-              />
-            )}
-
-            {approvalDate && (
-              <TextInput
-                style={[styles.textInputContainer, { color: "gray" }]}
-                value={approvalDate}
-                placeholder="Approval Date"
-                onChangeText={(text) => {
-                  setApprovalDate(text);
-                }}
-                editable={false}
-              />
-            )}
-
-
-            {firstEMIDate && (
-              <TextInput
-                style={[styles.textInputContainer, { color: "gray" }]}
-                value={firstEMIDate}
-                placeholder="First EMI Date"
-                onChangeText={(text) => {
-                  setfirstEMIDate(text);
-                }}
-                editable={false}
-              />
-            )}
 
             {/* <ButtonComponent title="Update" onPress={handleUpdateRecord} /> */}
           </View>

@@ -1,17 +1,21 @@
-import React, { useState, useEffect,useCallback } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Alert, LogBox } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import HeaderComponent from '../../common/Header';
+import ButtonComponent from '../../common/ButtonComponent';
 
 const PersonalLoanDetailsScreen = ({ route }) => {
   const navigation = useNavigation();
   const [personalLoan, setpersonalLoan] = useState(route.params.personalLoan);
+  const [recordId, setRecordId] = useState(route.params.personalLoan.kf_personalloanid);
+  LogBox.ignoreLogs([
+    'Non-serializable values were found in the navigation state',
+  ]);
 
   const fetchData = useCallback(async () => {
     const simulatedUpdatedData = { ...personalLoan };
     setpersonalLoan(simulatedUpdatedData);
   }, [personalLoan]);
-
 
   const fetchDataOnFocus = useCallback(async () => {
     const delayInMilliseconds = 100;
@@ -21,14 +25,17 @@ const PersonalLoanDetailsScreen = ({ route }) => {
   }, [fetchData]);
 
   useEffect(() => {
-
     const unsubscribeFocus = navigation.addListener('focus', fetchDataOnFocus);
-
     return () => {
       unsubscribeFocus();
     };
   }, [navigation, fetchDataOnFocus]);
 
+  // Update recordId when route params change
+  useEffect(() => {
+    // Update recordId when route params change
+    setRecordId(route.params.personalLoan.kf_personalloanid);
+  }, [route.params.personalLoan.kf_personalloanid]);
 
   const getGenderLabel = () => {
     switch (personalLoan.kf_gender) {
@@ -44,24 +51,18 @@ const PersonalLoanDetailsScreen = ({ route }) => {
   const getLoanStatus = () => {
     switch (personalLoan.kf_status) {
       case 123950000 :
-        numericValue = 'Approved';
-        break;
+        return 'Approved';
       case 123950001 :
-        numericValue = 'PendingApproval';
-        break;
+        return 'PendingApproval';
       case 123950002 :
-        numericValue = 'Draft';
-        break;
+        return 'Draft';
       case 123950003 :
-        numericValue = 'Cancelled';
-        break;
+        return 'Cancelled';
       case 123950004 :
-        numericValue = 'Expired';
-        break;
+        return 'Expired';
       default:
         return 'PendingApproval';
     }
-    return numericValue;
   };
   
   const getStatusReason = () => {
@@ -75,15 +76,6 @@ const PersonalLoanDetailsScreen = ({ route }) => {
     }
   };
   
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      setpersonalLoan(route.params.personalLoan);
-    });
-  
-    return unsubscribe;
-  }, [navigation, route.params.personalLoan]);
-
   const handleGoBack = () => {
     navigation.navigate("Dashboard");
   };
@@ -93,25 +85,60 @@ const PersonalLoanDetailsScreen = ({ route }) => {
       personalLoan,
       onUpdateSuccess: updatedpersonalLoan => setpersonalLoan(updatedpersonalLoan),
     });
-  }; 
+  };
 
-  const renderImage = () => {
-    if (personalLoan.entityimage) {
-      return (
-        <Image
-          source={{ uri: `data:image/png;base64,${personalLoan.entityimage}` }}
-          style={styles.cardImage}
-        />
-      );
-    } else {
-      const initials = `${personalLoan.kf_firstname[0]}${personalLoan.kf_lastname[0]}`;
-      return (
-        <View style={[styles.cardImage, styles.placeholderImage]}>
-          <Text style={styles.placeholderText}>{initials}</Text>
-        </View>
-      );
+  const getEmiSchedule = () => {
+    switch (personalLoan.kf_emischedule) {
+      case 1:
+        return 'Daily';
+      case 2:
+        return 'Weekly';
+      case 3:
+        return 'Monthly';
+      default:
+        return '';
     }
   };
+
+const renderImage = () => {
+  if (personalLoan && personalLoan.entityimage) {
+    return (
+      <Image
+        source={{ uri: `data:image/png;base64,${personalLoan.entityimage}` }}
+        style={styles.cardImage}
+      />
+    );
+  } else {
+    const initials = personalLoan ? `${personalLoan.kf_firstname[0]}${personalLoan.kf_lastname[0]}` : '';
+    return (
+      <View style={styles.cardImage}>
+        <Text style={styles.placeholderText}>{initials}</Text>
+      </View>
+    );
+  }
+};
+
+  const handleGoToAmortizationScreen = () => {
+    navigation.navigate('AmortizationScreen', {
+      recordId: recordId, // Pass the recordId as a parameter
+      principalLoanAmount: personalLoan.kf_loanamountrequested,
+      loanTermMonths: personalLoan.kf_numberofemi,
+      emiAmount: personalLoan.kf_emi,
+      interestRate: personalLoan.kf_interestrate,
+      name: `${personalLoan.kf_firstname} ${personalLoan.kf_lastname}`,
+      mobileNumber: personalLoan.kf_mobile,
+      aadharNumber: personalLoan.kf_aadharnumber,
+      panCardNumber: personalLoan.kf_pannumber,
+      emiSchedule: personalLoan.kf_emischedule,
+      applicationNumber: personalLoan.kf_applicationnumber,
+    });
+  };
+
+const date = personalLoan.kf_emicollectiondate ? new Date(personalLoan.kf_emicollectiondate) : null;
+const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+
+  const emischeduleDate = personalLoan.kf_dateofbirth ? new Date(personalLoan.kf_dateofbirth): null;
+  const emischeduleDateformatDate = emischeduleDate ? date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
 
   return (
     <View style={styles.container}>
@@ -120,18 +147,24 @@ const PersonalLoanDetailsScreen = ({ route }) => {
         onPress={handleGoBack}
         onIconPress={handleEdit}
         screenIcon="create-outline"
-      />  
+      />
+      <ScrollView contentContainerStyle={{ width: 405, padding: 15 }}
+      showsVerticalScrollIndicator={false}
+      showsHorizontalScrollIndicator={false}
+      >
+      <View style={styles.imageContainer}>
+        <View style={{ marginLeft: -12 }}>{renderImage()}</View>
+        <View style={{ marginLeft: 5, marginTop: 50}}>
+          <Text style={styles.cardTitle}>{`${personalLoan.kf_firstname} ${personalLoan.kf_lastname}`}</Text>
+          <Text style={styles.cardTitle}>Application No: {personalLoan.kf_applicationnumber}</Text>
+        </View>
+      </View>
 
-      <View style={styles.contactImageContainer}>{renderImage()}</View>
-
-      <View style={[styles.card, styles.cardElevated]}>
-        <View>{renderImage()}</View>
-        <Text style={styles.cardTitle}>Application Number: {personalLoan.kf_applicationnumber}</Text>
-        <ScrollView>
-        <Text style={styles.cardLabel}>Created By: {personalLoan.kf_createdby}</Text>
-        <Text style={styles.cardLabel}>Name: {`${personalLoan.kf_firstname} ${personalLoan.kf_lastname}`}</Text>
+      <View style={styles.personalDetailContainer} >
+        <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10 }]}>Personal Details</Text>
         <Text style={styles.cardLabel}>Gender: {getGenderLabel()}</Text>
-        <Text style={styles.cardLabel}>Date of Birth: {personalLoan.kf_dateofbirth ? new Date(personalLoan.kf_dateofbirth).toLocaleDateString() : ''}</Text>
+        {/* <Text style={styles.cardLabel}>Date of Birth: {personalLoan.kf_dateofbirth ? new Date(personalLoan.kf_dateofbirth).toLocaleDateString() : ''}</Text> */}
+        <Text style={styles.cardLabel}>Date of Birth: {formattedDate}</Text>
         <Text style={styles.cardLabel}>Age: {personalLoan.kf_age}</Text>
         <Text style={styles.cardLabel}>Mobile Number: {personalLoan.kf_mobile}</Text>
         <Text style={styles.cardLabel}>Email Address: {personalLoan.kf_email}</Text>
@@ -140,78 +173,127 @@ const PersonalLoanDetailsScreen = ({ route }) => {
         <Text style={styles.cardLabel}>Address 3: {personalLoan.kf_address3}</Text>
         <Text style={styles.cardLabel}>City: {personalLoan.kf_city}</Text>
         <Text style={styles.cardLabel}>State: {personalLoan.kf_state}</Text>
-        <Text style={styles.cardLabel}>Aadhar Number: {personalLoan.kf_aadharnumber}</Text>
-        <Text style={styles.cardLabel}>PANcard Number: {personalLoan.kf_pannumber}</Text>
         <Text style={styles.cardLabel}>Loan Amount Requested: {personalLoan.kf_loanamountrequested}</Text>
-         <Text style={styles.cardLabel}>Loan Status: {getLoanStatus()}</Text>
+        <Text style={styles.cardLabel}>Loan Status: {getLoanStatus()}</Text>
         {personalLoan.kf_statusR && (<Text style={styles.cardLabel}>Status Reason: {getStatusReason()}</Text>)}
         {personalLoan.kf_approvaldate && (<Text style={styles.cardLabel}>Approver: {personalLoan.kf_approver}</Text>)}
         {personalLoan.kf_approvaldate && (<Text style={styles.cardLabel}>Approval Date: {personalLoan.kf_approvaldate}</Text>)}
         {/* {personalLoan.kf_firstemidate && (<Text style={styles.cardLabel}>First EMI Date: {personalLoan.kf_firstemidate}</Text>)} */}
-        </ScrollView>
       </View>
+
+      <View style={styles.IndentityProofField}>
+        <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10 }]}>Indentity Proof</Text>
+        <Text style={styles.cardLabel}>Aadhar Number: {personalLoan.kf_aadharnumber}</Text>
+        <Text style={styles.cardLabel}>PANcard Number: {personalLoan.kf_pannumber}</Text>
+        <Text style={styles.cardLabel}>Aadhar Image: View</Text>
+        <Text style={styles.cardLabel}>PANcard Image: View </Text>
+      </View>
+
+      <View style={styles.loanDetailContainer}>
+        <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10 }]}>Loan Details</Text>
+        <Text style={styles.cardLabel}>EMI Schedule: {getEmiSchedule()}</Text>
+        <Text style={styles.cardLabel}>Number Of EMI: {personalLoan.kf_numberofemi}</Text>
+        <Text style={styles.cardLabel}>Interest Rate: {personalLoan.kf_interestrate}</Text>
+        <Text style={styles.cardLabel}>EMI: {personalLoan.kf_emi}</Text>
+        <Text style={styles.cardLabel}>EMI Collection Date: {emischeduleDateformatDate}</Text>
+        <Text style={styles.cardLabel}>Other Charges: {personalLoan.kf_othercharges}</Text>
+      </View>
+
+      <ButtonComponent style={{ marginBottom: 60 }}
+        title ="Calculate Amortization"
+        onPress={handleGoToAmortizationScreen}
+      />
+
+      </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    height: '90%',
+    // alignItems: 'center',
   },
-  contactImageContainer: {
-    width: '100%',
-    height: 170,
-    overflow: 'hidden',
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginTop: -150,
-    marginLeft: 10, 
-    marginBottom: 5
-  },
-  card: {
-    width: '90%',
-    // height: '90%',
-    borderRadius: 6,
-    padding: 16,
-    backgroundColor: '#FFFFFF',
-    elevation: 3,
+  imageContainer: {
+    flexDirection: 'row',
+    marginTop: 10,
+    backgroundColor: "white",
+    width: "95%",
+    padding: 20,
+    shadowColor: '#000',
     shadowOffset: {
-      width: 1,
-      height: 1,
+      width: 0,
+      height: 2,
     },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  cardElevated: {
-    marginTop: -150,
-    height:"87%"
+  personalDetailContainer: {
+    marginTop: 5,
+    width: "95%",
+    paddingVertical: 10,
+    backgroundColor: "white",
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  IndentityProofField: {
+    marginTop: 5,
+    width: "95%",
+    paddingVertical: 10,
+    backgroundColor: "white",
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  loanDetailContainer: {
+    marginTop: 5,
+    width: "95%",
+    paddingVertical: 10,
+    backgroundColor: "white",
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5
   },
   cardImage: {
-    width: '100%',
-    height: '50%',
-    resizeMode: 'contain',
-    borderRadius: 6,
+    borderRadius: 40
+  },
+  cardTitle: {
+    color: "red",
+    fontSize: 16,
+    fontWeight: "bold",
   },
   cardLabel: {
     color: '#000000',
     fontSize: 14,
-    // fontWeight: 'bold',
-    marginBottom: 6,
     marginLeft: 10
   },
   placeholderText: {
-    fontSize: 100,
+    fontSize: 80,
     fontWeight: 'bold',
     color: '#707070',
     textAlign: 'center',
     backgroundColor: 'gray',
-    height: '100%',
     color: 'white',
-    paddingTop: 35,
+    // borderRadius: 100,
+    padding: 15
   },
 });
 
 export default PersonalLoanDetailsScreen;
+

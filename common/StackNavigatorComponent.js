@@ -16,6 +16,10 @@ import Account from '../Screen/Account';
 import Loan from '../Screen/Loan';
 import Setting from '../Screen/setting';
 import CustomDrawerContent from './CustomDrawer';
+import ScheduleDetailsScreen from '../Screen/EMI/ScheduleDetailScreen';
+import AmortizationScreen from '../Screen/EMI/AmortizationScreen';
+import ScheduleDetailsScreenHomeLoan from '../Screen/EMI/ScheduleDetailsScreenHomeLoan';
+import AmortizationScreenHome from '../Screen/EMI/AmortizationScreenHome';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -36,6 +40,10 @@ const StackNavigator = () => (
     <Stack.Screen name="PersonalLoan" component={PersonalLoan} options={{ headerShown: false }} />
     <Stack.Screen name="EditHomeLoan" component={EditHomeLoan} options={{ headerShown: false }} />
     <Stack.Screen name="EditPersonalLoan" component={EditPersonalLoan} options={{ headerShown: false }} />
+    <Stack.Screen name="AmortizationScreen" component={AmortizationScreen} options={{ headerShown: false }} />
+    <Stack.Screen name="ScheduleDetailsScreen" component={ScheduleDetailsScreen} options={{ headerShown: false }} />
+    <Stack.Screen name="ScheduleDetailsScreenHomeLoan" component={ScheduleDetailsScreenHomeLoan} options={{ headerShown: false }} />
+    <Stack.Screen name="AmortizationScreenHome" component={AmortizationScreenHome} options={{ headerShown: false }} />
     <Stack.Screen name="DynamicDashboardScreen" component={DynamicDashboardScreen} options={{
       headerShown: false,
       unmountOnBlur: true,

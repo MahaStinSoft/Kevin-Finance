@@ -17,8 +17,10 @@ import HomeScreen from './Screen/HomeScreen';
 import PersonalLoan from './Screen/PersonalLoan';
 import HomeLoanDetailsScreen from './Screen/userDetails/HomeLoanDetailsScreen';
 import PersonalLoanDetailsScreen from './Screen/userDetails/PersonalLoanDetailScreen';
-
-import Logo from './Screen/Logo';
+import ScheduleDetailsScreen from './Screen/EMI/ScheduleDetailScreen';
+import AmortizationScreen from './Screen/EMI/AmortizationScreen';
+import ScheduleDetailsScreenHomeLoan from './Screen/EMI/ScheduleDetailsScreenHomeLoan';
+import AmortizationScreenHome from './Screen/EMI/AmortizationScreenHome';
 
 const Stack = createNativeStackNavigator();
 
@@ -68,6 +70,10 @@ const MainScreen = () => {
           <Stack.Screen name="EditPersonalLoan" component={EditPersonalLoan} options={{ headerShown: false }} />
           <Stack.Screen name="HomeLoanDetailsScreen" component={HomeLoanDetailsScreen} options={{ headerShown: false }} />
           <Stack.Screen name="PersonalLoanDetailsScreen" component={PersonalLoanDetailsScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="AmortizationScreen" component={AmortizationScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="ScheduleDetailsScreen" component={ScheduleDetailsScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="ScheduleDetailsScreenHomeLoan" component={ScheduleDetailsScreenHomeLoan} options={{ headerShown: false }} />
+          <Stack.Screen name="AmortizationScreenHome" component={AmortizationScreenHome} options={{ headerShown: false }} />
           </>
       )}
       </Stack.Navigator>

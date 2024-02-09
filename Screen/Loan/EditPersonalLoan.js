@@ -34,6 +34,12 @@ const EditPersonalLoan = ({ route, navigation }) => {
   const [firstEMIDate, setfirstEMIDate] = useState(personalLoan?.kf_firstemidate || '');
   const [aadharcardNumber, setAadharcardNumber] = useState(personalLoan?.kf_aadharnumber || '');
   const [pancardNumber, setPancardNumber] = useState(personalLoan?.kf_pannumber || '');
+  const [otherCharges, setOtherCharges] = useState(personalLoan?.kf_othercharges || '');
+  const [emiCollectionDate, setEmiCollectionDate] = useState(personalLoan?.kf_emicollectiondate || '');
+  const [interestRate, setInterestRate] = useState(personalLoan?.kf_interestrate || '');
+  const [emiSchedule, setEmiSchedule] = useState(personalLoan?.kf_emischedule || '');
+  const [numberOfEMI, setNumberOfEMI] = useState(personalLoan?.kf_numberofemi || '');
+  const [eminAmount, setEmiAmount] = useState(personalLoan?.kf_emi || '');
 
   const [isfirstnameValid, setIsfirstnameValid] = useState(true);
   const [isLastNameValid, setIsLastNameValid] = useState(true);
@@ -84,6 +90,12 @@ const EditPersonalLoan = ({ route, navigation }) => {
     setfirstEMIDate(personalLoan.kf_firstemidate);
     setAadharcardNumber(personalLoan.kf_aadharnumber);
     setPancardNumber(personalLoan.kf_pannumber);
+    setOtherCharges(personalLoan.kf_othercharges);
+    setEmiCollectionDate(personalLoan.kf_emicollectiondate);
+    setEmiSchedule(personalLoan.kf_emischedule);
+    setEmiAmount(personalLoan.kf_emi);
+    setInterestRate(personalLoan.kf_interestrate);
+    setNumberOfEMI(personalLoan.kf_numberofemi);
     setRecordId(personalLoan.kf_personalloanid);
     console.log('State updated:', {
       applicationnumber,
@@ -192,6 +204,12 @@ const EditPersonalLoan = ({ route, navigation }) => {
           kf_firstemidate: firstEMIDate,
           kf_aadharnumber: aadharcardNumber,
           kf_pannumber: pancardNumber,
+          kf_interestrate: interestRate,
+          kf_emi: eminAmount,
+          kf_emicollectiondate: emiCollectionDate,
+          kf_emischedule: emiSchedule,
+          kf_othercharges: otherCharges,
+          kf_numberofemi: numberOfEMI,
         },
         {
           headers: {
@@ -229,15 +247,24 @@ const EditPersonalLoan = ({ route, navigation }) => {
             kf_firstemidate: firstEMIDate,
             kf_aadharnumber: aadharcardNumber,
             kf_pannumber: pancardNumber,
+            kf_interestrate: interestRate,
+            kf_emi: eminAmount,
+            kf_emicollectiondate: emiCollectionDate,
+            kf_emischedule: emiSchedule,
+            kf_othercharges: otherCharges,
+            kf_numberofemi: numberOfEMI,
           });
         }
         console.log(age);
 
         Alert.alert('Updated the record Successfully.', '', [
+          // {
+          //   text: 'cancel'
+          // },
           {
             text: 'OK',
             onPress: () => {
-              navigation.navigate('PersonalLoanDetailsScreen', { personalLoan: personalLoan });
+              // navigation.navigate('PersonalLoanDetailsScreen', { personalLoan: personalLoan });
             },
           },
         ]);
@@ -263,6 +290,36 @@ const EditPersonalLoan = ({ route, navigation }) => {
         numericValue = null;
     }
     setGender(numericValue);
+  };
+
+  const handleEMISchedule = (selectedOptionSchedule) => {
+    let numericValue;
+    switch (selectedOptionSchedule) {
+      case 'Daily':
+        numericValue = 1;
+        break;
+      case 'Weekly':
+        numericValue = 2;
+        break;
+      case 'Monthly':
+        numericValue = 3
+      default:
+        numericValue = null;
+    }
+    setEmiSchedule(numericValue);
+  };
+
+  const getEmiSchedule = (numericValue) => {
+    switch (numericValue) {
+      case 1:
+        return 'Daily';
+      case 2:
+        return 'Weekly';
+      case 3:
+        return 'Monthly';
+      default:
+        return '';
+    }
   };
 
   const handleLoanStatusChange = (selectedOptionLoan) => {
@@ -334,7 +391,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
 
   const handleEmailChange = (text) => {
     setEmail(text);
-  
+
     if (text.trim() === '') {
       setErrorMessages({
         ...errorMessages,
@@ -438,7 +495,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
 
   const handleAadharCardNumberChange = (text) => {
     setAadharcardNumber(text);
-    
+
     if (text.trim() === '') {
       setIsaadharcardNumberValid(false);
       setErrorMessages({
@@ -448,7 +505,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
     } else {
       const aadharRegex = /^\d{12}$/;
       const isValid = aadharRegex.test(text);
-  
+
       setIsaadharcardNumberValid(isValid);
       setErrorMessages({
         ...errorMessages,
@@ -456,7 +513,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
       });
     }
   };
-  
+
 
   const handleLoanAmountRequestedChange = (text) => {
     const amountRequested = text.trim() !== '' ? parseFloat(text) : null;
@@ -483,15 +540,18 @@ const EditPersonalLoan = ({ route, navigation }) => {
     }
   };
 
+  const date = emiCollectionDate ? new Date(emiCollectionDate) : null;
+  const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+
   return (
     <>
       <HeaderComponent
-       titleText="Edit Personal Loan" 
-       onPress={handleGoBack}
+        titleText="Edit Personal Loan"
+        onPress={handleGoBack}
         onIconPress={handleUpdateRecord}
         screenIcon="md-save"
-        screenIconStyle={{ marginTop: 5 }} 
-        />
+        screenIconStyle={{ marginTop: 5 }}
+      />
       <ScrollView>
         <View style={styles.container}>
           <View style={styles.wrapper}>
@@ -653,6 +713,41 @@ const EditPersonalLoan = ({ route, navigation }) => {
             {errorMessages.loanAmountRequestedEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.loanAmountRequestedEdit}</Text>
             )}
+
+            <Text style={[styles.textInputContainer, { color: "gray", height: 45 }]}>{getEmiSchedule(emiSchedule)}</Text>
+
+            <TextInput
+              style={[styles.textInputContainer, { color: "gray" }]}
+              placeholder="No of EMIs"
+              value={numberOfEMI.toString()}
+              // onChangeText={(text) => setEmiSchedule(text)}
+              editable={false}
+            />
+            <TextInput
+              style={[styles.textInputContainer, { color: "gray" }]}
+              placeholder="Interest Rate%"
+              value={interestRate}
+              editable={false}
+            />
+            <TextInput
+              style={[styles.textInputContainer, { color: "gray" }]}
+              placeholder="EMI Collection Date"
+              // value={emiCollectionDate}
+              value={formattedDate}
+              editable={false}
+            />
+            <TextInput
+              style={[styles.textInputContainer, { color: "gray" }]}
+              placeholder="EMI Amount "
+              value={eminAmount.toString()}
+              editable={false}
+            />
+            <TextInput
+              style={styles.textInputContainer}
+              placeholder="Other Charges"
+              value={otherCharges? otherCharges.toString(): ""}
+              onChangeText={(text) => setOtherCharges(text)}
+            />
 
             <LoanStatusPicker
               onOptionChange={handleLoanStatusChange}

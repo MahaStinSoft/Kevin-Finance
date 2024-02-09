@@ -31,7 +31,15 @@ export const PersonalLoan = () => {
   const [authenticatedUser, setAuthenticatedUser] = useState(null);
   const [resetFormKey, setResetFormKey] = useState(0);
   const [image, setImage] = useState(null);
-  const [placeholderName, setPlaceholderName] = useState('Full Name');
+  const [kf_interestamount, setkf_interestamount] = useState(null);
+  const [kf_totalamount, setkf_totalamount] = useState(null);
+  const [kf_othercharges, setKf_othercharges] = useState(null);
+  const [kf_emicollectiondate, setKf_emicollectiondate] = useState(null);
+  // const [kf_loanamountrequested, setkf_loanamountrequested] = useState('');
+  const [kf_interestrate, setKf_interestrate] = useState('');
+  const [kf_emischedule, setKf_emischedule] = useState('');
+  const [kf_numberofemi, setKf_numberofemi] = useState('');
+  const [kf_emi, setKf_emi] = useState('');
 
   const [isfirstnameValid, setIsfirstnameValid] = useState(true);
   const [isLastNameValid, setIsLastNameValid] = useState(true);
@@ -40,7 +48,73 @@ export const PersonalLoan = () => {
   const [isPancardNumberValid, setIsPancardNumberValid] = useState(true);
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [isLoanAmountRequested, setIsLoanAmountRequested] = useState(true);
+  const [isEmiCollectionDateTouched, setIsEmiCollectionDateTouched] = useState(false);
 
+  const calculateEMI = () => {
+    const P = parseFloat(kf_loanamountrequested); // Principal loan amount
+    const r = parseFloat(kf_interestrate) / 100; // Annual interest rate (expressed as a decimal)
+    let n = null; // Number of payments per year
+    let N = null; // Total number of payments over the loan tenure
+    let t = null; // Loan tenure in years
+
+    // Determine the number of payments per year based on the selected EMI schedule
+    switch (kf_emischedule) {
+        case 1: // Daily
+            n = 365;
+            break;
+        case 2: // Weekly
+            n = 52;
+            break;
+        case 3: // Monthly
+            n = 12;
+            break;
+        default:
+            n = 12; // Default to monthly
+    }
+
+    // Total number of payments over the loan tenure
+    N = parseInt(kf_numberofemi);
+
+    // Loan tenure in years
+    t = N / n;
+
+    // Calculate EMI
+    const R = r / n; // Monthly interest rate
+    const EMI = (P * R * Math.pow((1 + R), N)) / (Math.pow((1 + R), N) - 1);
+
+    // Update state with calculated EMI
+    setKf_emi(EMI.toFixed(2));
+};
+
+// Function to handle changes in loan amount requested or interest rate
+const handleLoanChange = () => {
+  // Check if loan amount and interest rate are provided
+  if (kf_loanamountrequested && kf_interestrate) {
+    calculateEMI(); // Calculate EMI
+  }
+};
+
+// Function to handle changes in EMI schedule or number of EMIs
+const handleEMIScheduleChange = () => {
+  // Check if EMI schedule and number of EMIs are provided
+  if (kf_emischedule && kf_numberofemi) {
+    calculateEMI(); // Calculate EMI
+  }
+};
+
+const handleInterestRateChange = (text) => {
+  // Check if the input is a valid decimal number
+  const isValidDecimal = /^\d*\.?\d*$/.test(text);
+
+  if (isValidDecimal || text === '') {
+    // If the input is a valid decimal number or empty, update the state
+    setKf_interestrate(text);
+    setErrorMessages({ ...errorMessages, interestRate: '' });
+  } else {
+    // If the input is not a valid decimal number, show an error message
+    setErrorMessages({ ...errorMessages, interestRate: 'Enter a valid decimal number' });
+  }
+};
 
   const [errorMessages, setErrorMessages] = useState({
     firstName: '',
@@ -52,6 +126,10 @@ export const PersonalLoan = () => {
     loanAmountRequested: '',
     aadharCardNumber: '',
     panCardNumber: '',
+    interestRate: '',
+    emiSchedule: '',
+    NoOfEMIs: '',
+    emiCollectionDate: ''
   });
 
   const navigation = useNavigation();
@@ -75,6 +153,14 @@ export const PersonalLoan = () => {
     setkf_city(null);
     setkf_state(null);
     setkf_loanamountrequested(null);
+    setKf_emischedule(null);
+    setKf_emi(null);
+    setkf_interestamount(null);
+    setKf_emicollectiondate(null);
+    setKf_emi(null);
+    setKf_numberofemi(null);
+    setKf_emischedule(null);
+    setKf_interestrate(null);
     setResetFormKey((prevKey) => prevKey + 1);
   };
 
@@ -301,6 +387,100 @@ export const PersonalLoan = () => {
     }
   };
 
+  const handleInterestRate = (text) => {
+    setKf_interestrate(text);
+
+    if (text.trim() === '') {
+      setErrorMessages({
+        ...errorMessages,
+        interestRate: 'Enter a Interest Amount',
+      });
+    } else if (/^\d+$/.test(text)) {
+      setErrorMessages({
+        ...errorMessages,
+        interestRate: '',
+      });
+    } else {
+      setErrorMessages({
+        ...errorMessages,
+        interestRate: `Enter a Valid Interest Rate`,
+      });
+    }
+  };
+
+  const handleNoOfEMIs = (text) => {
+    setKf_numberofemi(text);
+
+    if (text.trim() === '') {
+      setErrorMessages({
+        ...errorMessages,
+        NoOfEMIs: 'Enter a No of EMI payment',
+      });
+    } else if (/^\d+$/.test(text)) {
+      setErrorMessages({
+        ...errorMessages,
+        NoOfEMIs: '',
+      });
+    } else {
+      setErrorMessages({
+        ...errorMessages,
+        NoOfEMIs: `Enter a Valid No of EMI payment`,
+      });
+    }
+  };
+
+  const handleEmiCollectionDateChange = (date) => {
+    setKf_emicollectiondate(date);
+    setIsEmiCollectionDateTouched(true); // Mark the field as touched when a date is selected
+
+    if (!date) {
+      setErrorMessages({
+        ...errorMessages,
+        emiCollectionDate: 'Select an EMI Collection Date',
+      });
+    } else {
+      setErrorMessages({
+        ...errorMessages,
+        emiCollectionDate: '',
+      });
+    }
+  };
+
+  const handleEmiScheduleOptionset = (EMIschedule) => {
+    let numericValue;
+    switch (EMIschedule) {
+      case 'Daily':
+        numericValue = 1;
+        break;
+      case 'Weekly':
+        numericValue = 2;
+        break;
+      case 'Monthly':
+        numericValue = 3;
+        break;
+      default:
+        numericValue = null;
+    }
+    setKf_emischedule(numericValue);
+  };
+
+  const handleEmiSchedule = (emischedule) => {
+    setKf_emischedule(emischedule);
+    handleEmiScheduleOptionset(emischedule); 
+  
+    if (emischedule.trim() === '') {
+      setErrorMessages({
+        ...errorMessages,
+        emiSchedule: 'Select an EMI Schedule',
+      });
+    } else {
+      setErrorMessages({
+        ...errorMessages,
+        emiSchedule: '',
+      });
+    }
+  } 
+
   const getAuthenticatedUser = async () => {
     try {
       const userString = await AsyncStorage.getItem('authenticatedUser');
@@ -345,6 +525,10 @@ export const PersonalLoan = () => {
       loanAmountRequested: !kf_loanamountrequested ? ' Enter Loan Amount Requested' : '',
       aadharCardNumber: !/^\d{12}$/.test(kf_aadharnumber) ? 'Enter Valid Aadharcard Number' : '',
       panCardNumber: !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(kf_pannumber) ? 'Enter Valid PAN Card Number' : '',
+      interestRate: !/^\d+$/.test(kf_interestrate) ? 'Enter a Valid Interest Rate' : '',
+      emiSchedule: !kf_emischedule ? 'select a EMISchedule' : '',
+      NoOfEMIs: !/^\d+$/.test(kf_numberofemi) ? 'Enter a Valid No of EMI payment' : '',
+      emiCollectionDate: !kf_emicollectiondate ? 'select a EMI Collection Date' : ''
     };
     setErrorMessages(newErrorMessages);
     if (Object.values(newErrorMessages).some(message => message !== '')) {
@@ -369,7 +553,6 @@ export const PersonalLoan = () => {
       // const formattedFirstEmiDate = kf_firstemidate ? kf_firstemidate.toISOString() : null;
       const formattedDateOfBirth = kf_dateofbirth ? kf_dateofbirth.toISOString() : null;
       const loanAmount = parseFloat(kf_loanamountrequested);
-
       const userAdminname = authenticatedUser ? authenticatedUser.kf_adminname : '';
       console.log("created by", userAdminname);
 
@@ -393,6 +576,12 @@ export const PersonalLoan = () => {
           kf_pannumber: kf_pannumber,
           kf_loanamountrequested: loanAmount,
           kf_createdby: userAdminname,
+          kf_emischedule: kf_emischedule,
+          kf_interestrate: kf_interestrate,
+          kf_emi: kf_emi,
+          kf_numberofemi: kf_numberofemi,
+          kf_emicollectiondate: kf_emicollectiondate,
+          kf_othercharges: kf_othercharges,
         },
         {
           headers: {
@@ -444,17 +633,6 @@ export const PersonalLoan = () => {
           />
 
           <TextInputComponent
-            placeholder="Loan Amount Request"
-            autoCapitalize="none"
-            value={kf_loanamountrequested}
-            onChangeText={handleLoanAmountRequestedChange}
-          />
-
-{errorMessages.loanAmountRequested !== '' && (
-            <Text style={styles.errorText}>{errorMessages.loanAmountRequested}</Text>
-          )}
-
-          <TextInputComponent
             placeholder="First Name"
             autoCapitalize="none"
             value={kf_firstname}
@@ -474,9 +652,9 @@ export const PersonalLoan = () => {
             <Text style={styles.errorText}>{errorMessages.lastName}</Text>
           )}
         
-          <Text style={[styles.textInputContainer, { marginTop: 15, marginBottom: 5  , color: "gray", height: 50 }]}>
+          {/* <Text style={[styles.textInputContainer, { marginTop: 15, marginBottom: 5  , color: "gray", height: 50 }]}>
             {(!kf_firstname && !kf_lastname) ? "Full Name" : `${kf_firstname} ${kf_lastname}`}
-          </Text>
+          </Text> */}
 
           <LoanStatusPicker
             onOptionChange={handleGenderOptionset}
@@ -584,6 +762,70 @@ export const PersonalLoan = () => {
           {errorMessages.panCardNumber !== '' && (
             <Text style={styles.errorText}>{errorMessages.panCardNumber}</Text>
           )}
+
+          <TextInputComponent
+            placeholder="Loan Amount Request"
+            autoCapitalize="none"
+            value={kf_loanamountrequested}
+            onChangeText={handleLoanAmountRequestedChange}
+            onBlur={handleLoanChange}
+          />
+
+          {errorMessages.loanAmountRequested !== '' && (
+            <Text style={styles.errorText}>{errorMessages.loanAmountRequested}</Text>
+          )}
+
+<TextInput
+            style={[styles.textInputContainer, { marginVertical: 10 }]}
+            placeholder="Interest Rate"
+            value={kf_interestrate}
+            onChangeText={handleInterestRate}
+            onBlur={handleLoanChange}
+          // keyboardType="numeric" 
+          />
+          {errorMessages.interestRate !== '' && (
+            <Text style={styles.errorText}>{errorMessages.interestRate}</Text>
+          )}
+
+          <LoanStatusPicker
+            onOptionChange={handleEmiSchedule}
+            title="EMI Schedule"
+            options={['Daily', 'Weekly', 'Monthly']}
+          />
+          {errorMessages.emiSchedule !== '' && (
+            <Text style={styles.errorText}>{errorMessages.emiSchedule}</Text>
+          )}
+
+          <TextInput
+            style={[styles.textInputContainer, { marginVertical: 10 }]}
+            placeholder="Number of EMIs"
+            value={kf_numberofemi}
+            onChangeText={handleNoOfEMIs}
+            onBlur={handleEMIScheduleChange}
+          // keyboardType="numeric"
+          />
+          {errorMessages.NoOfEMIs !== '' && (
+            <Text style={styles.errorText}>{errorMessages.NoOfEMIs}</Text>
+          )}
+
+          <Text style={[styles.textInputContainer, { marginVertical: 10, height: 48, color: "gray" }]}>EMI: {kf_emi}</Text>
+
+          <ComponentDatePicker
+            style={{ height: 48, marginBottom: 15 }}
+            selectedDate={kf_emicollectiondate}
+            onDateChange={handleEmiCollectionDateChange}
+            placeholder="EMI Collection Date"  
+          />
+          {errorMessages.emiCollectionDate !== '' && (
+            <Text style={styles.errorText}>{errorMessages.emiCollectionDate}</Text>
+          )}
+
+          {/* <TextInputComponent
+            placeholder="Other Charges"
+            autoCapitalize="none"
+            value={kf_othercharges}
+            onChangeText={(text) => setKf_othercharges(parseFloat(text))}
+          /> */}
 
           <ButtonComponent
             title="SUBMIT"
