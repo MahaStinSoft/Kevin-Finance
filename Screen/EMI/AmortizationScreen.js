@@ -28,93 +28,118 @@ const AmortizationScreen = ({ route }) => {
   const [isEMICalculated, setIsEMICalculated] = useState(false); 
   const [isAmortizationLoaded, setIsAmortizationLoaded] = useState(false); 
 
-  useEffect(() => {
-    // Load amortization schedule from AsyncStorage when the component mounts
-    setRecordId(route.params.recordId);
-    loadAmortizationSchedule();
-    setIsEMICalculated(loanDetails.amortizationSchedule.length > 0); // Update isEMICalculated based on whether the amortization schedule is loaded
+useEffect(() => {
+  // Load amortization schedule from AsyncStorage when the component mounts
+  setRecordId(route.params.recordId);
+  loadAmortizationSchedule();
+  setIsEMICalculated(loanDetails.amortizationSchedule.length > 0); 
+  calculateEMIAmount();
 }, [route.params.recordId]);
 
-
-  const loadAmortizationSchedule = async () => {
-    try {
-      const schedule = await AsyncStorage.getItem('amortizationSchedule');
-      if (schedule !== null) {
-        setLoanDetails((prevLoanDetails) => ({
-          ...prevLoanDetails,
-          amortizationSchedule: JSON.parse(schedule),
-        }));
-        setIsAmortizationLoaded(true);
-      }
-    } catch (error) {
-      console.error('Error loading amortization schedule:', error);
-    }
-  };
-
-  const saveAmortizationSchedule = async (schedule) => {
-    try {
-      await AsyncStorage.setItem('amortizationSchedule', JSON.stringify(schedule));
-    } catch (error) {
-      console.error('Error saving amortization schedule:', error);
-    }
-  };
-
-  const calculateEMIAmount = () => {
-    const { principalLoanAmount, interestRate, loanTermMonths, applicationNumber } = loanDetails;
-
-    const monthlyInterestRate = (interestRate / 100) / 12;
-    const numberOfPayments = loanTermMonths;
-
-    const emi = principalLoanAmount * (monthlyInterestRate * Math.pow(1 + monthlyInterestRate, numberOfPayments)) /
-      (Math.pow(1 + monthlyInterestRate, numberOfPayments) - 1);
-
-    // Generate amortization schedule after calculating EMI
-    const amortizationSchedule = generateAmortizationSchedule(principalLoanAmount, monthlyInterestRate, numberOfPayments, emi, applicationNumber);
-
-    // Update state with calculated EMI and amortization schedule
-    setLoanDetails((prevLoanDetails) => ({
+const loadAmortizationSchedule = async () => {
+try {
+  // Load amortization schedule for the current user using their application number
+  const schedule = await AsyncStorage.getItem(`amortizationSchedule_${loanDetails.applicationNumber}`);
+  if (schedule !== null) {
+    setLoanDetails(prevLoanDetails => ({
       ...prevLoanDetails,
-      emiAmount: emi.toFixed(2),
-      amortizationSchedule, // Update amortization schedule here
+      amortizationSchedule: JSON.parse(schedule)
     }));
+    setIsAmortizationLoaded(true);
+  }
+} catch (error) {
+  console.error('Error loading amortization schedule:', error);
+}
+};
 
-    // Save amortization schedule to AsyncStorage
-    saveAmortizationSchedule(amortizationSchedule);
-    setIsEMICalculated(true);
-  };
+const saveAmortizationSchedule = async (schedule, applicationNumber) => {
+try {
+  // Save the amortization schedule with a key that includes the application number
+  await AsyncStorage.setItem(`amortizationSchedule_${applicationNumber}`, JSON.stringify(schedule));
+} catch (error) {
+  console.error('Error saving amortization schedule:', error);
+}
+};
 
-  const generateAmortizationSchedule = (principal, monthlyInterestRate, numberOfPayments, emi, applicationNumber) => {
-    const schedule = [];
-    let remainingBalance = principal;
+const calculateEMIAmount = () => {
+  const { principalLoanAmount, interestRate, loanTermMonths, applicationNumber } = loanDetails;
 
-    // Start from current month
-    const currentDate = new Date();
+  const monthlyInterestRate = (interestRate / 100) / 12;
+  const numberOfPayments = loanTermMonths;
 
-    for (let i = 1; i <= numberOfPayments; i++) {
-      // Calculate interest and principal payments
-      const interestPayment = remainingBalance * monthlyInterestRate;
-      const principalPayment = emi - interestPayment;
-      remainingBalance -= principalPayment;
+  const emi = principalLoanAmount * (monthlyInterestRate * Math.pow(1 + monthlyInterestRate, numberOfPayments)) /
+    (Math.pow(1 + monthlyInterestRate, numberOfPayments) - 1);
 
-      // Calculate payment date
-      const paymentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, 1);
+  // Generate amortization schedule after calculating EMI
+  const amortizationSchedule = generateAmortizationSchedule(principalLoanAmount, monthlyInterestRate, numberOfPayments, emi, applicationNumber);
 
-      // Format payment date as "DD/MM/YYYY"
-      const formattedDate = formatDate(paymentDate);
+  // Update state with calculated EMI and amortization schedule
+  setLoanDetails((prevLoanDetails) => ({
+    ...prevLoanDetails,
+    emiAmount: emi.toFixed(2),
+    amortizationSchedule, // Update amortization schedule here
+  }));
 
-      schedule.push({
-        month: i,
-        paymentDate: formattedDate,
-        emiAmount: emi.toFixed(2),
-        interestPayment: interestPayment.toFixed(2),
-        principalPayment: principalPayment.toFixed(2),
-        remainingBalance: remainingBalance.toFixed(2),
-        applicationNumber: applicationNumber, 
-      });
+  // Save amortization schedule to AsyncStorage
+  saveAmortizationSchedule(amortizationSchedule);
+  setIsEMICalculated(true);
+};
+
+const generateAmortizationSchedule = (principal, monthlyInterestRate, numberOfPayments, emi, applicationNumber) => {
+  const schedule = [];
+  let remainingBalance = principal;
+
+  // Start from current month
+  const currentDate = new Date();
+
+  for (let i = 1; i <= numberOfPayments; i++) {
+    // Calculate interest and principal payments
+    const interestPayment = remainingBalance * monthlyInterestRate;
+    const principalPayment = emi - interestPayment;
+    remainingBalance -= principalPayment;
+
+    // Calculate payment date
+    const paymentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, 1);
+
+    // Format payment date as "DD/MM/YYYY"
+    const formattedDate = formatDate(paymentDate);
+
+    schedule.push({
+      month: i,
+      paymentDate: formattedDate,
+      emiAmount: emi.toFixed(2),
+      interestPayment: interestPayment.toFixed(2),
+      principalPayment: principalPayment.toFixed(2),
+      remainingBalance: remainingBalance.toFixed(2),
+      applicationNumber: applicationNumber,
+      paid: false // Initialize paid status
+    });
+  }
+
+  return schedule;
+};
+
+const handlePaid = (item) => {
+  // Mark the item as paid (update the item in the amortization schedule)
+  const updatedAmortizationSchedule = loanDetails.amortizationSchedule.map(scheduleItem => {
+    if (scheduleItem.month === item.month) {
+      return {
+        ...scheduleItem,
+        paid: true
+      };
     }
+    return scheduleItem;
+  });
 
-    return schedule;
-  };
+  // Update amortization schedule in the state
+  setLoanDetails(prevLoanDetails => ({
+    ...prevLoanDetails,
+    amortizationSchedule: updatedAmortizationSchedule
+  }));
+
+  // Save updated amortization schedule to AsyncStorage for the current user
+  saveAmortizationSchedule(updatedAmortizationSchedule, loanDetails.applicationNumber);
+};
 
   // Helper function to format date as "DD/MM/YYYY"
   const formatDate = (date) => {
@@ -146,9 +171,11 @@ const AmortizationScreen = ({ route }) => {
         </TouchableOpacity>
         <View style={styles.column4}>
           <View style={styles.column4}>
-            <View style={[styles.paidButton, { backgroundColor: item.paid ? 'green' : 'red' }]}>
+          <TouchableOpacity 
+            onPress={handlePaid}
+            style={[styles.paidButton, { backgroundColor: item.paid ? 'green' : 'red' }]}>
               <Text style={styles.paidButtonText}>{item.paid ? 'Paid' : 'Unpaid'}</Text>
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -161,36 +188,14 @@ const AmortizationScreen = ({ route }) => {
       recordId: recordId,
       loanDetails,
       applicationNumber: loanDetails.applicationNumber
-      // numberOfPaidEMIs: countPaidEMIs() 
     });
-    
   };
 
-  const handlePaid = (item) => {
-    // Mark the item as paid (update the item in the amortization schedule)
-    console.log("Marking item as paid:", item);
-  
-    const updatedAmortizationSchedule = loanDetails.amortizationSchedule.map(scheduleItem => {
-      if (scheduleItem.month === item.month) {
-        return {
-          ...scheduleItem,
-          paid: true
-        };
-      }
-      return scheduleItem;  
-    });
-  
-    setLoanDetails(prevLoanDetails => ({
-      ...prevLoanDetails,
-      amortizationSchedule: updatedAmortizationSchedule
-    }));
-  };
-  
   useEffect(() => {
     if (route.params && route.params.isPaid && route.params.month) {
       const updatedAmortizationSchedule = loanDetails.amortizationSchedule.map(item => {
         if (item.month === route.params.month) {
-          return { ...item, paid: true }; // Mark the item as paid
+          return { ...item, paid: true }; 
         }
         return item;
       });
@@ -199,16 +204,24 @@ const AmortizationScreen = ({ route }) => {
         ...prevLoanDetails,
         amortizationSchedule: updatedAmortizationSchedule
       }));
+  
+      // Save updated amortization schedule to AsyncStorage for the current user
+      saveAmortizationSchedule(updatedAmortizationSchedule, loanDetails.applicationNumber);
     }
   }, [route.params]);
-  
-  useEffect(() => {
-    // Your effect logic here
-  }, [route.params.recordId, NoOfEMIsPaid]); // Include NoOfEMIsPaid in the dependency array
- console.log("NoOfEMIsPaid:"+NoOfEMIsPaid) ; 
 
-  const deviceWidth = Dimensions.get('window').width;
-  console.log("Device width:", deviceWidth);
+  const getEmiSchedule = (emiSchedule) => {
+    switch (emiSchedule) {
+      case '1':
+        return 'Daily';
+      case '2':
+        return 'Weekly';
+      case '3':
+        return 'Monthly';
+      default:
+        return '';
+    }
+  };
 
   const shouldAdjustTop = () => {
     return Dimensions.get('window').width > 600 ? -61 : -71;
@@ -227,13 +240,6 @@ const AmortizationScreen = ({ route }) => {
       <HeaderComponent titleText="Schedule Details" onPress={handleGoBackPersonaldetails}/>
       <Text style={[styles.amortizationTitle, {marginTop: 10}]}>EMI Details</Text>
       <View style={{ paddingHorizontal: 15 }}>
-
-       {/*<Text>Name: {loanDetails.name}</Text>
- <Text>Application Number:{loanDetails.month} {loanDetails.applicationNumber}</Text>
-    <Text>Mobile Number: {loanDetails.mobileNumber}</Text>
-    <Text>Aadhar Number: {loanDetails.aadharNumber}</Text>
-    <Text>PAN Card Number: {loanDetails.panCardNumber}</Text>
-    <Text>EMI Schedule: {loanDetails.emiSchedule}</Text> */}
 
     <View style={{ flexDirection: "row"}}>
           <Text style={styles.detailsLabel}>Name:</Text>
@@ -273,6 +279,17 @@ const AmortizationScreen = ({ route }) => {
           editable={false}
         />
         </View>
+
+        <View style={{ flexDirection: "row"}}>
+          <Text style={styles.detailsLabel}>EMI schedule:</Text>
+          <TextInput
+            style={styles.textInputContainer}
+            value={getEmiSchedule(loanDetails.emiSchedule)}
+            onChangeText={(text) => setLoanDetails({ ...loanDetails, emiSchedule: text })}
+            editable={false}
+          />
+        </View>
+
         <View style={{ flexDirection: "row" }}>
         <Text style={styles.detailsLabel}>Loan Term (Months):</Text>
         <TextInput
@@ -293,24 +310,21 @@ const AmortizationScreen = ({ route }) => {
       </View>
       </View>
 
-      {/* <ButtonComponent title="Calculate EMI" onPress={calculateEMIAmount} style={{marginTop: 10}} disabled={isAmortizationLoaded}/> */}
-      <ButtonComponent
-    title="Calculate EMI"
-    onPress={calculateEMIAmount}
-    style={{ marginTop: 10 }}
-    disabled={isEMICalculated}
-/>
-
       <Text style={styles.amortizationTitle}>No of EMI Paid: {countPaidEMIs()}</Text>
-      {/* <Text style={styles.amortizationTitle}>No of EMI Paid: {NoOfEMIsPaid}</Text> */}
 
       <Text style={styles.amortizationTitle}>Amortization Schedule</Text>
 
-      <FlatList
+      {/* <FlatList
         data={loanDetails.amortizationSchedule}
         keyExtractor={(item) => item.month.toString()}
         renderItem={renderItem}
-      />
+      /> */}
+
+<FlatList
+  data={loanDetails.amortizationSchedule}
+  keyExtractor={(item, index) => `${loanDetails.applicationNumber}_${item.month}_${index}`}
+  renderItem={renderItem}
+/>
     </View>
   );
 };
