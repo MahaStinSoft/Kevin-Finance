@@ -152,6 +152,7 @@ const DashboardScreen = ({ navigation, route }) => {
             homeLoan.kf_createdby === userAdmin &&
             (
               homeLoan.kf_name && homeLoan.kf_name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+              homeLoan.kf_lastname && homeLoan.kf_lastname.toUpperCase().includes(searchQuery.toUpperCase()) ||
               (homeLoan.kf_mobilenumber && homeLoan.kf_mobilenumber.toLowerCase().includes(searchQuery.toLowerCase())) ||
               (homeLoan.kf_aadharnumber && homeLoan.kf_aadharnumber.toLowerCase().includes(searchQuery.toLowerCase()))
             )
@@ -161,7 +162,8 @@ const DashboardScreen = ({ navigation, route }) => {
           (personalLoan) => 
             personalLoan.kf_createdby === userAdmin &&
             (
-              personalLoan.kf_name && personalLoan.kf_name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+              personalLoan.kf_firstname && personalLoan.kf_firstname.toUpperCase().includes(searchQuery.toUpperCase()) ||
+              personalLoan.kf_lastname && personalLoan.kf_lastname.toUpperCase().includes(searchQuery.toUpperCase()) ||
               (personalLoan.kf_mobile && personalLoan.kf_mobile.toLowerCase().includes(searchQuery.toLowerCase())) ||
               (personalLoan.kf_aadharnumber && personalLoan.kf_aadharnumber.toLowerCase().includes(searchQuery.toLowerCase()))
             )

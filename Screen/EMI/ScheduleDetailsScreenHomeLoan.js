@@ -698,19 +698,32 @@ const ScheduleDetailsScreen = ({route}) => {
                 setIsNoteCreationDisabled(true);
 
                 // Update the amortization schedule if the month is 1
+                // if (scheduleItem.month === 1) {
+                //     const updatedAmortizationSchedule = loanDetails.amortizationSchedule.map(item => {
+                //         if (item.month === scheduleItem.month) {
+                //             return { ...item, paid: true };
+                //         }
+                //         return item;
+                //     });
+
+                //     await AsyncStorage.setItem('amortizationSchedule', JSON.stringify(updatedAmortizationSchedule));
+                //     await AsyncStorage.setItem(`paidStatus_${scheduleItem.month}`, 'true');
+                // }
                 if (scheduleItem.month === 1) {
-                    const updatedAmortizationSchedule = loanDetails.amortizationSchedule.map(item => {
-                        if (item.month === scheduleItem.month) {
-                            return { ...item, paid: true };
-                        }
-                        return item;
-                    });
-
-                    await AsyncStorage.setItem('amortizationSchedule', JSON.stringify(updatedAmortizationSchedule));
-                    await AsyncStorage.setItem(`paidStatus_${scheduleItem.month}`, 'true');
-                }
-
-                // Show success alert
+                                    setIsPaid(true); 
+                        
+                                    const updatedAmortizationSchedule = loanDetails.amortizationSchedule.map(item => {
+                                        if (item.month === scheduleItem.month) {
+                                            return { ...item, paid: true };
+                                        }
+                                        return item;
+                                    });
+                                    
+                                    // Save the updated amortization schedule to AsyncStorage
+                                    await AsyncStorage.setItem('amortizationSchedule', JSON.stringify(updatedAmortizationSchedule));
+                        
+                                   
+                                }
                 Alert.alert(
                     'Success',
                     'Note with file attachment created successfully.',

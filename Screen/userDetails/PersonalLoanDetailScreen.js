@@ -175,9 +175,9 @@ const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', 
         <Text style={styles.cardLabel}>State: {personalLoan.kf_state}</Text>
         <Text style={styles.cardLabel}>Loan Amount Requested: {personalLoan.kf_loanamountrequested}</Text>
         <Text style={styles.cardLabel}>Loan Status: {getLoanStatus()}</Text>
-        {personalLoan.kf_statusR && (<Text style={styles.cardLabel}>Status Reason: {getStatusReason()}</Text>)}
+        {/* {personalLoan.kf_statusR && (<Text style={styles.cardLabel}>Status Reason: {getStatusReason()}</Text>)}
         {personalLoan.kf_approvaldate && (<Text style={styles.cardLabel}>Approver: {personalLoan.kf_approver}</Text>)}
-        {personalLoan.kf_approvaldate && (<Text style={styles.cardLabel}>Approval Date: {personalLoan.kf_approvaldate}</Text>)}
+        {personalLoan.kf_approvaldate && (<Text style={styles.cardLabel}>Approval Date: {personalLoan.kf_approvaldate}</Text>)} */}
         {/* {personalLoan.kf_firstemidate && (<Text style={styles.cardLabel}>First EMI Date: {personalLoan.kf_firstemidate}</Text>)} */}
       </View>
 

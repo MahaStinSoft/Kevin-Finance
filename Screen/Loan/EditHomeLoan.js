@@ -100,7 +100,8 @@ const EditHomeLoan = ({ route, navigation }) => {
       firstname,
       lastname,
       gender,
-      status
+      status,
+      mobileNumber
     });
   }, [loanApplication]);
 
@@ -253,13 +254,13 @@ const EditHomeLoan = ({ route, navigation }) => {
         }
         console.log(loanAmountRequested)
         Alert.alert('Updated the record Successfully.', '', [
-          // {
-          //   text: 'cancel'
-          // },
+          {
+            text: 'cancel'
+          },
           {
             text: 'OK',
             onPress: () => {
-              // navigation.navigate('HomeLoanDetailsScreen', { loanApplication: loanApplication });
+              navigation.navigate('HomeLoanDetailsScreen', { loanApplication: loanApplication });
             },
           },
         ]);

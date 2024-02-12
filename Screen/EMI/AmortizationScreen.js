@@ -36,6 +36,25 @@ useEffect(() => {
   calculateEMIAmount();
 }, [route.params.recordId]);
 
+useEffect(() => {
+  if (loanDetails.amortizationSchedule.length > 0 && !loanDetails.amortizationSchedule[0].paid) {
+    const updatedAmortizationSchedule = loanDetails.amortizationSchedule.map((item, index) => {
+      if (index === 0) {
+        return { ...item, paid: true };
+      }
+      return item;
+    });
+
+    setLoanDetails(prevLoanDetails => ({
+      ...prevLoanDetails,
+      amortizationSchedule: updatedAmortizationSchedule
+    }));
+
+    // Save updated amortization schedule to AsyncStorage for the current user
+    saveAmortizationSchedule(updatedAmortizationSchedule, loanDetails.applicationNumber);
+  }
+}, [loanDetails.amortizationSchedule]);
+
 const loadAmortizationSchedule = async () => {
 try {
   // Load amortization schedule for the current user using their application number

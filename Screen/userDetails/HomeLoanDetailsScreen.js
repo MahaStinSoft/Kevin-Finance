@@ -186,7 +186,7 @@ const emischeduleDateformatDate = emischeduleDate ? date.toLocaleDateString('en-
       {/* <Text style={styles.cardLabel}>Date of Birth: {loanApplication.kf_dateofbirth ? new Date(loanApplication.kf_dateofbirth).toLocaleDateString('en-US') : ''}</Text> */}
       <Text style={styles.cardLabel}>Date of Birth: {formattedDate}</Text>
       <Text style={styles.cardLabel}>Age: {loanApplication.kf_age}</Text>
-      <Text style={styles.cardLabel}>Mobile Number: {loanApplication.kf_mobile}</Text>
+      <Text style={styles.cardLabel}>Mobile Number: {loanApplication.kf_mobilenumber}</Text>
       <Text style={styles.cardLabel}>Email Address: {loanApplication.kf_email}</Text>
       <Text style={styles.cardLabel}>Address 1: {loanApplication.kf_address1}</Text>
       <Text style={styles.cardLabel}>Address 2: {loanApplication.kf_address2}</Text>
@@ -195,9 +195,9 @@ const emischeduleDateformatDate = emischeduleDate ? date.toLocaleDateString('en-
       <Text style={styles.cardLabel}>State: {loanApplication.kf_state}</Text>
       <Text style={styles.cardLabel}>Loan Amount Requested: {loanApplication.kf_loanamountrequested}</Text>
       <Text style={styles.cardLabel}>Loan Status: {getLoanStatus()}</Text>
-      {loanApplication.kf_statusR && (<Text style={styles.cardLabel}>Status Reason: {getStatusReason()}</Text>)}
+      {/* {loanApplication.kf_statusR && (<Text style={styles.cardLabel}>Status Reason: {getStatusReason()}</Text>)}
       {loanApplication.kf_approvaldate && (<Text style={styles.cardLabel}>Approver: {loanApplication.kf_approver}</Text>)}
-      {loanApplication.kf_approvaldate && (<Text style={styles.cardLabel}>Approval Date: {loanApplication.kf_approvaldate}</Text>)}
+      {loanApplication.kf_approvaldate && (<Text style={styles.cardLabel}>Approval Date: {loanApplication.kf_approvaldate}</Text>)} */}
       {/* {loanApplication.kf_firstemidate && (<Text style={styles.cardLabel}>First EMI Date: {loanApplication.kf_firstemidate}</Text>)} */}
     </View>
 
