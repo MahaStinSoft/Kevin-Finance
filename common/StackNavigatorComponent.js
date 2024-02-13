@@ -3,16 +3,15 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { Ionicons } from '@expo/vector-icons'; // Import the icons
 
-import ToggleFormScreen from '../Screen/ToggleFormScreen';
-import DashboardScreen from '../Screen/Dashboard';
+import ToggleFormScreen from '../Screen/LoginPages/ToggleFormScreen';
+import DashboardScreen from '../Screen/Dashboards/Dashboard';
 import HomeLoanDetailsScreen from '../Screen/userDetails/HomeLoanDetailsScreen';
 import PersonalLoanDetailsScreen from '../Screen/userDetails/PersonalLoanDetailScreen';
 import EditHomeLoan from '../Screen/Loan/EditHomeLoan';
 import EditPersonalLoan from '../Screen/Loan/EditPersonalLoan';
-import HomeScreen from '../Screen/HomeScreen';
-import PersonalLoan from '../Screen/PersonalLoan';
+import HomeScreen from '../Screen/LoanCreate/HomeScreen';
+import PersonalLoan from '../Screen/LoanCreate/PersonalLoan';
 import DynamicDashboardScreen from '../Screen/DynamicDashboardScreen';
-import Account from '../Screen/Account';
 import Loan from '../Screen/Loan';
 import Setting from '../Screen/setting';
 import CustomDrawerContent from './CustomDrawer';
@@ -20,6 +19,11 @@ import ScheduleDetailsScreen from '../Screen/EMI/ScheduleDetailScreen';
 import AmortizationScreen from '../Screen/EMI/AmortizationScreen';
 import ScheduleDetailsScreenHomeLoan from '../Screen/EMI/ScheduleDetailsScreenHomeLoan';
 import AmortizationScreenHome from '../Screen/EMI/AmortizationScreenHome';
+import SignatureScreen from '../signature';
+import AccountScreen from '../Screen/Account';
+// import HomeLoanGaurantee from '../Screen/Gaurantee/HomeLoanGaurantee';
+import LoginScreen from '../Screen/LoginPages/LoginScreen';
+import LoginManagerScreen from '../Screen/LoginPages/LoginManager';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -44,6 +48,12 @@ const StackNavigator = () => (
     <Stack.Screen name="ScheduleDetailsScreen" component={ScheduleDetailsScreen} options={{ headerShown: false }} />
     <Stack.Screen name="ScheduleDetailsScreenHomeLoan" component={ScheduleDetailsScreenHomeLoan} options={{ headerShown: false }} />
     <Stack.Screen name="AmortizationScreenHome" component={AmortizationScreenHome} options={{ headerShown: false }} />
+    <Stack.Screen name="SignatureScreen" component={SignatureScreen} options={{ headerShown: false }} />
+    <Stack.Screen name="Setting" component={Setting} options={{ headerShown: false }} />
+    <Stack.Screen name="AccountScreen" component={AccountScreen} options={{ headerShown: false }} />
+    {/* <Stack.Screen name="HomeLoanGaurantee" component={HomeLoanGaurantee} options={{ headerShown: false }} /> */}
+    <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
+    <Stack.Screen name="LoginManagerScreen" component={LoginManagerScreen} options={{ headerShown: false }} />
     <Stack.Screen name="DynamicDashboardScreen" component={DynamicDashboardScreen} options={{
       headerShown: false,
       unmountOnBlur: true,

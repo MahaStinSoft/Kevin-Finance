@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import MainScreen from './MainScreen';
-import LoanCalculator from './Screen/EMI/EmiDetails';
+import MainScreen from './Screen/MainScreen';
 
 const App = () => {
 
