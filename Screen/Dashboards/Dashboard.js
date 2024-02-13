@@ -392,7 +392,7 @@ const handleSettings = () => {
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
           >
-          <Text style={{textAlign: "center", marginBottom: 40, fontSize: 18, fontWeight: "bold",color: "red"}}>MANAGER LOGIN</Text>
+          <Text style={{textAlign: "center", marginBottom: 40, fontSize: 18, fontWeight: "bold",color: "red"}}>ADMIN DASHBOARD</Text>
 
             <View>
               {authenticatedUser && (

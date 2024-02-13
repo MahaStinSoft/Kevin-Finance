@@ -39,9 +39,9 @@ const SettingIcon = () => <Ionicons name="md-settings" size={24} color="red" />;
 
 const StackNavigator = () => (
   <Stack.Navigator>
-    {/* <Stack.Screen name="Dashboard" component={DashboardScreen} options={{ headerShown: false }} />
-    <Stack.Screen name="ManagerDashboard" component={ManagerDashboard} options={{ headerShown: false }} /> */}
     <Stack.Screen name="AuthNavigator" component={AuthNavigator} options={{ headerShown: false }} />
+    <Stack.Screen name="Dashboard" component={DashboardScreen} options={{ headerShown: false }} />
+    <Stack.Screen name="ManagerDashboard" component={ManagerDashboard} options={{ headerShown: false }} />
     <Stack.Screen name="ToggleFormScreen" component={ToggleFormScreen} options={{ headerShown: false }} />
     <Stack.Screen name="LoginManagerScreen" component={LoginManagerScreen} options={{ headerShown: false }} />
     <Stack.Screen name="HomeLoanDetailsScreen" component={HomeLoanDetailsScreen} options={{ headerShown: false }} />
