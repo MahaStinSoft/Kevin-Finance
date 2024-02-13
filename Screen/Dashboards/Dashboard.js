@@ -19,11 +19,11 @@ import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { BarChart } from 'react-native-chart-kit';
-import LogoutButton from '../common/CustomDrawer';
+import LogoutButton from '../../common/CustomDrawer';
 
-import HomeLoanCard from './card/HomeLoanCard';
-import PersonalLoanCard from './card/PersonalLoanCard';
-import DynamicDashboardScreen from './DynamicDashboardScreen';
+import HomeLoanCard from '../card/HomeLoanCard';
+import PersonalLoanCard from '../card/PersonalLoanCard';
+import DynamicDashboardScreen from '../DynamicDashboardScreen';
 
 const DashboardScreen = ({ navigation, route }) => {
   // const { authenticatedUser } = route.params;

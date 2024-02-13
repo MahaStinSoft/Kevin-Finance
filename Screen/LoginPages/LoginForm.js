@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 import axios from 'axios';
 
-import ButtonComponent from '../common/ButtonComponent';
+import ButtonComponent from '../../common/ButtonComponent';
 
 export const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);

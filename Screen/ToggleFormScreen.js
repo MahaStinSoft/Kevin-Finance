@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, ImageBackground, Platform, KeyboardAvoidingView } from 'react-native';
-import LoginForm from './LoginForm';
 import RegisterForm from './RegisterScreen';
+import LoginForm from './LoginPages/LoginForm';
 
 const ToggleFormScreen = () => {
     const [activeTab, setActiveTab] = useState('login');

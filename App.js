@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import MainScreen from './Screen/MainScreen';
-
+import MainScreen
+ from './MainScreen';
 const App = () => {
 
   return (

@@ -6,21 +6,21 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import AuthNavigator from './common/StackNavigatorComponent';
-import ToggleFormScreen from './Screen/ToggleFormScreen';
 import AllStackScreens from './common/StackNavigatorComponent';
-import DashboardScreen from './Screen/Dashboard';
+import DashboardScreen from './Screen/Dashboards/Dashboard';
 import HomeLoanCard from './Screen/card/HomeLoanCard';
 import PersonalLoanCard from './Screen/card/PersonalLoanCard';
 import EditHomeLoan from './Screen/Loan/EditHomeLoan';
 import EditPersonalLoan from './Screen/Loan/EditPersonalLoan';
-import HomeScreen from './Screen/HomeScreen';
-import PersonalLoan from './Screen/PersonalLoan';
+import HomeScreen from './Screen/LoanCreate/HomeScreen';
+import PersonalLoan from './Screen/LoanCreate/PersonalLoan';
 import HomeLoanDetailsScreen from './Screen/userDetails/HomeLoanDetailsScreen';
 import PersonalLoanDetailsScreen from './Screen/userDetails/PersonalLoanDetailScreen';
 import ScheduleDetailsScreen from './Screen/EMI/ScheduleDetailScreen';
 import AmortizationScreen from './Screen/EMI/AmortizationScreen';
 import ScheduleDetailsScreenHomeLoan from './Screen/EMI/ScheduleDetailsScreenHomeLoan';
 import AmortizationScreenHome from './Screen/EMI/AmortizationScreenHome';
+import ToggleFormScreen from './Screen/ToggleFormScreen';
 
 const Stack = createNativeStackNavigator();
 

@@ -5,11 +5,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 
-import HeaderComponent from '../common/Header';
-import TextInputComponent from '../common/TextInput';
-import ButtonComponent from '../common/ButtonComponent';
-import LoanStatusPicker from '../common/LoanStatusPicker ';
-import ComponentDatePicker from '../common/ComponentDatePicker';
+import HeaderComponent from '../../common/Header';
+import TextInputComponent from '../../common/TextInput';
+import ButtonComponent from '../../common/ButtonComponent';
+import LoanStatusPicker from '../../common/LoanStatusPicker ';
+import ComponentDatePicker from '../../common/ComponentDatePicker';
 // import CardImage from '../common/CardImage';
 import { setLocale } from 'yup';
 

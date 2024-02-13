@@ -4,11 +4,11 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
-import HeaderComponent from '../common/Header';
-import TextInputComponent from '../common/TextInput';
-import ButtonComponent from '../common/ButtonComponent';
-import LoanStatusPicker from '../common/LoanStatusPicker ';
-import ComponentDatePicker from '../common/ComponentDatePicker';
+import HeaderComponent from '../../common/Header';
+import TextInputComponent from '../../common/TextInput';
+import ButtonComponent from '../../common/ButtonComponent';
+import LoanStatusPicker from '../../common/LoanStatusPicker ';
+import ComponentDatePicker from '../../common/ComponentDatePicker';
 
 export const PersonalLoan = () => {
   const [kf_firstname, setkf_firstname] = useState('');

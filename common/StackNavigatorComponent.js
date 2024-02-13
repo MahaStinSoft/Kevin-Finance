@@ -3,7 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { Ionicons } from '@expo/vector-icons'; // Import the icons
 
-import ToggleFormScreen from '../Screen/LoginPages/ToggleFormScreen';
+// import ToggleFormScreen from '../Screen/LoginPages/ToggleFormScreen';
 import DashboardScreen from '../Screen/Dashboards/Dashboard';
 import HomeLoanDetailsScreen from '../Screen/userDetails/HomeLoanDetailsScreen';
 import PersonalLoanDetailsScreen from '../Screen/userDetails/PersonalLoanDetailScreen';
@@ -21,9 +21,10 @@ import ScheduleDetailsScreenHomeLoan from '../Screen/EMI/ScheduleDetailsScreenHo
 import AmortizationScreenHome from '../Screen/EMI/AmortizationScreenHome';
 import SignatureScreen from '../signature';
 import AccountScreen from '../Screen/Account';
+import ToggleFormScreen from '../Screen/ToggleFormScreen';
 // import HomeLoanGaurantee from '../Screen/Gaurantee/HomeLoanGaurantee';
-import LoginScreen from '../Screen/LoginPages/LoginScreen';
-import LoginManagerScreen from '../Screen/LoginPages/LoginManager';
+// import LoginScreen from '../Screen/LoginPages/LoginScreen';
+// import LoginManagerScreen from '../Screen/LoginPages/LoginManager';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
