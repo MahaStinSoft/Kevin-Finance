@@ -23,8 +23,10 @@ import SignatureScreen from '../signature';
 import AccountScreen from '../Screen/Account';
 import ToggleFormScreen from '../Screen/ToggleFormScreen';
 // import HomeLoanGaurantee from '../Screen/Gaurantee/HomeLoanGaurantee';
-// import LoginScreen from '../Screen/LoginPages/LoginScreen';
-// import LoginManagerScreen from '../Screen/LoginPages/LoginManager';
+import LoginScreen from '../Screen/LoginPages/LoginScreen';
+import LoginManagerScreen from '../Screen/LoginPages/LoginManagerScreen';
+import ManagerDashboard from '../Screen/Dashboards/ManagerDashboard';
+import AuthNavigator from '../context/AuthNavigator';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -37,8 +39,11 @@ const SettingIcon = () => <Ionicons name="md-settings" size={24} color="red" />;
 
 const StackNavigator = () => (
   <Stack.Navigator>
-    <Stack.Screen name="Dashboard" component={DashboardScreen} options={{ headerShown: false }} />
+    {/* <Stack.Screen name="Dashboard" component={DashboardScreen} options={{ headerShown: false }} />
+    <Stack.Screen name="ManagerDashboard" component={ManagerDashboard} options={{ headerShown: false }} /> */}
+    <Stack.Screen name="AuthNavigator" component={AuthNavigator} options={{ headerShown: false }} />
     <Stack.Screen name="ToggleFormScreen" component={ToggleFormScreen} options={{ headerShown: false }} />
+    <Stack.Screen name="LoginManagerScreen" component={LoginManagerScreen} options={{ headerShown: false }} />
     <Stack.Screen name="HomeLoanDetailsScreen" component={HomeLoanDetailsScreen} options={{ headerShown: false }} />
     <Stack.Screen name="PersonalLoanDetailsScreen" component={PersonalLoanDetailsScreen} options={{ headerShown: false }} />
     <Stack.Screen name="HomeLoan" component={HomeScreen} options={{ headerShown: false }} />
@@ -54,7 +59,6 @@ const StackNavigator = () => (
     <Stack.Screen name="AccountScreen" component={AccountScreen} options={{ headerShown: false }} />
     {/* <Stack.Screen name="HomeLoanGaurantee" component={HomeLoanGaurantee} options={{ headerShown: false }} /> */}
     <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
-    <Stack.Screen name="LoginManagerScreen" component={LoginManagerScreen} options={{ headerShown: false }} />
     <Stack.Screen name="DynamicDashboardScreen" component={DynamicDashboardScreen} options={{
       headerShown: false,
       unmountOnBlur: true,
@@ -90,7 +94,7 @@ const DrawerNavigator = () => (
     />
       <Drawer.Screen
       name="Profile"
-      component={Account}
+      component={AccountScreen}
       options={{
         headerShown: false,
         drawerIcon: AccountIcon,

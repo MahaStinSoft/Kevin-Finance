@@ -19,13 +19,11 @@ import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { BarChart } from 'react-native-chart-kit';
-import LogoutButton from '../../common/CustomDrawer';
 
 import HomeLoanCard from '../card/HomeLoanCard';
 import PersonalLoanCard from '../card/PersonalLoanCard';
-import DynamicDashboardScreen from '../DynamicDashboardScreen';
 
-const DashboardScreen = ({ navigation, route }) => {
+const ManagerDashboard = ({ navigation, route }) => {
   // const { authenticatedUser } = route.params;
   const [showLoanModal, setShowLoanModal] = useState(false);
   const [loanData, setLoanData] = useState([]);
@@ -149,7 +147,7 @@ const DashboardScreen = ({ navigation, route }) => {
 
         const homeLoanRecords = homeLoans.filter(
           (homeLoan) => 
-            homeLoan.kf_createdby === userAdmin &&
+            // homeLoan.kf_createdby === userAdmin &&
             (
               homeLoan.kf_name && homeLoan.kf_name.toUpperCase().includes(searchQuery.toUpperCase()) ||
               homeLoan.kf_lastname && homeLoan.kf_lastname.toUpperCase().includes(searchQuery.toUpperCase()) ||
@@ -160,7 +158,7 @@ const DashboardScreen = ({ navigation, route }) => {
         
         const personalLoanRecords = personalLoans.filter(
           (personalLoan) => 
-            personalLoan.kf_createdby === userAdmin &&
+            // personalLoan.kf_createdby === userAdmin &&
             (
               personalLoan.kf_firstname && personalLoan.kf_firstname.toUpperCase().includes(searchQuery.toUpperCase()) ||
               personalLoan.kf_lastname && personalLoan.kf_lastname.toUpperCase().includes(searchQuery.toUpperCase()) ||
@@ -219,9 +217,9 @@ const DashboardScreen = ({ navigation, route }) => {
                 Authorization: `Bearer ${accessToken}`,
                 "Content-Type": "application/json",
               },
-              params: {
-                "$filter": `kf_createdby eq '${authenticatedUser.kf_adminname}'`
-              }
+              // params: {
+              //   "$filter": `kf_createdby eq '${authenticatedUser.kf_adminname}'`
+              // }
             }
           );
   
@@ -232,9 +230,9 @@ const DashboardScreen = ({ navigation, route }) => {
                 Authorization: `Bearer ${accessToken}`,
                 "Content-Type": "application/json",
               },
-              params: {
-                "$filter": `kf_createdby eq '${authenticatedUser.kf_adminname}'`
-              }
+              // params: {
+              //   "$filter": `kf_createdby eq '${authenticatedUser.kf_adminname}'`
+              // }
             }
           );
   
@@ -325,7 +323,6 @@ const DashboardScreen = ({ navigation, route }) => {
     setShowClearIcon(false);
     // Optionally, you can reset or re-fetch your data here
   };
-
   const handleRefresh = () => {
     // This function will be called when you want to refresh the page
     setRefresh(!refresh);
@@ -392,14 +389,16 @@ const handleSettings = () => {
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
           >
-          <Text style={{textAlign: "center", marginBottom: 40, fontSize: 18, fontWeight: "bold",color: "red"}}>MANAGER LOGIN</Text>
 
-            <View>
+            {/* <View>
               {authenticatedUser && (
                 <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 2, textAlign: "center" }}>Created By: {authenticatedUser.kf_adminname}</Text>
               )}
-            </View>
+            </View> */}
             {/* <LogoutButton navigation={navigation}/> */}
+
+            <Text style={{textAlign: "center", marginVertical: 10, fontSize: 18, fontWeight: "bold",color: "red"}}>MANAGER DASHBOARD</Text>
+
 
             <View style={styles.chart}>
               <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 10, marginBottom: 10 }}>Loan Status Chart</Text>
@@ -722,4 +721,4 @@ const styles = StyleSheet.create({
 },
 });
 
-export default DashboardScreen;
+export default ManagerDashboard;

@@ -21,6 +21,11 @@ import AmortizationScreen from './Screen/EMI/AmortizationScreen';
 import ScheduleDetailsScreenHomeLoan from './Screen/EMI/ScheduleDetailsScreenHomeLoan';
 import AmortizationScreenHome from './Screen/EMI/AmortizationScreenHome';
 import ToggleFormScreen from './Screen/ToggleFormScreen';
+import AccountScreen from './Screen/Account';
+import Setting from './Screen/setting';
+import LoginManagerScreen from './Screen/LoginPages/LoginManagerScreen';
+import LoginScreen from './Screen/LoginPages/LoginScreen';
+import ManagerDashboard from './Screen/Dashboards/ManagerDashboard';
 
 const Stack = createNativeStackNavigator();
 
@@ -62,6 +67,7 @@ const MainScreen = () => {
           <Stack.Screen name="Main" component={AllStackScreens} options={{ headerShown: false }} />
       ) : (
         <>
+          <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
           <Stack.Screen name="ToggleFormScreen" component={ToggleFormScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Dashboard" component={DashboardScreen} options={{ headerShown: false }} />
           <Stack.Screen name="HomeLoan" component={HomeScreen} options={{ headerShown: false }} />
@@ -74,6 +80,11 @@ const MainScreen = () => {
           <Stack.Screen name="ScheduleDetailsScreen" component={ScheduleDetailsScreen} options={{ headerShown: false }} />
           <Stack.Screen name="ScheduleDetailsScreenHomeLoan" component={ScheduleDetailsScreenHomeLoan} options={{ headerShown: false }} />
           <Stack.Screen name="AmortizationScreenHome" component={AmortizationScreenHome} options={{ headerShown: false }} />
+          <Stack.Screen name="AccountScreen" component={AccountScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="Setting" component={Setting} options={{ headerShown: false }} />
+          <Stack.Screen name="ManagerDashboard" component={ManagerDashboard} options={{ headerShown: false }} />
+          <Stack.Screen name="LoginManagerScreen" component={LoginManagerScreen} options={{ headerShown: false }} />
+
           </>
       )}
       </Stack.Navigator>

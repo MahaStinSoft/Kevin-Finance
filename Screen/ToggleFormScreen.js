@@ -31,9 +31,12 @@ const ToggleFormScreen = () => {
             <TouchableOpacity onPress={() => setActiveTab('register')} style={[styles.tabButton, activeTab === 'register' && styles.activeTab]}>
               <Text style={[styles.tabText, activeTab === 'register' && styles.activeText]}>Sign Up</Text>
             </TouchableOpacity> */}
-            <TouchableOpacity style={[styles.tabButton, styles.activeTab]}>
+            {/* <TouchableOpacity style={[styles.tabButton, styles.activeTab]}>
               <Text style={styles.activeText}>Log In</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
+             <View style={[styles.tabButton, styles.activeTab]}>
+             <Text style={{textAlign: "center", marginBottom: 10, fontSize: 18, fontWeight: "bold",color: "red"}}>ADMIN LOGIN</Text>
+            </View>
           </View>
           {renderForm()}
         </View>
@@ -108,7 +111,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingTop:10,
     paddingBottom:10,
-    width: 110,
+    width: "60%",
   },
   activeText: {
     color: 'rgba(255,28,53,255)', 

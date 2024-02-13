@@ -9,7 +9,7 @@ const LoginScreen = () => {
     navigation.navigate('ToggleFormScreen');
   };
   const handleUserLogin = () => {
-    navigation.navigate('LoginUser');
+    navigation.navigate('LoginManagerScreen');
   };
 
   return (
@@ -19,7 +19,7 @@ const LoginScreen = () => {
         <Text style={styles.buttonText}>Login as Administrator</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={handleUserLogin}>
-        <Text style={styles.buttonText}>Login as user</Text>
+        <Text style={styles.buttonText}>Login as Manager</Text>
       </TouchableOpacity>
     </View>
     
