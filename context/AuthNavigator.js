@@ -7,7 +7,7 @@ const Stack = createStackNavigator();
 
 const AuthNavigator = () => {
   // Assume you have some logic to determine the user's role (admin or manager)
-  const isLoggedInAsManager = true; // Placeholder logic for demonstration
+  const isLoggedInAsManager = false; // Placeholder logic for demonstration
 
   return (
     <Stack.Navigator>

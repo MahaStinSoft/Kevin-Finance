@@ -6,8 +6,9 @@ import ButtonComponent from '../../common/ButtonComponent';
 
 const HomeLoanDetailsScreen = ({ route }) => {
   const navigation = useNavigation();
-  const [loanApplication, setLoanApplication] = useState(route.params.loanApplication);
+  // const [loanApplication, setLoanApplication] = useState(route.params.loanApplication);
   const [recordId, setRecordId] = useState(route.params.loanApplication.kf_loanApplicationid);
+  const [loanApplication, setLoanApplication] = useState(route.params.loanApplication);
 
   LogBox.ignoreLogs([
     'Non-serializable values were found in the navigation state',
@@ -25,12 +26,12 @@ const HomeLoanDetailsScreen = ({ route }) => {
     }, delayInMilliseconds);
   }, [fetchData]);
 
-  useEffect(() => {
-    const unsubscribeFocus = navigation.addListener('focus', fetchDataOnFocus);
-    return () => {
-      unsubscribeFocus();
-    };
-  }, [navigation, fetchDataOnFocus]);
+  // useEffect(() => {
+  //   const unsubscribeFocus = navigation.addListener('focus', fetchDataOnFocus);
+  //   return () => {
+  //     unsubscribeFocus();
+  //   };
+  // }, [navigation, fetchDataOnFocus]);
 
   // Update recordId when route params change
   useEffect(() => {
@@ -126,15 +127,6 @@ const HomeLoanDetailsScreen = ({ route }) => {
       );
     }
   };
-  
-  const handlenavigatetoloandetail = () => {
-    navigation.navigate('LoanCalculator', 
-    // {
-    //   loanApplication,
-    //   onUpdateSuccess: updatedLoanApplication => setLoanApplication(updatedLoanApplication),
-    // }
-    );
-  }; 
 
   const handleGoToAmortizationScreen = () => {
     navigation.navigate('AmortizationScreenHome', {
