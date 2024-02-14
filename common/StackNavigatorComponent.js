@@ -66,74 +66,74 @@ const StackNavigator = () => (
   </Stack.Navigator>
 );
 
-const DrawerNavigator = () => (
-  <Drawer.Navigator
-  initialRouteName='Dashboards'
-  drawerContent={(props) => <CustomDrawerContent {...props} />}
-    screenOptions={{
-      drawerStyle: {
-        width: 210,
-        height: "100%"
-      },
-      drawerLabelStyle: {
-        color: 'red',
-        fontSize: 15
-      },
-      drawerItemStyle: {
-        borderBottomColor: 'gray',
-        borderBottomWidth: 1,
-      },
-    }}>
-       <Drawer.Screen
-      name="Dashboards"
-      component={StackNavigator}
-      options={{
-        headerShown: false,
-        drawerIcon: DashboardIcon,
-      }}
-    />
-      <Drawer.Screen
-      name="Profile"
-      component={AccountScreen}
-      options={{
-        headerShown: false,
-        drawerIcon: AccountIcon,
-      }}
-    />
-    {/* <Drawer.Screen
-      name="Dashboards"
-      component={StackNavigator}
-      options={{
-        headerShown: false,
-        drawerIcon: DashboardIcon,
-      }}
-    /> */}
-    <Drawer.Screen
-      name="Loans"
-      component={Loan}
-      options={{
-        headerShown: false,
-        drawerIcon: LoanIcon,
-      }}
-    />
-    <Drawer.Screen
-      name="Settings"
-      component={Setting}
-      options={{
-        headerShown: false,
-        drawerIcon: SettingIcon,
-        drawerItemStyle: {
-          marginBottom: 500
-        },
-      }}
-    />
-  </Drawer.Navigator>
-);
+// const DrawerNavigator = () => (
+//   <Drawer.Navigator
+//   initialRouteName='Dashboards'
+//   drawerContent={(props) => <CustomDrawerContent {...props} />}
+//     screenOptions={{
+//       drawerStyle: {
+//         width: 210,
+//         height: "100%"
+//       },
+//       drawerLabelStyle: {
+//         color: 'red',
+//         fontSize: 15
+//       },
+//       drawerItemStyle: {
+//         borderBottomColor: 'gray',
+//         borderBottomWidth: 1,
+//       },
+//     }}>
+//        <Drawer.Screen
+//       name="Dashboards"
+//       component={StackNavigator}
+//       options={{
+//         headerShown: false,
+//         drawerIcon: DashboardIcon,
+//       }}
+//     />
+//       <Drawer.Screen
+//       name="Profile"
+//       component={AccountScreen}
+//       options={{
+//         headerShown: false,
+//         drawerIcon: AccountIcon,
+//       }}
+//     />
+//     {/* <Drawer.Screen
+//       name="Dashboards"
+//       component={StackNavigator}
+//       options={{
+//         headerShown: false,
+//         drawerIcon: DashboardIcon,
+//       }}
+//     /> */}
+//     <Drawer.Screen
+//       name="Loans"
+//       component={Loan}
+//       options={{
+//         headerShown: false,
+//         drawerIcon: LoanIcon,
+//       }}
+//     />
+//     <Drawer.Screen
+//       name="Settings"
+//       component={Setting}
+//       options={{
+//         headerShown: false,
+//         drawerIcon: SettingIcon,
+//         drawerItemStyle: {
+//           marginBottom: 500
+//         },
+//       }}
+//     />
+//   </Drawer.Navigator>
+// );
 
-const AllStackScreens = () => (
-  <Drawer.Navigator>
-    <Drawer.Screen name="MainScreen" component={DrawerNavigator} options={{ headerShown: false }} />
-  </Drawer.Navigator>
-);
+// const AllStackScreens = () => (
+//   <Drawer.Navigator>
+//     <Drawer.Screen name="MainScreen" component={DrawerNavigator} options={{ headerShown: false }} />
+//   </Drawer.Navigator>
+// );
 
-export default AllStackScreens;
+export default StackNavigator;

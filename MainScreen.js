@@ -84,7 +84,6 @@ const MainScreen = () => {
           <Stack.Screen name="Setting" component={Setting} options={{ headerShown: false }} />
           <Stack.Screen name="ManagerDashboard" component={ManagerDashboard} options={{ headerShown: false }} />
           <Stack.Screen name="LoginManagerScreen" component={LoginManagerScreen} options={{ headerShown: false }} />
-
           </>
       )}
       </Stack.Navigator>

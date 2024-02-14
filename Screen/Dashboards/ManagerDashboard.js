@@ -17,6 +17,8 @@ RefreshControl
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
+
 import axios from 'axios';
 import { BarChart } from 'react-native-chart-kit';
 
@@ -49,6 +51,20 @@ const ManagerDashboard = ({ navigation, route }) => {
   const [showAllLoans, setShowAllLoans] = useState(false);
 
   const isFocused = useIsFocused();
+
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      console.log('Network state changed:', state.isConnected);
+      if (!state.isConnected) {
+        console.log('No Internet Connection');
+        Alert.alert('No Internet Connection', 'Please check your internet connection and try again.');
+      }      
+    });
+  
+    return () => {
+      unsubscribe();
+    };
+  }, []);  
 
   useEffect(() => {
     getAuthenticatedUser();

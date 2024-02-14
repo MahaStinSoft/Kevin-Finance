@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 import axios from 'axios';
+import NetInfo from "@react-native-community/netinfo";
 
 import ButtonComponent from '../../common/ButtonComponent';
 
@@ -13,14 +14,31 @@ export const LoginForm = () => {
   const [kf_adminname, setkf_adminname] = useState(null);
   const [kf_password, setPassword] = useState(null);
   const [isMounted, setIsMounted] = useState(false);
+  const [isConnected, setIsConnected] = useState(true);
 
   const navigation = useNavigation();
 
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      setIsConnected(state.isConnected);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
   const handleLogin = async () => {
+
+    if (!isConnected) {
+      Alert.alert("No Internet Connection", "Please check your internet connection and try again.");
+      return;
+    };
+
     if (!kf_name || !kf_password ) {
       Alert.alert("Error", "Please enter both firstname and password");
       return;
-    }
+    };
 
     try {
       // Authenticate and get the access token from Dynamics CRM
