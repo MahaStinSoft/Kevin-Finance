@@ -337,12 +337,12 @@ const HomeLoanDetailsScreen = ({ route }) => {
     }, delayInMilliseconds);
   }, [fetchData]);
 
-  useEffect(() => {
-    const unsubscribeFocus = navigation.addListener('focus', fetchDataOnFocus);
-    return () => {
-      unsubscribeFocus();
-    };
-  }, [navigation, fetchDataOnFocus]);
+  // useEffect(() => {
+  //   const unsubscribeFocus = navigation.addListener('focus', fetchDataOnFocus);
+  //   return () => {
+  //     unsubscribeFocus();
+  //   };
+  // }, [navigation, fetchDataOnFocus]);
 
   // Update recordId when route params change
   useEffect(() => {
