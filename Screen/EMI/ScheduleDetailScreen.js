@@ -374,7 +374,6 @@ const ScheduleDetailsScreen = ({route}) => {
                     onChangeText={handleOtherChargesChange}
                     value={otherCharges}
                     placeholder="Enter Other Charges"
-                    keyboardType="numeric"
                 />
                 <Text>New EMI Payment: {newEMIPayment}</Text> */}
                 <ButtonComponent title="Create Note with File" onPress={createNoteWithFile} disabled={isPaid || isNoteCreationDisabled}/>

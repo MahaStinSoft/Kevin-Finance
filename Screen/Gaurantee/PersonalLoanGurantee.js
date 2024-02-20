@@ -544,7 +544,6 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
               value={guarantormobilenumber}
               placeholder="Mobile Number"
               onChangeText={handleMobileNumberChange}
-              keyboardType="numeric"
             />
             {errorMessages.guarantorMobileNumberEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.guarantorMobileNumberEdit}</Text>

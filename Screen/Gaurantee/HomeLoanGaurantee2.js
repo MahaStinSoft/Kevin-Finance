@@ -27,7 +27,7 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
 
   const [firstEMIDate, setfirstEMIDate] = useState(loanApplication?.kf_firstemidate || '');
   const [guarantoraadharnumber, setAadharcardNumber] = useState(loanApplication?.kf_guarantor2aadharnumber || '');
-  const [guarantorpannumber, setPancardNumber] = useState(loanApplication?.kf_guarantor2aadharnumber || '');
+  const [guarantorpannumber, setPancardNumber] = useState(loanApplication?.kf_guarantor2pannumber || '');
 
   const [isfirstnameValid, setIsfirstnameValid] = useState(true);
   const [isLastNameValid, setIsLastNameValid] = useState(true);
@@ -60,7 +60,7 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
     setfirstname(loanApplication.kf_guarantor2firstname);
     setLastname(loanApplication.kf_guarantor2lastname);
     setdateofbirth(loanApplication.kf_guarantor2dateofbirth ? new Date(loanApplication.kf_guarantor2dateofbirth) : null);
-    setage(loanApplication.kf_guarantor2age || ''); // Ensure that kf_guarantor2age is set correctly
+    setage(loanApplication.kf_guarantor2age || ''); 
     setGender(loanApplication.kf_guarantor2gender);
     setMobileNumber(loanApplication.kf_guarantor2mobilenumber);
     setEmail(loanApplication.kf_guarantor2email);
@@ -70,7 +70,7 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
     setCity(loanApplication.kf_guarantor2city);
     setState(loanApplication.kf_guarantor2state);
     setAadharcardNumber(loanApplication.kf_guarantor2aadharnumber);
-    setPancardNumber(loanApplication.kf_guarantor2aadharnumber);
+    setPancardNumber(loanApplication.kf_guarantor2pannumber);
     setRecordId(loanApplication.kf_loanApplicationid);
     console.log('State updated:', {
       applicationnumber,
@@ -138,14 +138,14 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
 
 
       const updateRecordResponse = await axios.patch(
-        `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans(${recordId})`,
+        `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications(${recordId})`,
         {
           kf_applicationnumber: applicationnumber,
             kf_createdby: createdby,
             kf_guarantor2firstname: guarantorfirstname,
             kf_guarantor2lastname: guarantorlastname,
-            kf_guarantor2dateofbirth: formattedDateOfBirth,
-            kf_guarantor2age: guarantorage,
+            // kf_guarantor2dateofbirth: formattedDateOfBirth,
+            // kf_guarantor2age: guarantorage,
             kf_guarantor2gender: guarantorgender,
             kf_guarantor2mobilenumber: guarantormobilenumber,
             kf_guarantor2email: guarantoremail,
@@ -155,7 +155,7 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
             kf_guarantor2city: guarantorcity,
             kf_guarantor2state: guarantorstate,
             kf_guarantor2aadharnumber:guarantoraadharnumber,
-            kf_guarantor2aadharnumber:guarantorpannumber
+            kf_guarantor2pannumber:guarantorpannumber
         },
         {
           headers: {
@@ -186,7 +186,7 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
                           kf_guarantor2city: guarantorcity,
                           kf_guarantor2state: guarantorstate,
                           kf_guarantor2aadharnumber: guarantoraadharnumber,
-                          kf_guarantor2aadharnumber: guarantorpannumber,
+                          kf_guarantor2pannumber: guarantorpannumber,
           
           });
         }
@@ -543,7 +543,6 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
               value={guarantormobilenumber}
               placeholder="Mobile Number"
               onChangeText={handleMobileNumberChange}
-              keyboardType="numeric"
             />
             {errorMessages.guarantorMobileNumberEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.guarantorMobileNumberEdit}</Text>

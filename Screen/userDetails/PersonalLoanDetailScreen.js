@@ -477,9 +477,9 @@ const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', 
           <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={styles.buttonContainer}>
             <Text style={styles.buttonText}>Guarantee</Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity onPress={handleNavigateToGuaranteeScreen2} style={styles.buttonContainer}>
+          <TouchableOpacity onPress={handleNavigateToGuaranteeScreen2} style={styles.buttonContainer}>
             <Text style={styles.buttonText}>Guarantee-2</Text>
-          </TouchableOpacity> */}
+          </TouchableOpacity>
         </View>
       </View>
 

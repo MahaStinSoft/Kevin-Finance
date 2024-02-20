@@ -873,7 +873,6 @@ const handlesignature = async  () => {
               value={mobileNumber}
               placeholder="Mobile Number"
               onChangeText={handleMobileNumberChange}
-              keyboardType="numeric"
             />
             {errorMessages.mobileNumberEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.mobileNumberEdit}</Text>

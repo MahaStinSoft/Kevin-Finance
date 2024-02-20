@@ -333,14 +333,12 @@
 //                     onChangeText={handleOtherChargesChange}
 //                     value={otherCharges}
 //                     placeholder="Enter Other Charges"
-//                     keyboardType="numeric"
 //                 /> */}
 //                 <TextInput
 //                     style={styles.input}
 //                     onChangeText={(text) => handleOtherChargesChange(text)}
 //                     value={otherChargesData[scheduleItem.month] || ''} // Use otherChargesData for the current month
 //                     placeholder="Enter Penalty"
-//                     keyboardType="numeric"
 //                     editable={!isPaid && !isNoteCreationDisabled} // Make the input editable only if payment is not marked as paid and note creation is not disabled
 //                 />
 
@@ -708,14 +706,12 @@ const ScheduleDetailsScreen = ({route}) => {
                     onChangeText={handleOtherChargesChange}
                     value={otherCharges}
                     placeholder="Enter Other Charges"
-                    keyboardType="numeric"
                 /> */}
                 <TextInput
                     style={styles.input}
                     onChangeText={(text) => handleOtherChargesChange(text)}
                     value={otherChargesData[scheduleItem.month] || ''} 
                     placeholder="Enter Penalty"
-                    keyboardType="numeric"
                     editable={!isPaid && !isNoteCreationDisabled} 
                     />
                 <Text>New EMI Payment: {newEMIPayment}</Text>
