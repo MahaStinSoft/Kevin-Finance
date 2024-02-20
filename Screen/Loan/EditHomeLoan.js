@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, Alert, StyleSheet, ScrollView, Text } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 
 import HeaderComponent from '../../common/Header';
 import ButtonComponent from '../../common/ButtonComponent';
 import ComponentDatePicker from '../../common/ComponentDatePicker';
 import LoanStatusPicker from '../../common/LoanStatusPicker ';
+import CardImage from '../../common/CardImage';
+import SignatureScreen from '../../signature';
+import CardImageSignature from '../../common/CardImageSignature';
 
 const EditHomeLoan = ({ route, navigation }) => {
   const { loanApplication, onUpdateSuccess } = route.params || {};
@@ -37,6 +41,10 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [emiSchedule, setEmiSchedule] = useState(loanApplication?.kf_emischedule || '');
   const [numberOfEMI, setNumberOfEMI] = useState(loanApplication?.kf_numberofemi || '');
   const [eminAmount, setEmiAmount] = useState(loanApplication?.kf_emi || '');
+  const [aadharcard, setAadharcard] = useState({ fileName: null, fileContent: null });
+  const [pancard, setPancard] = useState({ fileName: null, fileContent: null });
+  const [applicantImage, setapplicantImage] = useState({ fileName: null, fileContent: null });
+  const [signature, setSignature] = useState({ fileName: null, fileContent: null });
 
   const [isfirstnameValid, setIsfirstnameValid] = useState(true);
   const [isLastNameValid, setIsLastNameValid] = useState(true);
@@ -45,8 +53,10 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [isaadharNumberValid, setIsaadharcardNumberValid] = useState(true);
   const [isPancardNumberValid, setIsPancardNumberValid] = useState(true);
   const [isLoanAmountValid, setIsLoanAmountValid] = useState(true);
+  const [ModalVisible, setModalVisible] = useState(true);  
 
-
+  // const { signatureImage } = route.params;
+  const [signatureImage, setSignatureImage] = useState(null);
   const [recordId, setRecordId] = useState(loanApplication.kf_loanapplicationid);
 
   const [errorMessages, setErrorMessages] = useState({
@@ -94,6 +104,10 @@ const EditHomeLoan = ({ route, navigation }) => {
     setInterestRate(loanApplication.kf_interestrate);
     setNumberOfEMI(loanApplication.kf_numberofemi);
     setRecordId(loanApplication.kf_loanapplicationid);
+    setAadharcard({ fileName: null, fileContent: null });
+    setPancard({ fileName: null, fileContent: null });
+    setapplicantImage({ fileName: null, fileContent: null });
+    setSignature({ fileName: null, fileContent: null})
     console.log('State updated:', {
       applicationnumber,
       createdby,
@@ -550,6 +564,218 @@ const EditHomeLoan = ({ route, navigation }) => {
     }
   };
 
+  const pickImage = async (imageType) => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+        base64: true,
+      });
+  
+      if (result.cancelled) {
+        return;
+      }
+  
+      const byteArray = result.base64; // Use result.base64 directly
+      const fileName = result.uri.split('/').pop(); // Extracting filename from URI
+  
+      switch (imageType) {
+        case 'aadhar':
+          setAadharcard({
+            fileName: fileName,
+            fileContent: byteArray,
+          });
+          break;
+        case 'pan':
+          setPancard({
+            fileName: fileName,
+            fileContent: byteArray,
+          });
+          break;
+        case 'applicant':
+          setapplicantImage({
+            fileName: fileName,
+            fileContent: byteArray,
+          });
+          break;
+        default:
+          break;
+      }
+    } catch (error) {
+      console.error('Error picking or processing the image:', error);
+      Alert.alert('Error', 'Failed to pick or process the image.');
+    }
+  };
+
+const sendAnnotation = async () => {
+  try {
+    const tokenResponse = await axios.post(
+      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+      {
+        grant_type: 'client_credentials',
+        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+        resource: 'https://org0f7e6203.crm5.dynamics.com',
+        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+      },
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
+
+    const accessToken = tokenResponse.data.access_token;
+
+    const annotations = [
+      {
+        subject: `Image: ${aadharcard.fileName || 'example.jpg'}`,
+        filename: aadharcard.fileName || 'example.jpg',
+        isdocument: true,
+        'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
+        documentbody: aadharcard.fileContent,
+      },
+    ];
+
+    const createAnnotationResponse = await axios.post(
+      'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
+      annotations,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (createAnnotationResponse.status === 204) {
+      console.log('Annotations (Notes) with file attachments created successfully.');
+      // Alert.alert('Success', 'Notes with file attachments created successfully.');
+    } else {
+      console.error('Failed to create annotations (notes) with file attachments. Response:', createAnnotationResponse.data);
+      Alert.alert('Error', 'Failed to create notes with file attachments.');
+    }
+  } catch (error) {
+    console.error('Error creating annotations (notes) with file attachments:', error.response?.data || error.message);
+    Alert.alert('Error', 'An error occurred while creating notes with file attachments.');
+  }
+};
+
+const sendAnnotation1 = async () => {
+  try {
+    const tokenResponse = await axios.post(
+      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+      {
+        grant_type: 'client_credentials',
+        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+        resource: 'https://org0f7e6203.crm5.dynamics.com',
+        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+      },
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
+
+    const accessToken = tokenResponse.data.access_token;
+
+    const annotations1 = [
+      {
+        subject: `Image: ${pancard.fileName || 'pancard.jpg'}`,
+        filename: pancard.fileName || 'pancard.jpg',
+        isdocument: true,
+        'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
+        documentbody: pancard.fileContent,
+      },
+    ];
+
+    const createAnnotationResponse = await axios.post(
+      'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
+      annotations1,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (createAnnotationResponse.status === 204) {
+      console.log('Annotations (Notes) with file attachments created successfully.');
+      // Alert.alert('Success', 'Notes with file attachments created successfully.');
+    } else {
+      console.error('Failed to create annotations (notes) with file attachments. Response:', createAnnotationResponse.data);
+      Alert.alert('Error', 'Failed to create notes with file attachments.');
+    }
+  } catch (error) {
+    console.error('Error creating annotations (notes) with file attachments:', error.response?.data || error.message);
+    Alert.alert('Error', 'An error occurred while creating notes with file attachments.');
+  }
+};
+
+const sendAnnotation2 = async () => {
+  try {
+    const tokenResponse = await axios.post(
+      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+      {
+        grant_type: 'client_credentials',
+        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+        resource: 'https://org0f7e6203.crm5.dynamics.com',
+        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+      },
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
+
+    const accessToken = tokenResponse.data.access_token;
+
+    const annotations2 = [
+      {
+        subject: `Image: ${applicantImage.fileName || 'applicantImage.jpg'}`,
+        filename: applicantImage.fileName || 'applicantImage.jpg',
+        isdocument: true,
+        'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
+        documentbody: applicantImage.fileContent,
+      }
+    ];
+
+    const createAnnotationResponse = await axios.post(
+      'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
+      annotations2,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (createAnnotationResponse.status === 204) {
+      console.log('Annotations (Notes) with file attachments created successfully.');
+      Alert.alert('Success', 'Notes with file attachments created successfully.');
+    } else {
+      console.error('Failed to create annotations (notes) with file attachments. Response:', createAnnotationResponse.data);
+      Alert.alert('Error', 'Failed to create notes with file attachments.');
+    }
+  } catch (error) {
+    console.error('Error creating annotations (notes) with file attachments:', error.response?.data || error.message);
+    Alert.alert('Error', 'An error occurred while creating notes with file attachments.');
+  }
+};
+
+const handleUpdateRecordAndSendAnnotation = () => {
+  sendAnnotation();
+  sendAnnotation1();
+  sendAnnotation2();
+  handleUpdateRecord(); 
+  
+};
+
+const onViewImage = () => {
+  setModalVisible(true);
+};
+
+
+const handlesignature = async  () => {
+  navigation.navigate('SignatureScreen', { loanApplication: loanApplication });
+}
+
   const date = emiCollectionDate ? new Date(emiCollectionDate) : null;
   const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
 
@@ -557,7 +783,7 @@ const EditHomeLoan = ({ route, navigation }) => {
     <>
       <HeaderComponent titleText="Edit Home Screen"
         onPress={handleGoBack}
-        onIconPress={handleUpdateRecord}
+        onIconPress={handleUpdateRecordAndSendAnnotation}
         screenIcon="md-save"
         screenIconStyle={{ marginTop: 5 }}
       />
@@ -772,6 +998,37 @@ const EditHomeLoan = ({ route, navigation }) => {
               style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
             />
 
+<CardImage
+  title="AadharCard"
+  imageContent={aadharcard}
+  onViewImage={onViewImage}
+  pickImage={() => pickImage('aadhar')}
+  setModalVisible={setModalVisible}
+/>
+
+<CardImage
+  title="Pancard"
+  imageContent={pancard}
+  onViewImage={onViewImage}
+  pickImage={() => pickImage('pan')}
+  setModalVisible={setModalVisible}
+/>
+
+<CardImage
+  title="Applicant Image"
+  imageContent={applicantImage}
+  onViewImage={onViewImage}
+  pickImage={() => pickImage('applicant')}
+  setModalVisible={setModalVisible}
+/>
+{/* <CardImageSignature
+        title="Signature"
+        signatureImage={signatureImage}
+        setSignatureImage={setSignatureImage}
+        pickImage={handlesignature}
+        onViewImage={onViewImage}
+      /> */}
+
             {/* <ButtonComponent title="Update" onPress={handleUpdateRecord} /> */}
           </View>
         </View>
@@ -785,7 +1042,8 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 20
+    marginTop: 20,
+    marginBottom: 40
   },
   wrapper: {
     width: '90%',

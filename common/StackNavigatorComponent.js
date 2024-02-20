@@ -27,6 +27,10 @@ import LoginScreen from '../Screen/LoginPages/LoginScreen';
 import LoginManagerScreen from '../Screen/LoginPages/LoginManagerScreen';
 import ManagerDashboard from '../Screen/Dashboards/ManagerDashboard';
 import AuthNavigator from '../context/AuthNavigator';
+import HomeLoanGurantee from '../Screen/Gaurantee/HomeLoanGaurantee';
+import HomeLoanGurantee2 from '../Screen/Gaurantee/HomeLoanGaurantee2';
+import PersonalLoanGurantee from '../Screen/Gaurantee/PersonalLoanGurantee';
+import PersonalLoanGurantee2 from '../Screen/Gaurantee/PersonalLoanGurantee2';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -57,8 +61,11 @@ const StackNavigator = () => (
     <Stack.Screen name="SignatureScreen" component={SignatureScreen} options={{ headerShown: false }} />
     <Stack.Screen name="Setting" component={Setting} options={{ headerShown: false }} />
     <Stack.Screen name="AccountScreen" component={AccountScreen} options={{ headerShown: false }} />
-    {/* <Stack.Screen name="HomeLoanGaurantee" component={HomeLoanGaurantee} options={{ headerShown: false }} /> */}
     <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
+    <Stack.Screen name="HomeLoanGurantee" component={HomeLoanGurantee} options={{ headerShown: false }} />
+    <Stack.Screen name="HomeLoanGurantee2" component={HomeLoanGurantee2} options={{ headerShown: false }} />
+    <Stack.Screen name="PersonalLoanGurantee" component={PersonalLoanGurantee} options={{ headerShown: false }} />
+    <Stack.Screen name="PersonalLoanGurantee2" component={PersonalLoanGurantee2} options={{ headerShown: false }} />
     <Stack.Screen name="DynamicDashboardScreen" component={DynamicDashboardScreen} options={{
       headerShown: false,
       unmountOnBlur: true,

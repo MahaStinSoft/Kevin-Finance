@@ -8,12 +8,22 @@ import { Ionicons } from '@expo/vector-icons';
 
 import ButtonComponent from './common/ButtonComponent';
 
-const SignatureScreen = () => {
+const SignatureScreen = ({ route }) => {
+  const { loanApplication } = route.params || {}; // Destructure loanApplication from route.params
   const [path, setPath] = useState('');
   const [signatureImage, setSignatureImage] = useState(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const svgRef = useRef(null);
   const navigation = useNavigation();
+
+  const [recordId, setRecordId] = useState(loanApplication?.kf_loanapplicationid || '');
+
+  useEffect(() => {
+    if (loanApplication) {
+      setRecordId(loanApplication.kf_loanapplicationid);
+    }
+  }, [loanApplication]);
+  
 
   useEffect(() => {
     // Load previously stored path if available
@@ -88,11 +98,28 @@ const SignatureScreen = () => {
         quality: 1,
       });
       setSignatureImage(uri);
-      navigation.navigate('HomeLoan', { signatureImage: uri });
+      await AsyncStorage.setItem('signatureImage', uri);
+      navigation.navigate('EditHomeLoan', { loanApplication, signatureImage: uri });
     } catch (error) {
       console.error('Error capturing signature:', error);
     }
   };
+  
+  
+  useEffect(() => {
+    const loadSignatureImage = async () => {
+      try {
+        const storedImage = await AsyncStorage.getItem('signatureImage');
+        if (storedImage) {
+          setSignatureImage(storedImage);
+        }
+      } catch (error) {
+        console.error('Error loading signature image:', error);
+      }
+    };
+  
+    loadSignatureImage();
+  }, []);  
 
   const handleSignature = () => {
     navigation.goBack();
@@ -117,7 +144,7 @@ const SignatureScreen = () => {
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginBottom: 10 }}>
         <ButtonComponent title="Clear" onPress={clearSignature} style={{width: "25%", height: 50}} />
-        <ButtonComponent title="Done" onPress={captureSignature} style={{width: "25%", height: 50}} />
+        <ButtonComponent title="Done" onPress={() => captureSignature(loanApplication)} style={{width: "25%", height: 50}} />
       </View>
       {signatureImage && (
         <View style={{ alignSelf: 'center', backgroundColor: 'white', width: '50%' }}>

@@ -17,7 +17,7 @@ const CardImageSignature = ({ title, signatureImage, setSignatureImage, pickImag
   return (
     <View style={{ flexDirection: 'row', marginTop: 15, alignContent: 'space-around' }}>
       <View style={{ marginHorizontal: 25, width: 140 }}>
-        <Text>{title} Image</Text>
+        <Text>{title}</Text>
       </View>
       <TouchableOpacity onPress={pickImage} style={{ backgroundColor: 'red', marginRight: 20, padding: 10, borderRadius: 25, width: 85, marginLeft: -10 }}>
         <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold' }}>{title}</Text>

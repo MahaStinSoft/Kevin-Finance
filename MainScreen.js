@@ -26,6 +26,11 @@ import Setting from './Screen/setting';
 import LoginManagerScreen from './Screen/LoginPages/LoginManagerScreen';
 import LoginScreen from './Screen/LoginPages/LoginScreen';
 import ManagerDashboard from './Screen/Dashboards/ManagerDashboard';
+import SignatureScreen from './signature';
+import HomeLoanGurantee from './Screen/Gaurantee/HomeLoanGaurantee';
+import HomeLoanGurantee2 from './Screen/Gaurantee/HomeLoanGaurantee2';
+import PersonalLoanGurantee from './Screen/Gaurantee/PersonalLoanGurantee';
+import PersonalLoanGurantee2 from './Screen/Gaurantee/PersonalLoanGurantee2';
 
 const Stack = createNativeStackNavigator();
 
@@ -84,6 +89,11 @@ const MainScreen = () => {
           <Stack.Screen name="Setting" component={Setting} options={{ headerShown: false }} />
           <Stack.Screen name="ManagerDashboard" component={ManagerDashboard} options={{ headerShown: false }} />
           <Stack.Screen name="LoginManagerScreen" component={LoginManagerScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="SignatureScreen" component={SignatureScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="HomeLoanGurantee" component={HomeLoanGurantee} options={{ headerShown: false }} />
+          <Stack.Screen name="HomeLoanGurantee2" component={HomeLoanGurantee2} options={{ headerShown: false }} />
+          <Stack.Screen name="PersonalLoanGurantee" component={PersonalLoanGurantee} options={{ headerShown: false }} />
+          <Stack.Screen name="PersonalLoanGurantee2" component={PersonalLoanGurantee2} options={{ headerShown: false }} />
           </>
       )}
       </Stack.Navigator>
