@@ -326,12 +326,12 @@ const PersonalLoanDetailsScreen = ({ route }) => {
     }, delayInMilliseconds);
   }, [fetchData]);
 
-  useEffect(() => {
-    const unsubscribeFocus = navigation.addListener('focus', fetchDataOnFocus);
-    return () => {
-      unsubscribeFocus();
-    };
-  }, [navigation, fetchDataOnFocus]);
+  // useEffect(() => {
+  //   const unsubscribeFocus = navigation.addListener('focus', fetchDataOnFocus);
+  //   return () => {
+  //     unsubscribeFocus();
+  //   };
+  // }, [navigation, fetchDataOnFocus]);
 
   // Update recordId when route params change
   useEffect(() => {
@@ -401,6 +401,14 @@ const PersonalLoanDetailsScreen = ({ route }) => {
         return '';
     }
   };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      setpersonalLoan(route.params.personalLoan);
+    });
+
+    return unsubscribe;
+  }, [navigation, route.params.personalLoan]);
 
 const renderImage = () => {
   if (personalLoan && personalLoan.entityimage) {
