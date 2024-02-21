@@ -16,132 +16,128 @@ const ScheduleDetailsScreen = ({route}) => {
     const [otherCharges, setOtherCharges] = useState('');
     const [newEMIPayment, setNewEMIPayment] = useState(null); 
     const [isNoteCreationDisabled, setIsNoteCreationDisabled] = useState(false);
+    const [otherChargesData, setOtherChargesData] = useState({}); // Store other charges for each month
 
-    const handlePaidButtonPress = async (loanDetails) => {
+    useEffect(() => {
+        fetchPaidStatus();
+        fetchOtherChargesData();
+    }, [applicationNumber, scheduleItem.month]);
+
+    useEffect(() => {
+        // Update other charges data whenever it changes
+        storeOtherChargesData();
+    }, [otherChargesData, isPaid]);
+
+    useEffect(() => {
+        storePaidStatus();
+    }, [isPaid]);
+
+    const fetchPaidStatus = async () => {
         try {
-            if (scheduleItem.month === 1) {
-                setIsPaid(true); 
-    
-                const updatedAmortizationSchedule = loanDetails.amortizationSchedule.map(item => {
-                    if (item.month === scheduleItem.month) {
-                        return { ...item, paid: true };
-                    }
-                    return item;
-                });
-                
-                // Save the updated amortization schedule to AsyncStorage
-                await AsyncStorage.setItem('amortizationSchedule', JSON.stringify(updatedAmortizationSchedule));
-    
-                Alert.alert(
-                    'Payment Marked', 
-                    'The payment for the first month has been marked as paid.', 
-                    [
-                        {
-                            text: 'OK', onPress: () => navigation.navigate('AmortizationScreen', {
-                                isPaid: true,
-                                month: scheduleItem.month,
-                                NoOfEMIsPaid: scheduleItem.month
-                            })
-                        }
-                    ]
-                );
-            } else {
-                // For months other than the first month, check the previous month's payment status
-                const previousMonthIndex = scheduleItem.month - 1;
-                const previousMonthItem = loanDetails.amortizationSchedule.find(item => item.month === previousMonthIndex);
-    
-                if (!previousMonthItem || !previousMonthItem.paid) {
-                    Alert.alert(
-                        'Payment Not Allowed', 
-                        'You cannot mark the payment for this month as paid because the previous month\'s payment has not been made yet.', 
-                        [{ text: 'OK' }]
-                    );
-                    return;
-                }
-    
-                setIsPaid(true);
-    
-                // Update the AsyncStorage with the updated amortization schedule
-                const updatedAmortizationSchedule = loanDetails.amortizationSchedule.map(item => {
-                    if (item.month === scheduleItem.month) {
-                        return { ...item, paid: true };
-                    }
-                    return item;
-                });
-    
-                await AsyncStorage.setItem('amortizationSchedule', JSON.stringify(updatedAmortizationSchedule));
-    
-                Alert.alert(
-                    'Payment Marked',
-                    'The payment has been marked as paid.',
-                    [
-                        { text: 'Cancel' },
-                        {
-                            text: 'OK', onPress: () => navigation.navigate('AmortizationScreen', {
-                                isPaid: true,
-                                month: scheduleItem.month,
-                                NoOfEMIsPaid: scheduleItem.month
-                            })
-                        }
-                    ]
-                );
-            }
+            const paidStatus = await AsyncStorage.getItem(`paidStatus_${applicationNumber}_${scheduleItem.month}`);
+            setIsPaid(paidStatus === 'true');
         } catch (error) {
-            console.error('Error marking payment as paid:', error);
-            Alert.alert('Error', 'An error occurred while marking the payment as paid.');
+            console.error('Error fetching paid status:', error);
         }
     };
 
-    useEffect(() => {
-        const fetchPaidStatus = async () => {
-            try {
-                const paidStatus = await AsyncStorage.getItem(`paidStatus_${scheduleItem.month}`);
-                if (paidStatus === 'true') {
-                    setIsPaid(true);
-                    setIsNoteCreationDisabled(true);
-                }
-            } catch (error) {
-                console.error('Error fetching paid status:', error);
+    const storePaidStatus = async () => {
+        try {
+            await AsyncStorage.setItem(`paidStatus_${applicationNumber}_${scheduleItem.month}`, isPaid.toString());
+        } catch (error) {
+            console.error('Error storing paid status:', error);
+        }
+    };
+
+    const fetchOtherChargesData = async () => {
+        try {
+            // Fetch other charges data for the current application number and month
+            const data = await AsyncStorage.getItem(`${applicationNumber}_${scheduleItem.month}`);
+            if (data) {
+                setOtherChargesData(JSON.parse(data));
             }
-        };
+        } catch (error) {
+            console.error('Error fetching other charges data:', error);
+        }
+    };
 
-        fetchPaidStatus();
-    }, [scheduleItem]);
+    const storeOtherChargesData = async () => {
+        try {
+            // Store other charges data for the current application number and month
+            await AsyncStorage.setItem(`${applicationNumber}_${scheduleItem.month}`, JSON.stringify(otherChargesData));
+        } catch (error) {
+            console.error('Error storing other charges data:', error);
+        }
+    };
+
+    const handleOtherChargesChange = (text) => {
+        // Update the otherChargesData state object with the penalty amount for the current month
+        setOtherChargesData({ ...otherChargesData, [scheduleItem.month]: text });
+    };
 
     useEffect(() => {
-        // Retrieve other charges from AsyncStorage when the component mounts
+        console.log('Other charges data:', otherChargesData);
+    }, [otherChargesData]);    
+
+    // Calculate the new EMI payment by adding EMI amount and penalty for the current month
+    useEffect(() => {
+        const calculateNewEMIPayment = () => {
+            // Convert otherChargesData for the current month to a number
+            const penalty = parseFloat(otherChargesData[scheduleItem.month] || 0); // If no penalty is entered, default to 0
+            // Convert EMI amount to a number
+            const emi = parseFloat(scheduleItem.emiAmount);
+            // Calculate the new EMI payment by adding EMI amount and penalty
+            return emi + penalty;
+        };
+        // Update the state with the new EMI payment
+        setNewEMIPayment(calculateNewEMIPayment());
+    }, [otherChargesData, scheduleItem.emiAmount, scheduleItem.month]);
+
+    // Retrieve other charges from AsyncStorage for the specific month when the component mounts
+    useEffect(() => {
         const fetchOtherCharges = async () => {
             try {
-                const savedOtherCharges = await AsyncStorage.getItem('otherCharges');
+                const savedOtherCharges = await AsyncStorage.getItem(`otherCharges_${scheduleItem.month}`);
                 if (savedOtherCharges) {
                     setOtherCharges(savedOtherCharges);
+                } else {
+                    // Set default value to 0 if no other charges are saved
+                    setOtherCharges('0');
                 }
             } catch (error) {
                 console.error('Error fetching other charges:', error);
             }
         };
         fetchOtherCharges();
-    }, []);
+    }, [scheduleItem.month]);
 
     useEffect(() => {
-        const calculateNewEMIPayment = () => {
-            // Calculate the new EMI payment by adding other charges to the existing EMI amount
-            const emi = parseFloat(scheduleItem.emiAmount);
-            const charges = parseFloat(otherCharges);
-            return emi + charges;
-        };
-        setNewEMIPayment(calculateNewEMIPayment());
-    }, [otherCharges, scheduleItem.emiAmount]);
+        // Fetch data for the current application number when the component mounts
+        fetchData();
+    }, []);
 
-    const handleOtherChargesChange = async (text) => {
+    const fetchData = async () => {
         try {
-            // Save other charges to AsyncStorage whenever it changes
-            await AsyncStorage.setItem('otherCharges', text);
-            setOtherCharges(text);
+            // Fetch paid status for the current application number
+            const paidStatus = await AsyncStorage.getItem(`paidStatus_${applicationNumber}`);
+            if (paidStatus === 'true') {
+                setIsPaid(true);
+                setIsNoteCreationDisabled(true);
+            }
+
+            // Fetch other charges for the current application number
+            const savedOtherCharges = await AsyncStorage.getItem(`otherCharges_${applicationNumber}`);
+            if (savedOtherCharges) {
+                setOtherCharges(savedOtherCharges);
+            } else {
+                // Set default value to 0 if no other charges are saved
+                setOtherCharges('0');
+            }
         } catch (error) {
-            console.error('Error saving other charges:', error);
+            console.error('Error fetching data:', error);
         }
     };
+
 
     useEffect(() => {
         if (scheduleItem.paid) {
@@ -150,33 +146,8 @@ const ScheduleDetailsScreen = ({route}) => {
     }, []);
 
     const handleGoBack = () => {
-       navigation.goBack();
+        navigation.goBack();
     };
-
-    const calculateOtherCharge = () => {
-        const currentDate = new Date();
-        const paymentDate = new Date(scheduleItem.paymentDate);
-    
-        // Calculate the difference in days between current date and payment date
-        const timeDifference = currentDate.getTime() - paymentDate.getTime();
-        const differenceInDays = Math.ceil(timeDifference / (1000 * 3600 * 24));
-    
-        // Define other charge per day (you can adjust this value)
-        const otherChargePerDay = 10;
-    
-        // Calculate the other charge
-        const otherCharge = differenceInDays * otherChargePerDay;
-    
-        return otherCharge;
-      };
-
-      const calculateNewEMIPayment = () => {
-        // Convert otherCharges to a number and add it to the EMI amount
-        const emi = parseFloat(scheduleItem.emiAmount);
-        const charges = parseFloat(otherCharges);
-        return emi + charges;
-    };
-    
 
       useEffect(() => {
         generateAccessToken();
@@ -187,7 +158,7 @@ const ScheduleDetailsScreen = ({route}) => {
             fetchRecordId();
         }
     }, [accessToken]);
-    
+
     const generateAccessToken = async () => {
         try {
             const tokenEndpoint = 'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token'; // Replace with your Azure AD token endpoint
@@ -241,7 +212,9 @@ const ScheduleDetailsScreen = ({route}) => {
                 `EMI Amount: ${scheduleItem.emiAmount}\n` +
                 `Interest Payment: ${scheduleItem.interestPayment}\n` +
                 `Principal Payment: ${scheduleItem.principalPayment}\n` +
-                `Remaining Balance: ${scheduleItem.remainingBalance}`;
+                `Remaining Balance: ${scheduleItem.remainingBalance}\n`+
+                `Other Charges: ${otherChargesData}\n` + 
+                `New EMI Amount: ${newEMIPayment}`;
 
             // Fetch the related record ID based on scheduleItem details
             const relatedRecordId = await fetchRelatedRecordId(scheduleItem);
@@ -369,13 +342,15 @@ const ScheduleDetailsScreen = ({route}) => {
                 >
                     <Text style={styles.buttonText}>{isPaid ? 'Paid' : 'Mark as Paid'}</Text>
                 </TouchableOpacity>
-               {/* <TextInput
+                <Text>Penalty</Text>
+                <TextInput
                     style={styles.input}
-                    onChangeText={handleOtherChargesChange}
-                    value={otherCharges}
-                    placeholder="Enter Other Charges"
-                />
-                <Text>New EMI Payment: {newEMIPayment}</Text> */}
+                    onChangeText={(text) => handleOtherChargesChange(text)}
+                    value={otherChargesData[scheduleItem.month] || ''} 
+                    placeholder="Enter Penalty"
+                    editable={!isPaid && !isNoteCreationDisabled} 
+                    />
+                <Text>New EMI Payment: {newEMIPayment}</Text>
                 <ButtonComponent title="Create Note with File" onPress={createNoteWithFile} disabled={isPaid || isNoteCreationDisabled}/>
             </View>
         </View>
