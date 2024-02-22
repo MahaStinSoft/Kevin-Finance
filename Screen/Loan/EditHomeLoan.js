@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, Alert, StyleSheet, ScrollView, Text } from 'react-native';
+import { View, TextInput, TouchableOpacity, Alert, StyleSheet, ScrollView, Text, FlatList, Linking, Platform, Image, Button } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 
@@ -54,6 +54,10 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [isPancardNumberValid, setIsPancardNumberValid] = useState(true);
   const [isLoanAmountValid, setIsLoanAmountValid] = useState(true);
   const [ModalVisible, setModalVisible] = useState(true);  
+  const [annotations, setAnnotations] = useState([]);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [showImage, setShowImage] = useState(false);
+  const [item, setItem] = useState(null); // Assuming you have some state to store the current item
 
   // const { signatureImage } = route.params;
   const [signatureImage, setSignatureImage] = useState(null);
@@ -609,6 +613,8 @@ const EditHomeLoan = ({ route, navigation }) => {
     }
   };
 
+  
+
 const sendAnnotation = async () => {
   try {
     const tokenResponse = await axios.post(
@@ -627,7 +633,7 @@ const sendAnnotation = async () => {
 
     const annotations = [
       {
-        subject: `Image: ${aadharcard.fileName || 'example.jpg'}`,
+        subject: `AadharCard Image: ${aadharcard.fileName || 'example.jpg'}`,
         filename: aadharcard.fileName || 'example.jpg',
         isdocument: true,
         'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
@@ -659,6 +665,65 @@ const sendAnnotation = async () => {
   }
 };
 
+useEffect(() => {
+  fetchAnnotations();
+}, []);
+
+const fetchAnnotations = async () => {
+  try {
+    const tokenResponse = await axios.post(
+      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+      {
+        grant_type: 'client_credentials',
+        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+        resource: 'https://org0f7e6203.crm5.dynamics.com',
+        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+      },
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
+
+    const accessToken = tokenResponse.data.access_token;
+
+    const fetchAnnotationsResponse = await axios.get(
+      'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations?$filter=_objectid_value eq ' + recordId,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    const fetchedAnnotations = fetchAnnotationsResponse.data.value;
+    console.log('Annotations:', fetchedAnnotations);
+    setAnnotations(fetchedAnnotations);
+
+  } catch (error) {
+    console.error('Error fetching annotations:', error.response?.data || error.message);
+    Alert.alert('Error', 'An error occurred while fetching annotations.');
+  }
+};
+
+const handleViewImages = () => {
+  setShowImage(!showImage); // Toggle the state to show/hide images
+};
+
+const filteredAnnotations = annotations.filter(item => item.documentbody);
+
+
+const renderAnnotationItem = ({ item }) => (
+<View style={styles.annotation}>
+<Text>Subject: {item.subject}</Text>
+{showImage && item.documentbody && (
+  <Image
+    style={{ width: 150, height: 150 }}
+    source={{ uri: `data:image/png;base64,${item.documentbody}` }}
+  />
+)}
+</View>
+);
+
 const sendAnnotation1 = async () => {
   try {
     const tokenResponse = await axios.post(
@@ -677,7 +742,7 @@ const sendAnnotation1 = async () => {
 
     const annotations1 = [
       {
-        subject: `Image: ${pancard.fileName || 'pancard.jpg'}`,
+        subject: `PanCard Image: ${pancard.fileName || 'pancard.jpg'}`,
         filename: pancard.fileName || 'pancard.jpg',
         isdocument: true,
         'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
@@ -727,7 +792,7 @@ const sendAnnotation2 = async () => {
 
     const annotations2 = [
       {
-        subject: `Image: ${applicantImage.fileName || 'applicantImage.jpg'}`,
+        subject: `Applicant Image: ${applicantImage.fileName || 'applicantImage.jpg'}`,
         filename: applicantImage.fileName || 'applicantImage.jpg',
         isdocument: true,
         'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
@@ -761,8 +826,8 @@ const sendAnnotation2 = async () => {
 
 const handleUpdateRecordAndSendAnnotation = () => {
   sendAnnotation();
-  sendAnnotation1();
-  sendAnnotation2();
+  // sendAnnotation1();
+  // sendAnnotation2();
   handleUpdateRecord(); 
   
 };
@@ -1013,13 +1078,14 @@ const handlesignature = async  () => {
   setModalVisible={setModalVisible}
 />
 
-<CardImage
+{/* <CardImage
   title="Applicant Image"
   imageContent={applicantImage}
   onViewImage={onViewImage}
   pickImage={() => pickImage('applicant')}
   setModalVisible={setModalVisible}
-/>
+/> */}
+
 {/* <CardImageSignature
         title="Signature"
         signatureImage={signatureImage}
@@ -1029,13 +1095,26 @@ const handlesignature = async  () => {
       /> */}
 
             {/* <ButtonComponent title="Update" onPress={handleUpdateRecord} /> */}
+
           </View>
+          <Text style={styles.heading}>Annotations</Text>
+          <Button title={showImage ? 'Hide Images' : 'View Images'} onPress={handleViewImages} />
+    {annotations && annotations.length > 0 ? (
+        <FlatList
+        data={filteredAnnotations}
+        renderItem={renderAnnotationItem}
+        keyExtractor={(item, index) => index.toString()}
+      />
+    ) : (
+        <Text>No annotations to display</Text>
+    )}
         </View>
       </ScrollView>
-    </>
-  );
-};
 
+    </>
+    );
+  };
+  
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -1065,6 +1144,18 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#FBFCFC',
     padding: 10,
+  }, 
+  heading: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  annotation: {
+    marginBottom: 15,
+    padding: 10,
+    // borderWidth: 1,
+    // borderColor: '#ccc',
+    borderRadius: 5,
   },
 });
 
