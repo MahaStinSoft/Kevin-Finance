@@ -9,14 +9,14 @@ import LoanStatusPicker from '../../common/LoanStatusPicker ';
 
 
 const HomeLoanGurantee = ({ route, navigation }) => {
-    const { loanApplication } = route.params || {};
+  const { loanApplication, onUpdateSuccess } = route.params || {};
   const [applicationnumber, setapplicationnumber] = useState(loanApplication?.kf_applicationnumber || '');
   const [guarantoraadharnumber, setAadharcardNumber] = useState(loanApplication?.kf_guarantoraadharnumber || '');
   const [guarantorpannumber, setPancardNumber] = useState(loanApplication?.kf_guarantorpannumber || '');
   const [createdby, setcreatedby] = useState(loanApplication?.kf_createdby || '');
   const [guarantorfirstname, setfirstname] = useState(loanApplication?.kf_guarantorfirstname || '');
   const [guarantorlastname, setLastname] = useState(loanApplication?.kf_guarantorlastname || '');
-  const [guarantordateofbirth, setdateofbirth] = useState(loanApplication?.kf_guarantordateofbirth ? new Date(loanApplication.kf_guarantordateofbirth) : null);
+  const [guarantordateofbirth, setdateofbirth] = useState(loanApplication?.kf_guarantordateofbirth ? new Date(loanApplication.kf_guarantor2dateofbirth) : null);
   const [guarantorage, setage] = useState(loanApplication?.kf_guarantorage || '');
   const [guarantorgender, setGender] = useState(loanApplication?.kf_guarantorgender || '');
   const [guarantormobilenumber, setMobileNumber] = useState(loanApplication?.kf_guarantormobilenumber || '');
@@ -49,6 +49,8 @@ const HomeLoanGurantee = ({ route, navigation }) => {
   const handleGoBack = () => {
     navigation.navigate("HomeLoanDetailsScreen", { loanApplication });
   };
+
+
 
   useEffect(() => {
     setapplicationnumber(loanApplication.kf_applicationnumber);
@@ -147,7 +149,7 @@ const HomeLoanGurantee = ({ route, navigation }) => {
             kf_guarantorfirstname: guarantorfirstname,
             kf_guarantorlastname: guarantorlastname,
             kf_guarantordateofbirth: formattedDateOfBirth,
-            kf_guarantorage: guarantorage,
+            kf_guarantorage: guarantorage.toString(),
             kf_guarantorgender: guarantorgender,
             kf_guarantormobilenumber: guarantormobilenumber,
             kf_guarantoremail: guarantoremail,
@@ -215,10 +217,6 @@ const HomeLoanGurantee = ({ route, navigation }) => {
 
 
   // Define onUpdateSuccess function in your component
-const onUpdateSuccess = (updatedData) => {
-    // Handle the updated data here, such as updating the state or performing any other action
-    console.log('Record updated successfully:', updatedData);
-  };
   
 
   const handleEmailChange = (text) => {
