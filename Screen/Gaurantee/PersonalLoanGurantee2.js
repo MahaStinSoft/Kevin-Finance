@@ -14,7 +14,7 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
   const [createdby, setcreatedby] = useState(personalLoan?.kf_createdby || '');
   const [guarantorfirstname, setfirstname] = useState(personalLoan?.kf_guarantor2firstname || '');
   const [guarantorlastname, setLastname] = useState(personalLoan?.kf_guarantor2lastname || '');
-  const [guarantordateofbirth, setdateofbirth] = useState(personalLoan?.kf_guarantor2dateofbirth ? new Date(loanApplication.kf_guarantor2dateofbirth) : null);
+  const [guarantordateofbirth, setdateofbirth] = useState(personalLoan?.kf_guarantor2dateofbirth ? new Date(personalLoan.kf_guarantor2dateofbirth) : null);
   const [guarantorage, setage] = useState(personalLoan?.setkf_guarantor2age || '');
   const [guarantorgender, setGender] = useState(personalLoan?.kf_guarantor2gender || '');
   const [guarantormobilenumber, setMobileNumber] = useState(personalLoan?.kf_guarantor2mobilenumber || '');
