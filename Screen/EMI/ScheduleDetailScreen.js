@@ -51,24 +51,28 @@ const ScheduleDetailsScreen = ({route}) => {
 
     const fetchOtherChargesData = async () => {
         try {
-            // Fetch other charges data for the current application number and month
+            // Retrieve the serialized data from AsyncStorage
             const data = await AsyncStorage.getItem(`${applicationNumber}_${scheduleItem.month}`);
             if (data) {
+                // Deserialize the data back into an object
                 setOtherChargesData(JSON.parse(data));
             }
         } catch (error) {
             console.error('Error fetching other charges data:', error);
         }
     };
+    
 
     const storeOtherChargesData = async () => {
         try {
-            // Store other charges data for the current application number and month
-            await AsyncStorage.setItem(`${applicationNumber}_${scheduleItem.month}`, JSON.stringify(otherChargesData));
+            // Serialize the object to a string before storing
+            const serializedData = JSON.stringify(otherChargesData);
+            await AsyncStorage.setItem(`${applicationNumber}_${scheduleItem.month}`, serializedData);
         } catch (error) {
             console.error('Error storing other charges data:', error);
         }
     };
+    
 
     const handleOtherChargesChange = (text) => {
         // Update the otherChargesData state object with the penalty amount for the current month
@@ -206,15 +210,16 @@ const ScheduleDetailsScreen = ({route}) => {
     };
     
     const createNoteWithFile = async () => {
-    try {
-        if (!isPaid && (scheduleItem.month === 1 || (scheduleItem.month > 1 && loanDetails.amortizationSchedule[scheduleItem.month - 2]?.paid))) {
-            const subject = `Loan Payment Details for Month ${scheduleItem.month}\n` +
-                `EMI Amount: ${scheduleItem.emiAmount}\n` +
-                `Interest Payment: ${scheduleItem.interestPayment}\n` +
-                `Principal Payment: ${scheduleItem.principalPayment}\n` +
-                `Remaining Balance: ${scheduleItem.remainingBalance}\n`+
-                `Other Charges: ${otherChargesData}\n` + 
-                `New EMI Amount: ${newEMIPayment}`;
+        try {
+            if (!isPaid && (scheduleItem.month === 1 || (scheduleItem.month > 1 && loanDetails.amortizationSchedule[scheduleItem.month - 2]?.paid))) {
+                const penalty = otherChargesData[scheduleItem.month] || 0;
+                const subject = `Loan Payment Details for Month ${scheduleItem.month}\n` +
+                    `EMI Amount: ${scheduleItem.emiAmount}\n` +
+                    `Interest Payment: ${scheduleItem.interestPayment}\n` +
+                    `Principal Payment: ${scheduleItem.principalPayment}\n` +
+                    `Remaining Balance: ${scheduleItem.remainingBalance}\n` +
+                    `Other Charges: ${penalty}\n` +
+                    `New EMI Amount: ${newEMIPayment}`;
 
             // Fetch the related record ID based on scheduleItem details
             const relatedRecordId = await fetchRelatedRecordId(scheduleItem);

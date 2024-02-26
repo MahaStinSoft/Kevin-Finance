@@ -427,6 +427,7 @@ const ScheduleDetailsScreen = ({route}) => {
             // Fetch other charges data for the current application number and month
             const data = await AsyncStorage.getItem(`${applicationNumber}_${scheduleItem.month}`);
             if (data) {
+                // Deserialize the data back into an object
                 setOtherChargesData(JSON.parse(data));
             }
         } catch (error) {
@@ -437,7 +438,8 @@ const ScheduleDetailsScreen = ({route}) => {
     const storeOtherChargesData = async () => {
         try {
             // Store other charges data for the current application number and month
-            await AsyncStorage.setItem(`${applicationNumber}_${scheduleItem.month}`, JSON.stringify(otherChargesData));
+            const serializedData = JSON.stringify(otherChargesData);
+            await AsyncStorage.setItem(`${applicationNumber}_${scheduleItem.month}`, serializedData);
         } catch (error) {
             console.error('Error storing other charges data:', error);
         }
@@ -581,12 +583,13 @@ const ScheduleDetailsScreen = ({route}) => {
     const createNoteWithFile = async () => {
         try {
             if (!isPaid && (scheduleItem.month === 1 || (scheduleItem.month > 1 && loanDetails.amortizationSchedule[scheduleItem.month - 2]?.paid))) {
+                const penalty = otherChargesData[scheduleItem.month] || 0;
                 const subject = `Loan Payment Details for Month ${scheduleItem.month}\n` +
                     `EMI Amount: ${scheduleItem.emiAmount}\n` +
                     `Interest Payment: ${scheduleItem.interestPayment}\n` +
                     `Principal Payment: ${scheduleItem.principalPayment}\n` +
                     `Remaining Balance: ${scheduleItem.remainingBalance}\n` +
-                    `Other Charges: ${otherChargesData}\n` + 
+                    `Other Charges: ${penalty}\n` +
                     `New EMI Amount: ${newEMIPayment}`;
 
                 // Fetch the related record ID based on scheduleItem details
@@ -658,7 +661,6 @@ const ScheduleDetailsScreen = ({route}) => {
             Alert.alert('Error', 'An error occurred while creating note with file attachment.');
         }
     };
-
     
     const fetchRelatedRecordId = async (scheduleItem) => {
         try {
