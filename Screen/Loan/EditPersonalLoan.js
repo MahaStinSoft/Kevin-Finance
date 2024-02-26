@@ -274,7 +274,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
           {
             text: 'OK',
             onPress: () => {
-              // navigation.navigate('PersonalLoanDetailsScreen', { personalLoan: personalLoan });
+              navigation.navigate('PersonalLoanDetailsScreen', { personalLoan: personalLoan });
             },
           },
         ]);
@@ -746,9 +746,9 @@ const sendAnnotation2 = async () => {
 };
 
 const handleUpdateRecordAndSendAnnotation = () => {
-  sendAnnotation();
-  sendAnnotation1();
-  sendAnnotation2();
+  // sendAnnotation();
+  // sendAnnotation1();
+  // sendAnnotation2();
   handleUpdateRecord(); 
   
 };
@@ -979,7 +979,7 @@ const handlesignature = async  () => {
               style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
             />
 
-<CardImage
+{/* <CardImage
   title="AadharCard"
   imageContent={aadharcard}
   onViewImage={onViewImage}
@@ -1001,7 +1001,7 @@ const handlesignature = async  () => {
   onViewImage={onViewImage}
   pickImage={() => pickImage('applicant')}
   setModalVisible={setModalVisible}
-/>
+/> */}
 
             {statusReason && (
               <LoanStatusPicker
