@@ -66,7 +66,7 @@
 //         return 'PendingApproval';
 //     }
 //   };
-  
+
 //   const getStatusReason = () => {
 //     switch (loanApplication.kf_statusreason) {
 //       case 123950000:
@@ -95,7 +95,7 @@
 //     const unsubscribe = navigation.addListener('focus', () => {
 //       setLoanApplication(route.params.loanApplication);
 //     });
-  
+
 //     return unsubscribe;
 //   }, [navigation, route.params.loanApplication]);
 
@@ -316,14 +316,43 @@ import { useNavigation } from '@react-navigation/native';
 import HeaderComponent from '../../common/Header';
 import ButtonComponent from '../../common/ButtonComponent';
 
+
 const HomeLoanDetailsScreen = ({ route }) => {
   const navigation = useNavigation();
   const [loanApplication, setLoanApplication] = useState(route.params.loanApplication);
   const [recordId, setRecordId] = useState(route.params.loanApplication.kf_loanApplicationid);
+  const [showHomeLoanGuarantee1, setShowHomeLoanGuarantee1] = useState(false);
+  const [kf_guarantorfirstname, setkf_guarantorfirstname] = useState(true);
+  const [isFormFilled, setIsFormFilled] = useState(false);
+  const [showMore, setShowMore] = useState(false);
+
+  const handleShowMoreToggle = () => {
+    setShowMore(!showMore);
+  };
+
 
   LogBox.ignoreLogs([
     'Non-serializable values were found in the navigation state',
   ]);
+
+
+  useEffect(() => {   
+    // Check if any value exists in columns related to HomeLoanGurantee 1
+    const hasValuesInGuarantee1 = Boolean(
+      loanApplication.kf_guarantorfirstname ||
+      loanApplication.kf_guarantorlastname ||
+      loanApplication.kf_guarantorage 
+    )
+
+    setShowHomeLoanGuarantee1(hasValuesInGuarantee1);
+  }, [loanApplication]);
+
+
+  const handleFormFill = () => {
+    // This function will be called when the form is filled
+    setIsFormFilled(true);
+  };
+
 
   const fetchData = useCallback(async () => {
     const simulatedUpdatedData = { ...loanApplication };
@@ -385,7 +414,7 @@ const HomeLoanDetailsScreen = ({ route }) => {
       case 123950001:
         return 'InvalidDocuments';
       default:
-        return '';
+        return ''; 
     }
   };
 
@@ -421,6 +450,7 @@ const HomeLoanDetailsScreen = ({ route }) => {
     });
   };
 
+
   const renderImage = () => {
     if (loanApplication.entityimage) {
       return (
@@ -442,22 +472,26 @@ const HomeLoanDetailsScreen = ({ route }) => {
     }
   };
 
+
   const handleNavigateToGuaranteeScreen = () => {
     // Example navigation code from the previous screen
-navigation.navigate('HomeLoanGurantee', { loanApplication,
-  onUpdateSuccess: updatedLoanApplication => setLoanApplication(updatedLoanApplication),
-});
-      // Pass any necessary parameters if needed
+    navigation.navigate('HomeLoanGurantee', {
+      loanApplication,
+      onUpdateSuccess: updatedLoanApplication => setLoanApplication(updatedLoanApplication),
+      
+    });
+    // Pass any necessary parameters if needed
   };
 
   const handleNavigateToGuaranteeScreen2 = () => {
     // Example navigation code from the previous screen
-navigation.navigate('HomeLoanGurantee2', { loanApplication,
-  onUpdateSuccess: updatedLoanApplication => setLoanApplication(updatedLoanApplication),
-});
-      // Pass any necessary parameters if needed
+    setShowHomeLoanGuarantee1(true);
+    navigation.navigate('HomeLoanGurantee2', {
+      loanApplication,
+      onUpdateSuccess: updatedLoanApplication => setLoanApplication(updatedLoanApplication),
+    });
+    // Pass any necessary parameters if needed
   };
-
 
 
   const handleGoToAmortizationScreen = () => {
@@ -499,17 +533,19 @@ navigation.navigate('HomeLoanGurantee2', { loanApplication,
         <View style={styles.imageContainer}>
           <View style={{ marginLeft: -12 }}>{renderImage()}</View>
           <View style={{ marginLeft: 5, marginTop: 50 }}>
-          <Text style={styles.cardTitle}>{`${loanApplication.kf_name} ${loanApplication.kf_lastname}`}</Text>
+            <Text style={styles.cardTitle}>{`${loanApplication.kf_name} ${loanApplication.kf_lastname}`}</Text>
             <Text style={styles.cardTitle}>Application No: {loanApplication.kf_applicationnumber}</Text>
             <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={styles.buttonContainer}>
-            <Text style={styles.buttonText}>Guarantee</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleNavigateToGuaranteeScreen2} style={styles.buttonContainer}>
-            <Text style={styles.buttonText}>Guarantee-2</Text>
-          </TouchableOpacity>
+              <Text style={styles.buttonText}>Guarantee 1</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleNavigateToGuaranteeScreen2} style={styles.buttonContainer}>
+              <Text style={styles.buttonText}>Guarantee 2</Text>
+            </TouchableOpacity>
           </View>
-        </View>
 
+
+
+        </View>
         <View style={styles.personalDetailContainer} >
           <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10 }]}>Personal Details</Text>
           <Text style={styles.cardLabel}>Gender: {getGenderLabel()}</Text>
@@ -544,6 +580,50 @@ navigation.navigate('HomeLoanGurantee2', { loanApplication,
           <Text style={styles.cardLabel}>Other Charges: {loanApplication.kf_othercharges}</Text>
         </View>
 
+        {showHomeLoanGuarantee1 && (
+        <View style={styles.HomeLoanGuranteeContainer} >
+          <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10 }]}>HomeLoanGurantee 1</Text>
+         {!kf_guarantorfirstname && <Text style={styles.cardLabel}>Guarantor Firstname : {loanApplication.kf_guarantorfirstname}</Text>}
+          <Text style={styles.cardLabel}>Guarantor Lastname : {loanApplication.kf_guarantorlastname}</Text>
+          {/* <Text style={styles.cardLabel}>Guarantor Gender : {getGenderLabel()}</Text> */}
+          {/* <Text style={styles.cardLabel}>Guarantor Dateofbirth : {formattedDate}</Text> */}
+          <Text style={styles.cardLabel}>Guarantor Age : {loanApplication.kf_guarantorage}</Text>
+          <Text style={styles.cardLabel}>Guarantor Mobilenumber : {loanApplication.kf_guarantormobilenumber}</Text>
+          <Text style={styles.cardLabel}>Guarantor Email : {loanApplication.kf_guarantoremail}</Text>
+          <Text style={styles.cardLabel}>Guarantor Address 1 : {loanApplication.kf_guarantoraddress1}</Text>
+          <Text style={styles.cardLabel}>Guarantor Address 2 : {loanApplication.kf_guarantoraddress2}</Text>
+          <Text style={styles.cardLabel}>Guarantor Address 3 : {loanApplication.kf_guarantoraddress3}</Text>
+          <Text style={styles.cardLabel}>Guarantor City : {loanApplication.kf_guarantorcity}</Text> 
+          <Text style={styles.cardLabel}>Guarantor State : {loanApplication.kf_guarantorstate}</Text> 
+          <Text style={styles.cardLabel}>Guarantor Aadharnumber : {loanApplication.kf_guarantoraadharnumber}</Text>
+          <Text style={styles.cardLabel}>Guarantor Pannumber : {loanApplication.kf_guarantorpannumber}</Text>
+        </View> 
+        )}
+
+
+        <View style={styles.HomeLoanGuranteeContainer} >
+          <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10 }]}>HomeLoanGurantee 2</Text>
+          <Text style={styles.cardLabel}>Guarantor Firstname : {loanApplication.kf_guarantor2firstname}</Text>
+          <Text style={styles.cardLabel}>Guarantor Lastname : {loanApplication.kf_guarantor2lastname}</Text>
+          <Text style={styles.cardLabel}>Guarantor Gender : {getGenderLabel()}</Text>
+          <Text style={styles.cardLabel}>Guarantor Dateofbirth : {formattedDate}</Text>
+          <Text style={styles.cardLabel}>Guarantor Age : {loanApplication.kf_guarantor2age}</Text>
+          <Text style={styles.cardLabel}>Guarantor Mobilenumber : {loanApplication.kf_guarantor2mobilenumber}</Text>
+          <Text style={styles.cardLabel}>Guarantor Email : {loanApplication.kf_guarantor2email}</Text>
+          <Text style={styles.cardLabel}>Guarantor Address 1 : {loanApplication.kf_guarantor2address1}</Text>
+          <Text style={styles.cardLabel}>Guarantor Address 2 : {loanApplication.kf_guarantor2address2}</Text>
+          <Text style={styles.cardLabel}>Guarantor Address 3 : {loanApplication.kf_guarantor2address3}</Text>
+          <Text style={styles.cardLabel}>Guarantor City : {loanApplication.kf_guarantor2city}</Text>
+          <Text style={styles.cardLabel}>Guarantor State : {loanApplication.kf_guarantor2state}</Text>
+          <Text style={styles.cardLabel}>Guarantor Aadharnumber : {loanApplication.kf_guarantor2aadharnumber}</Text>
+          <Text style={styles.cardLabel}>Guarantor Pannumber : {loanApplication.kf_guarantor2pannumber}</Text>
+        </View> 
+
+        <TouchableOpacity onPress={handleShowMoreToggle} style={styles.buttonContainer}>
+            <Text style={styles.buttonText}>{showMore ? 'View less' : 'View more'}</Text>
+          </TouchableOpacity>
+
+      
         <ButtonComponent style={{ marginBottom: 60 }}
           title="Calculate Amortization"
           onPress={handleGoToAmortizationScreen}
@@ -615,13 +695,30 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5
   },
+
+  HomeLoanGuranteeContainer: {
+    marginTop: 5,
+    width: "95%",
+    paddingVertical: 10,
+    backgroundColor: "white",
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+
+
   cardImage: {
     borderRadius: 40
   },
   cardTitle: {
     color: "red",
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "bold", 
   },
   cardLabel: {
     color: '#000000',
@@ -643,7 +740,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginTop: 10,
     borderRadius: 5,
-    marginLeft:20,
+    marginLeft: 20,
     width: "55%"
   },
   buttonText: {

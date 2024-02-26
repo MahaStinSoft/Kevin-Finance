@@ -482,12 +482,15 @@ const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', 
         <View style={{ marginLeft: 5, marginTop: 50}}>
           <Text style={styles.cardTitle}>{`${personalLoan.kf_firstname} ${personalLoan.kf_lastname}`}</Text>
           <Text style={styles.cardTitle}>Application No: {personalLoan.kf_applicationnumber}</Text>
+
+
           <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={styles.buttonContainer}>
-            <Text style={styles.buttonText}>Guarantee</Text>
+            <Text style={styles.buttonText}>Guarantee 1</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={handleNavigateToGuaranteeScreen2} style={styles.buttonContainer}>
-            <Text style={styles.buttonText}>Guarantee-2</Text>
+            <Text style={styles.buttonText}>Guarantee 2</Text>
           </TouchableOpacity>
+          
         </View>
       </View>
 
@@ -529,6 +532,43 @@ const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', 
         <Text style={styles.cardLabel}>EMI Collection Date: {emischeduleDateformatDate}</Text>
         <Text style={styles.cardLabel}>Other Charges: {personalLoan.kf_othercharges}</Text>
       </View>
+  
+      <View style={styles.personalDetailContainer} >
+          <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10 }]}>PersonaLoanGurantee 1</Text>
+          <Text style={styles.cardLabel}>Guarantor Firstname : {personalLoan.kf_guarantorfirstname}</Text>
+          <Text style={styles.cardLabel}>Guarantor Lastname : {personalLoan.kf_guarantorlastname}</Text>
+          <Text style={styles.cardLabel}>Guarantor Gender : {getGenderLabel()}</Text>
+          <Text style={styles.cardLabel}>Guarantor Dateofbirth : {formattedDate}</Text>
+          <Text style={styles.cardLabel}>Guarantor Age : {personalLoan.kf_guarantorage}</Text>
+          <Text style={styles.cardLabel}>Guarantor Mobilenumber : {personalLoan.kf_guarantormobilenumber}</Text>
+          <Text style={styles.cardLabel}>Guarantor Email : {personalLoan.kf_guarantoremail}</Text>
+          <Text style={styles.cardLabel}>Guarantor Address 1 : {personalLoan.kf_guarantoraddress1}</Text>
+          <Text style={styles.cardLabel}>Guarantor Address 2 : {personalLoan.kf_guarantoraddress2}</Text>
+          <Text style={styles.cardLabel}>Guarantor Address 3 : {personalLoan.kf_guarantoraddress3}</Text>
+          <Text style={styles.cardLabel}>Guarantor City : {personalLoan.kf_guarantorcity}</Text> 
+          <Text style={styles.cardLabel}>Guarantor State : {personalLoan.kf_guarantorstate}</Text> 
+          <Text style={styles.cardLabel}>Guarantor Aadharnumber : {personalLoan.kf_guarantoraadharnumber}</Text>
+          <Text style={styles.cardLabel}>Guarantor Pannumber : {personalLoan.kf_guarantorpannumber}</Text>
+        </View>              
+
+        <View style={styles.personalDetailContainer} >
+          <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10 }]}>PersonaLoanGurantee 2</Text>
+          <Text style={styles.cardLabel}>Guarantor Firstname : {personalLoan.kf_guarantor2firstname}</Text>
+          <Text style={styles.cardLabel}>Guarantor Lastname : {personalLoan.kf_guarantor2lastname}</Text>
+          <Text style={styles.cardLabel}>Guarantor Gender : {getGenderLabel()}</Text>
+          <Text style={styles.cardLabel}>Guarantor Dateofbirth : {formattedDate}</Text>
+          <Text style={styles.cardLabel}>Guarantor Age : {personalLoan.kf_guarantor2age}</Text>
+          <Text style={styles.cardLabel}>Guarantor Mobilenumber : {personalLoan.kf_guarantor2mobilenumber}</Text>
+          <Text style={styles.cardLabel}>Guarantor Email : {personalLoan.kf_guarantor2email}</Text>
+          <Text style={styles.cardLabel}>Guarantor Address 1 : {personalLoan.kf_guarantor2address1}</Text>
+          <Text style={styles.cardLabel}>Guarantor Address 2 : {personalLoan.kf_guarantor2address2}</Text>
+          <Text style={styles.cardLabel}>Guarantor Address 3 : {personalLoan.kf_guarantor2address3}</Text>
+          <Text style={styles.cardLabel}>Guarantor City : {personalLoan.kf_guarantor2city}</Text>
+          <Text style={styles.cardLabel}>Guarantor State : {personalLoan.kf_guarantor2state}</Text>
+          <Text style={styles.cardLabel}>Guarantor Aadharnumber : {personalLoan.kf_guarantor2aadharnumber}</Text>
+          <Text style={styles.cardLabel}>Guarantor Pannumber : {personalLoan.kf_guarantor2pannumber}</Text>
+        </View> 
+ 
 
       <ButtonComponent style={{ marginBottom: 60 }}
         title ="Calculate Amortization"
@@ -600,6 +640,21 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5
+  },
+
+  personalDetailContainer: {
+    marginTop: 5,
+    width: "95%",
+    paddingVertical: 10,
+    backgroundColor: "white",
+    shadowColor: '#000', 
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   cardImage: {
     borderRadius: 40
