@@ -13,6 +13,10 @@ const HomeLoanDetailsScreen = ({ route }) => {
   LogBox.ignoreLogs([
     'Non-serializable values were found in the navigation state',
   ]);
+  
+  const onUpdateSuccess = useCallback((updatedLoanApplication) => {
+    setLoanApplication(updatedLoanApplication);
+  }, []);
 
   useEffect(() => {
     // Update loanApplication and recordId when route params change

@@ -5,17 +5,19 @@ import axios from 'axios';
 import HeaderComponent from '../../common/Header';
 import ButtonComponent from '../../common/ButtonComponent';
 import ComponentDatePicker from '../../common/ComponentDatePicker';
-import TextInputComponent from '../../common/TextInput';
 import LoanStatusPicker from '../../common/LoanStatusPicker ';
 
-const PersonalLoanGurantee2 = ({ route, navigation }) => {
-  const { loanApplication, onUpdateSuccess } = route.params || {};
+
+const HomeLoanGurantee2 = ({ route, navigation }) => {
+    const { loanApplication,onUpdateSuccess } = route.params || {};
   const [applicationnumber, setapplicationnumber] = useState(loanApplication?.kf_applicationnumber || '');
+  const [guarantoraadharnumber, setAadharcardNumber] = useState(loanApplication?.kf_guarantor2aadharnumber || '');
+  const [guarantorpannumber, setPancardNumber] = useState(loanApplication?.kf_guarantor2pannumber || '');
   const [createdby, setcreatedby] = useState(loanApplication?.kf_createdby || '');
   const [guarantorfirstname, setfirstname] = useState(loanApplication?.kf_guarantor2firstname || '');
   const [guarantorlastname, setLastname] = useState(loanApplication?.kf_guarantor2lastname || '');
   const [guarantordateofbirth, setdateofbirth] = useState(loanApplication?.kf_guarantor2dateofbirth ? new Date(loanApplication.kf_guarantor2dateofbirth) : null);
-  const [guarantorage, setage] = useState(loanApplication?.setkf_guarantor2age || '');
+  const [guarantorage, setage] = useState(loanApplication?.kf_guarantor2age || '');
   const [guarantorgender, setGender] = useState(loanApplication?.kf_guarantor2gender || '');
   const [guarantormobilenumber, setMobileNumber] = useState(loanApplication?.kf_guarantor2mobilenumber || '');
   const [guarantoremail, setEmail] = useState(loanApplication?.kf_guarantor2email || '');
@@ -25,19 +27,14 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
   const [guarantorcity, setCity] = useState(loanApplication?.kf_guarantor2city || '');
   const [guarantorstate, setState] = useState(loanApplication?.kf_guarantor2state || '');
 
-  const [firstEMIDate, setfirstEMIDate] = useState(loanApplication?.kf_firstemidate || '');
-  const [guarantoraadharnumber, setAadharcardNumber] = useState(loanApplication?.kf_guarantor2aadharnumber || '');
-  const [guarantorpannumber, setPancardNumber] = useState(loanApplication?.kf_guarantor2pannumber || '');
-
   const [isfirstnameValid, setIsfirstnameValid] = useState(true);
   const [isLastNameValid, setIsLastNameValid] = useState(true);
   const [isMobileNumberValid, setIsMobileNumberValid] = useState(true);
+  const [isEmailValid, setIsEmailValid] = useState(true);
   const [isaadharNumberValid, setIsaadharcardNumberValid] = useState(true);
   const [isPancardNumberValid, setIsPancardNumberValid] = useState(true);
-  const [isEmailValid, setIsEmailValid] = useState(true);
-  const [isLoanAmountRequested, setIsLoanAmountRequested] = useState(true);
 
-  const [recordId, setRecordId] = useState(loanApplication.kf_loanApplicationid);
+  const [recordId, setRecordId] = useState(loanApplication.kf_loanapplicationid);
 
   const [errorMessages, setErrorMessages] = useState({
     guarantorFirstNameEdit: '',
@@ -54,13 +51,12 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    // Update guarantorstate and variables when the route parameters change
     setapplicationnumber(loanApplication.kf_applicationnumber);
     setcreatedby(loanApplication.kf_createdby);
     setfirstname(loanApplication.kf_guarantor2firstname);
     setLastname(loanApplication.kf_guarantor2lastname);
     setdateofbirth(loanApplication.kf_guarantor2dateofbirth ? new Date(loanApplication.kf_guarantor2dateofbirth) : null);
-    setage(loanApplication.kf_guarantor2age || ''); 
+    setage(loanApplication.kf_guarantor2age || '');
     setGender(loanApplication.kf_guarantor2gender);
     setMobileNumber(loanApplication.kf_guarantor2mobilenumber);
     setEmail(loanApplication.kf_guarantor2email);
@@ -71,7 +67,7 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
     setState(loanApplication.kf_guarantor2state);
     setAadharcardNumber(loanApplication.kf_guarantor2aadharnumber);
     setPancardNumber(loanApplication.kf_guarantor2pannumber);
-    setRecordId(loanApplication.kf_loanApplicationid);
+    setRecordId(loanApplication.kf_loanapplicationid);
     console.log('State updated:', {
       applicationnumber,
       createdby,
@@ -85,8 +81,10 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
     });
   }, [loanApplication]);
 
-  const handleUpdateRecord = async () => {
 
+
+  const handleUpdateRecord = async () => {
+    // Check if the guarantorage is greater than 18
     if (calculateAge(guarantordateofbirth) < 18) {
       setErrorMessages({
         ...errorMessages,
@@ -103,13 +101,20 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
       return; // Stop the update process if guarantoremail is invalid
     }
 
+    if (!isPancardNumberValid) {
+      setErrorMessages({
+        ...errorMessages,
+        guarantorPanCardNumberEdit: 'Enter Valid PAN Card',
+      });
+      return;
+    }
 
     const newErrorMessages = {
       guarantorFirstNameEdit: !guarantorfirstname ? 'Enter First Name' : '',
       guarantorLastNameEdit: !guarantorlastname ? 'Enter Last Name' : '',
       guarantorDateOfBirthEdit: !guarantordateofbirth ? 'Enter Date of Birth' : '',
       guarantorMobileNumberEdit: /^\d{10}$/.test(guarantormobilenumber) ? '' : 'Please Enter a Valid 10-digit mobile number.',
-      guarantorEmailEdit: !guarantoremail ? 'Enter Email Address' : '',
+      guarantorEmailEdit: !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guarantoremail) ? 'Enter Email Address' : '',
       guarantorAadharCardNumberEdit: /^\d{12}$/.test(guarantoraadharnumber) ? '' : 'Please Enter Valid Aadharcard Number',
       guarantorPanCardNumberEdit: !guarantorpannumber ? 'Enter PAN Card Number' : '',
     };
@@ -118,9 +123,7 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
     if (Object.values(newErrorMessages).some(message => message !== '')) {
       return;
     }
-
     try {
-
       const tokenResponse = await axios.post(
         'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
         {
@@ -136,16 +139,15 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
       const accessToken = tokenResponse.data.access_token;
       const formattedDateOfBirth = guarantordateofbirth ? guarantordateofbirth.toISOString() : null;
 
-
       const updateRecordResponse = await axios.patch(
         `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications(${recordId})`,
         {
-          kf_applicationnumber: applicationnumber,
+            kf_applicationnumber: applicationnumber,
             kf_createdby: createdby,
             kf_guarantor2firstname: guarantorfirstname,
             kf_guarantor2lastname: guarantorlastname,
-            // kf_guarantor2dateofbirth: formattedDateOfBirth,
-            // kf_guarantor2age: guarantorage,
+            kf_guarantor2dateofbirth: formattedDateOfBirth,
+            kf_guarantor2age: guarantorage,
             kf_guarantor2gender: guarantorgender,
             kf_guarantor2mobilenumber: guarantormobilenumber,
             kf_guarantor2email: guarantoremail,
@@ -168,49 +170,144 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
       if (updateRecordResponse.status === 204) {
         console.log('Record updated successfully in CRM');
 
+        // Notify the parent screen about the successful update
         if (onUpdateSuccess) {
-          onUpdateSuccess({
-            ...loanApplication,
-            kf_applicationnumber: applicationnumber,
-                          kf_createdby: createdby,
-                          kf_guarantor2firstname: guarantorfirstname,
-                          kf_guarantor2lastname: guarantorlastname,
-                          kf_guarantor2dateofbirth: formattedDateOfBirth,
-                          kf_guarantor2age: parseInt(guarantorage),
-                          kf_guarantor2gender: guarantorgender,
-                          kf_guarantor2mobilenumber: guarantormobilenumber,
-                          kf_guarantor2email: guarantoremail,
-                          kf_guarantor2address1: guarantoraddress1,
-                          kf_guarantor2address2: guarantoraddress2,
-                          kf_guarantor2address3: guarantoraddress3,
-                          kf_guarantor2city: guarantorcity,
-                          kf_guarantor2state: guarantorstate,
-                          kf_guarantor2aadharnumber: guarantoraadharnumber,
-                          kf_guarantor2pannumber: guarantorpannumber,
-          
-          });
-        }
-        console.log(guarantorage);
-
-        Alert.alert('Updated the record Successfully.', '', [
-          // {
-          //   text: 'cancel'
-          // },
-          {
-            text: 'OK',
-            onPress: () => {
-              //  navigation.navigate('PersonalLoanDetailsScreen', { loanApplication: loanApplication });
+            onUpdateSuccess({
+              ...loanApplication,
+              kf_applicationnumber: applicationnumber,
+              kf_createdby: createdby,
+              kf_guarantor2firstname: guarantorfirstname,
+              kf_guarantor2lastname: guarantorlastname,
+              kf_guarantor2dateofbirth: formattedDateOfBirth,
+              kf_guarantor2age: guarantorage,
+              kf_guarantor2gender: guarantorgender,
+              kf_guarantor2mobilenumber: guarantormobilenumber,
+              kf_guarantor2email: guarantoremail,
+              kf_guarantor2address1: guarantoraddress1,
+              kf_guarantor2ddress2: guarantoraddress2,
+              kf_guarantor2address3: guarantoraddress3,
+              kf_guarantor2city: guarantorcity,
+              kf_guarantor2state: guarantorstate,
+              kf_guarantor2aadharnumber: guarantoraadharnumber,
+              kf_guarantor2pannumber: guarantorpannumber,
+            });
+          }
+          Alert.alert('Updated the record Successfully.', '', [
+            // {
+            //   text: 'cancel'
+            // },
+            {
+              text: 'OK',
+              onPress: () => {
+                navigation.goBack();
+              },
             },
-          },
-        ]);
-      } else {
-        console.log('Error updating record in CRM:', updateRecordResponse);
-        Alert.alert('Error', 'Failed to update the record in CRM.');
+          ]);
+        } else {
+          console.log('Error updating record in CRM:', updateRecordResponse);
+          Alert.alert('Error', 'Failed to update the record in CRM.');
+        }
+      } catch (error) {
+        console.error('Error during update:', error.response?.data || error.message);
+        Alert.alert('Error', 'An unexpected error occurred. Please try again later.');
       }
-    } catch (error) {
-      console.error('Error during update:', error);
+    };
+
+
+  // Define onUpdateSuccess function in your component
+// const onUpdateSuccess = (updatedData) => {
+//     // Handle the updated data here, such as updating the state or performing any other action
+//     console.log('Record updated successfully:', updatedData);
+//   };
+  
+
+  const handleEmailChange = (text) => {
+    setEmail(text);
+
+    if (text.trim() === '') {
+      setErrorMessages({
+        ...errorMessages,
+        guarantorEmailEdit: 'Enter Email Address',
+      });
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text)) {
+      setErrorMessages({
+        ...errorMessages,
+        guarantorEmailEdit: 'Enter a Valid Email Address',
+      });
+    } else {
+      setErrorMessages({
+        ...errorMessages,
+        guarantorEmailEdit: '',
+      });
     }
   };
+
+
+  const calculateAge = (birthDate) => {
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let guarantorage = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      guarantorage--;
+    }
+
+    return guarantorage;
+  };
+
+  const handleDateOfBirth = (newDate) => {
+    if (!newDate) {
+      setdateofbirth(null);
+      setage('');
+      setErrorMessages({
+        ...errorMessages,
+        guarantorDateOfBirthEdit: '',
+      });
+      return;
+    }
+
+    const calculatedAge = calculateAge(newDate);
+    setdateofbirth(newDate);
+    setage(calculatedAge.toString());
+
+    if (calculatedAge <= 18) {
+      setErrorMessages({
+        ...errorMessages,
+        guarantorDateOfBirthEdit: 'You must be at least 18 years old.',
+      });
+    } else {
+      setErrorMessages({
+        ...errorMessages,
+        guarantorDateOfBirthEdit: '',
+      });
+    }
+  };
+
+  const handlePancardNumberValid = (text) => {
+    setPancardNumber(text);
+
+    if (text.trim() === '') {
+      setErrorMessages({
+        ...errorMessages,
+        guarantorPanCardNumberEdit: 'Enter PAN Card',
+      });
+      setIsPancardNumberValid(false);
+    } else if (/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(text)) {
+      setErrorMessages({
+        ...errorMessages,
+        guarantorPanCardNumberEdit: '',
+      });
+      setIsPancardNumberValid(true);
+    } else {
+      setErrorMessages({
+        ...errorMessages,
+        guarantorPanCardNumberEdit: 'Enter Valid PAN Card',
+      });
+      setIsPancardNumberValid(false);
+    }
+  };
+
 
   const handleGenderOptionset = (selectedOptionGender) => {
     let numericValue;
@@ -226,6 +323,7 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
     }
     setGender(numericValue);
   };
+
   const getGenderOptionsetStringFromNumericValue = (numericValue) => {
     switch (numericValue) {
       case 123950000:
@@ -234,6 +332,49 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
         return 'Female';
       default:
         return '';
+    }
+  };
+
+ 
+
+  const handleLoanStatusChange = (selectedOptionLoan) => {
+    let numericValue;
+    switch (selectedOptionLoan) {
+      case 'Approved':
+        numericValue = 123950000;
+        break;
+      case 'PendingApproval':
+        numericValue = 123950001;
+        break;
+      case 'Draft':
+        numericValue = 123950002;
+        break;
+      case 'Cancelled':
+        numericValue = 123950003;
+        break;
+      case 'Expired':
+        numericValue = 123950004;
+        break;
+      default:
+        numericValue = null;
+    }
+    setStatus(numericValue);
+  };
+
+  const getStatusStringFromNumericValue = (numericValue) => {
+    switch (numericValue) {
+      case 123950000:
+        return 'Approved';
+      case 123950001:
+        return 'Pending Approval';
+      case 123950002:
+        return 'Draft';
+      case 123950003:
+        return 'Cancelled';
+      case 123950004:
+        return 'Expired';
+      default:
+        return 'Pending Approval';
     }
   };
 
@@ -260,124 +401,6 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
         return 'InvalidDocuments';
       default:
         return '';
-    }
-  };
-
-  const handleEmailChange = (text) => {
-    setEmail(text);
-
-    if (text.trim() === '') {
-      setErrorMessages({
-        ...errorMessages,
-        guarantorEmailEdit: 'Enter Email Address',
-      });
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text)) {
-      setErrorMessages({
-        ...errorMessages,
-        guarantorEmailEdit: 'Enter a Valid Email Address',
-      });
-    } else {
-      setErrorMessages({
-        ...errorMessages,
-        guarantorEmailEdit: '',
-      });
-    }
-  };
-
-  const calculateAge = (birthDate) => {
-    const today = new Date();
-    const birth = new Date(birthDate);
-    let guarantorage = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-      guarantorage--;
-    }
-
-    return guarantorage;
-  };
-
-  // const handleDateOfBirth = (newDate) => {
-  //   if (!newDate) {
-  //     setdateofbirth(null);
-  //     setage('');
-  //     setErrorMessages({
-  //       ...errorMessages,
-  //       guarantorDateOfBirthEdit: '',
-  //     });
-  //     return;
-  //   }
-
-  //   const calculatedAge = calculateAge(newDate);
-  //   setdateofbirth(newDate);
-  //   setage(calculatedAge.toString());
-
-  //   if (calculatedAge <= 18) {
-  //     setErrorMessages({
-  //       ...errorMessages,
-  //       guarantorDateOfBirthEdit: 'You must be at least 18 years old.',
-  //     });
-  //   } else {
-  //     setErrorMessages({
-  //       ...errorMessages,
-  //       guarantorDateOfBirthEdit: '',
-  //     });
-  //   }
-  // };
-  const handleDateOfBirth = (newDate) => {
-    console.log('New date selected:', newDate);
-  
-    if (!newDate) {
-      setdateofbirth(null);
-      setage('');
-      setErrorMessages({
-        ...errorMessages,
-        guarantorDateOfBirthEdit: '',
-      });
-      return;
-    }
-  
-    const calculatedAge = calculateAge(newDate);
-    console.log('Calculated age:', calculatedAge);
-  
-    setdateofbirth(newDate);
-    setage(calculatedAge.toString());
-  
-    if (calculatedAge <= 18) {
-      setErrorMessages({
-        ...errorMessages,
-        guarantorDateOfBirthEdit: 'You must be at least 18 years old.',
-      });
-    } else {
-      setErrorMessages({
-        ...errorMessages,
-        guarantorDateOfBirthEdit: '',
-      });
-    }
-  };
-  
-
-  const handlePancardNumberValid = (text) => {
-    setPancardNumber(text);
-
-    if (text.trim() === '') {
-      setErrorMessages({
-        ...errorMessages,
-        guarantorPanCardNumberEdit: 'Enter PAN Card',
-      });
-      setIsPancardNumberValid(false);
-    } else if (/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(text)) {
-      setErrorMessages({
-        ...errorMessages,
-        guarantorPanCardNumberEdit: '',
-      });
-      setIsPancardNumberValid(true);
-    } else {
-      setErrorMessages({
-        ...errorMessages,
-        guarantorPanCardNumberEdit: 'Enter Valid PAN Card',
-      });
-      setIsPancardNumberValid(false);
     }
   };
 
@@ -421,36 +444,9 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
   };
 
 
-  const handleLoanAmountRequestedChange = (text) => {
-    const amountRequested = text.trim() !== '' ? parseFloat(text) : null;
-    setLoanAmountRequested(amountRequested);
-
-    const minLoanAmount = 25000;
-    const maxLoanAmount = 1500000;
-
-    if (text.trim() === '') {
-      setErrorMessages({
-        ...errorMessages,
-        loanAmountRequestedEdit: 'Enter Loan Amount',
-      });
-    } else if (/^\d{5,7}$/.test(text) && amountRequested !== null && amountRequested >= minLoanAmount && amountRequested <= maxLoanAmount) {
-      setErrorMessages({
-        ...errorMessages,
-        loanAmountRequestedEdit: '',
-      });
-    } else {
-      setErrorMessages({
-        ...errorMessages,
-        loanAmountRequestedEdit: `Enter Loan Amount (${minLoanAmount} to ${maxLoanAmount} INR)`,
-      });
-    }
-  };
-
-
   return (
     <>
-      <HeaderComponent
-        titleText="HomeLoan Gurantee2"
+      <HeaderComponent titleText="HomeLoan Gurantee2"
         onPress={handleGoBack}
         onIconPress={handleUpdateRecord}
         screenIcon="md-save"
@@ -512,7 +508,6 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
             />
             {errorMessages.guarantorLastNameEdit !== '' && <Text style={styles.errorText}>{errorMessages.guarantorLastNameEdit}</Text>}
 
-
             <LoanStatusPicker
               onOptionChange={handleGenderOptionset}
               title="Gender"
@@ -529,7 +524,7 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
             />
             {errorMessages.guarantorDateOfBirthEdit !== '' && <Text style={styles.errorText}>{errorMessages.guarantorDateOfBirthEdit}</Text>}
 
-      
+
             <TextInput
               style={[styles.textInputContainer, { color: "gray" }]}
               value={guarantorage.toString()}
@@ -588,6 +583,7 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
               placeholder="State"
               onChangeText={(text) => setState(text)}
             />
+
             <TextInput
               style={styles.textInputContainer}
               value={guarantoraadharnumber}
@@ -609,7 +605,9 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
               <Text style={styles.errorText}>{errorMessages.guarantorPanCardNumberEdit}</Text>
             )}
 
-         {/* <ButtonComponent title="Update" onPress={handleUpdateRecord} /> */}
+
+
+            {/* <ButtonComponent title="Update" onPress={handleUpdateRecord} /> */}
           </View>
         </View>
       </ScrollView>
@@ -622,17 +620,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 20
+    marginVertical: 20
   },
   wrapper: {
     width: '90%',
-  },
-  textInputContainer: {
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#bbb',
-    borderRadius: 5,
-    paddingHorizontal: 14,
   },
   errorText: {
     color: 'red',
@@ -655,4 +646,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PersonalLoanGurantee2;
+export default HomeLoanGurantee2;
+

@@ -9,7 +9,7 @@ import LoanStatusPicker from '../../common/LoanStatusPicker ';
 
 
 const HomeLoanGurantee = ({ route, navigation }) => {
-    const { loanApplication } = route.params || {};
+    const { loanApplication,onUpdateSuccess } = route.params || {};
   const [applicationnumber, setapplicationnumber] = useState(loanApplication?.kf_applicationnumber || '');
   const [guarantoraadharnumber, setAadharcardNumber] = useState(loanApplication?.kf_guarantoraadharnumber || '');
   const [guarantorpannumber, setPancardNumber] = useState(loanApplication?.kf_guarantorpannumber || '');
@@ -179,7 +179,7 @@ const HomeLoanGurantee = ({ route, navigation }) => {
               kf_guarantorfirstname: guarantorfirstname,
               kf_guarantorlastname: guarantorlastname,
               kf_guarantordateofbirth: formattedDateOfBirth,
-              kf_guarantorage: parseInt(guarantorage),
+              kf_guarantorage: guarantorage,
               kf_guarantorgender: guarantorgender,
               kf_guarantormobilenumber: guarantormobilenumber,
               kf_guarantoremail: guarantoremail,
@@ -193,16 +193,16 @@ const HomeLoanGurantee = ({ route, navigation }) => {
             });
           }
           Alert.alert('Updated the record Successfully.', '', [
-            {
-              text: 'cancel'
-            },
+            // {
+            //   text: 'cancel'
+            // },
             {
               text: 'OK',
               onPress: () => {
-                navigation.navigate('HomeLoanDetailsScreen', { loanApplication: loanApplication });
+                navigation.goBack();
               },
-            },
-          ]);
+            }, 
+          ])
         } else {
           console.log('Error updating record in CRM:', updateRecordResponse);
           Alert.alert('Error', 'Failed to update the record in CRM.');
@@ -215,10 +215,10 @@ const HomeLoanGurantee = ({ route, navigation }) => {
 
 
   // Define onUpdateSuccess function in your component
-const onUpdateSuccess = (updatedData) => {
-    // Handle the updated data here, such as updating the state or performing any other action
-    console.log('Record updated successfully:', updatedData);
-  };
+// const onUpdateSuccess = (updatedData) => {
+//     // Handle the updated data here, such as updating the state or performing any other action
+//     console.log('Record updated successfully:', updatedData);
+//   };
   
 
   const handleEmailChange = (text) => {

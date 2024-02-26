@@ -177,7 +177,7 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
                           kf_guarantorfirstname: guarantorfirstname,
                           kf_guarantorlastname: guarantorlastname,
                           kf_guarantordateofbirth: formattedDateOfBirth,
-                          kf_guarantorage: parseInt(guarantorage),
+                          kf_guarantorage: guarantorage,
                           kf_guarantorgender: guarantorgender,
                           kf_guarantormobilenumber: guarantormobilenumber,
                           kf_guarantoremail: guarantoremail,
@@ -200,7 +200,7 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
           {
             text: 'OK',
             onPress: () => {
-              //  navigation.navigate('PersonalLoanDetailsScreen', { personalLoan: personalLoan });
+              navigation.goBack();
             },
           },
         ]);
