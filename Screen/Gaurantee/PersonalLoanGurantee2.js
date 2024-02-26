@@ -14,7 +14,7 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
   const [createdby, setcreatedby] = useState(personalLoan?.kf_createdby || '');
   const [guarantorfirstname, setfirstname] = useState(personalLoan?.kf_guarantor2firstname || '');
   const [guarantorlastname, setLastname] = useState(personalLoan?.kf_guarantor2lastname || '');
-  const [guarantordateofbirth, setdateofbirth] = useState(personalLoan?.kf_guarantor2dateofbirth ? new Date(loanApplication.kf_guarantor2dateofbirth) : null);
+  const [guarantordateofbirth, setdateofbirth] = useState(personalLoan?.kf_guarantor2dateofbirth ? new Date(personalLoan.kf_guarantor2dateofbirth) : null);
   const [guarantorage, setage] = useState(personalLoan?.setkf_guarantor2age || '');
   const [guarantorgender, setGender] = useState(personalLoan?.kf_guarantor2gender || '');
   const [guarantormobilenumber, setMobileNumber] = useState(personalLoan?.kf_guarantor2mobilenumber || '');
@@ -70,7 +70,7 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
     setCity(personalLoan.kf_guarantor2city);
     setState(personalLoan.kf_guarantor2state);
     setAadharcardNumber(personalLoan.kf_guarantor2aadharnumber);
-    setPancardNumber(personalLoan.kf_guarantor2aadharnumber);
+    setPancardNumber(personalLoan.kf_guarantor2pannumber);
     setRecordId(personalLoan.kf_personalloanid);
     console.log('State updated:', {
       applicationnumber,
@@ -156,7 +156,7 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
             kf_guarantor2city: guarantorcity,
             kf_guarantor2state: guarantorstate,
             kf_guarantor2aadharnumber:guarantoraadharnumber,
-            kf_guarantor2aadharnumber:guarantorpannumber
+            kf_guarantor2pannumber:guarantorpannumber
         },
         {
           headers: {
@@ -177,7 +177,7 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
                           kf_guarantor2firstname: guarantorfirstname,
                           kf_guarantor2lastname: guarantorlastname,
                           kf_guarantor2dateofbirth: formattedDateOfBirth,
-                          kf_guarantor2age: parseInt(guarantorage),
+                          kf_guarantor2age: guarantorage,
                           kf_guarantor2gender: guarantorgender,
                           kf_guarantor2mobilenumber: guarantormobilenumber,
                           kf_guarantor2email: guarantoremail,
@@ -187,7 +187,7 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
                           kf_guarantor2city: guarantorcity,
                           kf_guarantor2state: guarantorstate,
                           kf_guarantor2aadharnumber: guarantoraadharnumber,
-                          kf_guarantor2aadharnumber: guarantorpannumber,
+                          kf_guarantor2pannumber: guarantorpannumber,
           
           });
         }
@@ -200,7 +200,7 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
           {
             text: 'OK',
             onPress: () => {
-              //  navigation.navigate('PersonalLoanDetailsScreen', { personalLoan: personalLoan });
+              navigation.goBack();
             },
           },
         ]);
