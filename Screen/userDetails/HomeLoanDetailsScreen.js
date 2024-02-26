@@ -305,10 +305,11 @@ const styles = StyleSheet.create({
     position:"absolute",
     top: 0,
     zIndex: 1000, 
-    marginLeft: 15
+    marginLeft: 15, 
+    height: 180
   },
   personalDetailContainer: {
-    marginTop: 178,
+    marginTop: 180,
     width: "95%",
     paddingVertical: 10,
     backgroundColor: "white",
