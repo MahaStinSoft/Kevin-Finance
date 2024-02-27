@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, Alert, StyleSheet, ScrollView, Text } from 'react-native';
+import { View, TextInput, TouchableOpacity, Alert, StyleSheet, ScrollView, Text, FlatList, Linking, Platform, Image, Button } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 
@@ -54,6 +54,10 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [isPancardNumberValid, setIsPancardNumberValid] = useState(true);
   const [isLoanAmountValid, setIsLoanAmountValid] = useState(true);
   const [ModalVisible, setModalVisible] = useState(true);  
+  const [annotations, setAnnotations] = useState([]);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [showImage, setShowImage] = useState(false);
+  const [item, setItem] = useState(null); // Assuming you have some state to store the current item
 
   // const { signatureImage } = route.params;
   const [signatureImage, setSignatureImage] = useState(null);
@@ -141,13 +145,13 @@ const EditHomeLoan = ({ route, navigation }) => {
     const minLoanAmount = 25000;
     const maxLoanAmount = 1500000;
 
-    if (loanAmountRequested < minLoanAmount || loanAmountRequested > maxLoanAmount) {
-      setErrorMessages({
-        ...errorMessages,
-        loanAmountRequestedEdit: `Loan amount should be between ${minLoanAmount} and ${maxLoanAmount} INR.`,
-      });
-      return;
-    }
+    // if (loanAmountRequested < minLoanAmount || loanAmountRequested > maxLoanAmount) {
+    //   setErrorMessages({
+    //     ...errorMessages,
+    //     loanAmountRequestedEdit: `Loan amount should be between ${minLoanAmount} and ${maxLoanAmount} INR.`,
+    //   });
+    //   return;
+    // }
 
     if (!isPancardNumberValid) {
       setErrorMessages({
@@ -551,12 +555,14 @@ const EditHomeLoan = ({ route, navigation }) => {
         ...errorMessages,
         loanAmountRequestedEdit: 'Enter Loan Amount',
       });
-    } else if (/^\d{5,7}$/.test(text) && amountRequested !== null && amountRequested >= minLoanAmount && amountRequested <= maxLoanAmount) {
-      setErrorMessages({
-        ...errorMessages,
-        loanAmountRequestedEdit: '',
-      });
-    } else {
+    } 
+    // else if (/^\d{5,7}$/.test(text) && amountRequested !== null && amountRequested >= minLoanAmount && amountRequested <= maxLoanAmount) {
+    //   setErrorMessages({
+    //     ...errorMessages,
+    //     loanAmountRequestedEdit: '',
+    //   });
+    // } 
+    else {
       setErrorMessages({
         ...errorMessages,
         loanAmountRequestedEdit: `Enter Loan Amount (${minLoanAmount} to ${maxLoanAmount} INR)`,
@@ -609,6 +615,164 @@ const EditHomeLoan = ({ route, navigation }) => {
     }
   };
 
+  
+
+// const sendAnnotation = async () => {
+//   try {
+//     const tokenResponse = await axios.post(
+//       'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+//       {
+//         grant_type: 'client_credentials',
+//         client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+//         resource: 'https://org0f7e6203.crm5.dynamics.com',
+//         scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+//         client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+//       },
+//       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+//     );
+
+//     const accessToken = tokenResponse.data.access_token;
+
+//     const annotations = [
+//       {
+//         subject: `AadharCard Image: ${aadharcard.fileName || 'example.jpg'}`,
+//         filename: aadharcard.fileName || 'example.jpg',
+//         isdocument: true,
+//         'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
+//         documentbody: aadharcard.fileContent,
+//       },
+//     ];
+
+//     const createAnnotationResponse = await axios.post(
+//       'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
+//       annotations,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${accessToken}`,
+//           'Content-Type': 'application/json',
+//         },
+//       }
+//     );
+
+//     if (createAnnotationResponse.status === 204) {
+//       console.log('Annotations (Notes) with file attachments created successfully.');
+//       // Alert.alert('Success', 'Notes with file attachments created successfully.');
+//     } else {
+//       console.error('Failed to create annotations (notes) with file attachments. Response:', createAnnotationResponse.data);
+//       Alert.alert('Error', 'Failed to create notes with file attachments.');
+//     }
+//   } catch (error) {
+//     console.error('Error creating annotations (notes) with file attachments:', error.response?.data || error.message);
+//     Alert.alert('Error', 'An error occurred while creating notes with file attachments.');
+//   }
+// };
+
+// useEffect(() => {
+//   fetchAnnotations();
+// }, []);
+
+// const fetchAnnotations = async () => {
+//   try {
+//     const tokenResponse = await axios.post(
+//       'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+//       {
+//         grant_type: 'client_credentials',
+//         client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+//         resource: 'https://org0f7e6203.crm5.dynamics.com',
+//         scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+//         client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+//       },
+//       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+//     );
+
+//     const accessToken = tokenResponse.data.access_token;
+
+//     const fetchAnnotationsResponse = await axios.get(
+//       'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations?$filter=_objectid_value eq ' + recordId,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${accessToken}`,
+//           'Content-Type': 'application/json',
+//         },
+//       }
+//     );
+
+//     const fetchedAnnotations = fetchAnnotationsResponse.data.value;
+//     console.log('Annotations:', fetchedAnnotations);
+//     setAnnotations(fetchedAnnotations);
+
+//   } catch (error) {
+//     console.error('Error fetching annotations:', error.response?.data || error.message);
+//     Alert.alert('Error', 'An error occurred while fetching annotations.');
+//   }
+// };
+
+// const fetchAnnotations = async () => {
+//   try {
+//     const tokenResponse = await axios.post(
+//       'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+//       {
+//         grant_type: 'client_credentials',
+//         client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+//         resource: 'https://org0f7e6203.crm5.dynamics.com',
+//         scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+//         client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+//       },
+//       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+//     );
+
+//     const accessToken = tokenResponse.data.access_token;
+
+//     const fetchAnnotationsResponse = await axios.get(
+//       'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations?$filter=_objectid_value eq ' + recordId,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${accessToken}`,
+//           'Content-Type': 'application/json',
+//         },
+//       }
+//     );
+
+//     const fetchedAnnotations = fetchAnnotationsResponse.data.value;
+//     console.log('Annotations:', fetchedAnnotations);
+//     setAnnotations(fetchedAnnotations);
+
+//     // Update annotations here if needed
+//     const updatedAnnotations = fetchedAnnotations.map(async annotation => {
+//       // Modify annotation properties as needed
+//       return await axios.patch(
+//         `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations(${annotation.annotationid})`,
+//         {
+//           subject: `Updated AadharCard Image: ${aadharcard.fileName || 'example.jpg'}`,
+//           filename: aadharcard.fileName || 'example.jpg',
+//           isdocument: true,
+//           'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
+//           documentbody: aadharcard.fileContent,
+//         },
+//         {
+//           headers: {
+//             Authorization: `Bearer ${accessToken}`,
+//             'Content-Type': 'application/json',
+//           },
+//         }
+//       );
+//     });
+
+//     // Wait for all PATCH requests to complete
+//     await Promise.all(updatedAnnotations);
+
+//     console.log('Annotations updated successfully.');
+
+//   } catch (error) {
+//     console.error('Error fetching annotations:', error.response?.data || error.message);
+//     Alert.alert('Error', 'An error occurred while fetching annotations.');
+//   }
+// };
+useEffect(() => {
+  fetchAnnotations();
+  fetchAnnotations1();
+}, []);
+
 const sendAnnotation = async () => {
   try {
     const tokenResponse = await axios.post(
@@ -625,10 +789,28 @@ const sendAnnotation = async () => {
 
     const accessToken = tokenResponse.data.access_token;
 
+    // Check if there is an existing Aadhar image annotation
+    const existingAnnotationResponse = await axios.get(
+      `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations?$filter=_objectid_value eq ${recordId} and subject eq 'AadharCard Image'`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (existingAnnotationResponse.data.value.length > 0) {
+      // If an existing annotation is found, delete it
+      const existingAnnotationId = existingAnnotationResponse.data.value[0].annotationid;
+      await deleteAnnotation(existingAnnotationId, accessToken);
+    }
+
+    // Create a new annotation
     const annotations = [
       {
-        subject: `Image: ${aadharcard.fileName || 'example.jpg'}`,
-        filename: aadharcard.fileName || 'example.jpg',
+        subject: 'AadharCard Image',
+        filename: aadharcard.fileName || 'AadharCard.jpg',
         isdocument: true,
         'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
         documentbody: aadharcard.fileContent,
@@ -647,15 +829,72 @@ const sendAnnotation = async () => {
     );
 
     if (createAnnotationResponse.status === 204) {
-      console.log('Annotations (Notes) with file attachments created successfully.');
-      // Alert.alert('Success', 'Notes with file attachments created successfully.');
+      console.log('Aadhar image annotation created successfully.');
     } else {
-      console.error('Failed to create annotations (notes) with file attachments. Response:', createAnnotationResponse.data);
-      Alert.alert('Error', 'Failed to create notes with file attachments.');
+      console.error('Failed to create Aadhar image annotation. Response:', createAnnotationResponse.data);
+      Alert.alert('Error', 'Failed to create Aadhar image annotation.');
     }
+
+    // Fetch and display the updated annotations
+    fetchAnnotations();
   } catch (error) {
-    console.error('Error creating annotations (notes) with file attachments:', error.response?.data || error.message);
-    Alert.alert('Error', 'An error occurred while creating notes with file attachments.');
+    console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
+    Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+  }
+};
+
+const deleteAnnotation = async (annotationId, accessToken) => {
+  try {
+    const deleteResponse = await axios.delete(
+      `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations(${annotationId})`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    console.log('Annotation deleted successfully:', deleteResponse.data);
+  } catch (error) {
+    console.error('Error deleting annotation:', error.response?.data || error.message);
+    throw new Error('An error occurred while deleting annotation.');
+  }
+};
+
+const fetchAnnotations = async () => {
+  try {
+    const tokenResponse = await axios.post(
+      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+      {
+        grant_type: 'client_credentials',
+        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+        resource: 'https://org0f7e6203.crm5.dynamics.com',
+        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+      },
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
+
+    const accessToken = tokenResponse.data.access_token;
+
+    const fetchAnnotationsResponse = await axios.get(
+      'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations?$filter=_objectid_value eq ' + recordId,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    const fetchedAnnotations = fetchAnnotationsResponse.data.value;
+    console.log('Annotations:', fetchedAnnotations);
+    setAnnotations(fetchedAnnotations);
+
+  } catch (error) {
+    console.error('Error fetching annotations:', error.response?.data || error.message);
+    Alert.alert('Error', 'An error occurred while fetching annotations.');
   }
 };
 
@@ -675,10 +914,28 @@ const sendAnnotation1 = async () => {
 
     const accessToken = tokenResponse.data.access_token;
 
-    const annotations1 = [
+    // Check if there is an existing Aadhar image annotation
+    const existingAnnotationResponse = await axios.get(
+      `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations?$filter=_objectid_value eq ${recordId} and subject eq 'PanCard Image'`,
       {
-        subject: `Image: ${pancard.fileName || 'pancard.jpg'}`,
-        filename: pancard.fileName || 'pancard.jpg',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (existingAnnotationResponse.data.value.length > 0) {
+      // If an existing annotation is found, delete it
+      const existingAnnotationId = existingAnnotationResponse.data.value[0].annotationid;
+      await deleteAnnotation1(existingAnnotationId, accessToken);
+    }
+
+    // Create a new annotation
+    const annotations = [
+      {
+        subject: 'PanCard Image',
+        filename: pancard.fileName || 'PanCard.jpg',
         isdocument: true,
         'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
         documentbody: pancard.fileContent,
@@ -687,7 +944,7 @@ const sendAnnotation1 = async () => {
 
     const createAnnotationResponse = await axios.post(
       'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
-      annotations1,
+      annotations,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -697,15 +954,72 @@ const sendAnnotation1 = async () => {
     );
 
     if (createAnnotationResponse.status === 204) {
-      console.log('Annotations (Notes) with file attachments created successfully.');
-      // Alert.alert('Success', 'Notes with file attachments created successfully.');
+      console.log('PanCard image annotation created successfully.');
     } else {
-      console.error('Failed to create annotations (notes) with file attachments. Response:', createAnnotationResponse.data);
-      Alert.alert('Error', 'Failed to create notes with file attachments.');
+      console.error('Failed to create Aadhar image annotation. Response:', createAnnotationResponse.data);
+      Alert.alert('Error', 'Failed to create Aadhar image annotation.');
     }
+
+    // Fetch and display the updated annotations
+    fetchAnnotations1();
   } catch (error) {
-    console.error('Error creating annotations (notes) with file attachments:', error.response?.data || error.message);
-    Alert.alert('Error', 'An error occurred while creating notes with file attachments.');
+    console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
+    Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+  }
+};
+
+const deleteAnnotation1 = async (annotationId, accessToken) => {
+  try {
+    const deleteResponse = await axios.delete(
+      `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations(${annotationId})`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    console.log('Annotation deleted successfully:', deleteResponse.data);
+  } catch (error) {
+    console.error('Error deleting annotation:', error.response?.data || error.message);
+    throw new Error('An error occurred while deleting annotation.');
+  }
+};
+
+const fetchAnnotations1 = async () => {
+  try {
+    const tokenResponse = await axios.post(
+      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+      {
+        grant_type: 'client_credentials',
+        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+        resource: 'https://org0f7e6203.crm5.dynamics.com',
+        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+      },
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
+
+    const accessToken = tokenResponse.data.access_token;
+
+    const fetchAnnotationsResponse = await axios.get(
+      'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations?$filter=_objectid_value eq ' + recordId,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    const fetchedAnnotations = fetchAnnotationsResponse.data.value;
+    console.log('Annotations:', fetchedAnnotations);
+    setAnnotations(fetchedAnnotations);
+
+  } catch (error) {
+    console.error('Error fetching annotations:', error.response?.data || error.message);
+    Alert.alert('Error', 'An error occurred while fetching annotations.');
   }
 };
 
@@ -727,7 +1041,7 @@ const sendAnnotation2 = async () => {
 
     const annotations2 = [
       {
-        subject: `Image: ${applicantImage.fileName || 'applicantImage.jpg'}`,
+        subject: `Applicant Image: ${applicantImage.fileName || 'applicantImage.jpg'}`,
         filename: applicantImage.fileName || 'applicantImage.jpg',
         isdocument: true,
         'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
@@ -762,7 +1076,7 @@ const sendAnnotation2 = async () => {
 const handleUpdateRecordAndSendAnnotation = () => {
   sendAnnotation();
   sendAnnotation1();
-  sendAnnotation2();
+  // sendAnnotation2();
   handleUpdateRecord(); 
   
 };
@@ -771,6 +1085,23 @@ const onViewImage = () => {
   setModalVisible(true);
 };
 
+const handleViewImages = () => {
+  setShowImage(!showImage); // Toggle the state to show/hide images
+};
+
+const filteredAnnotations = annotations.filter(item => item.documentbody);
+
+const renderAnnotationItem = ({ item }) => (
+<View style={styles.annotation}>
+<Text>Subject: {item.subject}</Text>
+{showImage && item.documentbody && (
+  <Image
+    style={{ width: 250, height: 250, objectFit: 'fill' }}
+    source={{ uri: `data:image/png;base64,${item.documentbody}` }}
+  />
+)}
+</View>
+);
 
 const handlesignature = async  () => {
   navigation.navigate('SignatureScreen', { loanApplication: loanApplication });
@@ -1013,13 +1344,14 @@ const handlesignature = async  () => {
   setModalVisible={setModalVisible}
 />
 
-<CardImage
+{/* <CardImage
   title="Applicant Image"
   imageContent={applicantImage}
   onViewImage={onViewImage}
   pickImage={() => pickImage('applicant')}
   setModalVisible={setModalVisible}
-/>
+/> */}
+
 {/* <CardImageSignature
         title="Signature"
         signatureImage={signatureImage}
@@ -1029,13 +1361,26 @@ const handlesignature = async  () => {
       /> */}
 
             {/* <ButtonComponent title="Update" onPress={handleUpdateRecord} /> */}
+
           </View>
+          <Text style={styles.heading}>Annotations</Text>
+          <Button title={showImage ? 'Hide Images' : 'View Images'} onPress={handleViewImages} />
+    {annotations && annotations.length > 0 ? (
+        <FlatList
+        data={filteredAnnotations}
+        renderItem={renderAnnotationItem}
+        keyExtractor={(item, index) => index.toString()}
+      />
+    ) : (
+        <Text>No annotations to display</Text>
+    )}
         </View>
       </ScrollView>
-    </>
-  );
-};
 
+    </>
+    );
+  };
+  
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -1065,8 +1410,19 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#FBFCFC',
     padding: 10,
+  }, 
+  heading: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  annotation: {
+    marginBottom: 15,
+    padding: 10,
+    // borderWidth: 1,
+    // borderColor: '#ccc',
+    borderRadius: 5,
   },
 });
 
 export default EditHomeLoan;
-
