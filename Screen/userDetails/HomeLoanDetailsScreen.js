@@ -177,8 +177,8 @@ navigation.navigate('HomeLoanGurantee2', { loanApplication,
           <View style={{ marginLeft: 12, marginTop: 0, width: 200, position:"relative" }}>
           <Text style={styles.cardTitle}>{loanApplication.kf_applicationnumber}</Text>
           <Text style={[styles.cardTitle]}>{`${loanApplication.kf_name} ${loanApplication.kf_lastname}`}</Text>
-            <View style={{flexDirection: "row", marginTop: 30}}>
-            <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={[styles.buttonContainer, {width: "45%", marginLeft: 5}]}>
+            <View style={{flexDirection: "row", marginTop: 50}}>
+            <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={[styles.buttonContainer, {width: "45%", marginLeft: -5}]}>
             <Text style={styles.buttonText}>Guarantee1</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={handleNavigateToGuaranteeScreen2} style={[styles.buttonContainer, {width: "45%", marginLeft: 2}]}>
