@@ -224,7 +224,7 @@ navigation.navigate('HomeLoanGurantee2', { loanApplication,
         </View>
 
         {showHomeLoanGuarantee1 && (
-          <View style={[styles.personalDetailContainer, {marginTop: -168}]}>
+          <View style={[styles.personalDetailContainer, {marginTop: 5}]}>
           <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10 }]}>HomeLoanGurantee 1</Text>
           <Text style={styles.cardLabel}>Guarantor Firstname : {loanApplication.kf_guarantorfirstname}</Text>
           <Text style={styles.cardLabel}>Guarantor Lastname : {loanApplication.kf_guarantorlastname}</Text>
