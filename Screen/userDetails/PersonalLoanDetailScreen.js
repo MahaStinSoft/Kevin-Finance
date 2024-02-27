@@ -8,11 +8,6 @@ const PersonalLoanDetailsScreen = ({ route }) => {
   const navigation = useNavigation();
   const [personalLoan, setpersonalLoan] = useState(route.params.personalLoan);
   const [recordId, setRecordId] = useState(route.params.personalLoan.kf_personalloanid);
-  const [showMore, setShowMore] = useState(false);
-  const [showHomeLoanGuarantee1, setShowHomeLoanGuarantee1] = useState(false);
-  const [showHomeLoanGuarantee2, setShowHomeLoanGuarantee2] = useState(false);
-
-  
   LogBox.ignoreLogs([
     'Non-serializable values were found in the navigation state',
   ]);
@@ -141,16 +136,16 @@ const renderImage = () => {
 
 const handleNavigateToGuaranteeScreen = () => {
   // Example navigation code from the previous screen
-navigation.navigate('HomeLoanGurantee', { loanApplication,
-onUpdateSuccess: updatedLoanApplication => setLoanApplication(updatedLoanApplication),
+navigation.navigate('PersonalLoanGurantee', { personalLoan,
+  onUpdateSuccess: updatedpersonalLoan => setpersonalLoan(updatedpersonalLoan),
 });
     // Pass any necessary parameters if needed
 };
 
 const handleNavigateToGuaranteeScreen2 = () => {
   // Example navigation code from the previous screen
-navigation.navigate('HomeLoanGurantee2', { loanApplication,
-onUpdateSuccess: updatedLoanApplication => setLoanApplication(updatedLoanApplication),
+navigation.navigate('PersonalLoanGurantee2', { personalLoan,
+  onUpdateSuccess: updatedpersonalLoan => setpersonalLoan(updatedpersonalLoan),
 });
     // Pass any necessary parameters if needed
 };
@@ -173,11 +168,32 @@ onUpdateSuccess: updatedLoanApplication => setLoanApplication(updatedLoanApplica
     });
   };
 
-const date = personalLoan.kf_emicollectiondate ? new Date(personalLoan.kf_emicollectiondate) : null;
-const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+  // const formatDate = (timestamp) => {
+  //   const date = new Date(timestamp);
+  //   // Get the day, month, and year
+  //   const day = String(date.getDate()).padStart(2, '0'); // Add leading zero if necessary
+  //   const month = String(date.getMonth() + 1).padStart(2, '0'); // Add leading zero if necessary
+  //   const year = date.getFullYear();
+  //   // Return formatted date
+  //   return `${day}/${month}/${year}`;
+  // };
 
-  const emischeduleDate = personalLoan.kf_dateofbirth ? new Date(personalLoan.kf_dateofbirth): null;
-  const emischeduleDateformatDate = emischeduleDate ? date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+  const formatDate = (timestamp) => {
+    // Check if timestamp is not provided or is not a valid date
+    if (!timestamp || isNaN(new Date(timestamp))) {
+      return ''; // Return empty string
+    }
+  
+    const date = new Date(timestamp);
+    // Get the day, month, and year
+    const day = String(date.getDate()).padStart(2, '0'); // Add leading zero if necessary
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Add leading zero if necessary
+    const year = date.getFullYear();
+    // Return formatted date
+    return `${day}/${month}/${year}`;
+  };
+  
+  
 
   return (
     <View style={styles.container}>
@@ -203,26 +219,7 @@ const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', 
             <Text style={styles.buttonText}>Guarantee-2</Text>
           </TouchableOpacity>
         </View>
-      </View> */}
-
-
-          <View style={styles.imageContainer}>
-          <View style={{ marginLeft: -12, position:"relative" }}>{renderImage()}</View>
-
-          <View style={{ marginLeft: 12, marginTop: 0, width: 200, position:"relative" }}>
-          <Text style={styles.cardTitle}>{personalLoan.kf_applicationnumber}</Text>
-          <Text style={[styles.cardTitle]}>{`${personalLoan.kf_name} ${personalLoan.kf_lastname}`}</Text>
-            <View style={{flexDirection: "row", marginTop: 30}}>
-            <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={[styles.buttonContainer, {width: "45%", marginLeft: 5}]}>
-            <Text style={styles.buttonText}>Guarantee1</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleNavigateToGuaranteeScreen2} style={[styles.buttonContainer, {width: "45%", marginLeft: 2}]}>
-            <Text style={styles.buttonText}>Guarantee2</Text>
-          </TouchableOpacity>
-          </View>
-          </View>
-
-        </View>
+      </View>
 
 
 
@@ -230,7 +227,7 @@ const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', 
         <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10 }]}>Personal Details</Text>
         <Text style={styles.cardLabel}>Gender: {getGenderLabel()}</Text>
         {/* <Text style={styles.cardLabel}>Date of Birth: {personalLoan.kf_dateofbirth ? new Date(personalLoan.kf_dateofbirth).toLocaleDateString() : ''}</Text> */}
-        <Text style={styles.cardLabel}>Date of Birth: {formattedDate}</Text>
+        <Text style={styles.cardLabel}>Date of Birth: {formatDate(personalLoan.kf_dateofbirth)}</Text>
         <Text style={styles.cardLabel}>Age: {personalLoan.kf_age}</Text>
         <Text style={styles.cardLabel}>Mobile Number: {personalLoan.kf_mobile}</Text>
         <Text style={styles.cardLabel}>Email Address: {personalLoan.kf_email}</Text>
@@ -261,7 +258,7 @@ const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', 
         <Text style={styles.cardLabel}>Number Of EMI: {personalLoan.kf_numberofemi}</Text>
         <Text style={styles.cardLabel}>Interest Rate: {personalLoan.kf_interestrate}</Text>
         <Text style={styles.cardLabel}>EMI: {personalLoan.kf_emi}</Text>
-        <Text style={styles.cardLabel}>EMI Collection Date: {emischeduleDateformatDate}</Text>
+        <Text style={styles.cardLabel}>EMI Collection Date: {formatDate(personalLoan.kf_emicollectiondate)}</Text>
         <Text style={styles.cardLabel}>Other Charges: {personalLoan.kf_othercharges}</Text>
       </View>
 
@@ -272,7 +269,7 @@ const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', 
           <Text style={styles.cardLabel}>Guarantor Firstname : {personalLoan.kf_guarantorfirstname}</Text>
           <Text style={styles.cardLabel}>Guarantor Lastname : {personalLoan.kf_guarantorlastname}</Text>
           <Text style={styles.cardLabel}>Guarantor Gender : {getGenderLabel()}</Text>
-          <Text style={styles.cardLabel}>Guarantor Dateofbirth : {formattedDate}</Text>
+          <Text style={styles.cardLabel}>Guarantor Dateofbirth : {formatDate(personalLoan.kf_guarantordateofbirth)}</Text>
           <Text style={styles.cardLabel}>Guarantor Age : {personalLoan.kf_guarantorage}</Text>
           <Text style={styles.cardLabel}>Guarantor Mobilenumber : {personalLoan.kf_guarantormobilenumber}</Text>
           <Text style={styles.cardLabel}>Guarantor Email : {personalLoan.kf_guarantoremail}</Text>
@@ -294,7 +291,7 @@ const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', 
           <Text style={styles.cardLabel}>Guarantor Firstname : {personalLoan.kf_guarantor2firstname}</Text>
           <Text style={styles.cardLabel}>Guarantor Lastname : {personalLoan.kf_guarantor2lastname}</Text>
           <Text style={styles.cardLabel}>Guarantor Gender : {getGenderLabel()}</Text>
-          <Text style={styles.cardLabel}>Guarantor Dateofbirth : {formattedDate}</Text>
+          <Text style={styles.cardLabel}>Guarantor Dateofbirth : {formatDate(personalLoan.kf_guarantor2dateofbirth)}</Text>
           <Text style={styles.cardLabel}>Guarantor Age : {personalLoan.kf_guarantor2age}</Text>
           <Text style={styles.cardLabel}>Guarantor Mobilenumber : {personalLoan.kf_guarantor2mobilenumber}</Text>
           <Text style={styles.cardLabel}>Guarantor Email : {personalLoan.kf_guarantor2email}</Text>
@@ -435,6 +432,8 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
+    marginVertical: -3,
+    fontSize: 12
   },
 });
 

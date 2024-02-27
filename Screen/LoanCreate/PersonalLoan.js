@@ -376,15 +376,17 @@ const handleInterestRateChange = (text) => {
         ...errorMessages,
         loanAmountRequested: 'Enter Loan Amount',
       });
-    } else if (/^\d{5,7}$/.test(text) && amountRequested !== null && amountRequested >= minLoanAmount && amountRequested <= maxLoanAmount) {
+    } 
+    // else if (/^\d{5,7}$/.test(text) && amountRequested !== null && amountRequested >= minLoanAmount && amountRequested <= maxLoanAmount) {
+    //   setErrorMessages({
+    //     ...errorMessages,
+    //     loanAmountRequested: '',
+    //   });
+    // } 
+    else {
       setErrorMessages({
         ...errorMessages,
-        loanAmountRequested: '',
-      });
-    } else {
-      setErrorMessages({
-        ...errorMessages,
-        loanAmountRequested: `Loan amount should be between ${minLoanAmount} and ${maxLoanAmount} INR.`,
+        // loanAmountRequested: `Loan amount should be between ${minLoanAmount} and ${maxLoanAmount} INR.`,
       });
     }
   };
@@ -507,16 +509,16 @@ const handleInterestRateChange = (text) => {
       return; 
     }
 
-    const minLoanAmount = 25000;
-    const maxLoanAmount = 1500000;
+    // const minLoanAmount = 25000;
+    // const maxLoanAmount = 1500000;
 
-    if (kf_loanamountrequested < minLoanAmount || kf_loanamountrequested > maxLoanAmount) {
-      setErrorMessages({
-        ...errorMessages,
-        loanAmountRequested: `Loan amount should be between ${minLoanAmount} and ${maxLoanAmount} INR.`,
-      });
-      return;
-    }
+    // if (kf_loanamountrequested < minLoanAmount || kf_loanamountrequested > maxLoanAmount) {
+    //   setErrorMessages({
+    //     ...errorMessages,
+    //     // loanAmountRequested: `Loan amount should be between ${minLoanAmount} and ${maxLoanAmount} INR.`,
+    //   });
+    //   return;
+    // }
 
     const newErrorMessages = {
       firstName: !kf_firstname ? ' Enter First Name' : '',
