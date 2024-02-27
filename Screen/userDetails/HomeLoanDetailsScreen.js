@@ -151,11 +151,31 @@ navigation.navigate('HomeLoanGurantee2', { loanApplication,
     });
   };
 
-  const date = loanApplication.kf_emicollectiondate ? new Date(loanApplication.kf_emicollectiondate) : null;
-  const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+  // const formatDate = (timestamp) => {
+  //   const date = new Date(timestamp);
+  //   // Get the day, month, and year
+  //   const day = String(date.getDate()).padStart(2, '0'); // Add leading zero if necessary
+  //   const month = String(date.getMonth() + 1).padStart(2, '0'); // Add leading zero if necessary
+  //   const year = date.getFullYear();
+  //   // Return formatted date
+  //   return `${day}/${month}/${year}`;
+  // };
 
-  const emischeduleDate = loanApplication.kf_dateofbirth ? new Date(loanApplication.kf_dateofbirth) : null;
-  const emischeduleDateformatDate = emischeduleDate ? date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+  const formatDate = (timestamp) => {
+    // Check if timestamp is not provided or is not a valid date
+    if (!timestamp || isNaN(new Date(timestamp))) {
+      return ''; // Return empty string
+    }
+  
+    const date = new Date(timestamp);
+    // Get the day, month, and year
+    const day = String(date.getDate()).padStart(2, '0'); // Add leading zero if necessary
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Add leading zero if necessary
+    const year = date.getFullYear();
+    // Return formatted date
+    return `${day}/${month}/${year}`;
+  };
+  
 
   return (
     <View style={styles.container}>
@@ -192,7 +212,7 @@ navigation.navigate('HomeLoanGurantee2', { loanApplication,
         <View style={[styles.personalDetailContainer]} >
           <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10 }]}>Personal Details</Text>
           <Text style={styles.cardLabel}>Gender: {getGenderLabel()}</Text>
-          <Text style={styles.cardLabel}>Date of Birth: {formattedDate}</Text>
+          <Text style={styles.cardLabel}>Date of Birth: {formatDate(loanApplication.kf_dateofbirth)}</Text>
           <Text style={styles.cardLabel}>Age: {loanApplication.kf_age}</Text>
           <Text style={styles.cardLabel}>Mobile Number: {loanApplication.kf_mobilenumber}</Text>
           <Text style={styles.cardLabel}>Email Address: {loanApplication.kf_email}</Text>
@@ -219,7 +239,7 @@ navigation.navigate('HomeLoanGurantee2', { loanApplication,
           <Text style={styles.cardLabel}>Number Of EMI: {loanApplication.kf_numberofemi}</Text>
           <Text style={styles.cardLabel}>Interest Rate: {loanApplication.kf_interestrate}</Text>
           <Text style={styles.cardLabel}>EMI: {loanApplication.kf_emi}</Text>
-          <Text style={styles.cardLabel}>EMI Collection Date: {emischeduleDateformatDate}</Text>
+          <Text style={styles.cardLabel}>EMI Collection Date: {formatDate(loanApplication.kf_emicollectiondate)}</Text>
           <Text style={styles.cardLabel}>Other Charges: {loanApplication.kf_othercharges}</Text>
         </View>
 
@@ -229,7 +249,7 @@ navigation.navigate('HomeLoanGurantee2', { loanApplication,
           <Text style={styles.cardLabel}>Guarantor Firstname : {loanApplication.kf_guarantorfirstname}</Text>
           <Text style={styles.cardLabel}>Guarantor Lastname : {loanApplication.kf_guarantorlastname}</Text>
            <Text style={styles.cardLabel}>Guarantor Gender : {getGenderLabel()}</Text> 
-           <Text style={styles.cardLabel}>Guarantor Dateofbirth : {formattedDate}</Text> 
+           <Text style={styles.cardLabel}>Guarantor Dateofbirth : {formatDate(loanApplication.kf_guarantordateofbirth)}</Text> 
           <Text style={styles.cardLabel}>Guarantor Age : {loanApplication.kf_guarantorage}</Text>
           <Text style={styles.cardLabel}>Guarantor Mobilenumber : {loanApplication.kf_guarantormobilenumber}</Text>
           <Text style={styles.cardLabel}>Guarantor Email : {loanApplication.kf_guarantoremail}</Text>
@@ -250,7 +270,7 @@ navigation.navigate('HomeLoanGurantee2', { loanApplication,
           <Text style={styles.cardLabel}>Guarantor Firstname : {loanApplication.kf_guarantor2firstname}</Text>
           <Text style={styles.cardLabel}>Guarantor Lastname : {loanApplication.kf_guarantor2lastname}</Text>
           <Text style={styles.cardLabel}>Guarantor Gender : {getGenderLabel()}</Text>
-          <Text style={styles.cardLabel}>Guarantor Dateofbirth : {formattedDate}</Text>
+          <Text style={styles.cardLabel}>Guarantor Dateofbirth : {formatDate(loanApplication.kf_guarantor2dateofbirth)}</Text>
           <Text style={styles.cardLabel}>Guarantor Age : {loanApplication.kf_guarantor2age}</Text>
           <Text style={styles.cardLabel}>Guarantor Mobilenumber : {loanApplication.kf_guarantor2mobilenumber}</Text>
           <Text style={styles.cardLabel}>Guarantor Email : {loanApplication.kf_guarantor2email}</Text>
