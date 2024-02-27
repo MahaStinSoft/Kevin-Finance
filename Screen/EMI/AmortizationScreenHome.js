@@ -1765,62 +1765,99 @@ const AmortizationScreenHome = ({ route }) => {
     }
   }, [route.params]);
   
-  const calculateEMIAmount = () => {
-    const { principalLoanAmount, interestRate, loanTermMonths, applicationNumber } = loanDetails;
-  
-    const monthlyInterestRate = (interestRate / 100) / 12;
-    const numberOfPayments = loanTermMonths;
-  
-    const emi = principalLoanAmount * (monthlyInterestRate * Math.pow(1 + monthlyInterestRate, numberOfPayments)) /
-      (Math.pow(1 + monthlyInterestRate, numberOfPayments) - 1);
-  
-    // Generate amortization schedule after calculating EMI
-    const amortizationSchedule = generateAmortizationSchedule(principalLoanAmount, monthlyInterestRate, numberOfPayments, emi, applicationNumber);
-  
-    // Update state with calculated EMI and amortization schedule
-    setLoanDetails(prevLoanDetails => ({
+
+
+const calculateEMIAmount = () => {
+  const { principalLoanAmount, interestRate, loanTermMonths, emiSchedule, applicationNumber } = loanDetails;
+
+  const monthlyInterestRate = (interestRate / 100) / 12;
+  const weeklyInterestRate = (interestRate / 100) / 52;
+  const dailyInterestRate = (interestRate / 100) / 365;
+  const numberOfPayments = loanTermMonths;
+
+  let emi;
+  let intervalText;
+  let periodicInterestRate;
+
+  switch (emiSchedule) {
+      case '1': // Daily
+          periodicInterestRate = dailyInterestRate;
+          intervalText = 'Day';
+          break;
+      case '2': // Weekly
+          periodicInterestRate = weeklyInterestRate;
+          intervalText = 'Week';
+          break;
+      case '3': // Monthly
+      default: // Default to monthly if emiSchedule is not recognized
+          periodicInterestRate = monthlyInterestRate;
+          intervalText = 'Month';
+          break;
+  }
+
+  // Calculate the loan repayment amount per payment period (R)
+  const R = principalLoanAmount * periodicInterestRate / (1 - Math.pow(1 + periodicInterestRate, -numberOfPayments));
+
+  // Calculate the EMI amount using the formula
+  emi = R;
+
+  // Generate amortization schedule after calculating EMI
+  const amortizationSchedule = generateAmortizationSchedule(principalLoanAmount, periodicInterestRate, numberOfPayments, emi, applicationNumber, intervalText);
+
+  // Update state with calculated EMI and amortization schedule
+  setLoanDetails(prevLoanDetails => ({
       ...prevLoanDetails,
       emiAmount: emi.toFixed(2),
       amortizationSchedule, // Update amortization schedule here
-    }));
-  
-    // Save amortization schedule to AsyncStorage
-    saveAmortizationSchedule(amortizationSchedule);
-  };
+  }));
 
-const generateAmortizationSchedule = (principal, monthlyInterestRate, numberOfPayments, emi, applicationNumber) => {
+  // Save amortization schedule to AsyncStorage
+  saveAmortizationSchedule(amortizationSchedule);
+};
+
+
+const generateAmortizationSchedule = (principal, monthlyInterestRate, numberOfPayments, emi, applicationNumber, intervalText) => {
   const schedule = [];
   let remainingBalance = principal;
 
-  // Start from current month
-  const currentDate = new Date();
-
   for (let i = 1; i <= numberOfPayments; i++) {
-    // Calculate interest and principal payments
-    const interestPayment = remainingBalance * monthlyInterestRate;
-    const principalPayment = emi - interestPayment;
-    remainingBalance -= principalPayment;
+      // Calculate interest payment
+      const interestPayment = remainingBalance * monthlyInterestRate;
 
-    // Calculate payment date
-    const paymentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, 1);
+      let principalPayment;
+      if (i === numberOfPayments) {
+          // For the last month, ensure the remaining balance becomes zero
+          principalPayment = remainingBalance;
+          remainingBalance = 0;
+      } else {
+          // Calculate principal payment for other months
+          principalPayment = emi - interestPayment;
+          remainingBalance -= principalPayment;
+      }
 
-    // Format payment date as "DD/MM/YYYY"
-    const formattedDate = formatDate(paymentDate);
+      // Format payment date
+      const paymentDate = new Date();
+      paymentDate.setDate(paymentDate.getDate() + (i * (intervalText === 'Day' ? 1 : (intervalText === 'Week' ? 7 : 30))));
 
-    schedule.push({
-      month: i,
-      paymentDate: formattedDate,
-      emiAmount: emi.toFixed(2),
-      interestPayment: interestPayment.toFixed(2),
-      principalPayment: principalPayment.toFixed(2),
-      remainingBalance: remainingBalance.toFixed(2),
-      applicationNumber: applicationNumber,
-      paid: false // Initialize paid status
-    });
+      // Format payment date as "DD/MM/YYYY"
+      const formattedDate = formatDate(paymentDate);
+
+      schedule.push({
+          month: i,
+          paymentDate: formattedDate,
+          emiAmount: emi.toFixed(2),
+          interestPayment: interestPayment.toFixed(2),
+          principalPayment: principalPayment.toFixed(2),
+          remainingBalance: remainingBalance.toFixed(2),
+          applicationNumber: applicationNumber,
+          paid: false // Initialize paid status
+      });
   }
 
   return schedule;
 };
+
+
 
 const handlePaid = (item) => {
   // Mark the item as paid (update the item in the amortization schedule)
