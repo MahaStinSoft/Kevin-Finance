@@ -16,7 +16,7 @@ const CardImage = ({ title, imageContent, pickImage, setModalVisible }) => {
     };
   return (
     <View style={{ flexDirection: 'row', marginTop: 15, alignContent: 'space-around' }}>
-      <View style={{ marginHorizontal: 25,width: 140 }}>
+      <View style={{ marginHorizontal: 10,width: 140 }}>
         <Text>{title} Image</Text>
       </View>
       <View style={{}}>
@@ -59,7 +59,6 @@ const CardImage = ({ title, imageContent, pickImage, setModalVisible }) => {
           }}
           style={{
             backgroundColor: imageContent.fileContent ? 'red' : 'gray', // Change color based on file content
-            marginRight: 20,
             padding: 10,
             borderRadius: 25,
             width: 80,

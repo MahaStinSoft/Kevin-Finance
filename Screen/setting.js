@@ -150,7 +150,13 @@ const Setting = () => {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.sepratorContent}>
+       
+      </View>
+    ) : (
+      <ActivityIndicator size="large" color="#0000ff" />
+    )}
+  </View>
+  <View style={styles.sepratorContent}>
           <View style={styles.iconContent}>
             <Ionicons name="md-log-out" size={24} color="white" />
           </View>
@@ -158,11 +164,6 @@ const Setting = () => {
             <Text style={styles.textContent}>Logout</Text>
           </TouchableOpacity>
         </View>
-      </View>
-    ) : (
-      <ActivityIndicator size="large" color="#0000ff" />
-    )}
-  </View>
 </View>
 
   );

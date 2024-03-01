@@ -9,6 +9,8 @@ const HomeLoanDetailsScreen = ({ route }) => {
   const [loanApplication, setLoanApplication] = useState(route.params.loanApplication);
   const [recordId, setRecordId] = useState(route.params.loanApplication.kf_loanApplicationid);
   const [showMore, setShowMore] = useState(false);
+  const [showHomeLoanGuarantee1, setShowHomeLoanGuarantee1] = useState(false);
+  const [showHomeLoanGuarantee2, setShowHomeLoanGuarantee2] = useState(false);
 
   LogBox.ignoreLogs([
     'Non-serializable values were found in the navigation state',
@@ -23,6 +25,13 @@ const HomeLoanDetailsScreen = ({ route }) => {
     setLoanApplication(route.params.loanApplication);
     setRecordId(route.params.loanApplication.kf_loanApplicationid);
   }, [route.params.loanApplication]);
+
+  const handleShowMoreToggle = () => {
+    setShowMore(!showMore);
+    // Toggle the visibility of HomeLoanGuarantee1 and HomeLoanGuarantee2
+    setShowHomeLoanGuarantee1(!showMore);
+    setShowHomeLoanGuarantee2(!showMore);
+  };
 
   const getGenderLabel = () => {
     switch (loanApplication.kf_gender) {
@@ -142,15 +151,31 @@ navigation.navigate('HomeLoanGurantee2', { loanApplication,
     });
   };
 
-  const handleShowMoreToggle = () => {
-    setShowMore(!showMore);
+  // const formatDate = (timestamp) => {
+  //   const date = new Date(timestamp);
+  //   // Get the day, month, and year
+  //   const day = String(date.getDate()).padStart(2, '0'); // Add leading zero if necessary
+  //   const month = String(date.getMonth() + 1).padStart(2, '0'); // Add leading zero if necessary
+  //   const year = date.getFullYear();
+  //   // Return formatted date
+  //   return `${day}/${month}/${year}`;
+  // };
+
+  const formatDate = (timestamp) => {
+    // Check if timestamp is not provided or is not a valid date
+    if (!timestamp || isNaN(new Date(timestamp))) {
+      return ''; // Return empty string
+    }
+  
+    const date = new Date(timestamp);
+    // Get the day, month, and year
+    const day = String(date.getDate()).padStart(2, '0'); // Add leading zero if necessary
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Add leading zero if necessary
+    const year = date.getFullYear();
+    // Return formatted date
+    return `${day}/${month}/${year}`;
   };
-
-  const date = loanApplication.kf_emicollectiondate ? new Date(loanApplication.kf_emicollectiondate) : null;
-  const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
-
-  const emischeduleDate = loanApplication.kf_dateofbirth ? new Date(loanApplication.kf_dateofbirth) : null;
-  const emischeduleDateformatDate = emischeduleDate ? date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+  
 
   return (
     <View style={styles.container}>
@@ -167,23 +192,27 @@ navigation.navigate('HomeLoanGurantee2', { loanApplication,
       >
 
         <View style={styles.imageContainer}>
-          <View style={{ marginLeft: -12 }}>{renderImage()}</View>
-          <View style={{ marginLeft: 5, marginTop: 50 }}>
-          <Text style={styles.cardTitle}>{`${loanApplication.kf_name} ${loanApplication.kf_lastname}`}</Text>
-            <Text style={styles.cardTitle}>Application No: {loanApplication.kf_applicationnumber}</Text>
-            <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={styles.buttonContainer}>
-            <Text style={styles.buttonText}>Guarantee</Text>
+          <View style={{ marginLeft: -12, position:"relative" }}>{renderImage()}</View>
+
+          <View style={{ marginLeft: 12, marginTop: 0, width: 200, position:"relative" }}>
+          <Text style={styles.cardTitle}>{loanApplication.kf_applicationnumber}</Text>
+          <Text style={[styles.cardTitle]}>{`${loanApplication.kf_name} ${loanApplication.kf_lastname}`}</Text>
+            <View style={{flexDirection: "row", marginTop: 50}}>
+            <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={[styles.buttonContainer, {width: "45%", marginLeft: -5}]}>
+            <Text style={styles.buttonText}>Guarantee1</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleNavigateToGuaranteeScreen2} style={styles.buttonContainer}>
-            <Text style={styles.buttonText}>Guarantee-2</Text>
+          <TouchableOpacity onPress={handleNavigateToGuaranteeScreen2} style={[styles.buttonContainer, {width: "45%", marginLeft: 2}]}>
+            <Text style={styles.buttonText}>Guarantee2</Text>
           </TouchableOpacity>
           </View>
+          </View>
+
         </View>
 
-        <View style={styles.personalDetailContainer} >
+        <View style={[styles.personalDetailContainer]} >
           <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10 }]}>Personal Details</Text>
           <Text style={styles.cardLabel}>Gender: {getGenderLabel()}</Text>
-          <Text style={styles.cardLabel}>Date of Birth: {formattedDate}</Text>
+          <Text style={styles.cardLabel}>Date of Birth: {formatDate(loanApplication.kf_dateofbirth)}</Text>
           <Text style={styles.cardLabel}>Age: {loanApplication.kf_age}</Text>
           <Text style={styles.cardLabel}>Mobile Number: {loanApplication.kf_mobilenumber}</Text>
           <Text style={styles.cardLabel}>Email Address: {loanApplication.kf_email}</Text>
@@ -210,16 +239,17 @@ navigation.navigate('HomeLoanGurantee2', { loanApplication,
           <Text style={styles.cardLabel}>Number Of EMI: {loanApplication.kf_numberofemi}</Text>
           <Text style={styles.cardLabel}>Interest Rate: {loanApplication.kf_interestrate}</Text>
           <Text style={styles.cardLabel}>EMI: {loanApplication.kf_emi}</Text>
-          <Text style={styles.cardLabel}>EMI Collection Date: {emischeduleDateformatDate}</Text>
+          <Text style={styles.cardLabel}>EMI Collection Date: {formatDate(loanApplication.kf_emicollectiondate)}</Text>
           <Text style={styles.cardLabel}>Other Charges: {loanApplication.kf_othercharges}</Text>
         </View>
 
-        <View style={styles.personalDetailContainer} >
+        {showHomeLoanGuarantee1 && (
+          <View style={[styles.personalDetailContainer, {marginTop: 5}]}>
           <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10 }]}>HomeLoanGurantee 1</Text>
           <Text style={styles.cardLabel}>Guarantor Firstname : {loanApplication.kf_guarantorfirstname}</Text>
           <Text style={styles.cardLabel}>Guarantor Lastname : {loanApplication.kf_guarantorlastname}</Text>
            <Text style={styles.cardLabel}>Guarantor Gender : {getGenderLabel()}</Text> 
-           <Text style={styles.cardLabel}>Guarantor Dateofbirth : {formattedDate}</Text> 
+           <Text style={styles.cardLabel}>Guarantor Dateofbirth : {formatDate(loanApplication.kf_guarantordateofbirth)}</Text> 
           <Text style={styles.cardLabel}>Guarantor Age : {loanApplication.kf_guarantorage}</Text>
           <Text style={styles.cardLabel}>Guarantor Mobilenumber : {loanApplication.kf_guarantormobilenumber}</Text>
           <Text style={styles.cardLabel}>Guarantor Email : {loanApplication.kf_guarantoremail}</Text>
@@ -231,13 +261,16 @@ navigation.navigate('HomeLoanGurantee2', { loanApplication,
           <Text style={styles.cardLabel}>Guarantor Aadharnumber : {loanApplication.kf_guarantoraadharnumber}</Text>
           <Text style={styles.cardLabel}>Guarantor Pannumber : {loanApplication.kf_guarantorpannumber}</Text>
         </View> 
+        )}
 
-        <View style={styles.personalDetailContainer} >
+
+          {showHomeLoanGuarantee2 && (
+        <View style={[styles.personalDetailContainer, {marginTop: 5}]}>
           <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10 }]}>HomeLoanGurantee 2</Text>
           <Text style={styles.cardLabel}>Guarantor Firstname : {loanApplication.kf_guarantor2firstname}</Text>
           <Text style={styles.cardLabel}>Guarantor Lastname : {loanApplication.kf_guarantor2lastname}</Text>
           <Text style={styles.cardLabel}>Guarantor Gender : {getGenderLabel()}</Text>
-          <Text style={styles.cardLabel}>Guarantor Dateofbirth : {formattedDate}</Text>
+          <Text style={styles.cardLabel}>Guarantor Dateofbirth : {formatDate(loanApplication.kf_guarantor2dateofbirth)}</Text>
           <Text style={styles.cardLabel}>Guarantor Age : {loanApplication.kf_guarantor2age}</Text>
           <Text style={styles.cardLabel}>Guarantor Mobilenumber : {loanApplication.kf_guarantor2mobilenumber}</Text>
           <Text style={styles.cardLabel}>Guarantor Email : {loanApplication.kf_guarantor2email}</Text>
@@ -248,18 +281,24 @@ navigation.navigate('HomeLoanGurantee2', { loanApplication,
           <Text style={styles.cardLabel}>Guarantor State : {loanApplication.kf_guarantor2state}</Text>
           <Text style={styles.cardLabel}>Guarantor Aadharnumber : {loanApplication.kf_guarantor2aadharnumber}</Text>
           <Text style={styles.cardLabel}>Guarantor Pannumber : {loanApplication.kf_guarantor2pannumber}</Text>
-        </View>  
+        </View> 
+        )} 
 
-        <ButtonComponent style={{ marginBottom: 60 }}
+        <View style={{flexDirection:"row"}}>
+        <View  style={{alignContent:"flex-start",width:"60%", left: -35}}>
+        <ButtonComponent  style={{height: 50}}
           title={showMore ? "View less" : "View more"}
           onPress={handleShowMoreToggle}
         />  
+        </View>
 
-        <ButtonComponent style={{ marginBottom: 60 }}
-          title="Calculate Amortization"
-          onPress={handleGoToAmortizationScreen}
+        <View style={{ width:"60%"}}>
+        <ButtonComponent style={{ marginBottom: 60,height: 50, marginLeft: -120}}
+        title="CalculateEMI"
+        onPress={handleGoToAmortizationScreen}
         />
-
+</View>
+</View>
       </ScrollView>
     </View>
   );
@@ -283,9 +322,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    position:"absolute",
+    top: 0,
+    zIndex: 1000, 
+    marginLeft: 15, 
+    height: 180
   },
   personalDetailContainer: {
-    marginTop: 5,
+    marginTop: 180,
     width: "95%",
     paddingVertical: 10,
     backgroundColor: "white",
@@ -297,6 +341,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    // position: "absolute",
   },
   IndentityProofField: {
     marginTop: 5,
@@ -333,6 +378,7 @@ const styles = StyleSheet.create({
     color: "red",
     fontSize: 16,
     fontWeight: "bold",
+    
   },
   cardLabel: {
     color: '#000000',
@@ -353,14 +399,17 @@ const styles = StyleSheet.create({
     backgroundColor: 'red',
     padding: 10,
     marginTop: 10,
-    borderRadius: 5,
+    borderRadius: 15,
     marginLeft:20,
-    width: "55%"
+    width: "55%",
+    height: 30
   },
   buttonText: {
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
+    fontSize: 12,
+    marginVertical:-5 
   },
 });
 
