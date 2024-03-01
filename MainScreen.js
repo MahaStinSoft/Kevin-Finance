@@ -23,6 +23,7 @@ import AmortizationScreenHome from './Screen/EMI/AmortizationScreenHome';
 import ToggleFormScreen from './Screen/ToggleFormScreen';
 import AccountScreen from './Screen/Account';
 import Setting from './Screen/setting';
+import Notification from './Screen/Notification';
 import LoginManagerScreen from './Screen/LoginPages/LoginManagerScreen';
 import LoginScreen from './Screen/LoginPages/LoginScreen';
 import ManagerDashboard from './Screen/Dashboards/ManagerDashboard';
@@ -87,6 +88,7 @@ const MainScreen = () => {
           <Stack.Screen name="AmortizationScreenHome" component={AmortizationScreenHome} options={{ headerShown: false }} />
           <Stack.Screen name="AccountScreen" component={AccountScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Setting" component={Setting} options={{ headerShown: false }} />
+          <Stack.Screen name="Notification" component={Notification} options={{ headerShown: false }} />
           <Stack.Screen name="ManagerDashboard" component={ManagerDashboard} options={{ headerShown: false }} />
           <Stack.Screen name="LoginManagerScreen" component={LoginManagerScreen} options={{ headerShown: false }} />
           <Stack.Screen name="SignatureScreen" component={SignatureScreen} options={{ headerShown: false }} />

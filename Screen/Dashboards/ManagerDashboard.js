@@ -352,10 +352,9 @@ const handleDynamicDashboard = () => {
 }
 }
 
-const handleSettings = () => {
-  navigation.navigate( "Setting");
+const handleNavigation = () => {
+  navigation.navigate( "Notification");
 };
-
   return (
     <>
       <StatusBar />
@@ -371,7 +370,7 @@ const handleSettings = () => {
               <Ionicons name="list-sharp" size={25} color="#fff" />
             </TouchableOpacity> */}
             <Text style={styles.text}>Kevin Small Finance</Text>
-            <TouchableOpacity style={styles.iconButton} onPress={handleSettings}>
+            <TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
               <Ionicons name="notifications" size={25} color="#fff" />
             </TouchableOpacity>
           </View>

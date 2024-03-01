@@ -14,6 +14,7 @@ import PersonalLoan from '../Screen/LoanCreate/PersonalLoan';
 import DynamicDashboardScreen from '../Screen/DynamicDashboardScreen';
 import Loan from '../Screen/Loan';
 import Setting from '../Screen/setting';
+import Notification from '../Screen/Notification';
 import CustomDrawerContent from './CustomDrawer';
 import ScheduleDetailsScreen from '../Screen/EMI/ScheduleDetailScreen';
 import AmortizationScreen from '../Screen/EMI/AmortizationScreen';
@@ -40,7 +41,7 @@ const DashboardIcon = () => <Ionicons name="md-home" size={24} color="red" />;
 const AccountIcon = () => <Ionicons name="md-person" size={24} color="red" />;
 const LoanIcon = () => <Ionicons name="md-cash" size={24} color="red" />;
 const SettingIcon = () => <Ionicons name="md-settings" size={24} color="red" />;
-
+// const NotificationIcon = () => <Ionicons name="md-settings" size={24} color="red" />;
 const StackNavigator = () => (
   <Stack.Navigator>
     <Stack.Screen name="AuthNavigator" component={AuthNavigator} options={{ headerShown: false }} />
@@ -60,6 +61,7 @@ const StackNavigator = () => (
     <Stack.Screen name="AmortizationScreenHome" component={AmortizationScreenHome} options={{ headerShown: false }} />
     <Stack.Screen name="SignatureScreen" component={SignatureScreen} options={{ headerShown: false }} />
     <Stack.Screen name="Setting" component={Setting} options={{ headerShown: false }} />
+    <Stack.Screen name="Notification" component={Notification} options={{ headerShown: false }} />
     <Stack.Screen name="AccountScreen" component={AccountScreen} options={{ headerShown: false }} />
     <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
     <Stack.Screen name="HomeLoanGurantee" component={HomeLoanGurantee} options={{ headerShown: false }} />
