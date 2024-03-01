@@ -97,7 +97,7 @@ const LoanCalculator = () => {
           keyboardType="numeric"
         />
 
-        <Text>Loan Term (Months):</Text>
+        <Text>Loan Term:</Text>
         <TextInput
           style={styles.input}
           value={loanDetails.loanTermMonths}

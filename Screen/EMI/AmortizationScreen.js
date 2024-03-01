@@ -213,7 +213,7 @@ const formatDate = (date) => {
         <TouchableOpacity onPress={() => navigateToDetails(item)}>
           <View style={styles.column}>
             <View style={styles.column1}>
-              <Text>Month: </Text>
+              {/* <Text>Month: </Text> */}
               <Text> {item.month}</Text>
             </View>
 
@@ -350,7 +350,7 @@ const formatDate = (date) => {
         </View>
 
         <View style={{ flexDirection: "row" }}>
-        <Text style={styles.detailsLabel}>Loan Term (Months):</Text>
+        <Text style={styles.detailsLabel}>Loan Term:</Text>
         <TextInput
           style={styles.textInputContainer}
           value={loanDetails.loanTermMonths}
@@ -427,22 +427,23 @@ const styles = StyleSheet.create({
     marginHorizontal: 10
   },
   column: {
-    height: 40,
+    height: 35,
+    marginTop:15
   },
   column1: {
     flexDirection: 'column',
   },
   column2: {
     flexDirection: 'column',
-    marginLeft: 70,
+    marginLeft: 50,
     top: -32,
   },
   column3: {
     flexDirection: 'column',
-    marginLeft: 180,
+    marginLeft: 160,
   },
   column4: {
-    top: -5,
+    top: 0,
   },
   paidButton: {
     backgroundColor: 'green',

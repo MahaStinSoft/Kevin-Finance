@@ -377,12 +377,13 @@ const handleNavigation = () => {
             {/* <TouchableOpacity style={styles.iconButton} onPress={() => navigation.openDrawer()}>
               <Ionicons name="list-sharp" size={25} color="#fff" />
             </TouchableOpacity> */}
-            <Text style={styles.text}>Kevin Small Finance</Text>
             <TouchableOpacity style={styles.iconButton} onPress={handleSettings}>
-              <Ionicons name="notifications" size={25} color="#fff" />
+              <Ionicons name="list-sharp" size={25} color="#fff" />
             </TouchableOpacity>
+            <Text style={styles.text}>Kevin Small Finance</Text>
           
-          <TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
+          
+            <TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
               <Ionicons name="notifications" size={25} color="#fff" />
             </TouchableOpacity>
           </View>

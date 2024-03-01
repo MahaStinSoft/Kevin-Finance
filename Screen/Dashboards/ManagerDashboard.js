@@ -352,6 +352,10 @@ const handleDynamicDashboard = () => {
 }
 }
 
+const handlelogout = () => {
+  navigation.navigate( "Setting");
+};
+
 const handleNavigation = () => {
   navigation.navigate( "Notification");
 };
@@ -369,10 +373,14 @@ const handleNavigation = () => {
             {/* <TouchableOpacity style={styles.iconButton} onPress={() => navigation.openDrawer()}>
               <Ionicons name="list-sharp" size={25} color="#fff" />
             </TouchableOpacity> */}
+             <TouchableOpacity style={styles.iconButton} onPress={handlelogout}>
+              <Ionicons name="list-sharp" size={25} color="#fff" />
+            </TouchableOpacity>
             <Text style={styles.text}>Kevin Small Finance</Text>
             <TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
               <Ionicons name="notifications" size={25} color="#fff" />
             </TouchableOpacity>
+           
           </View>
 
           <View style={styles.searchSection}>

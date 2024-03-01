@@ -187,7 +187,7 @@ navigation.navigate('HomeLoanGurantee2', { loanApplication,
         screenIcon="create-outline"
       />
 
-      <ScrollView contentContainerStyle={{ width: 405, padding: 15 }}
+      <ScrollView contentContainerStyle={{ width: "100%", padding: 15 }}
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
       >
@@ -199,10 +199,10 @@ navigation.navigate('HomeLoanGurantee2', { loanApplication,
           <Text style={styles.cardTitle}>{loanApplication.kf_applicationnumber}</Text>
           <Text style={[styles.cardTitle]}>{`${loanApplication.kf_name} ${loanApplication.kf_lastname}`}</Text>
             <View style={{flexDirection: "row", marginTop: 50}}>
-            <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={[styles.buttonContainer, {width: "45%", marginLeft: -5}]}>
+            <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={[styles.buttonContainer, {width: "42%", marginLeft: -5}]}>
             <Text style={styles.buttonText}>Guarantee1</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleNavigateToGuaranteeScreen2} style={[styles.buttonContainer, {width: "45%", marginLeft: 2}]}>
+          <TouchableOpacity onPress={handleNavigateToGuaranteeScreen2} style={[styles.buttonContainer, {width: "42%", marginLeft: 2}]}>
             <Text style={styles.buttonText}>Guarantee2</Text>
           </TouchableOpacity>
           </View>
@@ -230,8 +230,8 @@ navigation.navigate('HomeLoanGurantee2', { loanApplication,
           <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10 }]}>Indentity Proof</Text>
           <Text style={styles.cardLabel}>Aadhar Number: {loanApplication.kf_aadharnumber}</Text>
           <Text style={styles.cardLabel}>PANcard Number: {loanApplication.kf_pannumber}</Text>
-          <Text style={styles.cardLabel}>Aadhar Image: View</Text>
-          <Text style={styles.cardLabel}>PANcard Image: View </Text>
+          {/* <Text style={styles.cardLabel}>Aadhar Image: View</Text>
+          <Text style={styles.cardLabel}>PANcard Image: View </Text> */}
         </View>
 
         <View style={styles.loanDetailContainer}>
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 10,
     backgroundColor: "white",
-    width: "95%",
+    width: "100%",
     padding: 20,
     shadowColor: '#000',
     shadowOffset: {
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
   },
   personalDetailContainer: {
     marginTop: 180,
-    width: "95%",
+    width: "100%",
     paddingVertical: 10,
     backgroundColor: "white",
     shadowColor: '#000',
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
   },
   IndentityProofField: {
     marginTop: 5,
-    width: "95%",
+    width: "100%",
     paddingVertical: 10,
     backgroundColor: "white",
     shadowColor: '#000',
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
   },
   loanDetailContainer: {
     marginTop: 5,
-    width: "95%",
+    width: "100%",
     paddingVertical: 10,
     backgroundColor: "white",
     shadowColor: '#000',
