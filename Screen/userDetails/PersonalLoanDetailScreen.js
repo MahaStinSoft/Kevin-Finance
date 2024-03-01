@@ -79,7 +79,8 @@ const PersonalLoanDetailsScreen = ({ route }) => {
   };
   
   const handleGoBack = () => {
-    navigation.navigate("Dashboard");
+    // navigation.navigate("Dashboard");
+    navigation.goBack();
   };
 
   const handleEdit = () => {
@@ -207,7 +208,7 @@ navigation.navigate('PersonalLoanGurantee2', { personalLoan,
       showsVerticalScrollIndicator={false}
       showsHorizontalScrollIndicator={false}
       >
-      {/* <View style={styles.imageContainer}>
+       <View style={styles.imageContainer}>
         <View style={{ marginLeft: -12 }}>{renderImage()}</View>
         <View style={{ marginLeft: 5, marginTop: 50}}>
           <Text style={styles.cardTitle}>{`${personalLoan.kf_firstname} ${personalLoan.kf_lastname}`}</Text>

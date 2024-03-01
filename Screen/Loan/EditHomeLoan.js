@@ -60,8 +60,8 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [showImage, setShowImage] = useState(true);
   const [item, setItem] = useState(null); // Assuming you have some state to store the current item
 
-  // const { signatureImage } = route.params;
-  const [signatureImage, setSignatureImage] = useState(null);
+  const { signatureImage } = route.params;
+  // const [signatureImage, setSignatureImage] = useState(null);
   const [recordId, setRecordId] = useState(loanApplication.kf_loanapplicationid);
 
 
@@ -622,6 +622,78 @@ useEffect(() => {
   fetchAnnotations();
 }, []);
 
+// const sendAnnotation = async () => {
+//   try {
+//     const tokenResponse = await axios.post(
+//       'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+//       {
+//         grant_type: 'client_credentials',
+//         client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+//         resource: 'https://org0f7e6203.crm5.dynamics.com',
+//         scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+//         client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+//       },
+//       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+//     );
+
+//     const accessToken = tokenResponse.data.access_token;
+
+//     // Check if there is an existing Aadhar image annotation
+//     const existingAnnotationResponse = await axios.get(
+//       `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations?$filter=_objectid_value eq ${recordId} and subject eq 'AadharCard Image'`,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${accessToken}`,
+//           'Content-Type': 'application/json',
+//         },
+//       }
+//     );
+
+//     if (existingAnnotationResponse.data.value.length > 0) {
+//       // If an existing annotation is found, delete it
+//       const existingAnnotationId = existingAnnotationResponse.data.value[0].annotationid;
+//       await deleteAnnotation(existingAnnotationId, accessToken);
+//     }
+
+//     // Create a new annotation
+//     const annotations = [
+//       {
+//         subject: 'AadharCard Image',
+//         filename: aadharcard.fileName || 'AadharCard.jpg',
+//         isdocument: true,
+//         'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
+//         documentbody: aadharcard.fileContent,
+//       },
+//     ];
+
+//     const createAnnotationResponse = await axios.post(
+//       'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
+//       annotations,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${accessToken}`,
+//           'Content-Type': 'application/json',
+//         },
+//       }
+//     );
+
+//     if (createAnnotationResponse.status === 204) {
+//       console.log('Aadhar image annotation created successfully.');
+//       // Alert.alert('Sucess', '');
+
+//     } else {
+//       console.error('Failed to create Aadhar image annotation. Response:', createAnnotationResponse.data);
+//       Alert.alert('Error', 'Failed to create Aadhar image annotation.');
+//     }
+
+//     // Fetch and display the updated annotations
+//     fetchAnnotations();
+//   } catch (error) {
+//     console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
+//     Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+//   }
+// };
+
 const sendAnnotation = async () => {
   try {
     const tokenResponse = await axios.post(
@@ -650,25 +722,59 @@ const sendAnnotation = async () => {
     );
 
     if (existingAnnotationResponse.data.value.length > 0) {
-      // If an existing annotation is found, delete it
+      // If an existing annotation is found, update it
       const existingAnnotationId = existingAnnotationResponse.data.value[0].annotationid;
-      await deleteAnnotation(existingAnnotationId, accessToken);
+      const updateAnnotationResponse = await axios.patch(
+        `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations(${existingAnnotationId})`,
+        {
+          filename: aadharcard.fileName || 'AadharCard.jpg',
+          documentbody: aadharcard.fileContent,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (updateAnnotationResponse.status === 204) {
+        console.log('Aadhar image annotation updated successfully.');
+        // Fetch the updated annotations
+        fetchAnnotations(); // Assuming this function updates the state with the latest annotations
+      } else {
+        console.error('Failed to update Aadhar image annotation. Response:', updateAnnotationResponse.data);
+        Alert.alert('Error', 'Failed to update Aadhar image annotation.');
+      }
+    } else {
+      console.error('Aadhar image annotation not found.');
+      Alert.alert('Error', 'Aadhar image annotation not found.');
     }
+  } catch (error) {
+    console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
+    Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+  }
+};
 
-    // Create a new annotation
-    const annotations = [
+
+const fetchLatestAadharAnnotation = async () => {
+  try {
+    const tokenResponse = await axios.post(
+      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
       {
-        subject: 'AadharCard Image',
-        filename: aadharcard.fileName || 'AadharCard.jpg',
-        isdocument: true,
-        'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
-        documentbody: aadharcard.fileContent,
+        grant_type: 'client_credentials',
+        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+        resource: 'https://org0f7e6203.crm5.dynamics.com',
+        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
       },
-    ];
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
 
-    const createAnnotationResponse = await axios.post(
-      'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
-      annotations,
+    const accessToken = tokenResponse.data.access_token;
+
+    const fetchAnnotationsResponse = await axios.get(
+      'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations?$filter=_objectid_value eq ' + recordId + ' and subject eq \'AadharCard Image\'&$orderby=createdon desc&$top=1',
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -677,22 +783,15 @@ const sendAnnotation = async () => {
       }
     );
 
-    if (createAnnotationResponse.status === 204) {
-      console.log('Aadhar image annotation created successfully.');
-      // Alert.alert('Sucess', '');
-
-    } else {
-      console.error('Failed to create Aadhar image annotation. Response:', createAnnotationResponse.data);
-      Alert.alert('Error', 'Failed to create Aadhar image annotation.');
-    }
-
-    // Fetch and display the updated annotations
-    fetchAnnotations();
+    const latestAadharAnnotation = fetchAnnotationsResponse.data.value[0];
+    console.log('Latest Aadhar Annotation:', latestAadharAnnotation);
+    return latestAadharAnnotation;
   } catch (error) {
-    console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
-    Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+    console.error('Error fetching latest Aadhar annotation:', error.response?.data || error.message);
+    throw new Error('An error occurred while fetching latest Aadhar annotation.');
   }
 };
+
 
 const deleteAnnotation = async (annotationId, accessToken) => {
   try {
@@ -891,11 +990,64 @@ const sendAnnotation2 = async () => {
   }
 };
 
+// const sendAnnotation3 = async (signatureImage, recordId) => {
+//   try {
+//     const tokenResponse = await axios.post(
+//       'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+//       {
+//         grant_type: 'client_credentials',
+//         client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+//         resource: 'https://org0f7e6203.crm5.dynamics.com',
+//         scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+//         client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+//       },
+//       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+//     );
+
+//     const accessToken = tokenResponse.data.access_token;
+
+//     // Assuming signatureImage is an object with fileName and fileContent properties
+//     const annotationData = {
+//       subject: 'Signature Image',
+//       filename: signatureImage.fileName || 'Signature.jpg',
+//       isdocument: true,
+//       'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
+//       documentbody: signatureImage.fileContent,
+//     };
+
+//     const createAnnotationResponse = await axios.post(
+//       'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
+//       annotationData,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${accessToken}`,
+//           'Content-Type': 'application/json',
+//         },
+//       }
+//     );
+
+//     if (createAnnotationResponse.status === 204) {
+//       console.log('Signature image annotation created successfully.');
+//       Alert.alert('Success', 'Signature image annotation created successfully.');
+//     } else {
+//       console.error('Failed to create signature image annotation. Response:', createAnnotationResponse.data);
+//       Alert.alert('Error', 'Failed to create signature image annotation.');
+//     }
+
+//     // Fetch and display the updated annotations (including Aadhar annotations)
+//     fetchAnnotations(); // Assuming fetchAnnotations function is defined elsewhere
+//   } catch (error) {
+//     console.error('Error sending signature image annotation:', error.response?.data || error.message);
+//     Alert.alert('Error', 'An error occurred while sending signature image annotation.');
+//   }
+// };
+
 
 const handleUpdateRecordAndSendAnnotation = () => {
   sendAnnotation();
-  sendAnnotation1();
-  sendAnnotation2();
+  // sendAnnotation1();
+  // sendAnnotation2();
+  // sendAnnotation3();
   handleUpdateRecord(); 
   
 };
@@ -921,9 +1073,11 @@ const renderAnnotationItem = ({ item }) => (
 </View>
 );
 
-const handlesignature = async  () => {
-  navigation.navigate('SignatureScreen', { loanApplication: loanApplication });
-}
+// Navigation from the previous screen to the SignatureScreen
+const handleNavigateToSignatureScreen = () => {
+  navigation.navigate('SignatureScreen', { loanApplication });
+};
+
 
   const date = emiCollectionDate ? new Date(emiCollectionDate) : null;
   const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
@@ -1146,7 +1300,7 @@ const handlesignature = async  () => {
               style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
             />
 
-            <View style={{backgroundColor:"white", marginTop: 15, height: 180}}>
+            <View style={{backgroundColor:"white", marginTop: 15, height: 235}}>
 
 <CardImage
   title="AadharCard"
@@ -1165,21 +1319,30 @@ const handlesignature = async  () => {
 />
 
 <CardImage
-  title="Applicant Image"
+  title="Applicant"
   imageContent={applicantImage}
   onViewImage={onViewImage}
   pickImage={() => pickImage('applicant')}
   setModalVisible={setModalVisible}
 />
-</View>
 
 {/* <CardImageSignature
         title="Signature"
-        signatureImage={signatureImage}
+        signatureImage={signature}
         setSignatureImage={setSignatureImage}
         pickImage={handlesignature}
         onViewImage={onViewImage}
       /> */}
+
+<CardImageSignature
+        title="Signature"
+        imageContent={signatureImage}
+        pickImage={handleNavigateToSignatureScreen}
+      />
+
+</View>
+
+
 
             {/* <ButtonComponent title="Update" onPress={handleUpdateRecord} /> */}
 
@@ -1195,12 +1358,13 @@ const handlesignature = async  () => {
         <Text>No annotations to display</Text>
     )} */}
     
-    <RenderAnnotation
+    <RenderAnnotation style={{height: 60}}
         annotations={annotations}
         filteredAnnotations={filteredAnnotations}
         showImage={showImage}
         handleViewImages={handleViewImages}
       />
+      <Text> hii</Text>
         </View>
       </ScrollView>
 

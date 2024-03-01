@@ -86,7 +86,8 @@ const HomeLoanDetailsScreen = ({ route }) => {
   };
 
   const handleGoBack = () => {
-    navigation.navigate("Dashboard");
+    // navigation.navigate("Dashboard");
+    navigation.goBack();
   };
 
   const handleEdit = () => {
