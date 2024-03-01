@@ -63,7 +63,7 @@ const EditHomeLoan = ({ route, navigation }) => {
   const { signatureImage } = route.params;
   // const [signatureImage, setSignatureImage] = useState(null);
   const [recordId, setRecordId] = useState(loanApplication.kf_loanapplicationid);
-
+  const [imageSource, setImageSource] = useState(null);
 
   const [errorMessages, setErrorMessages] = useState({
     firstNameEdit: '',
@@ -572,7 +572,118 @@ const EditHomeLoan = ({ route, navigation }) => {
     }
   };
 
-  const pickImage = async (imageType) => {
+  // const pickImage = async (imageType) => {
+  //   try {
+  //     const result = await ImagePicker.launchImageLibraryAsync({
+  //       mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  //       allowsEditing: true,
+  //       aspect: [4, 3],
+  //       quality: 1,
+  //       base64: true,
+  //     });
+  
+  //     if (result.cancelled) {
+  //       return;
+  //     }
+  
+  //     const byteArray = result.base64; // Use result.base64 directly
+  //     const fileName = result.uri.split('/').pop(); // Extracting filename from URI
+  
+  //     switch (imageType) {
+  //       case 'aadhar':
+  //         setAadharcard({
+  //           fileName: fileName,
+  //           fileContent: byteArray,
+  //         });
+  //         break;
+  //       case 'pan':
+  //         setPancard({
+  //           fileName: fileName,
+  //           fileContent: byteArray,
+  //         });
+  //         break;
+  //       case 'applicant':
+  //         setapplicantImage({
+  //           fileName: fileName,
+  //           fileContent: byteArray,
+  //         });
+  //         break;
+  //       default:
+  //         break;
+  //     }
+  //   } catch (error) {
+  //     console.error('Error picking or processing the image:', error);
+  //     Alert.alert('Error', 'Failed to pick or process the image.');
+  //   }
+  // };
+
+  const pickImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+        base64: true,
+      });
+
+      if (result.cancelled) {
+        return;
+      }
+
+      const byteArray = result.base64; // Use result.base64 directly
+      const fileName = result.uri.split('/').pop(); // Extracting filename from URI
+
+      setImageSource(result.uri);
+
+      setAadharcard({
+        fileName: fileName,
+        fileContent: byteArray,
+      });
+
+    } catch (error) {
+      // console.error('Error picking or processing the image:', error);
+      Alert.alert('Failed to pick or process the image.');
+    }
+  };
+
+  const takePictureWithCamera = async () => {
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        console.log('Camera permission denied');
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+        base64: true,
+      });
+
+      if (result.cancelled) {
+        return;
+      }
+
+      const byteArray = result.base64; // Use result.base64 directly
+      const fileName = result.uri.split('/').pop(); // Extracting filename from URI
+
+      setImageSource(result.uri);
+
+      setAadharcard({
+        fileName: fileName,
+        fileContent: byteArray,
+      });
+
+    } catch (error) {
+      console.error('Error picking or processing the image:', error);
+      Alert.alert('Error', 'Failed to pick or process the image.');
+    }
+  };
+
+  const pickPanCardImage = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -589,37 +700,58 @@ const EditHomeLoan = ({ route, navigation }) => {
       const byteArray = result.base64; // Use result.base64 directly
       const fileName = result.uri.split('/').pop(); // Extracting filename from URI
   
-      switch (imageType) {
-        case 'aadhar':
-          setAadharcard({
-            fileName: fileName,
-            fileContent: byteArray,
-          });
-          break;
-        case 'pan':
-          setPancard({
-            fileName: fileName,
-            fileContent: byteArray,
-          });
-          break;
-        case 'applicant':
-          setapplicantImage({
-            fileName: fileName,
-            fileContent: byteArray,
-          });
-          break;
-        default:
-          break;
+      setImageSource(result.uri);
+  
+      setPancard({
+        fileName: fileName,
+        fileContent: byteArray,
+      });
+  
+    } catch (error) {
+      console.error('Error picking or processing the image:', error);
+      Alert.alert('Failed to pick or process the image.');
+    }
+  };
+  
+  const takePictureOfPanCard = async () => {
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        console.log('Camera permission denied');
+        return;
       }
+  
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+        base64: true,
+      });
+  
+      if (result.cancelled) {
+        return;
+      }
+  
+      const byteArray = result.base64; // Use result.base64 directly
+      const fileName = result.uri.split('/').pop(); // Extracting filename from URI
+  
+      setImageSource(result.uri);
+  
+      setPancard({
+        fileName: fileName,
+        fileContent: byteArray,
+      });
+  
     } catch (error) {
       console.error('Error picking or processing the image:', error);
       Alert.alert('Error', 'Failed to pick or process the image.');
     }
   };
 
-
 useEffect(() => {
   fetchAnnotations();
+  fetchAnnotations1();
 }, []);
 
 // const sendAnnotation = async () => {
@@ -722,59 +854,25 @@ const sendAnnotation = async () => {
     );
 
     if (existingAnnotationResponse.data.value.length > 0) {
-      // If an existing annotation is found, update it
+      // If an existing annotation is found, delete it
       const existingAnnotationId = existingAnnotationResponse.data.value[0].annotationid;
-      const updateAnnotationResponse = await axios.patch(
-        `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations(${existingAnnotationId})`,
-        {
-          filename: aadharcard.fileName || 'AadharCard.jpg',
-          documentbody: aadharcard.fileContent,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      if (updateAnnotationResponse.status === 204) {
-        console.log('Aadhar image annotation updated successfully.');
-        // Fetch the updated annotations
-        fetchAnnotations(); // Assuming this function updates the state with the latest annotations
-      } else {
-        console.error('Failed to update Aadhar image annotation. Response:', updateAnnotationResponse.data);
-        Alert.alert('Error', 'Failed to update Aadhar image annotation.');
-      }
-    } else {
-      console.error('Aadhar image annotation not found.');
-      Alert.alert('Error', 'Aadhar image annotation not found.');
+      await deleteAnnotation(existingAnnotationId, accessToken);
     }
-  } catch (error) {
-    console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
-    Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
-  }
-};
 
-
-const fetchLatestAadharAnnotation = async () => {
-  try {
-    const tokenResponse = await axios.post(
-      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+    // Create a new annotation
+    const annotations = [
       {
-        grant_type: 'client_credentials',
-        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
-        resource: 'https://org0f7e6203.crm5.dynamics.com',
-        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
-        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        subject: 'AadharCard Image',
+        filename: aadharcard.fileName || 'AadharCard.jpg',
+        isdocument: true,
+        'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
+        documentbody: aadharcard.fileContent,
       },
-      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
-    );
+    ];
 
-    const accessToken = tokenResponse.data.access_token;
-
-    const fetchAnnotationsResponse = await axios.get(
-      'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations?$filter=_objectid_value eq ' + recordId + ' and subject eq \'AadharCard Image\'&$orderby=createdon desc&$top=1',
+    const createAnnotationResponse = await axios.post(
+      'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
+      annotations,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -783,15 +881,20 @@ const fetchLatestAadharAnnotation = async () => {
       }
     );
 
-    const latestAadharAnnotation = fetchAnnotationsResponse.data.value[0];
-    console.log('Latest Aadhar Annotation:', latestAadharAnnotation);
-    return latestAadharAnnotation;
+    if (createAnnotationResponse.status === 204) {
+      console.log('Aadhar image annotation created successfully.');
+    } else {
+      console.error('Failed to create Aadhar image annotation. Response:', createAnnotationResponse.data);
+      Alert.alert('Error', 'Failed to create Aadhar image annotation.');
+    }
+
+    // Fetch and display the updated annotations
+    fetchAnnotations();
   } catch (error) {
-    console.error('Error fetching latest Aadhar annotation:', error.response?.data || error.message);
-    throw new Error('An error occurred while fetching latest Aadhar annotation.');
+    console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
+    Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
   }
 };
-
 
 const deleteAnnotation = async (annotationId, accessToken) => {
   try {
@@ -805,7 +908,7 @@ const deleteAnnotation = async (annotationId, accessToken) => {
       }
     );
 
-    console.log('Annotation deleted successfully:', deleteResponse.data);
+    // console.log('Annotation deleted successfully:', deleteResponse.data);
   } catch (error) {
     console.error('Error deleting annotation:', error.response?.data || error.message);
     throw new Error('An error occurred while deleting annotation.');
@@ -839,7 +942,7 @@ const fetchAnnotations = async () => {
     );
 
     const fetchedAnnotations = fetchAnnotationsResponse.data.value;
-    console.log('Annotations:', fetchedAnnotations);
+    // console.log('Annotations:', fetchedAnnotations);
     setAnnotations(fetchedAnnotations);
 
   } catch (error) {
@@ -878,7 +981,7 @@ const sendAnnotation1 = async () => {
     if (existingAnnotationResponse.data.value.length > 0) {
       // If an existing annotation is found, delete it
       const existingAnnotationId = existingAnnotationResponse.data.value[0].annotationid;
-      await deleteAnnotation(existingAnnotationId, accessToken);
+      await deleteAnnotation1(existingAnnotationId, accessToken);
     }
 
     // Create a new annotation
@@ -911,10 +1014,65 @@ const sendAnnotation1 = async () => {
     }
 
     // Fetch and display the updated annotations
-    fetchAnnotations();
+    fetchAnnotations1();
   } catch (error) {
     console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
     Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+  }
+};
+
+const deleteAnnotation1 = async (annotationId, accessToken) => {
+  try {
+    const deleteResponse = await axios.delete(
+      `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations(${annotationId})`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    // console.log('Annotation deleted successfully:', deleteResponse.data);
+  } catch (error) {
+    console.error('Error deleting annotation:', error.response?.data || error.message);
+    throw new Error('An error occurred while deleting annotation.');
+  }
+};
+
+const fetchAnnotations1 = async () => {
+  try {
+    const tokenResponse = await axios.post(
+      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+      {
+        grant_type: 'client_credentials',
+        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+        resource: 'https://org0f7e6203.crm5.dynamics.com',
+        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+      },
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
+
+    const accessToken = tokenResponse.data.access_token;
+
+    const fetchAnnotationsResponse = await axios.get(
+      'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations?$filter=_objectid_value eq ' + recordId,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    const fetchedAnnotations = fetchAnnotationsResponse.data.value;
+    // console.log('Annotations:', fetchedAnnotations);
+    setAnnotations(fetchedAnnotations);
+
+  } catch (error) {
+    console.error('Error fetching annotations:', error.response?.data || error.message);
+    Alert.alert('Error', 'An error occurred while fetching annotations.');
   }
 };
 
@@ -1045,7 +1203,7 @@ const sendAnnotation2 = async () => {
 
 const handleUpdateRecordAndSendAnnotation = () => {
   sendAnnotation();
-  // sendAnnotation1();
+  sendAnnotation1();
   // sendAnnotation2();
   // sendAnnotation3();
   handleUpdateRecord(); 
@@ -1301,7 +1459,7 @@ const handleNavigateToSignatureScreen = () => {
             />
 
             <View style={{backgroundColor:"white", marginTop: 15, height: 235}}>
-
+{/* 
 <CardImage
   title="AadharCard"
   imageContent={aadharcard}
@@ -1316,15 +1474,33 @@ const handleNavigateToSignatureScreen = () => {
   onViewImage={onViewImage}
   pickImage={() => pickImage('pan')}
   setModalVisible={setModalVisible}
-/>
+/> */}
+
+              <CardImage
+                title="AadharCard"
+                imageContent={aadharcard}
+                onViewImage={onViewImage}
+                pickImage={() => pickImage('aadhar')}
+                takePictureWithCamera={takePictureWithCamera}
+                setModalVisible={setModalVisible}
+              />
 
 <CardImage
-  title="Applicant"
-  imageContent={applicantImage}
-  onViewImage={onViewImage}
-  pickImage={() => pickImage('applicant')}
-  setModalVisible={setModalVisible}
-/>
+    title="Pancard"
+    imageContent={pancard} 
+    onViewImage={onViewImage}
+    pickImage={() => pickPanCardImage ('pan')}
+    takePictureWithCamera={takePictureOfPanCard }
+    setModalVisible={setModalVisible}
+  />
+
+              <CardImage
+                title="Applicant"
+                imageContent={applicantImage}
+                onViewImage={onViewImage}
+                pickImage={() => pickImage('applicant')}
+                setModalVisible={setModalVisible}
+              />
 
 {/* <CardImageSignature
         title="Signature"

@@ -304,8 +304,6 @@ navigation.navigate('PersonalLoanGurantee2', { personalLoan,
         </View>  
           )}  
 
-
-
           {showHomeLoanGuarantee1 && (
           <View style={[styles.personalDetailContainer,{marginTop:5}]} >
           <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10 }]}>PersonaLoanGurantee 2</Text>

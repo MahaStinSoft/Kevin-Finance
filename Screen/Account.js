@@ -118,7 +118,7 @@ const AccountScreen = () => {
             onError={(error) => console.error('Image load error:', error.nativeEvent.error)}
           />
           <View style={{ width: '50%', paddingTop: 35, paddingLeft: 10 }}>
-            <Text style={{ color: 'rgba(249,249,249,255)', fontWeight: 'bold', fontSize: 25, letterSpacing: 1, paddingBottom: 8 }}>{user.kf_adminname}</Text>
+            <Text style={{ color: 'rgba(249,249,249,255)', fontWeight: 'bold', fontSize: 18, letterSpacing: 1, paddingBottom: 8 }}>{user.kf_adminname}</Text>
             <Text style={{ color: 'rgba(249,249,249,255)', letterSpacing: 1,fontWeight: 'bold', marginLeft:1 }}>{user.kf_employeeid}</Text>
           </View>
         </View>
