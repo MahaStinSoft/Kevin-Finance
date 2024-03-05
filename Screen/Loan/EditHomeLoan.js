@@ -1170,14 +1170,21 @@ const EditHomeLoan = ({ route, navigation }) => {
       />
       <ScrollView>
         <View style={styles.container}>
-          <View style={styles.wrapper}>     
-            <LoanStatusPicker
+          <View style={styles.wrapper}>
+          {/* <LoanStatusPicker
               onOptionChange={handleSendApproval}
               title="Send Approval"
               options={['No', 'Yes']}
               initialOption={sendApproval ? getSendApproval(sendApproval) : ''}
               style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
-            />
+            /> */}
+            <LoanStatusPicker
+  onOptionChange={handleSendApproval}
+  title="Send Approval"
+  options={['No', 'Yes']}
+  initialOption={sendApproval ? getSendApproval(sendApproval) : ''}
+  style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
+/>
             <TextInput
               style={[styles.textInputContainer, { color: "gray" }]}
               value={applicationnumber}

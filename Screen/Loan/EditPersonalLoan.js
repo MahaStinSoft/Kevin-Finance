@@ -47,6 +47,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
   const [pancard, setPancard] = useState({ fileName: null, fileContent: null });
   const [applicantImage, setapplicantImage] = useState({ fileName: null, fileContent: null });
   const [signature, setSignature] = useState({ fileName: null, fileContent: null });
+  const [sendApproval, setSendApproval] = useState(personalLoan?.kf_sendapproval || '');
+
 
   const [isfirstnameValid, setIsfirstnameValid] = useState(true);
   const [isLastNameValid, setIsLastNameValid] = useState(true);
@@ -109,6 +111,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
     setInterestRate(personalLoan.kf_interestrate);
     setNumberOfEMI(personalLoan.kf_numberofemi);
     setRecordId(personalLoan.kf_personalloanid);
+    setSendApproval(personalLoan.kf_sendapproval);
     setAadharcard({ fileName: null, fileContent: null });
     setPancard({ fileName: null, fileContent: null });
     setapplicantImage({ fileName: null, fileContent: null });
@@ -225,6 +228,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
           kf_emischedule: emiSchedule,
           kf_othercharges: otherCharges,
           kf_numberofemi: numberOfEMI,
+          kf_sendapproval: sendApproval
         },
         {
           headers: {
@@ -268,6 +272,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
             kf_emischedule: emiSchedule,
             kf_othercharges: otherCharges,
             kf_numberofemi: numberOfEMI,
+            kf_sendapproval: sendApproval
           });
         }
         console.log(age);
@@ -292,6 +297,31 @@ const EditPersonalLoan = ({ route, navigation }) => {
     }
   };
 
+  const handleSendApproval = (selectedOptionGender) => {
+    let booleanValue;
+    switch (selectedOptionGender) {
+      case 'No':
+        booleanValue = false;
+        break;
+      case 'Yes':
+        booleanValue = true;
+        break;
+      default:
+        booleanValue = null;
+    }
+    setSendApproval(booleanValue);
+  };
+  
+  const getSendApproval = (booleanValue) => {
+    switch (booleanValue) {
+      case false:
+        return 'No';
+      case true:
+        return 'Yes';
+      default:
+        return '';
+    }
+  };
   const handleGenderOptionset = (selectedOptionGender) => {
     let numericValue;
     switch (selectedOptionGender) {
@@ -905,7 +935,7 @@ const renderAnnotationItem = ({ item }) => (
 </View>
 );
 const handlesignature = async  () => {
-  navigation.navigate('SignatureScreen', { loanApplication: loanApplication });
+  navigation.navigate('SignatureScreen', { personalLoan: personalLoan });
 }
 
 
@@ -924,6 +954,13 @@ const handlesignature = async  () => {
       <ScrollView>
         <View style={styles.container}>
           <View style={styles.wrapper}>
+          <LoanStatusPicker
+  onOptionChange={handleSendApproval}
+  title="Send Approval"
+  options={['No', 'Yes']}
+  initialOption={sendApproval ? getSendApproval(sendApproval) : ''}
+  style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
+/>
             <TextInput
               style={[styles.textInputContainer, { color: "gray" }]}
               value={applicationnumber}
