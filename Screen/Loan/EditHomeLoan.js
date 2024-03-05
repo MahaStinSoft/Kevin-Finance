@@ -46,6 +46,7 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [pancard, setPancard] = useState({ fileName: null, fileContent: null });
   const [applicantImage, setapplicantImage] = useState({ fileName: null, fileContent: null });
   const [signature, setSignature] = useState({ fileName: null, fileContent: null });
+  const [sendApproval, setSendApproval] = useState(loanApplication?.kf_sendapproval || '');
 
   const [isfirstnameValid, setIsfirstnameValid] = useState(true);
   const [isLastNameValid, setIsLastNameValid] = useState(true);
@@ -111,6 +112,7 @@ const EditHomeLoan = ({ route, navigation }) => {
     setEmiAmount(loanApplication.kf_emi);
     setInterestRate(loanApplication.kf_interestrate);
     setNumberOfEMI(loanApplication.kf_numberofemi);
+    setSendApproval(loanApplication.kf_sendapproval);
     setRecordId(loanApplication.kf_loanapplicationid);
     setAadharcard({ fileName: null, fileContent: null });
     setPancard({ fileName: null, fileContent: null });
@@ -228,6 +230,7 @@ const EditHomeLoan = ({ route, navigation }) => {
           kf_emischedule: emiSchedule,
           kf_othercharges: otherCharges,
           kf_numberofemi: numberOfEMI,
+          kf_sendapproval: sendApproval
         },
         {
           headers: {
@@ -272,6 +275,7 @@ const EditHomeLoan = ({ route, navigation }) => {
             kf_emischedule: emiSchedule,
             kf_othercharges: otherCharges,
             kf_numberofemi: numberOfEMI,
+            kf_sendapproval: sendApproval
           });
         }
         console.log(loanAmountRequested)
@@ -405,6 +409,57 @@ const EditHomeLoan = ({ route, navigation }) => {
         return 'Male';
       case 123950001:
         return 'Female';
+      default:
+        return '';
+    }
+  };
+
+  // const handleSendApproval = (selectedOptionGender) => {
+  //   let numericValue;
+  //   switch (selectedOptionGender) {
+  //     case 'No':
+  //       numericValue = 0;
+  //       break;
+  //     case 'Yes':
+  //       numericValue = 1;
+  //       break;
+  //     default:
+  //       numericValue = null;
+  //   }
+  //   setSendApproval(numericValue);
+  // };
+
+  // const getSendApproval= (numericValue) => {
+  //   switch (numericValue) {
+  //     case 0:
+  //       return 'No';
+  //     case 1:
+  //       return 'Yes';
+  //     default:
+  //       return '';
+  //   }
+  // };
+  const handleSendApproval = (selectedOptionGender) => {
+    let booleanValue;
+    switch (selectedOptionGender) {
+      case 'No':
+        booleanValue = false;
+        break;
+      case 'Yes':
+        booleanValue = true;
+        break;
+      default:
+        booleanValue = null;
+    }
+    setSendApproval(booleanValue);
+  };
+  
+  const getSendApproval = (booleanValue) => {
+    switch (booleanValue) {
+      case false:
+        return 'No';
+      case true:
+        return 'Yes';
       default:
         return '';
     }
@@ -1077,9 +1132,9 @@ const EditHomeLoan = ({ route, navigation }) => {
 
 
   const handleUpdateRecordAndSendAnnotation = () => {
-    sendAnnotation();
-    sendAnnotation1();
-    sendAnnotation2();
+    // sendAnnotation();
+    // sendAnnotation1();
+    // sendAnnotation2();
     // sendAnnotation3();
     handleUpdateRecord();
 
@@ -1115,7 +1170,14 @@ const EditHomeLoan = ({ route, navigation }) => {
       />
       <ScrollView>
         <View style={styles.container}>
-          <View style={styles.wrapper}>
+          <View style={styles.wrapper}>     
+            <LoanStatusPicker
+              onOptionChange={handleSendApproval}
+              title="Send Approval"
+              options={['No', 'Yes']}
+              initialOption={sendApproval ? getSendApproval(sendApproval) : ''}
+              style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
+            />
             <TextInput
               style={[styles.textInputContainer, { color: "gray" }]}
               value={applicationnumber}
