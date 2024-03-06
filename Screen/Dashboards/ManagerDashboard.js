@@ -357,7 +357,7 @@ const handlelogout = () => {
 };
 
 const handleNavigation = () => {
-  navigation.navigate( "Notification");
+  navigation.navigate("Notification", { kf_adminname });
 };
   return (
     <>
@@ -413,11 +413,11 @@ const handleNavigation = () => {
             showsHorizontalScrollIndicator={false}
           >
 
-            {/* <View>
-              {authenticatedUser && (
-                <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 2, textAlign: "center" }}>Created By: {authenticatedUser.kf_adminname}</Text>
-              )}
-            </View> */}
+            <View>
+              {/* {authenticatedUser && ( */}
+                <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 2, textAlign: "center" }}>Created By: {kf_adminname}</Text>
+              {/* // )} */}
+            </View>
             {/* <LogoutButton navigation={navigation}/> */}
 
             <Text style={{textAlign: "center", marginVertical: 10, fontSize: 18, fontWeight: "bold",color: "red"}}>MANAGER DASHBOARD</Text>

@@ -12,6 +12,7 @@ import TextInputComponent from '../../common/TextInput';
 import LoanStatusPicker from '../../common/LoanStatusPicker ';
 import CardImage from '../../common/CardImage';
 import RenderAnnotation from '../../common/renderAnnotationItem';
+import SendNotification from '../../common/SendNotification';
 
 const EditPersonalLoan = ({ route, navigation }) => {
   const { personalLoan, onUpdateSuccess } = route.params || {};
@@ -128,6 +129,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
       status
     });
   }, [personalLoan]);
+
+  console.log("send personal approval ", sendApproval);
 
   const handleUpdateRecord = async () => {
 
@@ -895,6 +898,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
               options={['No', 'Yes']}
               initialOption={sendApproval ? getSendApproval(sendApproval) : ''}
               style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
+              disabled={sendApproval}
             />
             <TextInput
               style={[styles.textInputContainer, { color: "gray" }]}
@@ -1095,8 +1099,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
               options={['Approved', 'PendingApproval', 'Draft', 'Cancelled']}
               initialOption={getStatusStringFromNumericValue(status)}
               style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
+              disabled={true}
             />
-
 
             {statusReason && (
               <LoanStatusPicker
@@ -1155,6 +1159,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
             showImage={showImage}
             handleViewImages={handleViewImages}
           />
+          <SendNotification sendApproval={sendApproval} />
         </View>
       </ScrollView>
     </View>

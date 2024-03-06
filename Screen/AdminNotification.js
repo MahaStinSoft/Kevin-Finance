@@ -4,16 +4,14 @@ import axios from 'axios';
 import { ScrollView } from 'react-native-gesture-handler';
 import querystring from 'querystring';
 import moment from 'moment'; // Import moment.js for date formatting
+import Notification from './Notification';
 
-const Notification = ({loanApplication, navigation, personalLoan,route}) => {
+const AdminNotification = ({loanApplication, navigation, personalLoan, route }) => {
   const [loanApplications, setLoanApplications] = useState([]);
   const [notifications, setNotifications] = useState([]);
-  const [rejectReason, setRejectReason] = useState('');
-  const [showRejectAlert, setShowRejectAlert] = useState(false);
-  // const [approverName, setApproverName] = useState('');
+  const [approverName, setApproverName] = useState('');
   const [sendApproval, setSendApproval] = useState(null);
-  const { kf_adminname } = route.params;
-
+  const { authenticatedUser } = route.params;
 
   useEffect(() => {
     fetchLoanApplications();
@@ -111,8 +109,7 @@ const Notification = ({loanApplication, navigation, personalLoan,route}) => {
       const accessToken = tokenResponse.data.access_token;
 
       await axios.patch(`https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications(${applicationId})`, {
-        kf_status: 123950000, // Approved status
-        kf_approvedby: kf_adminname, // Set the admin name
+        kf_status: 123950000 // Assuming 123950000 represents the status for approval
       }, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -180,8 +177,7 @@ const Notification = ({loanApplication, navigation, personalLoan,route}) => {
       const accessToken = tokenResponse.data.access_token;
 
       await axios.patch(`https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications(${applicationId})`, {
-        kf_status: 123950004 ,// Assuming 123950000 represents the status for approval
-        kf_sendapproval:false
+        kf_status: 123950004 // Assuming 123950000 represents the status for approval
       }, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -220,8 +216,7 @@ const handleApproveNotification = async (personalLoanId) => {
     const accessToken = tokenResponse.data.access_token;
 
     await axios.patch(`https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans(${personalLoanId})`, {
-      kf_status: 123950000, // Approved status
-      kf_approvedby: kf_adminname, // Assuming 123950000 represents the status for approval
+      kf_status: 123950000 // Assuming 123950000 represents the status for approval
     }, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -321,8 +316,7 @@ const handlePendingApprovals = async (personalLoanId) => {
       const accessToken = tokenResponse.data.access_token;
   
       await axios.patch(`https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans(${personalLoanId})`, {
-        kf_status: 123950004 ,
-        kf_sendapproval:false
+        kf_status: 123950004 // Assuming 123950000 represents the status for approval
       }, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -369,10 +363,6 @@ const handlePendingApprovals = async (personalLoanId) => {
     navigation.navigate('HomeLoanDetailsScreen', { loanApplication }); // Pass Home Loan application data
   };
 
-   // Function to format date and time
-   const formatDateTime = (dateTime) => {
-    return moment(dateTime).format('MMM DD, YYYY h:mm A'); // Example format: "Mar 05, 2024 11:12 AM"
-  };
 
   return (
     <ScrollView>
@@ -380,45 +370,37 @@ const handlePendingApprovals = async (personalLoanId) => {
         <Text style={styles.header}>Loan Applications</Text>
         {loanApplications
   .filter(application => sendApproval === null || application.kf_sendapproval === (sendApproval ? 1 : 0))
+  .filter(application => authenticatedUser && application.kf_createdby === authenticatedUser.kf_adminname) // Filter based on the condition
   .map((application, index) => (
     <View key={index} style={styles.itemContainer}>
-            <Text>Application Number: {application.kf_applicationnumber}</Text>
-            <Text>Created By: {application.kf_createdby}</Text>
-            <Text>Admin Name: {kf_adminname}</Text>
-            <Text>Name: {application.kf_name} {application.kf_lastname}</Text>
-            {/* Display the status name */}
-            <Text>Status: {statusNames[application.kf_status]}</Text>
-            {/* Buttons for actions */}
-            <Text>Created At: {formatDateTime(application.created_at)}</Text>
-            <View style={styles.buttonContainer}>
-              <Button title={`✓ Approve`} onPress={() => handleApproveLoan(application.kf_loanapplicationid)} color="green" disabled={application.kf_status === 123950000} />
-              <Button title={`✗ Reject`} onPress={() => handleRejectLoan(application.kf_loanapplicationid)} color="red" disabled={application.kf_status === 123950000} />
-              <Button title="View Record" onPress={() => handleViewHomeLoan(application)} /> 
-              {/* Display date and time */}
-            
-            </View>
-          </View>
-        ))}
-
+      <Text>Application Number: {application.kf_applicationnumber}</Text>
+      <Text>Name: {application.kf_name} {application.kf_lastname}</Text>
+      <Text>Created By: {application.kf_createdby}</Text>
+      <Text>Status: {statusNames[application.kf_status]}</Text>
+      <View style={styles.buttonContainer}>
+        {/* <Button title={`✓ Approve`} onPress={() => handleApproveLoan(application.kf_loanapplicationid)} color="green" disabled={application.kf_status === 123950000} />
+        <Button title={`✗ Reject`} onPress={() => handleRejectLoan(application.kf_loanapplicationid)} color="red" disabled={application.kf_status === 123950000} /> */}
+        <Button title="View Record" onPress={() => handleViewHomeLoan(application)} /> 
+      </View>
+    </View>
+  ))}
 
         <Text style={styles.header}>Personal Loan Notifications</Text>
-        {notifications.map((notification, index) => (
-          <View key={index} style={styles.itemContainer}>
-            <Text>Application Number: {notification.kf_applicationnumber}</Text>
-            <Text>Admin Name: {kf_adminname}</Text>
-            <Text>Created By: {notification.kf_createdby}</Text>
-            <Text>Name: {notification.kf_firstname} {notification.kf_lastname}</Text>
-            {/* Display the status name */}
-            <Text>Status: {statusNames[notification.kf_status]}</Text>
-            {/* Buttons for actions */}
-            <Text>Created At: {formatDateTime(notification.created_at)}</Text>
-            <View style={styles.buttonContainer}>
-              <Button title={`✓ Approve`} onPress={() => handleApproveNotification(notification.kf_personalloanid)} color="green" disabled={notification.kf_status === 123950000} />
-              <Button title={`✗ Reject`} onPress={() => handleRejectNotification(notification.kf_personalloanid)} color="red" disabled={notification.kf_status === 123950000} />
-              <Button title="View Record" onPress={() => handleViewPersonalLoan(notification)} />
-            </View>
-          </View>
-        ))}
+        {notifications
+  .filter(notification => authenticatedUser && notification.kf_createdby === authenticatedUser.kf_adminname)
+  .map((notification, index) => (
+    <View key={index} style={styles.itemContainer}>
+      <Text>Application Number: {notification.kf_applicationnumber}</Text>
+      <Text>Created By: {notification.kf_createdby}</Text>
+      <Text>Name: {notification.kf_firstname} {notification.kf_lastname}</Text>
+      <Text>Status: {statusNames[notification.kf_status]}</Text>
+      <Text>Approved By: {notification.kf_approvedby}</Text> 
+      <Text>Approval Date: {moment(notification.kf_approvaldatetime).format('MMMM D, YYYY hh:mm A')}</Text>
+      <View style={styles.buttonContainer}>
+        <Button title="View Record" onPress={() => handleViewPersonalLoan(notification)} />
+      </View>
+    </View>
+  ))}
       </View>
     </ScrollView>
   );
@@ -448,4 +430,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Notification;
+export default AdminNotification;

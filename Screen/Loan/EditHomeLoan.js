@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, TouchableOpacity, Alert, StyleSheet, ScrollView, Text, FlatList, Linking, Platform, Image, Button } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 
 import HeaderComponent from '../../common/Header';
@@ -11,6 +10,7 @@ import CardImage from '../../common/CardImage';
 import SignatureScreen from '../../signature';
 import CardImageSignature from '../../common/CardImageSignature';
 import RenderAnnotation from '../../common/renderAnnotationItem';
+import SendNotification from '../../common/SendNotification';
 
 const EditHomeLoan = ({ route, navigation }) => {
   const { loanApplication, onUpdateSuccess } = route.params || {};
@@ -62,6 +62,7 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [item, setItem] = useState(null); // Assuming you have some state to store the current item
   const [imageContent, setImageContent] = useState(null);
   const [aadharImageContent, setAadharImageContent] = useState(null);
+  const [sendApprovalDisabled, setSendApprovalDisabled] = useState(false);
 
   const { signatureImage } = route.params;
   // const [signatureImage, setSignatureImage] = useState(null);
@@ -82,7 +83,7 @@ const EditHomeLoan = ({ route, navigation }) => {
   const handleGoBack = () => {
     navigation.navigate("HomeLoanDetailsScreen", { loanApplication });
   };
-
+console.log("send home approval ", sendApproval);
   useEffect(() => {
     setapplicationnumber(loanApplication.kf_applicationnumber);
     setcreatedby(loanApplication.kf_createdby);
@@ -898,6 +899,7 @@ const EditHomeLoan = ({ route, navigation }) => {
               options={['No', 'Yes']}
               initialOption={sendApproval ? getSendApproval(sendApproval) : ''}
               style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
+              disabled={sendApproval}
             />
             <TextInput
               style={[styles.textInputContainer, { color: "gray" }]}
@@ -1098,12 +1100,21 @@ const EditHomeLoan = ({ route, navigation }) => {
               onChangeText={(text) => setOtherCharges(text)}
             />
 
-            <LoanStatusPicker
+            {/* <LoanStatusPicker
               onOptionChange={handleLoanStatusChange}
               title="Select Loan Status"
               options={['Approved', 'PendingApproval', 'Draft', 'Cancelled']}
               initialOption={getStatusStringFromNumericValue(status)}
               style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
+            /> */}
+
+            <LoanStatusPicker
+              onOptionChange={handleLoanStatusChange}
+              title="Select Loan Status"
+              options={['Approved', 'PendingApproval', 'Draft', 'Cancelled', 'Expired']}
+              initialOption={getStatusStringFromNumericValue(status)}
+              style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
+            disabled={true}
             />
 
             <View style={{ backgroundColor: "white", marginTop: 15 }}>
@@ -1153,6 +1164,9 @@ const EditHomeLoan = ({ route, navigation }) => {
             showImage={showImage}
             handleViewImages={handleViewImages}
           />
+          {/* <SendNotification/> */}
+          <SendNotification sendApproval={sendApproval} />
+
           {/* <Text> annotation</Text> */}
         </View>
       </ScrollView>

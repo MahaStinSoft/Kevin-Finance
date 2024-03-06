@@ -32,6 +32,9 @@ import HomeLoanGurantee from './Screen/Gaurantee/HomeLoanGaurantee';
 import HomeLoanGurantee2 from './Screen/Gaurantee/HomeLoanGaurantee2';
 import PersonalLoanGurantee from './Screen/Gaurantee/PersonalLoanGurantee';
 import PersonalLoanGurantee2 from './Screen/Gaurantee/PersonalLoanGurantee2';
+import EditLoanDetail from './Screen/EMI/EditLoanDetail';
+import SendNotification from './common/SendNotification';
+import AdminNotification from './Screen/AdminNotification';
 
 const Stack = createNativeStackNavigator();
 
@@ -96,6 +99,9 @@ const MainScreen = () => {
           <Stack.Screen name="HomeLoanGurantee2" component={HomeLoanGurantee2} options={{ headerShown: false }} />
           <Stack.Screen name="PersonalLoanGurantee" component={PersonalLoanGurantee} options={{ headerShown: false }} />
           <Stack.Screen name="PersonalLoanGurantee2" component={PersonalLoanGurantee2} options={{ headerShown: false }} />
+          <Stack.Screen name="EditLoanDetail" component={EditLoanDetail} options={{ headerShown: false }} />
+          <Stack.Screen name="SendNotification" component={SendNotification} options={{ headerShown: false }} />
+          <Stack.Screen name="AdminNotification" component={AdminNotification} options={{ headerShown: false }} />
           </>
       )}
       </Stack.Navigator>

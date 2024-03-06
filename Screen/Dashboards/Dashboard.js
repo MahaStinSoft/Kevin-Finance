@@ -359,9 +359,8 @@ const handleSettings = () => {
   navigation.navigate( "Setting");
 };
 const handleNavigation = () => {
-  navigation.navigate("Notification", { authenticatedUser });
+  navigation.navigate("AdminNotification", { authenticatedUser });
 };
-
 
   return (
     <>
