@@ -151,13 +151,13 @@ const EditHomeLoan = ({ route, navigation }) => {
     const minLoanAmount = 25000;
     const maxLoanAmount = 1500000;
 
-    // if (loanAmountRequested < minLoanAmount || loanAmountRequested > maxLoanAmount) {
-    //   setErrorMessages({
-    //     ...errorMessages,
-    //     loanAmountRequestedEdit: `Loan amount should be between ${minLoanAmount} and ${maxLoanAmount} INR.`,
-    //   });
-    //   return;
-    // }
+    if (!loanAmountRequested) {
+      setErrorMessages({
+        ...errorMessages,
+        loanAmountRequestedEdit: `Enter Loan Amount`,
+      });
+      return;
+    }
 
     if (!isPancardNumberValid) {
       setErrorMessages({
@@ -173,7 +173,7 @@ const EditHomeLoan = ({ route, navigation }) => {
       dateOfBirthEdit: !dateofbirth ? 'Enter Date of Birth' : '',
       mobileNumberEdit: /^\d{10}$/.test(mobileNumber) ? '' : 'Please Enter a Valid 10-digit mobile number.',
       emailEdit: !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? 'Enter Email Address' : '',
-      loanAmountRequestedEdit: /^\d{5,7}$/.test(loanAmountRequested) ? '' : 'Enter Loan Amount',
+      // loanAmountRequestedEdit: !loanAmountRequested ? '' : 'Enter Loan Amount',
       aadharCardNumberEdit: /^\d{12}$/.test(aadharcardNumber) ? '' : 'Please Enter Valid Aadharcard Number',
       panCardNumberEdit: !pancardNumber ? 'Enter PAN Card Number' : '',
     };
@@ -321,7 +321,6 @@ const EditHomeLoan = ({ route, navigation }) => {
     }
   };
 
-
   const calculateAge = (birthDate) => {
     const today = new Date();
     const birth = new Date(birthDate);
@@ -387,7 +386,6 @@ const EditHomeLoan = ({ route, navigation }) => {
     }
   };
 
-
   const handleGenderOptionset = (selectedOptionGender) => {
     let numericValue;
     switch (selectedOptionGender) {
@@ -414,31 +412,6 @@ const EditHomeLoan = ({ route, navigation }) => {
     }
   };
 
-  // const handleSendApproval = (selectedOptionGender) => {
-  //   let numericValue;
-  //   switch (selectedOptionGender) {
-  //     case 'No':
-  //       numericValue = 0;
-  //       break;
-  //     case 'Yes':
-  //       numericValue = 1;
-  //       break;
-  //     default:
-  //       numericValue = null;
-  //   }
-  //   setSendApproval(numericValue);
-  // };
-
-  // const getSendApproval= (numericValue) => {
-  //   switch (numericValue) {
-  //     case 0:
-  //       return 'No';
-  //     case 1:
-  //       return 'Yes';
-  //     default:
-  //       return '';
-  //   }
-  // };
   const handleSendApproval = (selectedOptionGender) => {
     let booleanValue;
     switch (selectedOptionGender) {
@@ -601,7 +574,6 @@ const EditHomeLoan = ({ route, navigation }) => {
     }
   };
 
-
   const handleLoanAmountRequestedChange = (text) => {
     const amountRequested = text.trim() !== '' ? parseFloat(text) : null;
     setLoanAmountRequested(amountRequested);
@@ -624,153 +596,21 @@ const EditHomeLoan = ({ route, navigation }) => {
     else {
       setErrorMessages({
         ...errorMessages,
-        loanAmountRequestedEdit: `Enter Loan Amount (${minLoanAmount} to ${maxLoanAmount} INR)`,
+        // loanAmountRequestedEdit: `Enter Loan Amount (${minLoanAmount} to ${maxLoanAmount} INR)`,
       });
     }
   };
-
-  const pickImage = async () => {
-    try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-        base64: true,
-      });
-
-      if (result.cancelled) {
-        return;
-      }
-
-      const byteArray = result.base64; // Use result.base64 directly
-      const fileName = result.uri.split('/').pop(); // Extracting filename from URI
-
-      setImageSource(result.uri);
-
-      setAadharcard({
-        fileName: fileName,
-        fileContent: byteArray,
-      });
-
-    } catch (error) {
-      // console.error('Error picking or processing the image:', error);
-      Alert.alert('Failed to pick or process the image.');
-    }
-  };
-
-  const takePictureWithCamera = async () => {
-    try {
-      const { status } = await ImagePicker.requestCameraPermissionsAsync();
-      if (status !== 'granted') {
-        console.log('Camera permission denied');
-        return;
-      }
-
-      const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-        base64: true,
-      });
-
-      if (result.cancelled) {
-        return;
-      }
-
-      const byteArray = result.base64; // Use result.base64 directly
-      const fileName = result.uri.split('/').pop(); // Extracting filename from URI
-
-      setImageSource(result.uri);
-
-      setAadharcard({
-        fileName: fileName,
-        fileContent: byteArray,
-      });
-
-    } catch (error) {
-      console.error('Error picking or processing the image:', error);
-      Alert.alert('Error', 'Failed to pick or process the image.');
-    }
-  };
-
-  const pickPanCardImage = async () => {
-    try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-        base64: true,
-      });
-
-      if (result.cancelled) {
-        return;
-      }
-
-      const byteArray = result.base64; // Use result.base64 directly
-      const fileName = result.uri.split('/').pop(); // Extracting filename from URI
-
-      setImageSource(result.uri);
-
-      setPancard({
-        fileName: fileName,
-        fileContent: byteArray,
-      });
-
-    } catch (error) {
-      console.error('Error picking or processing the image:', error);
-      Alert.alert('Failed to pick or process the image.');
-    }
-  };
-
-  const takePictureOfPanCard = async () => {
-    try {
-      const { status } = await ImagePicker.requestCameraPermissionsAsync();
-      if (status !== 'granted') {
-        console.log('Camera permission denied');
-        return;
-      }
-
-      const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-        base64: true,
-      });
-
-      if (result.cancelled) {
-        return;
-      }
-
-      const byteArray = result.base64; // Use result.base64 directly
-      const fileName = result.uri.split('/').pop(); // Extracting filename from URI
-
-      setImageSource(result.uri);
-
-      setPancard({
-        fileName: fileName,
-        fileContent: byteArray,
-      });
-
-    } catch (error) {
-      console.error('Error picking or processing the image:', error);
-      Alert.alert('Error', 'Failed to pick or process the image.');
-    }
-  };
-
-  const onViewImage = async () => {
-    if (!imageContent) {
-      // Fetch the image data if it's not available
-      await fetchAnnotationImage();
-    }
-    setModalVisible(true);
-  };
+ 
+  // view button(if need view then add)
+  // const onViewImage = async () => {
+  //   if (!imageContent) {
+  //     // Fetch the image data if it's not available
+  //     await fetchAnnotationImage();
+  //   }
+  //   setModalVisible(true);
+  // };
 
   useEffect(() => {
-    fetchAnnotations();
     fetchAnnotations1();
   }, []);
 
@@ -803,7 +643,6 @@ const EditHomeLoan = ({ route, navigation }) => {
 
       const createAnnotationResponse = await axios.post(
         'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
-        // 'https://org0f7e6203.crm5.dynamics.com/api/data/v9.2/$metadata#kf_personalloans(kf_personalloan_Annotations(annotationid,documentbody,notetext))',
         annotations,
         {
           headers: {
@@ -820,97 +659,11 @@ const EditHomeLoan = ({ route, navigation }) => {
         Alert.alert('Error', 'Failed to create Aadhar image annotation.');
       }
 
-      // Fetch and display the updated annotations
-      fetchAnnotations();
     } catch (error) {
       console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
       Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
     }
   };
-
-  const fetchAnnotations = async () => {
-    try {
-
-      const tokenResponse = await axios.post(
-        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
-        {
-          grant_type: 'client_credentials',
-          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
-          resource: 'https://org0f7e6203.crm5.dynamics.com',
-          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
-          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
-        },
-        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
-      );
-
-      const accessToken = tokenResponse.data.access_token;
-      // Fetch annotations for the specific record
-      const response = await axios.get(
-        `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations?$filter=_objectid_value eq ${recordId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-
-      // Filter annotations for 'AadharCard Image'
-      const aadharAnnotations = response.data.value.filter(annotation => annotation.subject === 'AadharCard Image');
-
-      // Get the latest annotation
-      const latestAadharAnnotation = aadharAnnotations.length > 0 ? aadharAnnotations[0] : null;
-
-      // Set the image content if the latest annotation is found
-      if (latestAadharAnnotation) {
-        setAadharImageContent(latestAadharAnnotation.documentbody);
-      } else {
-        setAadharImageContent(null);
-      }
-    } catch (error) {
-      console.error('Error fetching annotations:', error.response?.data || error.message);
-    }
-  };
-
-  // const fetchAnnotations = async () => {
-  //   try {
-  //     const tokenResponse = await axios.post(
-  //       'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
-  //       {
-  //         grant_type: 'client_credentials',
-  //         client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
-  //         resource: 'https://org0f7e6203.crm5.dynamics.com',
-  //         scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
-  //         client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
-  //       },
-  //       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
-  //     );
-
-  //     const accessToken = tokenResponse.data.access_token;
-
-  //     const fetchAnnotationsResponse = await axios.get(
-  //       'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations?$filter=_objectid_value eq ' + recordId,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${accessToken}`,
-  //           'Content-Type': 'application/json',
-  //         },
-  //       }
-  //     );
-
-  //     const fetchedAnnotations = fetchAnnotationsResponse.data.value;
-  //     // console.log('Annotations:', fetchedAnnotations);
-  //     setAnnotations(fetchedAnnotations);
-
-  //   } catch (error) {
-  //     console.error('Error fetching annotations:', error.response?.data || error.message);
-  //     Alert.alert('Error', 'An error occurred while fetching annotations.');
-  //   }
-  // };
-
-  useEffect(() => {
-    // Fetch annotations when the component mounts
-    fetchAnnotations();
-  }, [recordId]);
 
   const sendAnnotation1 = async () => {
     try {
@@ -957,30 +710,9 @@ const EditHomeLoan = ({ route, navigation }) => {
         Alert.alert('Error', 'Failed to create Aadhar image annotation.');
       }
 
-      // Fetch and display the updated annotations
-      fetchAnnotations1();
     } catch (error) {
       console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
       Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
-    }
-  };
-
-  const deleteAnnotation1 = async (annotationId, accessToken) => {
-    try {
-      const deleteResponse = await axios.delete(
-        `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations(${annotationId})`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      // console.log('Annotation deleted successfully:', deleteResponse.data);
-    } catch (error) {
-      console.error('Error deleting annotation:', error.response?.data || error.message);
-      throw new Error('An error occurred while deleting annotation.');
     }
   };
 
@@ -1067,8 +799,6 @@ const EditHomeLoan = ({ route, navigation }) => {
         Alert.alert('Error', 'Failed to create Aadhar image annotation.');
       }
 
-      // Fetch and display the updated annotations
-      fetchAnnotations();
     } catch (error) {
       console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
       Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
@@ -1123,7 +853,6 @@ const EditHomeLoan = ({ route, navigation }) => {
       }
 
       // Fetch and display the updated annotations
-      fetchAnnotations();
     } catch (error) {
       console.error('Error sending Signature image annotation:', error.response?.data || error.message);
       Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
@@ -1132,30 +861,22 @@ const EditHomeLoan = ({ route, navigation }) => {
 
 
   const handleUpdateRecordAndSendAnnotation = () => {
-    // sendAnnotation();
-    // sendAnnotation1();
-    // sendAnnotation2();
+    sendAnnotation();
+    sendAnnotation1();
+    sendAnnotation2();
     // sendAnnotation3();
     handleUpdateRecord();
-
   };
 
-  // const onViewImage = () => {
-  //   setModalVisible(true);
-  // };
-
   const handleViewImages = () => {
-    setShowImage(!showImage); // Toggle the state to show/hide images
+    setShowImage(!showImage); 
   };
 
   const filteredAnnotations = annotations.filter(item => item.documentbody);
   
-
-  // Navigation from the previous screen to the SignatureScreen
   const handleNavigateToSignatureScreen = () => {
     navigation.navigate('SignatureScreen', { loanApplication });
   };
-
 
   const date = emiCollectionDate ? new Date(emiCollectionDate) : null;
   const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
@@ -1171,20 +892,13 @@ const EditHomeLoan = ({ route, navigation }) => {
       <ScrollView>
         <View style={styles.container}>
           <View style={styles.wrapper}>
-          {/* <LoanStatusPicker
+            <LoanStatusPicker
               onOptionChange={handleSendApproval}
               title="Send Approval"
               options={['No', 'Yes']}
               initialOption={sendApproval ? getSendApproval(sendApproval) : ''}
               style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
-            /> */}
-            <LoanStatusPicker
-  onOptionChange={handleSendApproval}
-  title="Send Approval"
-  options={['No', 'Yes']}
-  initialOption={sendApproval ? getSendApproval(sendApproval) : ''}
-  style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
-/>
+            />
             <TextInput
               style={[styles.textInputContainer, { color: "gray" }]}
               value={applicationnumber}
@@ -1393,13 +1107,12 @@ const EditHomeLoan = ({ route, navigation }) => {
             />
 
             <View style={{ backgroundColor: "white", marginTop: 15 }}>
-
               <View style={{ marginVertical: 3 }}>
                 <CardImage
                   title="AadharCard"
                   imageContent={aadharcard}
                   setImageContent={setAadharcard}
-                  onViewImage={onViewImage}
+                  // onViewImage={onViewImage}
                 />
               </View>
               <View style={{ marginVertical: 3 }}>
@@ -1431,18 +1144,7 @@ const EditHomeLoan = ({ route, navigation }) => {
                 />
 
               </View>
-
-{/* 
-               <CardImageSignature
-        title="Signature"
-        signatureImage={signature}
-        setSignatureImage={setSignatureImage}
-        pickImage={handlesignature}
-        onViewImage={onViewImage}
-      /> */}
-
             </View>
-
           </View>
 
           <RenderAnnotation
