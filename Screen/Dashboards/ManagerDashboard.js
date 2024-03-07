@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
   StatusBar,
   Platform,
-RefreshControl
+  RefreshControl
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -44,7 +44,7 @@ const ManagerDashboard = ({ navigation, route }) => {
   const [lastMonthData, setLastMonthData] = useState([]);
   const [selectedLoanStatus, setSelectedLoanStatus] = useState(null);
   const [kf_adminname, setkf_adminname] = useState(null);
-    const [refresh, setRefresh] = useState(false);
+  const [refresh, setRefresh] = useState(false);
 
   const [displayedHomeLoans, setDisplayedHomeLoans] = useState([]);
   const [displayedPersonalLoans, setDisplayedPersonalLoans] = useState([]);
@@ -58,13 +58,13 @@ const ManagerDashboard = ({ navigation, route }) => {
       if (!state.isConnected) {
         console.log('No Internet Connection');
         Alert.alert('No Internet Connection', 'Please check your internet connection and try again.');
-      }      
+      }
     });
-  
+
     return () => {
       unsubscribe();
     };
-  }, []);  
+  }, []);
 
   useEffect(() => {
     getAuthenticatedUser();
@@ -162,30 +162,30 @@ const ManagerDashboard = ({ navigation, route }) => {
         const userAdmin = authenticatedUser ? authenticatedUser.kf_adminname : '';
 
         const homeLoanRecords = homeLoans.filter(
-          (homeLoan) => 
-            // homeLoan.kf_createdby === userAdmin &&
-            (
-              homeLoan.kf_name && homeLoan.kf_name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-              homeLoan.kf_lastname && homeLoan.kf_lastname.toUpperCase().includes(searchQuery.toUpperCase()) ||
-              (homeLoan.kf_mobilenumber && homeLoan.kf_mobilenumber.toLowerCase().includes(searchQuery.toLowerCase())) ||
-              (homeLoan.kf_aadharnumber && homeLoan.kf_aadharnumber.toLowerCase().includes(searchQuery.toLowerCase()))
-            )
-        );        
-        
-        const personalLoanRecords = personalLoans.filter(
-          (personalLoan) => 
-            // personalLoan.kf_createdby === userAdmin &&
-            (
-              personalLoan.kf_firstname && personalLoan.kf_firstname.toUpperCase().includes(searchQuery.toUpperCase()) ||
-              personalLoan.kf_lastname && personalLoan.kf_lastname.toUpperCase().includes(searchQuery.toUpperCase()) ||
-              (personalLoan.kf_mobile && personalLoan.kf_mobile.toLowerCase().includes(searchQuery.toLowerCase())) ||
-              (personalLoan.kf_aadharnumber && personalLoan.kf_aadharnumber.toLowerCase().includes(searchQuery.toLowerCase()))
-            )
+          (homeLoan) =>
+          // homeLoan.kf_createdby === userAdmin &&
+          (
+            homeLoan.kf_name && homeLoan.kf_name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+            homeLoan.kf_lastname && homeLoan.kf_lastname.toUpperCase().includes(searchQuery.toUpperCase()) ||
+            (homeLoan.kf_mobilenumber && homeLoan.kf_mobilenumber.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (homeLoan.kf_aadharnumber && homeLoan.kf_aadharnumber.toLowerCase().includes(searchQuery.toLowerCase()))
+          )
         );
-    
+
+        const personalLoanRecords = personalLoans.filter(
+          (personalLoan) =>
+          // personalLoan.kf_createdby === userAdmin &&
+          (
+            personalLoan.kf_firstname && personalLoan.kf_firstname.toUpperCase().includes(searchQuery.toUpperCase()) ||
+            personalLoan.kf_lastname && personalLoan.kf_lastname.toUpperCase().includes(searchQuery.toUpperCase()) ||
+            (personalLoan.kf_mobile && personalLoan.kf_mobile.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (personalLoan.kf_aadharnumber && personalLoan.kf_aadharnumber.toLowerCase().includes(searchQuery.toLowerCase()))
+          )
+        );
+
         setHomeLoanRecords(homeLoanRecords);
         setPersonalLoanRecords(personalLoanRecords);
-    
+
         setHomeLoanContacts(homeLoanRecords);
         setPersonalLoanContacts(personalLoanRecords);
 
@@ -209,7 +209,7 @@ const ManagerDashboard = ({ navigation, route }) => {
       const fetchLoanData = async () => {
         try {
           setLoading(true);
-  
+
           const data = {
             grant_type: "client_credentials",
             client_id: "d9dcdf05-37f4-4bab-b428-323957ad2f86",
@@ -217,15 +217,15 @@ const ManagerDashboard = ({ navigation, route }) => {
             scope: "https://org0f7e6203.crm5.dynamics.com/.default",
             client_secret: "JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2",
           };
-  
+
           const tokenResponse = await axios.post(
             "https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token",
             new URLSearchParams(data).toString(),
             { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
           );
-  
+
           const accessToken = tokenResponse.data.access_token;
-  
+
           const responseLoanApplications = await axios.get(
             "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications",
             {
@@ -238,7 +238,7 @@ const ManagerDashboard = ({ navigation, route }) => {
               // }
             }
           );
-  
+
           const responsePersonalLoans = await axios.get(
             "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans",
             {
@@ -251,33 +251,33 @@ const ManagerDashboard = ({ navigation, route }) => {
               // }
             }
           );
-  
+
           const homeLoans = responseLoanApplications.data.value;
           const personalLoans = responsePersonalLoans.data.value;
-  
+
           const filteredHomeLoans = homeLoans.filter(
             (homeLoan) => homeLoan.kf_status !== null
           );
-  
+
           const filteredPersonalLoans = personalLoans.filter(
             (personalLoan) => personalLoan.kf_status !== null
           );
-  
+
           const combinedData = [...filteredHomeLoans, ...filteredPersonalLoans];
-  
+
           setLoanData(combinedData);
-  
+
           const today = new Date();
           const lastMonth = new Date(today);
           lastMonth.setMonth(today.getMonth() - 1);
-  
+
           const lastMonthRecords = combinedData.filter((item) => {
             const createdDate = new Date(item.createdon);
             return createdDate >= lastMonth && createdDate <= today;
           });
-  
+
           setLastMonthData(lastMonthRecords);
-    
+
         } catch (error) {
           console.error("Error fetching loan data:", error);
           console.log("API Response:", error.response?.data);
@@ -285,7 +285,7 @@ const ManagerDashboard = ({ navigation, route }) => {
           setLoading(false);
         }
       };
-  
+
       if (authenticatedUser) {
         fetchLoanData();
       } else {
@@ -293,8 +293,8 @@ const ManagerDashboard = ({ navigation, route }) => {
       }
     }, [authenticatedUser])
   );
-  
-  
+
+
 
   const filteredData = loanData.filter(
     (item) =>
@@ -344,21 +344,22 @@ const ManagerDashboard = ({ navigation, route }) => {
     setRefresh(!refresh);
   };
 
-const handleDynamicDashboard = () => {
- try {
-  navigation.navigate('DynamicDashboardScreen');
-} catch (error) {
-  console.error('Error navigating to DynamicDashboardScreen:', error);
-}
-}
+  const handleDynamicDashboard = () => {
+    try {
+      navigation.navigate('DynamicDashboardScreen');
+    } catch (error) {
+      console.error('Error navigating to DynamicDashboardScreen:', error);
+    }
+  }
 
-const handlelogout = () => {
-  navigation.navigate( "Setting");
-};
+  const handlelogout = () => {
+    navigation.navigate("Setting");
+  };
 
-const handleNavigation = () => {
-  navigation.navigate("Notification", { kf_adminname });
-};
+  const handleNavigation = () => {
+    navigation.navigate("Notification", { kf_adminname });
+  };
+
   return (
     <>
       <StatusBar />
@@ -373,14 +374,14 @@ const handleNavigation = () => {
             {/* <TouchableOpacity style={styles.iconButton} onPress={() => navigation.openDrawer()}>
               <Ionicons name="list-sharp" size={25} color="#fff" />
             </TouchableOpacity> */}
-             <TouchableOpacity style={styles.iconButton} onPress={handlelogout}>
+            <TouchableOpacity style={styles.iconButton} onPress={handlelogout}>
               <Ionicons name="list-sharp" size={25} color="#fff" />
             </TouchableOpacity>
             <Text style={styles.text}>Kevin Small Finance</Text>
             <TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
               <Ionicons name="notifications" size={25} color="#fff" />
             </TouchableOpacity>
-           
+
           </View>
 
           <View style={styles.searchSection}>
@@ -415,12 +416,12 @@ const handleNavigation = () => {
 
             <View>
               {/* {authenticatedUser && ( */}
-                <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 2, textAlign: "center" }}>Created By: {kf_adminname}</Text>
+              <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 2, textAlign: "center" }}>Created By: {kf_adminname}</Text>
               {/* // )} */}
             </View>
             {/* <LogoutButton navigation={navigation}/> */}
 
-            <Text style={{textAlign: "center", marginVertical: 10, fontSize: 18, fontWeight: "bold",color: "red"}}>MANAGER DASHBOARD</Text>
+            <Text style={{ textAlign: "center", marginVertical: 10, fontSize: 18, fontWeight: "bold", color: "red" }}>MANAGER DASHBOARD</Text>
 
 
             <View style={styles.chart}>
@@ -480,21 +481,21 @@ const handleNavigation = () => {
               />
             </View>
 
-              {/* Dynamic Dashboard Button */}
-              {/* <TouchableOpacity style={styles.dynamicDashboardButton} onPress={handleDynamicDashboard}>
+            {/* Dynamic Dashboard Button */}
+            {/* <TouchableOpacity style={styles.dynamicDashboardButton} onPress={handleDynamicDashboard}>
                 <Text style={styles.dynamicDashboardButtonText}>Dynamic Dashboard</Text>
               </TouchableOpacity> */}
 
-              <View style={{ marginLeft: 0 }}>
-                <TouchableOpacity
-                  onPress={() => setShowAllLoans(!showAllLoans)}
-                  style={styles.viewButton}
-                >
-                  <Text style={styles.dynamicDashboardButtonText}>
-                    {showAllLoans ? 'View Less' : 'View More'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
+            <View style={{ marginLeft: 0 }}>
+              <TouchableOpacity
+                onPress={() => setShowAllLoans(!showAllLoans)}
+                style={styles.viewButton}
+              >
+                <Text style={styles.dynamicDashboardButtonText}>
+                  {showAllLoans ? 'View Less' : 'View More'}
+                </Text>
+              </TouchableOpacity>
+            </View>
 
 
             {/* <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10 }}>
@@ -525,7 +526,7 @@ const handleNavigation = () => {
           </View> */}
 
             <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10 }}>
-            {initialLoading ? (
+              {initialLoading ? (
                 <ActivityIndicator size="large" color="#0000ff" />
               ) : (
                 <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
@@ -728,20 +729,20 @@ const styles = StyleSheet.create({
     marginRight: 30
   },
   dynamicDashboardButtonText: {
-    backgroundColor:'rgba(255, 28, 53, 255)',
+    backgroundColor: 'rgba(255, 28, 53, 255)',
     color: '#fff',
     fontSize: 15,
     fontWeight: 'bold',
-    textAlign:"center"
+    textAlign: "center"
   },
   viewButton: {
-    backgroundColor:'rgba(255, 28, 53, 255)',
+    backgroundColor: 'rgba(255, 28, 53, 255)',
     borderRadius: 25,
     padding: 10,
     marginTop: 10,
     width: 100,
     alignSelf: "flex-end"
-},
+  },
 });
 
 export default ManagerDashboard;
