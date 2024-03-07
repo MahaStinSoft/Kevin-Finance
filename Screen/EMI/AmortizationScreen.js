@@ -573,6 +573,7 @@ const AmortizationScreen = ({ route }) => {
 
       setFetchedRecords(fetchedRecords);
       setIsLoading(false);
+      setSaveButtonDisabled(true);
     } catch (error) {
       console.error("Error fetching loan records:", error);
     }
@@ -978,7 +979,7 @@ const AmortizationScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <HeaderComponent titleText="Schedule Details(Personal)" onPress={handleGoBackPersonaldetails} />
+      <HeaderComponent titleText="Schedule Details" onPress={handleGoBackPersonaldetails} />
       <Text style={[styles.amortizationTitle, { marginTop: 10 }]}>EMI Details</Text>
       <View style={{ paddingHorizontal: 15 }}>
 
@@ -1061,100 +1062,97 @@ const AmortizationScreen = ({ route }) => {
       </View>
 
       <View style={styles.createdRecordsList}>
-        <Text style={styles.createdRecordsTitle}>  EMI Unpaid Records:</Text>
-        <ScrollView contentContainerStyle={styles.scrollViewContent} ref={scrollViewRef}>
-          {fetchedRecords
-            .filter(record => {
-              // console.log("Record:", record); // Log each record to see if they match the filter condition
-              return record.kf_applicationnumber === loanDetails.applicationNumber && record.kf_paidstatus === false;
-            })
-            .map((item) => (
-              <View>
-                <View style={styles.amortizationTile}>
-                  <TouchableOpacity key={item.kf_loanId} onPress={() => handlePress(item)}>
-                    <View style={styles.column}>
-                      <View style={styles.column1}>
-                        <Text >Terms</Text>
-                        <Text >{parseInt(item.kf_totalmonths)}</Text>
-                      </View>
-
-                      <View style={styles.column2}>
-                        <Text>EMI Amount</Text>
-                        <Text>{item.kf_emiamount}</Text>
-                      </View>
-
-                      <View style={styles.column3}>
-                        <Text>Payment Date</Text>
-                        <Text>{(item.kf_receiveddate)}</Text>
-                      </View>
-
-                      <View style={[styles.column4, { backgroundColor: item.kf_paidstatus === 'Paid' ? 'green' : 'red' }]}>
-                        <Text style={{ color: "white", fontWeight: "bold", textAlign: "center" }}>
-                          {item.kf_paidstatus ? 'Paid' : 'Unpaid'}
-                        </Text>
-                      </View>
-
-                    </View>
-                  </TouchableOpacity>
-
-                  {/* <TouchableOpacity 
-                    // onPress={handlePaid}
-                    style={[styles.paidButton, { backgroundColor: item.paid ? 'green' : 'red' }]}>
-                      <Text style={styles.paidButtonText}>{item.paid ? 'Paid' : 'Unpaid'}</Text>
-             </TouchableOpacity> */}
-
+  <Text style={styles.createdRecordsTitle}>EMI Unpaid Records:</Text>
+  {fetchedRecords.filter(record => record.kf_applicationnumber === loanDetails.applicationNumber && record.kf_paidstatus === false).length === 0 ? (
+    <View style={{ alignItems:"center",justifyContent: "center" , flex:1}}>
+    <Text>No unpaid records found.</Text>
+    </View>
+  ) : (
+    <ScrollView contentContainerStyle={styles.scrollViewContent} ref={scrollViewRef}>
+      {fetchedRecords
+        .filter(record => record.kf_applicationnumber === loanDetails.applicationNumber && record.kf_paidstatus === false)
+        .map((item) => (
+          <View key={item.kf_loanId}>
+            <View style={styles.amortizationTile}>
+              <TouchableOpacity onPress={() => handlePress(item)}>
+                <View style={styles.column}>
+                  <View style={styles.column1}>
+                    <Text>{parseInt(item.kf_totalmonths)}</Text>
+                  </View>
+                  <View style={styles.column2}>
+                    <Text>EMI Amount</Text>
+                    <Text>{item.kf_emiamount}</Text>
+                  </View>
+                  <View style={styles.column3}>
+                    <Text>Payment Date</Text>
+                    <Text>{(item.kf_receiveddate)}</Text>
+                  </View>
+                  <View style={[styles.column4, { backgroundColor: item.kf_paidstatus ? 'green' : 'red' }]}>
+                    <Text style={{ color: "white", fontWeight: "bold", textAlign: "center", marginVertical: -5 }}>
+                      {item.kf_paidstatus ? 'Paid' : 'Unpaid'}
+                    </Text>
+                  </View>
                 </View>
-
-              </View>
-            ))}
-        </ScrollView>
-      </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ))}
+    </ScrollView>
+  )}
+</View>
 
       <View style={styles.createdRecordsContainer}>
-        <Text style={styles.createdRecordsTitle}>  EMI Paided Records:</Text>
-        <ScrollView contentContainerStyle={styles.scrollViewContent} ref={scrollViewRef}>
-          {fetchedSavedRecords
-            .filter(record => {
-              // console.log("Record:", record); // Log each record to see if they match the filter condition
-              return record.kf_applicationnumber === loanDetails.applicationNumber;
-            })
-            .map((item) => (
-              <View>
-                <View style={styles.amortizationTile}>
-                  <TouchableOpacity key={item.kf_loanId} onPress={() => handlePress(item)}>
-                    <View style={styles.column}>
-                      <View style={styles.column1}>
-                        <Text >Terms</Text>
-                        <Text >{parseInt(item.kf_totalmonths)}</Text>
-                      </View>
-
-                      <View style={styles.column2}>
-                        <Text>EMI Amount</Text>
-                        <Text>{item.kf_emiamount}</Text>
-                      </View>
-
-                      <View style={styles.column3}>
-                        <Text>Payment Date</Text>
-                        <Text>{(item.kf_receiveddate)}</Text>
-                      </View>
-
-                      <View style={[styles.column4, { backgroundColor: item.kf_paidstatus === 'Paid' ? 'red' : 'green' }]}>
-                        <Text style={{ color: "white", fontWeight: "bold", textAlign: "center" }}>
-                          {item.kf_paidstatus ? 'Paid' : 'Unpaid'}
-                        </Text>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-
+  <Text style={styles.createdRecordsTitle}>EMI Paid Records:</Text>
+  {fetchedSavedRecords.filter(record => record.kf_applicationnumber === loanDetails.applicationNumber).length === 0 ? (
+    <View style={{alignItems:"center",justifyContent: "center" , flex:1}}>
+    <Text>No paid records found.</Text>
+    </View>
+  ) : (
+    <ScrollView contentContainerStyle={styles.scrollViewContent} ref={scrollViewRef}>
+      {fetchedSavedRecords
+        .filter(record => record.kf_applicationnumber === loanDetails.applicationNumber)
+        .map((item) => (
+          <View key={item.kf_loanId}>
+            <View style={styles.amortizationTile}>
+              <TouchableOpacity onPress={() => handlePress(item)}>
+                <View style={styles.column}>
+                  <View style={styles.column1}>
+                    <Text>{parseInt(item.kf_totalmonths)}</Text>
+                  </View>
+                  <View style={styles.column2}>
+                    <Text>EMI Amount</Text>
+                    <Text>{item.kf_emiamount}</Text>
+                  </View>
+                  <View style={styles.column3}>
+                    <Text>Payment Date</Text>
+                    <Text>{(item.kf_receiveddate)}</Text>
+                  </View>
+                  <View style={[styles.column4, { backgroundColor: item.kf_paidstatus ? 'red' : 'green' }]}>
+                    <Text style={{ color: "white", fontWeight: "bold", textAlign: "center", marginVertical: -5 }}>
+                      {item.kf_paidstatus ? 'Paid' : 'Unpaid'}
+                    </Text>
+                  </View>
                 </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ))}
+    </ScrollView>
+  )}
+</View>
 
-              </View>
-            ))}
-        </ScrollView>
+{/* {!recordsFetched && !saveButtonDisabled && (
+  <Button
+    title="Save Records to CRM"
+    onPress={() => {
+      handleSave();
+      setRecordsFetched(true); // Set recordsFetched to true when saving is initiated
+    }}
+    disabled={isSaving}
+  />
+)} */}
 
-      </View>
-
-      {!recordsFetched && (
+{fetchedRecords.filter(record => record.kf_applicationnumber === loanDetails.applicationNumber && record.kf_paidstatus === false).length === 0 && (
         <Button
           title="Save Records to CRM"
           onPress={() => {
@@ -1165,14 +1163,8 @@ const AmortizationScreen = ({ route }) => {
         />
       )}
 
-      {isSaving && <ActivityIndicator size="large" color="#0000ff" />}
-
-      {createdRecords.length > 0 && (
-        <Text>All records created successfully in CRM</Text>
-      )}
     </View>
   );
-
 };
 
 const styles = StyleSheet.create({
@@ -1206,32 +1198,36 @@ const styles = StyleSheet.create({
   },
   amortizationTile: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    // justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 10,
+    padding: 5,
     borderBottomWidth: 1,
     borderBottomColor: 'gray',
-    marginHorizontal: 10
+    marginHorizontal: 5,
+    maxHeight: 100
   },
   column: {
     flexDirection: 'row',
+    alignSelf:"center"
   },
   column1: {
-
+marginLeft: 5
   },
   column2: {
-    marginLeft: 25
+    marginLeft: 35
   },
   column3: {
     marginLeft: 30
   },
   column4: {
-    marginLeft: 60,
+    marginLeft: 30,
     backgroundColor: 'red',
     padding: 8,
     borderRadius: 10,
     color: 'white',
-    width: 60
+    width: "20%",
+    height: 28,
+    alignSelf:"center"
   },
   paidButton: {
     backgroundColor: 'green',
@@ -1282,4 +1278,5 @@ const styles = StyleSheet.create({
     marginLeft: 30
   },
 });
+
 export default AmortizationScreen;
