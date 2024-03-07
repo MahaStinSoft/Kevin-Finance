@@ -18,6 +18,8 @@ const EditLoanDetail = ({ route, navigation }) => {
   const [penalty, setPenalty] = useState(record.kf_penalty || '0');
   const [isLoading, setIsLoading] = useState(false);
   const emiStatusOptions = ['Paid', 'Unpaid'];
+  const [statusUpdated, setStatusUpdated] = useState(false); // New state variable
+  const [emiStatusUpdated, setEmiStatusUpdated] = useState(false); // New state variable
 
   useEffect(() => {
     if (penalty) {
@@ -42,9 +44,86 @@ const EditLoanDetail = ({ route, navigation }) => {
     retrievePaidStatus();
   }, []);
 
+  // const handleUpdate = async () => {
+  //   setIsLoading(true);
+  //   if (!kf_paidstatus) {
+  //     // If EMI status is unpaid, show an alert and return
+  //     Alert.alert('Cannot Update', 'EMI status is unpaid. Cannot update.');
+  //     setIsLoading(false);
+  //     return;
+  //   }
+  //   try {
+  //     const tokenResponse = await axios.post(
+  //       'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+  //       {
+  //         grant_type: 'client_credentials',
+  //         client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+  //         resource: 'https://org0f7e6203.crm5.dynamics.com',
+  //         scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+  //         client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+  //       },
+  //       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+  //     );
+
+  //     const accessToken = tokenResponse.data.access_token;
+  //     const updatedKfPaidStatus = kf_paidstatus ? true : false;
+
+  //     const payload = {
+  //       kf_applicationnumber: applicationNumber,
+  //       kf_principalloanamount: principalLoanAmount,
+  //       kf_receiveddate: receivedDate,
+  //       kf_emiamount: emiAmount,
+  //       kf_remainingbalance: remainingBalance,
+  //       kf_paidstatus: updatedKfPaidStatus,
+  //     };
+
+  //     console.log('Payload:', payload);
+  //     const updateRecordResponse = await axios.patch(
+  //       `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loans(${record.kf_loanid})`,
+  //       payload,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${accessToken}`,
+  //           'Content-Type': 'application/json',
+  //         },
+  //       }
+  //     );
+
+  //     if (updateRecordResponse.status === 204) {
+  //       console.log('Record updated successfully in CRM');
+  //       setIsPaid(true);
+  //       await AsyncStorage.setItem(`paid_${record.kf_loanid}`, 'true');
+  //       Alert.alert('EMI Amount Is Paided Successfully.', '', [
+  //         {
+  //           text: 'OK',
+  //           onPress: () => {
+  //             setIsPaid(true);
+  //             setIsLoading(false);
+  //             setEmiStatusUpdated(true);
+  //             navigation.goBack({ isPaid })
+  //           },
+  //         },
+  //       ]);
+  //     } else {
+  //       console.log('Error updating record in CRM:', updateRecordResponse);
+  //       Alert.alert('Error', 'Failed to update the record in CRM.');
+  //     }
+  //     setkf_paidstatus(kf_paidstatus);
+  //   } catch (error) {
+  //     console.error('Error during update:', error.response?.data || error.message);
+  //     Alert.alert('Error', 'An unexpected error occurred. Please try again later.');
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
   const handleUpdate = async () => {
     setIsLoading(true);
-
+    if (!kf_paidstatus) {
+      Alert.alert('Cannot Update', 'EMI status is unpaid. Cannot update.');
+      setIsLoading(false);
+      return;
+    }
     try {
       const tokenResponse = await axios.post(
         'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
@@ -57,10 +136,10 @@ const EditLoanDetail = ({ route, navigation }) => {
         },
         { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
       );
-
+  
       const accessToken = tokenResponse.data.access_token;
       const updatedKfPaidStatus = kf_paidstatus ? true : false;
-
+  
       const payload = {
         kf_applicationnumber: applicationNumber,
         kf_principalloanamount: principalLoanAmount,
@@ -69,8 +148,7 @@ const EditLoanDetail = ({ route, navigation }) => {
         kf_remainingbalance: remainingBalance,
         kf_paidstatus: updatedKfPaidStatus,
       };
-
-      console.log('Payload:', payload);
+  
       const updateRecordResponse = await axios.patch(
         `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loans(${record.kf_loanid})`,
         payload,
@@ -81,7 +159,7 @@ const EditLoanDetail = ({ route, navigation }) => {
           },
         }
       );
-
+  
       if (updateRecordResponse.status === 204) {
         console.log('Record updated successfully in CRM');
         setIsPaid(true);
@@ -91,7 +169,10 @@ const EditLoanDetail = ({ route, navigation }) => {
             text: 'OK',
             onPress: () => {
               setIsPaid(true);
-              navigation.goBack({ isPaid })
+              setIsLoading(false);
+              setEmiStatusUpdated(true);
+              setStatusUpdated(true); // Set statusUpdated to true after successful update
+              navigation.goBack({ isPaid });
             },
           },
         ]);
@@ -107,6 +188,7 @@ const EditLoanDetail = ({ route, navigation }) => {
       setIsLoading(false);
     }
   };
+  
 
   const handleGoBackPersonaldetails = () => {
     navigation.goBack();
@@ -122,6 +204,7 @@ const EditLoanDetail = ({ route, navigation }) => {
             style={styles.valueInput}
             value={applicationNumber}
             onChangeText={(text) => setApplicationNumber(text)}
+            editable={false}
           />
         </View>
         <View style={styles.row}>
@@ -131,6 +214,7 @@ const EditLoanDetail = ({ route, navigation }) => {
             value={principalLoanAmount}
             onChangeText={(text) => setPrincipalLoanAmount(text)}
             keyboardType="numeric"
+            editable={false}
           />
         </View>
         <View style={styles.row}>
@@ -139,13 +223,14 @@ const EditLoanDetail = ({ route, navigation }) => {
             style={styles.valueInput}
             value={receivedDate}
             onChangeText={(text) => setReceivedDate(text)}
+            editable={false}
           />
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Penalty:</Text>
           <TextInput
-            style={styles.valueInput}
+            style={[styles.valueInput, { color: "black" }]}
             value={penalty}
             onChangeText={(text) => setPenalty(text)}
             keyboardType="numeric"
@@ -159,39 +244,32 @@ const EditLoanDetail = ({ route, navigation }) => {
             value={emiAmount}
             onChangeText={(text) => setEmiAmount(text)}
             keyboardType="numeric"
+            editable={false}
           />
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>EMI Status</Text>
           <Picker
-            style={styles.valueInput}
+            style={[styles.valueInput, { color: kf_paidstatus ? "gray" : "black" }]}
             selectedValue={kf_paidstatus ? 'Paid' : 'Unpaid'}
             onValueChange={(itemValue, itemIndex) => setkf_paidstatus(itemValue === 'Paid')}
+            enabled={!kf_paidstatus && !isLoading} // Disable the Picker if isLoading is true
           >
             {emiStatusOptions.map((option, index) => (
               <Picker.Item key={index} label={option} value={option} />
             ))}
           </Picker>
-
         </View>
 
-        <View>
-          {/* <TouchableOpacity
-          style={[styles.button, { backgroundColor: isPaid ? 'green' : 'red' }]}
-          disabled={isPaid}
-          onPress={handleUpdate}
-        >
-          <Text style={styles.buttonText}>{isPaid ? 'Paid' : 'Mark as Paid'}</Text>
-        </TouchableOpacity> */}
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleUpdate}
-            disabled={isLoading} // Disable the button when the update is in progress
-          >
-            <Text style={styles.buttonText}>Paid</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+  style={[styles.button, { backgroundColor: kf_paidstatus ? 'green' : 'blue' }]}
+  onPress={handleUpdate}
+  disabled={isLoading || kf_paidstatus === 'Paid' || statusUpdated} 
+>
+  <Text style={styles.buttonText}>Paid</Text>
+</TouchableOpacity>
+
       </View>
     </View>
   );
@@ -229,8 +307,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 5,
-    paddingHorizontal: 10,
+    paddingHorizontal: 5,
     fontSize: 16,
+    color: "gray"
   },
   button: {
     marginTop: 20,

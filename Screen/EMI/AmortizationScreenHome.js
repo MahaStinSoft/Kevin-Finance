@@ -1077,7 +1077,7 @@ const AmortizationScreenHome = ({ route }) => {
                   <TouchableOpacity key={item.kf_loanId} onPress={() => handlePress(item)}>
                     <View style={styles.column}>
                       <View style={styles.column1}>
-                        <Text >Terms</Text>
+                        {/* <Text >Terms</Text> */}
                         <Text >{parseInt(item.kf_totalmonths)}</Text>
                       </View>
 
@@ -1092,7 +1092,7 @@ const AmortizationScreenHome = ({ route }) => {
                       </View>
 
                       <View style={[styles.column4, { backgroundColor: item.kf_paidstatus === 'Paid' ? 'green' : 'red' }]}>
-                        <Text style={{ color: "white", fontWeight: "bold", textAlign: "center" }}>
+                        <Text style={{ color: "white", fontWeight: "bold", textAlign: "center", marginVertical: -5 }}>
                           {item.kf_paidstatus ? 'Paid' : 'Unpaid'}
                         </Text>
                       </View>
@@ -1127,7 +1127,7 @@ const AmortizationScreenHome = ({ route }) => {
                   <TouchableOpacity key={item.kf_loanId} onPress={() => handlePress(item)}>
                     <View style={styles.column}>
                       <View style={styles.column1}>
-                        <Text >Terms</Text>
+                        {/* <Text >Terms</Text> */}
                         <Text >{parseInt(item.kf_totalmonths)}</Text>
                       </View>
 
@@ -1142,7 +1142,7 @@ const AmortizationScreenHome = ({ route }) => {
                       </View>
 
                       <View style={[styles.column4, { backgroundColor: item.kf_paidstatus === 'Paid' ? 'red' : 'green' }]}>
-                        <Text style={{ color: "white", fontWeight: "bold", textAlign: "center" }}>
+                        <Text style={{ color: "white", fontWeight: "bold", textAlign: "center", marginVertical: -5 }}>
                           {item.kf_paidstatus ? 'Paid' : 'Unpaid'}
                         </Text>
                       </View>
@@ -1209,32 +1209,36 @@ const styles = StyleSheet.create({
   },
   amortizationTile: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    // justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 10,
+    padding: 5,
     borderBottomWidth: 1,
     borderBottomColor: 'gray',
-    marginHorizontal: 10
+    marginHorizontal: 5,
+    maxHeight: 100
   },
   column: {
     flexDirection: 'row',
+    alignSelf:"center"
   },
   column1: {
-
+marginLeft: 5
   },
   column2: {
-    marginLeft: 25
+    marginLeft: 35
   },
   column3: {
     marginLeft: 30
   },
   column4: {
-    marginLeft: 60,
+    marginLeft: 30,
     backgroundColor: 'red',
     padding: 8,
     borderRadius: 10,
     color: 'white',
-    width: 60
+    width: "20%",
+    height: 28,
+    alignSelf:"center"
   },
   paidButton: {
     backgroundColor: 'green',
@@ -1276,13 +1280,10 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,
-
   },
   gridItemText: {
     fontSize: 16,
     marginBottom: 5,
-
-
   },
   label: {
     marginLeft: 30

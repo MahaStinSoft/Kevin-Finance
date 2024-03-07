@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, TouchableOpacity, Alert, StyleSheet, ScrollView, Text, FlatList, Linking, Platform, Image, Button } from 'react-native';
 import axios from 'axios';
+import { schedulePushNotification } from '../../common/notificationUtils';
 
 import HeaderComponent from '../../common/Header';
 import ButtonComponent from '../../common/ButtonComponent';
@@ -65,7 +66,6 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [sendApprovalDisabled, setSendApprovalDisabled] = useState(false);
 
   const { signatureImage } = route.params;
-  // const [signatureImage, setSignatureImage] = useState(null);
   const [recordId, setRecordId] = useState(loanApplication.kf_loanapplicationid);
   const [imageSource, setImageSource] = useState(null);
 
@@ -882,6 +882,24 @@ console.log("send home approval ", sendApproval);
   const date = emiCollectionDate ? new Date(emiCollectionDate) : null;
   const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
 
+  // const handleSendNotification = () => {
+    
+  //   navigation.navigate('SendNotification', { 
+  //     route: route,
+  //     sendApproval: sendApproval,
+  //     createdby: createdby,
+  //    applicationnumber: applicationnumber, 
+  //    firstname: firstname,
+  //    lastname: lastname,
+  //   loanAmount: loanAmountRequested
+  //     });
+  // };
+  const handleSendNotification = () => {
+    schedulePushNotification(applicationnumber, firstname, lastname, loanAmountRequested, createdby); // Trigger push notification
+  };
+
+  console.log("applicationnumber home: " + firstname);
+  
   return (
     <View>
       <HeaderComponent titleText="Edit Home Screen"
@@ -893,6 +911,8 @@ console.log("send home approval ", sendApproval);
       <ScrollView>
         <View style={styles.container}>
           <View style={styles.wrapper}>
+          <Button title="notification" onPress={handleSendNotification}/>
+
             <LoanStatusPicker
               onOptionChange={handleSendApproval}
               title="Send Approval"
@@ -1165,7 +1185,7 @@ console.log("send home approval ", sendApproval);
             handleViewImages={handleViewImages}
           />
           {/* <SendNotification/> */}
-          <SendNotification sendApproval={sendApproval} />
+          {/* <SendNotification sendApproval={sendApproval} /> */}
 
           {/* <Text> annotation</Text> */}
         </View>
