@@ -4,6 +4,7 @@ import axios from 'axios';
 import HeaderComponent from '../../common/Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
+import ButtonComponent from '../../common/ButtonComponent';
 
 const EditLoanDetail = ({ route, navigation }) => {
   const { record, recordId } = route.params;
@@ -13,6 +14,8 @@ const EditLoanDetail = ({ route, navigation }) => {
   const [receivedDate, setReceivedDate] = useState(record.kf_receiveddate);
   const [isPaid, setIsPaid] = useState(false);
   const [remainingBalance, setRemainingBalance] = useState(record.kf_remainingbalance);
+  const [kf_totalmonths, setMonth] = useState(record.kf_totalmonths);
+  const [interestPayment, setInterestPayment] = useState(record.kf_annualinterest);
   const [emiAmount, setEmiAmount] = useState(record.kf_emiamount.toString());
   const [applicationNumber, setApplicationNumber] = useState(record.kf_applicationnumber);
   const [penalty, setPenalty] = useState(record.kf_penalty || '0');
@@ -136,10 +139,10 @@ const EditLoanDetail = ({ route, navigation }) => {
         },
         { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
       );
-  
+
       const accessToken = tokenResponse.data.access_token;
       const updatedKfPaidStatus = kf_paidstatus ? true : false;
-  
+
       const payload = {
         kf_applicationnumber: applicationNumber,
         kf_principalloanamount: principalLoanAmount,
@@ -148,7 +151,7 @@ const EditLoanDetail = ({ route, navigation }) => {
         kf_remainingbalance: remainingBalance,
         kf_paidstatus: updatedKfPaidStatus,
       };
-  
+
       const updateRecordResponse = await axios.patch(
         `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loans(${record.kf_loanid})`,
         payload,
@@ -159,7 +162,7 @@ const EditLoanDetail = ({ route, navigation }) => {
           },
         }
       );
-  
+
       if (updateRecordResponse.status === 204) {
         console.log('Record updated successfully in CRM');
         setIsPaid(true);
@@ -188,7 +191,7 @@ const EditLoanDetail = ({ route, navigation }) => {
       setIsLoading(false);
     }
   };
-  
+
 
   const handleGoBackPersonaldetails = () => {
     navigation.goBack();
@@ -208,6 +211,15 @@ const EditLoanDetail = ({ route, navigation }) => {
           />
         </View>
         <View style={styles.row}>
+          <Text style={styles.label}>Loan Terms:</Text>
+          <TextInput
+            style={styles.valueInput}
+            value={kf_totalmonths}
+            onChangeText={(text) => setMonth(text)}
+            editable={false}
+          />
+        </View>
+        <View style={styles.row}>
           <Text style={styles.label}>Principal Loan Amount:</Text>
           <TextInput
             style={styles.valueInput}
@@ -218,7 +230,18 @@ const EditLoanDetail = ({ route, navigation }) => {
           />
         </View>
         <View style={styles.row}>
-          <Text style={styles.label}>Received Date:</Text>
+          <Text style={styles.label}>Interest:</Text>
+          <TextInput
+            style={styles.valueInput}
+            value={interestPayment}
+            onChangeText={(text) => setInterestPayment(text)}
+            keyboardType="numeric"
+            editable={false}
+          />
+        </View>
+        {/* <Text>{interestPayment}</Text> */}
+        <View style={styles.row}>
+          <Text style={styles.label}>Due Date:</Text>
           <TextInput
             style={styles.valueInput}
             value={receivedDate}
@@ -226,7 +249,6 @@ const EditLoanDetail = ({ route, navigation }) => {
             editable={false}
           />
         </View>
-
         <View style={styles.row}>
           <Text style={styles.label}>Penalty:</Text>
           <TextInput
@@ -236,7 +258,6 @@ const EditLoanDetail = ({ route, navigation }) => {
             keyboardType="numeric"
           />
         </View>
-
         <View style={styles.row}>
           <Text style={styles.label}>EMI Amount:</Text>
           <TextInput
@@ -247,7 +268,16 @@ const EditLoanDetail = ({ route, navigation }) => {
             editable={false}
           />
         </View>
-
+        <View style={styles.row}>
+          <Text style={styles.label}>Remaining Balance:</Text>
+          <TextInput
+            style={styles.valueInput}
+            value={remainingBalance}
+            onChangeText={(text) => setRemainingBalance(text)}
+            keyboardType="numeric"
+            editable={false}
+          />
+        </View>
         <View style={styles.row}>
           <Text style={styles.label}>EMI Status</Text>
           <Picker
@@ -261,14 +291,19 @@ const EditLoanDetail = ({ route, navigation }) => {
             ))}
           </Picker>
         </View>
-
-        <TouchableOpacity
+        {/* <TouchableOpacity
   style={[styles.button, { backgroundColor: kf_paidstatus ? 'green' : 'blue' }]}
   onPress={handleUpdate}
   disabled={isLoading || kf_paidstatus === 'Paid' || statusUpdated} 
 >
   <Text style={styles.buttonText}>Paid</Text>
-</TouchableOpacity>
+</TouchableOpacity> */}
+
+        <ButtonComponent title="Update"
+          onPress={handleUpdate}
+          disabled={isLoading || kf_paidstatus === 'Paid' || statusUpdated}
+          style={{ width: "35%", backgroundColor: kf_paidstatus ? 'green' : 'red' }}
+        />
 
       </View>
     </View>
@@ -278,7 +313,7 @@ const EditLoanDetail = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f0f0',
+    // backgroundColor: '#f0f0f0',
   },
   title: {
     fontSize: 24,
@@ -287,10 +322,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   detailsContainer: {
-    backgroundColor: '#fff',
+    // backgroundColor: '#fff',
     padding: 20,
-    borderRadius: 10,
-    elevation: 3,
+    // borderRadius: 10,
+    // elevation: 3,
   },
   row: {
     flexDirection: 'row',
@@ -300,7 +335,7 @@ const styles = StyleSheet.create({
   label: {
     flex: 1,
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 14,
   },
   valueInput: {
     flex: 2,
@@ -308,13 +343,13 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 5,
     paddingHorizontal: 5,
-    fontSize: 16,
+    fontSize: 14,
     color: "gray"
   },
   button: {
     marginTop: 20,
     padding: 10,
-    backgroundColor: 'blue',
+    // backgroundColor: 'blue',
     borderRadius: 5,
     alignItems: 'center',
   },

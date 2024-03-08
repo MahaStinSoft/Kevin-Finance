@@ -948,6 +948,8 @@ const AmortizationScreen = ({ route }) => {
       remainingBalance: item.kf_remainingbalance,
       emiAmount: item.kf_emiamount,
       applicationNumber: item.kf_applicationnumber,
+      kf_totalmonths: item.month,
+      kf_annualinterest: item.interestPayment
     });
   };
 
@@ -980,8 +982,9 @@ const AmortizationScreen = ({ route }) => {
   return (
     <View style={styles.container}>
       <HeaderComponent titleText="Schedule Details" onPress={handleGoBackPersonaldetails} />
+      <ScrollView>
       <Text style={[styles.amortizationTitle, { marginTop: 10 }]}>EMI Details</Text>
-      <View style={{ paddingHorizontal: 15 }}>
+      <View style={{ paddingHorizontal: 15, marginBottom: 20 }}>
 
         <View style={{ flexDirection: "row" }}>
           <Text style={styles.detailsLabel}>Name:</Text>
@@ -1062,13 +1065,14 @@ const AmortizationScreen = ({ route }) => {
       </View>
 
       <View style={styles.createdRecordsList}>
-  <Text style={styles.createdRecordsTitle}>EMI Unpaid Records:</Text>
+  <Text style={styles.amortizationTitle}>EMI Unpaid Records:</Text>
   {fetchedRecords.filter(record => record.kf_applicationnumber === loanDetails.applicationNumber && record.kf_paidstatus === false).length === 0 ? (
     <View style={{ alignItems:"center",justifyContent: "center" , flex:1}}>
     <Text>No unpaid records found.</Text>
     </View>
   ) : (
-    <ScrollView contentContainerStyle={styles.scrollViewContent} ref={scrollViewRef}>
+    <View style={[styles.scrollViewContent, {marginBottom: 20}]}>
+    {/* <ScrollView contentContainerStyle={styles.scrollViewContent} ref={scrollViewRef}> */}
       {fetchedRecords
         .filter(record => record.kf_applicationnumber === loanDetails.applicationNumber && record.kf_paidstatus === false)
         .map((item) => (
@@ -1097,18 +1101,20 @@ const AmortizationScreen = ({ route }) => {
             </View>
           </View>
         ))}
-    </ScrollView>
+    {/* </ScrollView> */}
+    </View>
   )}
 </View>
 
       <View style={styles.createdRecordsContainer}>
-  <Text style={styles.createdRecordsTitle}>EMI Paid Records:</Text>
+  <Text style={styles.amortizationTitle}>EMI Paid Records:</Text>
   {fetchedSavedRecords.filter(record => record.kf_applicationnumber === loanDetails.applicationNumber).length === 0 ? (
     <View style={{alignItems:"center",justifyContent: "center" , flex:1}}>
     <Text>No paid records found.</Text>
     </View>
   ) : (
-    <ScrollView contentContainerStyle={styles.scrollViewContent} ref={scrollViewRef}>
+    <View style={styles.scrollViewContent}>
+     {/* <ScrollView contentContainerStyle={styles.scrollViewContent} ref={scrollViewRef}> */}
       {fetchedSavedRecords
         .filter(record => record.kf_applicationnumber === loanDetails.applicationNumber)
         .map((item) => (
@@ -1127,7 +1133,7 @@ const AmortizationScreen = ({ route }) => {
                     <Text>Payment Date</Text>
                     <Text>{(item.kf_receiveddate)}</Text>
                   </View>
-                  <View style={[styles.column4, { backgroundColor: item.kf_paidstatus ? 'red' : 'green' }]}>
+                  <View style={[styles.column4, { backgroundColor: item.kf_paidstatus ? 'green' : 'red' }]}>
                     <Text style={{ color: "white", fontWeight: "bold", textAlign: "center", marginVertical: -5 }}>
                       {item.kf_paidstatus ? 'Paid' : 'Unpaid'}
                     </Text>
@@ -1137,7 +1143,8 @@ const AmortizationScreen = ({ route }) => {
             </View>
           </View>
         ))}
-    </ScrollView>
+    {/* </ScrollView> */}
+    </View>
   )}
 </View>
 
@@ -1153,16 +1160,16 @@ const AmortizationScreen = ({ route }) => {
 )} */}
 
 {fetchedRecords.filter(record => record.kf_applicationnumber === loanDetails.applicationNumber && record.kf_paidstatus === false).length === 0 && (
-        <Button
-          title="Save Records to CRM"
+        <ButtonComponent
+          title="Create EMI Schedule"
           onPress={() => {
             handleSave();
-            setRecordsFetched(true); // Set recordsFetched to true when saving is initiated
+            setRecordsFetched(true); 
           }}
           disabled={isSaving}
         />
       )}
-
+</ScrollView>
     </View>
   );
 };
@@ -1190,11 +1197,12 @@ const styles = StyleSheet.create({
     marginTop: 6
   },
   amortizationTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     marginTop: 0,
     marginBottom: 10,
     paddingHorizontal: 10,
+    color: "red"
   },
   amortizationTile: {
     flexDirection: 'row',
@@ -1241,7 +1249,9 @@ marginLeft: 5
   },
   detailsLabel: {
     width: "50%",
-    marginVertical: 15
+    marginVertical: 15,
+    fontSize: 14,
+    fontWeight: "bold"
   },
   createdRecordsContainer: {
     flex: 1,
