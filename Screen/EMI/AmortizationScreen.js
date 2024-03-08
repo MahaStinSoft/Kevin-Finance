@@ -35,16 +35,16 @@
 //       }
 //       return item;
 //     });
-  
+
 //     setLoanDetails(prevLoanDetails => ({
 //       ...prevLoanDetails,
 //       amortizationSchedule: updatedAmortizationSchedule
 //     }));
-  
+
 //     // Save updated amortization schedule to AsyncStorage
 //     saveAmortizationSchedule(updatedAmortizationSchedule, loanDetails.applicationNumber);
 //   };
-  
+
 //   // Function to load amortization schedule and paid status from AsyncStorage
 //   const loadAmortizationSchedule = async () => {
 //     try {
@@ -75,13 +75,13 @@
 //   useEffect(() => {
 //     loadAmortizationSchedule();
 //   }, []);
-  
+
 //   useEffect(() => {
 //     if (route.params && route.params.isPaid && route.params.month) {
 //       updatePaidStatus();
 //     }
 //   }, [route.params]);
-  
+
 
 
 // const calculateEMIAmount = () => {
@@ -258,12 +258,12 @@
 //         }
 //         return item;
 //       });
-  
+
 //       setLoanDetails(prevLoanDetails => ({
 //         ...prevLoanDetails,
 //         amortizationSchedule: updatedAmortizationSchedule
 //       }));
-  
+
 //       // Save updated amortization schedule to AsyncStorage for the current user
 //       saveAmortizationSchedule(updatedAmortizationSchedule, loanDetails.applicationNumber);
 //     }
@@ -309,7 +309,7 @@
 //             editable={false}
 //           />
 //         </View>
-        
+
 //         <View style={{ flexDirection: "row"}}>
 //           <Text style={styles.detailsLabel}>Application Number:</Text>
 //           <TextInput
@@ -983,58 +983,58 @@ const AmortizationScreen = ({ route }) => {
     <View style={styles.container}>
       <HeaderComponent titleText="Schedule Details" onPress={handleGoBackPersonaldetails} />
       <ScrollView>
-      <Text style={[styles.amortizationTitle, { marginTop: 10 }]}>EMI Details</Text>
-      <View style={{ paddingHorizontal: 15, marginBottom: 20 }}>
+        <Text style={[styles.amortizationTitle, { marginTop: 10 }]}>EMI Details</Text>
+        <View style={{ paddingHorizontal: 15, marginBottom: 20 }}>
 
-        <View style={{ flexDirection: "row" }}>
-          <Text style={styles.detailsLabel}>Name:</Text>
-          <TextInput
-            style={styles.textInputContainer}
-            value={loanDetails.name}
-            onChangeText={(text) => setLoanDetails({ ...loanDetails, principalLoanAmount: text })}
-            editable={false}
-          />
-        </View>
+          <View style={{ flexDirection: "row" }}>
+            <Text style={styles.detailsLabel}>Name:</Text>
+            <TextInput
+              style={styles.textInputContainer}
+              value={loanDetails.name}
+              onChangeText={(text) => setLoanDetails({ ...loanDetails, principalLoanAmount: text })}
+              editable={false}
+            />
+          </View>
 
-        <View style={{ flexDirection: "row" }}>
-          <Text style={styles.detailsLabel}>Application Number:</Text>
-          <TextInput
-            style={styles.textInputContainer}
-            value={loanDetails.applicationNumber}
-            onChangeText={(text) => setLoanDetails({ ...loanDetails, principalLoanAmount: text })}
-            editable={false}
-          />
-        </View>
+          <View style={{ flexDirection: "row" }}>
+            <Text style={styles.detailsLabel}>Application Number:</Text>
+            <TextInput
+              style={styles.textInputContainer}
+              value={loanDetails.applicationNumber}
+              onChangeText={(text) => setLoanDetails({ ...loanDetails, principalLoanAmount: text })}
+              editable={false}
+            />
+          </View>
 
-        <View style={{ flexDirection: "row" }}>
-          <Text style={styles.detailsLabel}>Loan Amount:</Text>
-          <TextInput
-            style={styles.textInputContainer}
-            value={loanDetails.principalLoanAmount}
-            onChangeText={(text) => setLoanDetails({ ...loanDetails, principalLoanAmount: text })}
-            editable={false}
-          />
-        </View>
-        <View style={{ flexDirection: "row" }}>
-          <Text style={styles.detailsLabel}>Annual Interest Rate(%):</Text>
-          <TextInput
-            style={styles.textInputContainer}
-            value={loanDetails.interestRate}
-            onChangeText={(text) => setLoanDetails({ ...loanDetails, interestRate: text })}
-            editable={false}
-          />
-        </View>
-        <View style={{ flexDirection: "row" }}>
-          <Text style={styles.detailsLabel}>EMI schedule:</Text>
-          <TextInput
-            style={styles.textInputContainer}
-            value={getEmiSchedule(loanDetails.emiSchedule)}
-            onChangeText={(text) => setLoanDetails({ ...loanDetails, emiSchedule: text })}
-            editable={false}
-          />
-        </View>
+          <View style={{ flexDirection: "row" }}>
+            <Text style={styles.detailsLabel}>Loan Amount:</Text>
+            <TextInput
+              style={styles.textInputContainer}
+              value={loanDetails.principalLoanAmount}
+              onChangeText={(text) => setLoanDetails({ ...loanDetails, principalLoanAmount: text })}
+              editable={false}
+            />
+          </View>
+          <View style={{ flexDirection: "row" }}>
+            <Text style={styles.detailsLabel}>Annual Interest Rate(%):</Text>
+            <TextInput
+              style={styles.textInputContainer}
+              value={loanDetails.interestRate}
+              onChangeText={(text) => setLoanDetails({ ...loanDetails, interestRate: text })}
+              editable={false}
+            />
+          </View>
+          <View style={{ flexDirection: "row" }}>
+            <Text style={styles.detailsLabel}>EMI schedule:</Text>
+            <TextInput
+              style={styles.textInputContainer}
+              value={getEmiSchedule(loanDetails.emiSchedule)}
+              onChangeText={(text) => setLoanDetails({ ...loanDetails, emiSchedule: text })}
+              editable={false}
+            />
+          </View>
 
-        {/* <View style={{ flexDirection: "row"}}>
+          {/* <View style={{ flexDirection: "row"}}>
         <Text style={styles.detailsLabel}>EMI Collection date:</Text>
         <TextInput
           style={styles.textInputContainer}
@@ -1044,132 +1044,128 @@ const AmortizationScreen = ({ route }) => {
         />
       </View> */}
 
-        <View style={{ flexDirection: "row" }}>
-          <Text style={styles.detailsLabel}>Loan Term (Months):</Text>
-          <TextInput
-            style={styles.textInputContainer}
-            value={loanDetails.loanTermMonths}
-            onChangeText={(text) => setLoanDetails({ ...loanDetails, loanTermMonths: text })}
-            editable={false}
-          />
-        </View>
-        <View style={{ flexDirection: "row" }}>
-          <Text style={styles.detailsLabel}>EMI Amount (Months):</Text>
-          <TextInput
-            style={styles.textInputContainer}
-            value={loanDetails.emiAmount}
-            onChangeText={(text) => setLoanDetails({ ...loanDetails, emiAmount: text })}
-            editable={false}
-          />
-        </View>
-      </View>
-
-      <View style={styles.createdRecordsList}>
-  <Text style={styles.amortizationTitle}>EMI Unpaid Records:</Text>
-  {fetchedRecords.filter(record => record.kf_applicationnumber === loanDetails.applicationNumber && record.kf_paidstatus === false).length === 0 ? (
-    <View style={{ alignItems:"center",justifyContent: "center" , flex:1}}>
-    <Text>No unpaid records found.</Text>
-    </View>
-  ) : (
-    <View style={[styles.scrollViewContent, {marginBottom: 20}]}>
-    {/* <ScrollView contentContainerStyle={styles.scrollViewContent} ref={scrollViewRef}> */}
-      {fetchedRecords
-        .filter(record => record.kf_applicationnumber === loanDetails.applicationNumber && record.kf_paidstatus === false)
-        .map((item) => (
-          <View key={item.kf_loanId}>
-            <View style={styles.amortizationTile}>
-              <TouchableOpacity onPress={() => handlePress(item)}>
-                <View style={styles.column}>
-                  <View style={styles.column1}>
-                    <Text>{parseInt(item.kf_totalmonths)}</Text>
-                  </View>
-                  <View style={styles.column2}>
-                    <Text>EMI Amount</Text>
-                    <Text>{item.kf_emiamount}</Text>
-                  </View>
-                  <View style={styles.column3}>
-                    <Text>Payment Date</Text>
-                    <Text>{(item.kf_receiveddate)}</Text>
-                  </View>
-                  <View style={[styles.column4, { backgroundColor: item.kf_paidstatus ? 'green' : 'red' }]}>
-                    <Text style={{ color: "white", fontWeight: "bold", textAlign: "center", marginVertical: -5 }}>
-                      {item.kf_paidstatus ? 'Paid' : 'Unpaid'}
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            </View>
+          <View style={{ flexDirection: "row" }}>
+            <Text style={styles.detailsLabel}>Loan Term (Months):</Text>
+            <TextInput
+              style={styles.textInputContainer}
+              value={loanDetails.loanTermMonths}
+              onChangeText={(text) => setLoanDetails({ ...loanDetails, loanTermMonths: text })}
+              editable={false}
+            />
           </View>
-        ))}
-    {/* </ScrollView> */}
-    </View>
-  )}
-</View>
-
-      <View style={styles.createdRecordsContainer}>
-  <Text style={styles.amortizationTitle}>EMI Paid Records:</Text>
-  {fetchedSavedRecords.filter(record => record.kf_applicationnumber === loanDetails.applicationNumber).length === 0 ? (
-    <View style={{alignItems:"center",justifyContent: "center" , flex:1}}>
-    <Text>No paid records found.</Text>
-    </View>
-  ) : (
-    <View style={styles.scrollViewContent}>
-     {/* <ScrollView contentContainerStyle={styles.scrollViewContent} ref={scrollViewRef}> */}
-      {fetchedSavedRecords
-        .filter(record => record.kf_applicationnumber === loanDetails.applicationNumber)
-        .map((item) => (
-          <View key={item.kf_loanId}>
-            <View style={styles.amortizationTile}>
-              <TouchableOpacity onPress={() => handlePress(item)}>
-                <View style={styles.column}>
-                  <View style={styles.column1}>
-                    <Text>{parseInt(item.kf_totalmonths)}</Text>
-                  </View>
-                  <View style={styles.column2}>
-                    <Text>EMI Amount</Text>
-                    <Text>{item.kf_emiamount}</Text>
-                  </View>
-                  <View style={styles.column3}>
-                    <Text>Payment Date</Text>
-                    <Text>{(item.kf_receiveddate)}</Text>
-                  </View>
-                  <View style={[styles.column4, { backgroundColor: item.kf_paidstatus ? 'green' : 'red' }]}>
-                    <Text style={{ color: "white", fontWeight: "bold", textAlign: "center", marginVertical: -5 }}>
-                      {item.kf_paidstatus ? 'Paid' : 'Unpaid'}
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            </View>
+          <View style={{ flexDirection: "row" }}>
+            <Text style={styles.detailsLabel}>EMI Amount (Months):</Text>
+            <TextInput
+              style={styles.textInputContainer}
+              value={loanDetails.emiAmount}
+              onChangeText={(text) => setLoanDetails({ ...loanDetails, emiAmount: text })}
+              editable={false}
+            />
           </View>
-        ))}
-    {/* </ScrollView> */}
-    </View>
-  )}
-</View>
+        </View>
 
-{/* {!recordsFetched && !saveButtonDisabled && (
-  <Button
-    title="Save Records to CRM"
-    onPress={() => {
-      handleSave();
-      setRecordsFetched(true); // Set recordsFetched to true when saving is initiated
-    }}
-    disabled={isSaving}
-  />
-)} */}
+        <View style={styles.createdRecordsList}>
+          <Text style={styles.amortizationTitle}>EMI Unpaid Records:</Text>
+          {fetchedRecords.filter(record => record.kf_applicationnumber === loanDetails.applicationNumber && record.kf_paidstatus === false).length === 0 ? (
+            <View style={{ alignItems: "center", justifyContent: "center", flex: 1 }}>
+              <Text>No unpaid records found.</Text>
+            </View>
+          ) : (
+            <View style={[styles.scrollViewContent, { marginBottom: 20 }]}>
+              {/* <ScrollView contentContainerStyle={styles.scrollViewContent} ref={scrollViewRef}> */}
+              {fetchedRecords
+                .filter(record => record.kf_applicationnumber === loanDetails.applicationNumber && record.kf_paidstatus === false)
+                .map((item) => (
+                  <View key={item.kf_loanId}>
+                    <View style={styles.amortizationTile}>
+                      <TouchableOpacity onPress={() => handlePress(item)}>
+                        <View style={styles.column}>
+                          <View style={styles.column1}>
+                          <Text>Term</Text>
+                            <Text>{parseInt(item.kf_totalmonths)}</Text>
+                          </View>
+                          <View style={styles.column2}>
+                            <Text>EMI Amount</Text>
+                            <Text>{item.kf_emiamount}</Text>
+                          </View>
+                          <View style={styles.column3}>
+                            <Text>Payment Date</Text>
+                            <Text>{(item.kf_receiveddate)}</Text>
+                          </View>
+                          <View style={[styles.column4, { backgroundColor: item.kf_paidstatus ? 'green' : 'red' }]}>
+                            <Text style={{ color: "white", fontWeight: "bold", textAlign: "center", marginVertical: -5 }}>
+                              {item.kf_paidstatus ? 'Paid' : 'Unpaid'}
+                            </Text>
+                          </View>
+                        </View>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ))}
+              {/* </ScrollView> */}
+            </View>
+          )}
+        </View>
 
-{fetchedRecords.filter(record => record.kf_applicationnumber === loanDetails.applicationNumber && record.kf_paidstatus === false).length === 0 && (
-        <ButtonComponent
-          title="Create EMI Schedule"
-          onPress={() => {
-            handleSave();
-            setRecordsFetched(true); 
-          }}
-          disabled={isSaving}
-        />
-      )}
-</ScrollView>
+        <View style={styles.createdRecordsContainer}>
+          <Text style={styles.amortizationTitle}>EMI Paid Records:</Text>
+          {fetchedSavedRecords.filter(record => record.kf_applicationnumber === loanDetails.applicationNumber).length === 0 ? (
+            <View style={{ alignItems: "center", justifyContent: "center", flex: 1 }}>
+              <Text>No paid records found.</Text>
+            </View>
+          ) : (
+            <View style={styles.scrollViewContent}>
+              {/* <ScrollView contentContainerStyle={styles.scrollViewContent} ref={scrollViewRef}> */}
+              {fetchedSavedRecords
+                .filter(record => record.kf_applicationnumber === loanDetails.applicationNumber)
+                .map((item) => (
+                  <View key={item.kf_loanId}>
+                    <View style={styles.amortizationTile}>
+                      <TouchableOpacity onPress={() => handlePress(item)}>
+                        <View style={styles.column}>
+                          <View style={styles.column1}>
+                            <Text>Term</Text>
+                            <Text>{parseInt(item.kf_totalmonths)}</Text>
+                          </View>
+                          <View style={styles.column2}>
+                            <Text>EMI Amount</Text>
+                            <Text>{item.kf_emiamount}</Text>
+                          </View>
+                          <View style={styles.column3}>
+                            <Text>Payment Date</Text>
+                            <Text>{(item.kf_receiveddate)}</Text>
+                          </View>
+                          <View style={[styles.column4, { backgroundColor: item.kf_paidstatus ? 'green' : 'red' }]}>
+                            <Text style={{ color: "white", fontWeight: "bold", textAlign: "center", marginVertical: -5 }}>
+                              {item.kf_paidstatus ? 'Paid' : 'Unpaid'}
+                            </Text>
+                          </View>
+                        </View>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ))}
+              {/* </ScrollView> */}
+            </View>
+          )}
+        </View>
+
+        {fetchedRecords.filter(record => record.kf_applicationnumber === loanDetails.applicationNumber && record.kf_paidstatus === false).length === 0 && (
+          <View>
+            {fetchedSavedRecords.filter(record => record.kf_applicationnumber === loanDetails.applicationNumber).length === 0 && (
+              <ButtonComponent
+                title="Create EMI Schedule"
+                onPress={() => {
+                  handleSave();
+                  setRecordsFetched(true); // Set recordsFetched to true when saving is initiated
+                }}
+                disabled={isSaving}
+              />
+            )}
+          </View>
+        )}
+
+      </ScrollView>
     </View>
   );
 };
@@ -1216,16 +1212,16 @@ const styles = StyleSheet.create({
   },
   column: {
     flexDirection: 'row',
-    alignSelf:"center"
+    alignSelf: "center",
   },
   column1: {
-marginLeft: 5
+    marginLeft: 5
   },
   column2: {
-    marginLeft: 35
+    marginLeft: 25,
   },
   column3: {
-    marginLeft: 30
+    marginLeft: 20
   },
   column4: {
     marginLeft: 30,
