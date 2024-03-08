@@ -27,7 +27,8 @@ import Notification from './Screen/Notification';
 import LoginManagerScreen from './Screen/LoginPages/LoginManagerScreen';
 import LoginScreen from './Screen/LoginPages/LoginScreen';
 import ManagerDashboard from './Screen/Dashboards/ManagerDashboard';
-import SignatureScreen from './signature';
+import SignatureScreen from './Screen/Signature/signature';
+import PersonalSignatureScreen from './Screen/Signature/PersonalSignatureScreen';
 import HomeLoanGurantee from './Screen/Gaurantee/HomeLoanGaurantee';
 import HomeLoanGurantee2 from './Screen/Gaurantee/HomeLoanGaurantee2';
 import PersonalLoanGurantee from './Screen/Gaurantee/PersonalLoanGurantee';
@@ -35,6 +36,10 @@ import PersonalLoanGurantee2 from './Screen/Gaurantee/PersonalLoanGurantee2';
 import EditLoanDetail from './Screen/EMI/EditLoanDetail';
 import SendNotification from './common/SendNotification';
 import AdminNotification from './Screen/AdminNotification';
+import Gurantee1SignatureHome from './Screen/Signature/Gurantee1SignatureHome';
+import Gurantee2SignatureHome from './Screen/Signature/Gurantee2SignatureHome';
+import Gurantee1SignaturePersonal from './Screen/Signature/Gurantee1SignaturePersonal';
+import Gurantee2SignaturePersonal from './Screen/Signature/Gurantee2SignaturePersonal';
 
 const Stack = createNativeStackNavigator();
 
@@ -95,6 +100,7 @@ const MainScreen = () => {
           <Stack.Screen name="ManagerDashboard" component={ManagerDashboard} options={{ headerShown: false }} />
           <Stack.Screen name="LoginManagerScreen" component={LoginManagerScreen} options={{ headerShown: false }} />
           <Stack.Screen name="SignatureScreen" component={SignatureScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="PersonalSignatureScreen" component={PersonalSignatureScreen} options={{ headerShown: false }} />
           <Stack.Screen name="HomeLoanGurantee" component={HomeLoanGurantee} options={{ headerShown: false }} />
           <Stack.Screen name="HomeLoanGurantee2" component={HomeLoanGurantee2} options={{ headerShown: false }} />
           <Stack.Screen name="PersonalLoanGurantee" component={PersonalLoanGurantee} options={{ headerShown: false }} />
@@ -102,6 +108,10 @@ const MainScreen = () => {
           <Stack.Screen name="EditLoanDetail" component={EditLoanDetail} options={{ headerShown: false }} />
           <Stack.Screen name="SendNotification" component={SendNotification} options={{ headerShown: false }} />
           <Stack.Screen name="AdminNotification" component={AdminNotification} options={{ headerShown: false }} />
+          <Stack.Screen name="Gurantee1SignatureHome" component={Gurantee1SignatureHome} options={{ headerShown: false }} />
+          <Stack.Screen name="Gurantee2SignatureHome" component={Gurantee2SignatureHome} options={{ headerShown: false }} />
+          <Stack.Screen name="Gurantee1SignaturePersonal" component={Gurantee1SignaturePersonal} options={{ headerShown: false }} />
+          <Stack.Screen name="Gurantee2SignaturePersonal" component={Gurantee2SignaturePersonal} options={{ headerShown: false }} />
           </>
       )}
       </Stack.Navigator>

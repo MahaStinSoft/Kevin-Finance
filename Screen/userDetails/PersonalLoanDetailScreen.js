@@ -212,19 +212,6 @@ navigation.navigate('PersonalLoanGurantee2', { personalLoan,
       showsVerticalScrollIndicator={false}
       showsHorizontalScrollIndicator={false}
       >
-       {/* <View style={styles.imageContainer}>
-        <View style={{ marginLeft: -12 }}>{renderImage()}</View>
-        <View style={{ marginLeft: 5, marginTop: 50}}>
-          <Text style={styles.cardTitle}>{`${personalLoan.kf_firstname} ${personalLoan.kf_lastname}`}</Text>
-          <Text style={styles.cardTitle}>Application No: {personalLoan.kf_applicationnumber}</Text>
-          <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={styles.buttonContainer}>
-            <Text style={styles.buttonText}>Guarantee</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleNavigateToGuaranteeScreen2} style={styles.buttonContainer}>
-            <Text style={styles.buttonText}>Guarantee-2</Text>
-          </TouchableOpacity>
-        </View>
-      </View> */}
 
 <View style={styles.imageContainer}>
           <View style={{ marginLeft: -12, position:"relative" }}>{renderImage()}</View>
@@ -232,7 +219,7 @@ navigation.navigate('PersonalLoanGurantee2', { personalLoan,
           <View style={{ marginLeft: 12, marginTop: 0, width: 200, position:"relative" }}>
           <Text style={styles.cardTitle}>{personalLoan.kf_applicationnumber}</Text>
           <Text style={[styles.cardTitle]}>{`${personalLoan.kf_firstname} ${personalLoan.kf_lastname}`}</Text>
-            <View style={{flexDirection: "row", marginTop: 50}}>
+            <View style={{flexDirection: "row", marginTop: 30}}>
             <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={[styles.buttonContainer, {width: "42%", marginLeft: -5}]}>
             <Text style={styles.buttonText}>Guarantee1</Text>
           </TouchableOpacity>
@@ -241,7 +228,6 @@ navigation.navigate('PersonalLoanGurantee2', { personalLoan,
           </TouchableOpacity>
           </View>
           </View>
-
         </View>
 
       <View style={styles.personalDetailContainer} >
@@ -372,9 +358,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    position:"absolute",
+    top: 0,
+    zIndex: 1000, 
+    marginLeft: 15, 
+    // height: 180
   },
   personalDetailContainer: {
-    marginTop: 5,
+    marginTop: 154,
     width: "100%",
     paddingVertical: 10,
     backgroundColor: "white",
@@ -386,6 +377,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    // position: "absolute",
   },
   IndentityProofField: {
     marginTop: 5,
@@ -429,7 +421,7 @@ const styles = StyleSheet.create({
     marginLeft: 10
   },
   placeholderText: {
-    fontSize: 80,
+    fontSize: 60,
     fontWeight: 'bold',
     color: '#707070',
     textAlign: 'center',

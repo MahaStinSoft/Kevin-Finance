@@ -198,7 +198,7 @@ navigation.navigate('HomeLoanGurantee2', { loanApplication,
           <View style={{ marginLeft: 12, marginTop: 0, width: 200, position:"relative" }}>
           <Text style={styles.cardTitle}>{loanApplication.kf_applicationnumber}</Text>
           <Text style={[styles.cardTitle]}>{`${loanApplication.kf_name} ${loanApplication.kf_lastname}`}</Text>
-            <View style={{flexDirection: "row", marginTop: 50}}>
+            <View style={{flexDirection: "row", marginTop: 30}}>
             <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={[styles.buttonContainer, {width: "42%", marginLeft: -5}]}>
             <Text style={styles.buttonText}>Guarantee1</Text>
           </TouchableOpacity>
@@ -327,10 +327,10 @@ const styles = StyleSheet.create({
     top: 0,
     zIndex: 1000, 
     marginLeft: 15, 
-    height: 180
+    // height: 180
   },
   personalDetailContainer: {
-    marginTop: 180,
+    marginTop: 154,
     width: "100%",
     paddingVertical: 10,
     backgroundColor: "white",
@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
     marginLeft: 10
   },
   placeholderText: {
-    fontSize: 80,
+    fontSize: 60,
     fontWeight: 'bold',
     color: '#707070',
     textAlign: 'center',

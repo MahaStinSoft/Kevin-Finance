@@ -20,7 +20,8 @@ import ScheduleDetailsScreen from '../Screen/EMI/ScheduleDetailScreen';
 import AmortizationScreen from '../Screen/EMI/AmortizationScreen';
 import ScheduleDetailsScreenHomeLoan from '../Screen/EMI/ScheduleDetailsScreenHomeLoan';
 import AmortizationScreenHome from '../Screen/EMI/AmortizationScreenHome';
-import SignatureScreen from '../signature';
+import SignatureScreen from '../Screen/Signature/signature';
+import PersonalSignatureScreen from '../Screen/Signature/PersonalSignatureScreen';
 import AccountScreen from '../Screen/Account';
 import ToggleFormScreen from '../Screen/ToggleFormScreen';
 // import HomeLoanGaurantee from '../Screen/Gaurantee/HomeLoanGaurantee';
@@ -35,6 +36,10 @@ import PersonalLoanGurantee2 from '../Screen/Gaurantee/PersonalLoanGurantee2';
 import EditLoanDetail from '../Screen/EMI/EditLoanDetail';
 import SendNotification from './SendNotification';
 import AdminNotification from '../Screen/AdminNotification';
+import Gurantee1SignatureHome from '../Screen/Signature/Gurantee1SignatureHome';
+import Gurantee2SignatureHome from '../Screen/Signature/Gurantee2SignatureHome';
+import Gurantee1SignaturePersonal from '../Screen/Signature/Gurantee1SignaturePersonal';
+import Gurantee2SignaturePersonal from '../Screen/Signature/Gurantee2SignaturePersonal';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -63,6 +68,7 @@ const StackNavigator = () => (
     <Stack.Screen name="ScheduleDetailsScreenHomeLoan" component={ScheduleDetailsScreenHomeLoan} options={{ headerShown: false }} />
     <Stack.Screen name="AmortizationScreenHome" component={AmortizationScreenHome} options={{ headerShown: false }} />
     <Stack.Screen name="SignatureScreen" component={SignatureScreen} options={{ headerShown: false }} />
+    <Stack.Screen name="PersonalSignatureScreen" component={PersonalSignatureScreen} options={{ headerShown: false }} />
     <Stack.Screen name="Setting" component={Setting} options={{ headerShown: false }} />
     <Stack.Screen name="Notification" component={Notification} options={{ headerShown: false }} />
     <Stack.Screen name="AccountScreen" component={AccountScreen} options={{ headerShown: false }} />
@@ -74,6 +80,10 @@ const StackNavigator = () => (
     <Stack.Screen name="EditLoanDetail" component={EditLoanDetail} options={{ headerShown: false }} />
     <Stack.Screen name="SendNotification" component={SendNotification} options={{ headerShown: false }} />
     <Stack.Screen name="AdminNotification" component={AdminNotification} options={{ headerShown: false }} />
+    <Stack.Screen name="Gurantee1SignatureHome" component={Gurantee1SignatureHome} options={{ headerShown: false }} />
+    <Stack.Screen name="Gurantee2SignatureHome" component={Gurantee2SignatureHome} options={{ headerShown: false }} />
+    <Stack.Screen name="Gurantee1SignaturePersonal" component={Gurantee1SignaturePersonal} options={{ headerShown: false }} />
+    <Stack.Screen name="Gurantee2SignaturePersonal" component={Gurantee2SignaturePersonal} options={{ headerShown: false }} />
     <Stack.Screen name="DynamicDashboardScreen" component={DynamicDashboardScreen} options={{
       headerShown: false,
       unmountOnBlur: true,

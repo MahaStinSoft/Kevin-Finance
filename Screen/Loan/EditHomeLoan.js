@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, TouchableOpacity, Alert, StyleSheet, ScrollView, Text, FlatList, Linking, Platform, Image, Button } from 'react-native';
 import axios from 'axios';
-import { schedulePushNotification } from '../../common/notificationUtils';
 
 import HeaderComponent from '../../common/Header';
 import ButtonComponent from '../../common/ButtonComponent';
 import ComponentDatePicker from '../../common/ComponentDatePicker';
 import LoanStatusPicker from '../../common/LoanStatusPicker ';
 import CardImage from '../../common/CardImage';
-import SignatureScreen from '../../signature';
+import SignatureScreen from '../Signature/signature';
 import CardImageSignature from '../../common/CardImageSignature';
-import RenderAnnotation from '../../common/renderAnnotationItem';
+import RenderAnnotation from '../Annotations/renderAnnotationItem';
 import SendNotification from '../../common/SendNotification';
 
 const EditHomeLoan = ({ route, navigation }) => {
@@ -46,7 +45,7 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [aadharcard, setAadharcard] = useState({ fileName: null, fileContent: null });
   const [pancard, setPancard] = useState({ fileName: null, fileContent: null });
   const [applicantImage, setapplicantImage] = useState({ fileName: null, fileContent: null });
-  const [signature, setSignature] = useState({ fileName: null, fileContent: null });
+  const [signature, setSignature] = useState({ fileName: null });
   const [sendApproval, setSendApproval] = useState(loanApplication?.kf_sendapproval || '');
 
   const [isfirstnameValid, setIsfirstnameValid] = useState(true);
@@ -66,6 +65,8 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [sendApprovalDisabled, setSendApprovalDisabled] = useState(false);
 
   const { signatureImage } = route.params;
+  console.log('signature',signatureImage);
+  // const [signatureImage, setSignatureImage] = useState(null);
   const [recordId, setRecordId] = useState(loanApplication.kf_loanapplicationid);
   const [imageSource, setImageSource] = useState(null);
 
@@ -83,7 +84,7 @@ const EditHomeLoan = ({ route, navigation }) => {
   const handleGoBack = () => {
     navigation.navigate("HomeLoanDetailsScreen", { loanApplication });
   };
-console.log("send home approval ", sendApproval);
+// console.log("send home approval ", sendApproval);
   useEffect(() => {
     setapplicationnumber(loanApplication.kf_applicationnumber);
     setcreatedby(loanApplication.kf_createdby);
@@ -118,7 +119,7 @@ console.log("send home approval ", sendApproval);
     setAadharcard({ fileName: null, fileContent: null });
     setPancard({ fileName: null, fileContent: null });
     setapplicantImage({ fileName: null, fileContent: null });
-    setSignature({ fileName: null, fileContent: null })
+    setSignature({ fileName: null})
     console.log('State updated:', {
       applicationnumber,
       createdby,
@@ -279,7 +280,7 @@ console.log("send home approval ", sendApproval);
             kf_sendapproval: sendApproval
           });
         }
-        console.log(loanAmountRequested)
+        // console.log(loanAmountRequested)
         Alert.alert('Updated the record Successfully.', '', [
           {
             text: 'cancel'
@@ -829,9 +830,11 @@ console.log("send home approval ", sendApproval);
           filename: signatureImage.fileName || 'Signature.jpg',
           isdocument: true,
           'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
-          documentbody: signatureImage.fileContent,
+          documentbody: signatureImage,
         },
       ];
+
+   console.log('documentbody',signatureImage);
 
       const createAnnotationResponse = await axios.post(
         'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
@@ -860,12 +863,11 @@ console.log("send home approval ", sendApproval);
     }
   };
 
-
   const handleUpdateRecordAndSendAnnotation = () => {
     sendAnnotation();
     sendAnnotation1();
     sendAnnotation2();
-    // sendAnnotation3();
+    sendAnnotation3();
     handleUpdateRecord();
   };
 
@@ -882,24 +884,6 @@ console.log("send home approval ", sendApproval);
   const date = emiCollectionDate ? new Date(emiCollectionDate) : null;
   const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
 
-  // const handleSendNotification = () => {
-    
-  //   navigation.navigate('SendNotification', { 
-  //     route: route,
-  //     sendApproval: sendApproval,
-  //     createdby: createdby,
-  //    applicationnumber: applicationnumber, 
-  //    firstname: firstname,
-  //    lastname: lastname,
-  //   loanAmount: loanAmountRequested
-  //     });
-  // };
-  const handleSendNotification = () => {
-    schedulePushNotification(applicationnumber, firstname, lastname, loanAmountRequested, createdby); // Trigger push notification
-  };
-
-  console.log("applicationnumber home: " + firstname);
-  
   return (
     <View>
       <HeaderComponent titleText="Edit Home Screen"
@@ -911,8 +895,6 @@ console.log("send home approval ", sendApproval);
       <ScrollView>
         <View style={styles.container}>
           <View style={styles.wrapper}>
-          <Button title="notification" onPress={handleSendNotification}/>
-
             <LoanStatusPicker
               onOptionChange={handleSendApproval}
               title="Send Approval"
@@ -1178,16 +1160,17 @@ console.log("send home approval ", sendApproval);
             </View>
           </View>
 
+<View style={{width: "100%", paddingHorizontal: 20}}>
           <RenderAnnotation
             annotations={annotations}
             filteredAnnotations={filteredAnnotations}
             showImage={showImage}
             handleViewImages={handleViewImages}
           />
-          {/* <SendNotification/> */}
           {/* <SendNotification sendApproval={sendApproval} /> */}
 
           {/* <Text> annotation</Text> */}
+          </View>
         </View>
       </ScrollView>
 
@@ -1201,7 +1184,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 20,
-    marginBottom: 40
+    marginBottom: 80
   },
   wrapper: {
     width: '90%',

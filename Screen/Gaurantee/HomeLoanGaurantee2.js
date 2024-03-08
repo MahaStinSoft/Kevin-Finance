@@ -6,10 +6,12 @@ import HeaderComponent from '../../common/Header';
 import ButtonComponent from '../../common/ButtonComponent';
 import ComponentDatePicker from '../../common/ComponentDatePicker';
 import LoanStatusPicker from '../../common/LoanStatusPicker ';
-
+import CardImage from '../../common/CardImage';
+import Gurantee2Annotation from '../Annotations/Gurantee2Annotation';
+import CardImageSignature from '../../common/CardImageSignature';
 
 const HomeLoanGurantee2 = ({ route, navigation }) => {
-    const { loanApplication,onUpdateSuccess } = route.params || {};
+  const { loanApplication, onUpdateSuccess } = route.params || {};
   const [applicationnumber, setapplicationnumber] = useState(loanApplication?.kf_applicationnumber || '');
   const [guarantoraadharnumber, setAadharcardNumber] = useState(loanApplication?.kf_guarantor2aadharnumber || '');
   const [guarantorpannumber, setPancardNumber] = useState(loanApplication?.kf_guarantor2pannumber || '');
@@ -26,6 +28,9 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
   const [guarantoraddress3, setAddress3] = useState(loanApplication?.kf_guarantor2address3 || '');
   const [guarantorcity, setCity] = useState(loanApplication?.kf_guarantor2city || '');
   const [guarantorstate, setState] = useState(loanApplication?.kf_guarantor2state || '');
+  const [aadharcard, setAadharcard] = useState({ fileName: null, fileContent: null });
+  const [pancard, setPancard] = useState({ fileName: null, fileContent: null });
+  const [applicantImage, setapplicantImage] = useState({ fileName: null, fileContent: null });
 
   const [isfirstnameValid, setIsfirstnameValid] = useState(true);
   const [isLastNameValid, setIsLastNameValid] = useState(true);
@@ -33,8 +38,14 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [isaadharNumberValid, setIsaadharcardNumberValid] = useState(true);
   const [isPancardNumberValid, setIsPancardNumberValid] = useState(true);
+  const [annotations, setAnnotations] = useState([]);
+  const [aadharImageContent, setAadharImageContent] = useState(null);
+  const [showImage, setShowImage] = useState(true);
 
   const [recordId, setRecordId] = useState(loanApplication.kf_loanapplicationid);
+  
+  const { signatureImage } = route.params;
+  console.log('signature',signatureImage);
 
   const [errorMessages, setErrorMessages] = useState({
     guarantorFirstNameEdit: '',
@@ -67,6 +78,9 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
     setState(loanApplication.kf_guarantor2state);
     setAadharcardNumber(loanApplication.kf_guarantor2aadharnumber);
     setPancardNumber(loanApplication.kf_guarantor2pannumber);
+    setAadharcard({ fileName: null, fileContent: null });
+    setPancard({ fileName: null, fileContent: null });
+    setapplicantImage({ fileName: null, fileContent: null });
     setRecordId(loanApplication.kf_loanapplicationid);
     console.log('State updated:', {
       applicationnumber,
@@ -76,7 +90,7 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
       guarantorgender,
       guarantorpannumber,
       guarantoraadharnumber,
-    //   status,
+      //   status,
       guarantormobilenumber
     });
   }, [loanApplication]);
@@ -142,22 +156,22 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
       const updateRecordResponse = await axios.patch(
         `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications(${recordId})`,
         {
-            kf_applicationnumber: applicationnumber,
-            kf_createdby: createdby,
-            kf_guarantor2firstname: guarantorfirstname,
-            kf_guarantor2lastname: guarantorlastname,
-            kf_guarantor2dateofbirth: formattedDateOfBirth,
-            kf_guarantor2age: guarantorage,
-            kf_guarantor2gender: guarantorgender,
-            kf_guarantor2mobilenumber: guarantormobilenumber,
-            kf_guarantor2email: guarantoremail,
-            kf_guarantor2address1: guarantoraddress1,
-            kf_guarantor2address2: guarantoraddress2,
-            kf_guarantor2address3: guarantoraddress3,
-            kf_guarantor2city: guarantorcity,
-            kf_guarantor2state: guarantorstate,
-            kf_guarantor2aadharnumber:guarantoraadharnumber,
-            kf_guarantor2pannumber:guarantorpannumber
+          kf_applicationnumber: applicationnumber,
+          kf_createdby: createdby,
+          kf_guarantor2firstname: guarantorfirstname,
+          kf_guarantor2lastname: guarantorlastname,
+          kf_guarantor2dateofbirth: formattedDateOfBirth,
+          kf_guarantor2age: guarantorage,
+          kf_guarantor2gender: guarantorgender,
+          kf_guarantor2mobilenumber: guarantormobilenumber,
+          kf_guarantor2email: guarantoremail,
+          kf_guarantor2address1: guarantoraddress1,
+          kf_guarantor2address2: guarantoraddress2,
+          kf_guarantor2address3: guarantoraddress3,
+          kf_guarantor2city: guarantorcity,
+          kf_guarantor2state: guarantorstate,
+          kf_guarantor2aadharnumber: guarantoraadharnumber,
+          kf_guarantor2pannumber: guarantorpannumber
         },
         {
           headers: {
@@ -172,54 +186,319 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
 
         // Notify the parent screen about the successful update
         if (onUpdateSuccess) {
-            onUpdateSuccess({
-              ...loanApplication,
-              kf_applicationnumber: applicationnumber,
-              kf_createdby: createdby,
-              kf_guarantor2firstname: guarantorfirstname,
-              kf_guarantor2lastname: guarantorlastname,
-              kf_guarantor2dateofbirth: formattedDateOfBirth,
-              kf_guarantor2age: guarantorage,
-              kf_guarantor2gender: guarantorgender,
-              kf_guarantor2mobilenumber: guarantormobilenumber,
-              kf_guarantor2email: guarantoremail,
-              kf_guarantor2address1: guarantoraddress1,
-              kf_guarantor2ddress2: guarantoraddress2,
-              kf_guarantor2address3: guarantoraddress3,
-              kf_guarantor2city: guarantorcity,
-              kf_guarantor2state: guarantorstate,
-              kf_guarantor2aadharnumber: guarantoraadharnumber,
-              kf_guarantor2pannumber: guarantorpannumber,
-            });
-          }
-          Alert.alert('Updated the record Successfully.', '', [
-            // {
-            //   text: 'cancel'
-            // },
-            {
-              text: 'OK',
-              onPress: () => {
-                navigation.goBack();
-              },
-            },
-          ]);
-        } else {
-          console.log('Error updating record in CRM:', updateRecordResponse);
-          Alert.alert('Error', 'Failed to update the record in CRM.');
+          onUpdateSuccess({
+            ...loanApplication,
+            kf_applicationnumber: applicationnumber,
+            kf_createdby: createdby,
+            kf_guarantor2firstname: guarantorfirstname,
+            kf_guarantor2lastname: guarantorlastname,
+            kf_guarantor2dateofbirth: formattedDateOfBirth,
+            kf_guarantor2age: guarantorage,
+            kf_guarantor2gender: guarantorgender,
+            kf_guarantor2mobilenumber: guarantormobilenumber,
+            kf_guarantor2email: guarantoremail,
+            kf_guarantor2address1: guarantoraddress1,
+            kf_guarantor2ddress2: guarantoraddress2,
+            kf_guarantor2address3: guarantoraddress3,
+            kf_guarantor2city: guarantorcity,
+            kf_guarantor2state: guarantorstate,
+            kf_guarantor2aadharnumber: guarantoraadharnumber,
+            kf_guarantor2pannumber: guarantorpannumber,
+          });
         }
-      } catch (error) {
-        console.error('Error during update:', error.response?.data || error.message);
-        Alert.alert('Error', 'An unexpected error occurred. Please try again later.');
+        Alert.alert('Updated the record Successfully.', '', [
+          // {
+          //   text: 'cancel'
+          // },
+          {
+            text: 'OK',
+            onPress: () => {
+              navigation.goBack();
+            },
+          },
+        ]);
+      } else {
+        console.log('Error updating record in CRM:', updateRecordResponse);
+        Alert.alert('Error', 'Failed to update the record in CRM.');
       }
-    };
+    } catch (error) {
+      console.error('Error during update:', error.response?.data || error.message);
+      Alert.alert('Error', 'An unexpected error occurred. Please try again later.');
+    }
+  };
 
 
   // Define onUpdateSuccess function in your component
-// const onUpdateSuccess = (updatedData) => {
-//     // Handle the updated data here, such as updating the state or performing any other action
-//     console.log('Record updated successfully:', updatedData);
-//   };
-  
+  // const onUpdateSuccess = (updatedData) => {
+  //     // Handle the updated data here, such as updating the state or performing any other action
+  //     console.log('Record updated successfully:', updatedData);
+  //   };
+
+
+  useEffect(() => {
+    fetchAnnotations1();
+  }, []);
+
+  const sendAnnotation = async () => {
+    try {
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        {
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        },
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      );
+
+      const accessToken = tokenResponse.data.access_token;
+
+      // Create a new annotation
+      const annotations = [
+        {
+          subject: 'Guarantee2 AadharCard Image',
+          filename: aadharcard.fileName || 'Guarantee2AadharCard.jpg',
+          isdocument: true,
+          'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
+          documentbody: aadharcard.fileContent,
+        },
+      ];
+
+      const createAnnotationResponse = await axios.post(
+        'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
+        annotations,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (createAnnotationResponse.status === 204) {
+        console.log('Aadhar image annotation created successfully.');
+      } else {
+        console.error('Failed to create Aadhar image annotation. Response:', createAnnotationResponse.data);
+        Alert.alert('Error', 'Failed to create Aadhar image annotation.');
+      }
+
+    } catch (error) {
+      console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
+      Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+    }
+  };
+
+  const sendAnnotation1 = async () => {
+    try {
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        {
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        },
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      );
+
+      const accessToken = tokenResponse.data.access_token;
+
+      // Create a new annotation
+      const annotations = [
+        {
+          subject: 'Guarantee2 PanCard Image',
+          filename: pancard.fileName || 'Guarantee2PanCard.jpg',
+          isdocument: true,
+          'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
+          documentbody: pancard.fileContent,
+        },
+      ];
+
+      const createAnnotationResponse = await axios.post(
+        'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
+        annotations,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (createAnnotationResponse.status === 204) {
+        console.log('PanCard image annotation created successfully.');
+      } else {
+        console.error('Failed to create Aadhar image annotation. Response:', createAnnotationResponse.data);
+        Alert.alert('Error', 'Failed to create Aadhar image annotation.');
+      }
+
+    } catch (error) {
+      console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
+      Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+    }
+  };
+
+  const fetchAnnotations1 = async () => {
+    try {
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        {
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        },
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      );
+
+      const accessToken = tokenResponse.data.access_token;
+
+      const fetchAnnotationsResponse = await axios.get(
+        'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations?$filter=_objectid_value eq ' + recordId,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      const fetchedAnnotations = fetchAnnotationsResponse.data.value;
+      // console.log('Annotations:', fetchedAnnotations);
+      setAnnotations(fetchedAnnotations);
+
+    } catch (error) {
+      console.error('Error fetching annotations:', error.response?.data || error.message);
+      Alert.alert('Error', 'An error occurred while fetching annotations.');
+    }
+  };
+
+  const sendAnnotation2 = async () => {
+    try {
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        {
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        },
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      );
+
+      const accessToken = tokenResponse.data.access_token;
+
+      // Create a new annotation
+      const annotations = [
+        {
+          subject: 'Guarantee2 Applicant Image',
+          filename: applicantImage.fileName || 'Guarantee2Applicant.jpg',
+          isdocument: true,
+          'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
+          documentbody: applicantImage.fileContent,
+        },
+      ];
+
+      const createAnnotationResponse = await axios.post(
+        'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
+        annotations,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (createAnnotationResponse.status === 204) {
+        console.log('ApplicantImage image annotation created successfully.');
+        // Alert.alert('Sucess', '');
+
+      } else {
+        console.error('Failed to create Applicant image annotation. Response:', createAnnotationResponse.data);
+        Alert.alert('Error', 'Failed to create Aadhar image annotation.');
+      }
+
+    } catch (error) {
+      console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
+      Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+    }
+  };
+
+  const sendAnnotation3 = async () => {
+    try {
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        {
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        },
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      );
+
+      const accessToken = tokenResponse.data.access_token;
+
+      // Create a new annotation
+      const annotations = [
+        {
+          subject: 'Gurantee2 Signature Image',
+          filename: signatureImage.fileName || 'Gurantee2SignatureHome.jpg',
+          isdocument: true,
+          'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
+          documentbody: signatureImage,
+        },
+      ];
+
+   console.log('documentbody',signatureImage);
+
+      const createAnnotationResponse = await axios.post(
+        'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
+        annotations,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (createAnnotationResponse.status === 204) {
+        console.log('Signature image annotation created successfully.');
+        // Alert.alert('Sucess', '');
+
+      } else {
+        console.error('Failed to create Signature image annotation. Response:', createAnnotationResponse.data);
+        Alert.alert('Error', 'Failed to create Aadhar image annotation.');
+      }
+
+      // Fetch and display the updated annotations
+    } catch (error) {
+      console.error('Error sending Signature image annotation:', error.response?.data || error.message);
+      Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+    }
+  };
+
+  const handleUpdateRecordAndSendAnnotation = () => {
+    sendAnnotation();
+    sendAnnotation1();
+    sendAnnotation2();
+    sendAnnotation3();
+    handleUpdateRecord();
+  };
+
+  const handleViewImages = () => {
+    setShowImage(!showImage);
+  };
+
+  const filteredAnnotations = annotations.filter(item => item.documentbody);
 
   const handleEmailChange = (text) => {
     setEmail(text);
@@ -241,7 +520,6 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
       });
     }
   };
-
 
   const calculateAge = (birthDate) => {
     const today = new Date();
@@ -334,8 +612,6 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
         return '';
     }
   };
-
- 
 
   const handleLoanStatusChange = (selectedOptionLoan) => {
     let numericValue;
@@ -443,12 +719,16 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
     }
   };
 
+  const handleNavigateToSignatureScreen = () => {
+    navigation.navigate('Gurantee2SignatureHome', { loanApplication });
+  };
 
   return (
     <>
       <HeaderComponent titleText="HomeLoan Gurantee2"
         onPress={handleGoBack}
-        onIconPress={handleUpdateRecord}
+        // onIconPress={handleUpdateRecord}
+        onIconPress={handleUpdateRecordAndSendAnnotation}
         screenIcon="md-save"
         screenIconStyle={{ marginTop: 5 }}
       />
@@ -605,7 +885,47 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
               <Text style={styles.errorText}>{errorMessages.guarantorPanCardNumberEdit}</Text>
             )}
 
+            <View style={{ backgroundColor: "white", marginTop: 15 }}>
+              <View style={{ marginVertical: 3 }}>
+                <CardImage
+                  title=" AadharCard"
+                  imageContent={aadharcard}
+                  setImageContent={setAadharcard}
+                // onViewImage={onViewImage}
+                />
+              </View>
 
+
+              <View style={{ marginVertical: 3 }}>
+                <CardImage
+                  title=" PanCard"
+                  imageContent={pancard}
+                  setImageContent={setPancard}
+                />
+              </View>
+
+              <View style={{ marginVertical: 3 }}>
+                <CardImage
+                  title=" Applicant"
+                  imageContent={applicantImage}
+                  setImageContent={setapplicantImage}
+                />
+              </View>
+              <View style={{ marginBottom: 15 }}>
+              <CardImageSignature
+                  title="Signature"
+                  imageContent={signatureImage}
+                  pickImage={handleNavigateToSignatureScreen}
+                  sendAnnotation={sendAnnotation3}
+                />
+                </View>
+            </View>
+            <Gurantee2Annotation
+              annotations={annotations}
+              filteredAnnotations={filteredAnnotations}
+              showImage={showImage}
+              handleViewImages={handleViewImages}
+            />
 
             {/* <ButtonComponent title="Update" onPress={handleUpdateRecord} /> */}
           </View>
@@ -643,6 +963,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#FBFCFC',
     padding: 10,
+  },
+
+  annotation: {
+    marginBottom: 15,
+    padding: 10,
+    // borderWidth: 1,
+    // borderColor: '#ccc',
+    borderRadius: 5,
   },
 });
 

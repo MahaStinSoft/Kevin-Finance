@@ -11,8 +11,10 @@ import ComponentDatePicker from '../../common/ComponentDatePicker';
 import TextInputComponent from '../../common/TextInput';
 import LoanStatusPicker from '../../common/LoanStatusPicker ';
 import CardImage from '../../common/CardImage';
-import RenderAnnotation from '../../common/renderAnnotationItem';
+import CardImageSignature from '../../common/CardImageSignature';
+import RenderAnnotation from '../Annotations/renderAnnotationItem';
 import SendNotification from '../../common/SendNotification';
+
 
 const EditPersonalLoan = ({ route, navigation }) => {
   const { personalLoan, onUpdateSuccess } = route.params || {};
@@ -47,9 +49,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
   const [aadharcard, setAadharcard] = useState({ fileName: null, fileContent: null });
   const [pancard, setPancard] = useState({ fileName: null, fileContent: null });
   const [applicantImage, setapplicantImage] = useState({ fileName: null, fileContent: null });
-  const [signature, setSignature] = useState({ fileName: null, fileContent: null });
+  const [signature, setSignature] = useState({ fileName: null });
   const [sendApproval, setSendApproval] = useState(personalLoan?.kf_sendapproval || '');
-
 
   const [isfirstnameValid, setIsfirstnameValid] = useState(true);
   const [isLastNameValid, setIsLastNameValid] = useState(true);
@@ -66,7 +67,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
   const [imageContent, setImageContent] = useState(null);
   const [aadharImageContent, setAadharImageContent] = useState(null);
 
-
+  const { signatureFile } = route.params;
+  console.log('signature',signatureFile);
   const [recordId, setRecordId] = useState(personalLoan.kf_personalloanid);
   const [imageSource, setImageSource] = useState(null);
 
@@ -120,6 +122,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
     setAadharcard({ fileName: null, fileContent: null });
     setPancard({ fileName: null, fileContent: null });
     setapplicantImage({ fileName: null, fileContent: null });
+    setSignature({ fileName: null})
     console.log('State updated:', {
       applicationnumber,
       createdby,
@@ -282,7 +285,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
             kf_sendapproval: sendApproval
           });
         }
-        console.log(age);
+        // console.log(age);
 
         Alert.alert('Updated the record Successfully.', '', [
           // {
@@ -859,10 +862,69 @@ const EditPersonalLoan = ({ route, navigation }) => {
   };
 
 
+  const sendAnnotation3 = async () => {
+    try {
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        {
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        },
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      );
+
+      const accessToken = tokenResponse.data.access_token;
+
+      // Create a new annotation
+      const annotations = [
+        {
+          subject: 'Signature Image',
+          filename: signatureFile.fileName || 'Signature.jpg',
+          isdocument: true,
+          'objectid_kf_personalloan@odata.bind': `/kf_personalloans(${recordId})`,
+          documentbody: signatureFile,
+        },
+      ];
+
+   console.log('documentbody',signatureFile);
+
+      const createAnnotationResponse = await axios.post(
+        'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
+        annotations,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (createAnnotationResponse.status === 204) {
+        console.log('Signature image annotation created successfully.');
+        // Alert.alert('Sucess', '');
+
+      } else {
+        console.error('Failed to create Signature image annotation. Response:', createAnnotationResponse.data);
+        Alert.alert('Error', 'Failed to create Aadhar image annotation.');
+      }
+
+      // Fetch and display the updated annotations
+    } catch (error) {
+      console.error('Error sending Signature image annotation:', error.response?.data || error.message);
+      Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+    }
+  };
+
+
+
   const handleUpdateRecordAndSendAnnotation = () => {
     sendAnnotation();
     sendAnnotation1();
     sendAnnotation2();
+    sendAnnotation3();
     handleUpdateRecord();
 
   };
@@ -873,8 +935,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
 
   const filteredAnnotations = annotations.filter(item => item.documentbody);
 
-  const handlesignature = async () => {
-    navigation.navigate('SignatureScreen', { personalLoan: personalLoan });
+  const handleNavigateToSignatureScreen = async () => {
+    navigation.navigate('PersonalSignatureScreen', { personalLoan: personalLoan });
   }
 
   const date = emiCollectionDate ? new Date(emiCollectionDate) : null;
@@ -1138,28 +1200,29 @@ const EditPersonalLoan = ({ route, navigation }) => {
               <View style={{ marginBottom: 15 }}>
                 {/* <CardImageSignature
                   title="Draw Signature"
-                  imageContent={signatureImage}
+                  imageContent={signatureFile}
                   pickImage={handleNavigateToSignatureScreen}
                 /> */}
 
-                {/* <CardImageSignature
+                <CardImageSignature
                   title="Signature"
-                  imageContent={signatureImage}
+                  imageContent={signatureFile}
                   pickImage={handleNavigateToSignatureScreen}
                   sendAnnotation={sendAnnotation3}
-                /> */}
+                />
 
               </View>
             </View>
           </View>
-
+          <View style={{width: "100%", paddingHorizontal: 20}}>
           <RenderAnnotation
             annotations={annotations}
             filteredAnnotations={filteredAnnotations}
             showImage={showImage}
             handleViewImages={handleViewImages}
           />
-          <SendNotification sendApproval={sendApproval} />
+          </View>
+          {/* <SendNotification sendApproval={sendApproval} /> */}
         </View>
       </ScrollView>
     </View>
