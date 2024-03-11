@@ -47,6 +47,7 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [applicantImage, setapplicantImage] = useState({ fileName: null, fileContent: null });
   const [signature, setSignature] = useState({ fileName: null });
   const [sendApproval, setSendApproval] = useState(loanApplication?.kf_sendapproval || '');
+  const [reason, setReason] = useState(loanApplication?.kf_reason || '');
 
   const [isfirstnameValid, setIsfirstnameValid] = useState(true);
   const [isLastNameValid, setIsLastNameValid] = useState(true);
@@ -65,7 +66,7 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [sendApprovalDisabled, setSendApprovalDisabled] = useState(false);
 
   const { signatureImage } = route.params;
-  console.log('signature',signatureImage);
+  console.log('signature', signatureImage);
   // const [signatureImage, setSignatureImage] = useState(null);
   const [recordId, setRecordId] = useState(loanApplication.kf_loanapplicationid);
   const [imageSource, setImageSource] = useState(null);
@@ -84,7 +85,7 @@ const EditHomeLoan = ({ route, navigation }) => {
   const handleGoBack = () => {
     navigation.navigate("HomeLoanDetailsScreen", { loanApplication });
   };
-// console.log("send home approval ", sendApproval);
+  // console.log("send home approval ", sendApproval);
   useEffect(() => {
     setapplicationnumber(loanApplication.kf_applicationnumber);
     setcreatedby(loanApplication.kf_createdby);
@@ -115,11 +116,12 @@ const EditHomeLoan = ({ route, navigation }) => {
     setInterestRate(loanApplication.kf_interestrate);
     setNumberOfEMI(loanApplication.kf_numberofemi);
     setSendApproval(loanApplication.kf_sendapproval);
+    setReason(loanApplication.kf_reason);
     setRecordId(loanApplication.kf_loanapplicationid);
     setAadharcard({ fileName: null, fileContent: null });
     setPancard({ fileName: null, fileContent: null });
     setapplicantImage({ fileName: null, fileContent: null });
-    setSignature({ fileName: null})
+    setSignature({ fileName: null })
     console.log('State updated:', {
       applicationnumber,
       createdby,
@@ -232,7 +234,8 @@ const EditHomeLoan = ({ route, navigation }) => {
           kf_emischedule: emiSchedule,
           kf_othercharges: otherCharges,
           kf_numberofemi: numberOfEMI,
-          kf_sendapproval: sendApproval
+          kf_sendapproval: sendApproval,
+          kf_reason: reason
         },
         {
           headers: {
@@ -277,7 +280,8 @@ const EditHomeLoan = ({ route, navigation }) => {
             kf_emischedule: emiSchedule,
             kf_othercharges: otherCharges,
             kf_numberofemi: numberOfEMI,
-            kf_sendapproval: sendApproval
+            kf_sendapproval: sendApproval,
+            kf_reason: reason
           });
         }
         // console.log(loanAmountRequested)
@@ -428,7 +432,7 @@ const EditHomeLoan = ({ route, navigation }) => {
     }
     setSendApproval(booleanValue);
   };
-  
+
   const getSendApproval = (booleanValue) => {
     switch (booleanValue) {
       case false:
@@ -602,7 +606,7 @@ const EditHomeLoan = ({ route, navigation }) => {
       });
     }
   };
- 
+
   // view button(if need view then add)
   // const onViewImage = async () => {
   //   if (!imageContent) {
@@ -834,7 +838,7 @@ const EditHomeLoan = ({ route, navigation }) => {
         },
       ];
 
-   console.log('documentbody',signatureImage);
+      console.log('documentbody', signatureImage);
 
       const createAnnotationResponse = await axios.post(
         'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
@@ -858,8 +862,8 @@ const EditHomeLoan = ({ route, navigation }) => {
 
       // Fetch and display the updated annotations
     } catch (error) {
-      console.error('Error sending Signature image annotation:', error.response?.data || error.message);
-      Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+      // console.error('Error sending Signature image annotation:', error.response?.data || error.message);
+      // Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
     }
   };
 
@@ -872,11 +876,11 @@ const EditHomeLoan = ({ route, navigation }) => {
   };
 
   const handleViewImages = () => {
-    setShowImage(!showImage); 
+    setShowImage(!showImage);
   };
 
   const filteredAnnotations = annotations.filter(item => item.documentbody);
-  
+
   const handleNavigateToSignatureScreen = () => {
     navigation.navigate('SignatureScreen', { loanApplication });
   };
@@ -899,7 +903,8 @@ const EditHomeLoan = ({ route, navigation }) => {
               onOptionChange={handleSendApproval}
               title="Send Approval"
               options={['No', 'Yes']}
-              initialOption={sendApproval ? getSendApproval(sendApproval) : ''}
+              // initialOption={sendApproval ? getSendApproval(sendApproval) : ''}
+              initialOption={sendApproval ? 'Yes' : 'No'}
               style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
               disabled={sendApproval}
             />
@@ -1110,13 +1115,27 @@ const EditHomeLoan = ({ route, navigation }) => {
               style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
             /> */}
 
-            <LoanStatusPicker
+            {/* <LoanStatusPicker
               onOptionChange={handleLoanStatusChange}
               title="Select Loan Status"
               options={['Approved', 'PendingApproval', 'Draft', 'Cancelled', 'Expired']}
               initialOption={getStatusStringFromNumericValue(status)}
               style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
             disabled={true}
+            /> */}
+
+            <TextInput
+              style={[styles.textInputContainer, { color: "gray" }]}
+              placeholder="Loan Status"
+              value={getStatusStringFromNumericValue(status)}
+              editable={false}
+            />
+
+            <TextInput
+              style={[styles.textInputContainer, { color: "red" }]}
+              placeholder="Resaon"
+              value={reason}
+              editable={false}
             />
 
             <View style={{ backgroundColor: "white", marginTop: 15 }}>
@@ -1125,7 +1144,7 @@ const EditHomeLoan = ({ route, navigation }) => {
                   title="AadharCard"
                   imageContent={aadharcard}
                   setImageContent={setAadharcard}
-                  // onViewImage={onViewImage}
+                // onViewImage={onViewImage}
                 />
               </View>
               <View style={{ marginVertical: 3 }}>
@@ -1160,16 +1179,16 @@ const EditHomeLoan = ({ route, navigation }) => {
             </View>
           </View>
 
-<View style={{width: "100%", paddingHorizontal: 20}}>
-          <RenderAnnotation
-            annotations={annotations}
-            filteredAnnotations={filteredAnnotations}
-            showImage={showImage}
-            handleViewImages={handleViewImages}
-          />
-          {/* <SendNotification sendApproval={sendApproval} /> */}
+          <View style={{ width: "100%", paddingHorizontal: 20 }}>
+            <RenderAnnotation
+              annotations={annotations}
+              filteredAnnotations={filteredAnnotations}
+              showImage={showImage}
+              handleViewImages={handleViewImages}
+            />
+            {/* <SendNotification sendApproval={sendApproval} /> */}
 
-          {/* <Text> annotation</Text> */}
+            {/* <Text> annotation</Text> */}
           </View>
         </View>
       </ScrollView>

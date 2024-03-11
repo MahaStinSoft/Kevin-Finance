@@ -51,6 +51,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
   const [applicantImage, setapplicantImage] = useState({ fileName: null, fileContent: null });
   const [signature, setSignature] = useState({ fileName: null });
   const [sendApproval, setSendApproval] = useState(personalLoan?.kf_sendapproval || '');
+  const [reason, setReason] = useState(personalLoan?.kf_reason || '');
 
   const [isfirstnameValid, setIsfirstnameValid] = useState(true);
   const [isLastNameValid, setIsLastNameValid] = useState(true);
@@ -68,7 +69,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
   const [aadharImageContent, setAadharImageContent] = useState(null);
 
   const { signatureFile } = route.params;
-  console.log('signature',signatureFile);
+  console.log('signature', signatureFile);
   const [recordId, setRecordId] = useState(personalLoan.kf_personalloanid);
   const [imageSource, setImageSource] = useState(null);
 
@@ -117,12 +118,13 @@ const EditPersonalLoan = ({ route, navigation }) => {
     setEmiAmount(personalLoan.kf_emi);
     setInterestRate(personalLoan.kf_interestrate);
     setNumberOfEMI(personalLoan.kf_numberofemi);
+    setReason(personalLoan.kf_reason);
     setRecordId(personalLoan.kf_personalloanid);
     setSendApproval(personalLoan.kf_sendapproval);
     setAadharcard({ fileName: null, fileContent: null });
     setPancard({ fileName: null, fileContent: null });
     setapplicantImage({ fileName: null, fileContent: null });
-    setSignature({ fileName: null})
+    setSignature({ fileName: null })
     console.log('State updated:', {
       applicationnumber,
       createdby,
@@ -238,7 +240,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
           kf_emischedule: emiSchedule,
           kf_othercharges: otherCharges,
           kf_numberofemi: numberOfEMI,
-          kf_sendapproval: sendApproval
+          kf_sendapproval: sendApproval,
+          kf_reason: reason
         },
         {
           headers: {
@@ -282,7 +285,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
             kf_emischedule: emiSchedule,
             kf_othercharges: otherCharges,
             kf_numberofemi: numberOfEMI,
-            kf_sendapproval: sendApproval
+            kf_sendapproval: sendApproval,
+            kf_reason: reason
           });
         }
         // console.log(age);
@@ -889,7 +893,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
         },
       ];
 
-   console.log('documentbody',signatureFile);
+      console.log('documentbody', signatureFile);
 
       const createAnnotationResponse = await axios.post(
         'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
@@ -913,8 +917,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
 
       // Fetch and display the updated annotations
     } catch (error) {
-      console.error('Error sending Signature image annotation:', error.response?.data || error.message);
-      Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+      // console.error('Error sending Signature image annotation:', error.response?.data || error.message);
+      // Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
     }
   };
 
@@ -958,7 +962,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
               onOptionChange={handleSendApproval}
               title="Send Approval"
               options={['No', 'Yes']}
-              initialOption={sendApproval ? getSendApproval(sendApproval) : ''}
+              // initialOption={sendApproval ? getSendApproval(sendApproval) : ''}
+              initialOption={sendApproval ? 'Yes' : 'No'}
               style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
               disabled={sendApproval}
             />
@@ -1155,16 +1160,30 @@ const EditPersonalLoan = ({ route, navigation }) => {
               onChangeText={(text) => setOtherCharges(text)}
             />
 
-            <LoanStatusPicker
+            {/* <LoanStatusPicker
               onOptionChange={handleLoanStatusChange}
               title="Select Loan Status"
               options={['Approved', 'PendingApproval', 'Draft', 'Cancelled']}
               initialOption={getStatusStringFromNumericValue(status)}
-              style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
+              style={{ width: "100%", marginLeft: 0, marginTop: 5 , color: "gray"}}
               disabled={true}
+            /> */}
+
+            <TextInput
+              style={[styles.textInputContainer, { color: "gray" }]}
+              placeholder="Loan Status"
+              value={getStatusStringFromNumericValue(status)}
+              editable={false}
             />
 
-            {statusReason && (
+            <TextInput
+              style={[styles.textInputContainer, { color: "red" }]}
+              placeholder="Resaon"
+              value={reason}
+              editable={false}
+            />
+
+            {/* {statusReason && (
               <LoanStatusPicker
                 onOptionChange={handleAnotherOptionChange}
                 title="Status Reason"
@@ -1172,7 +1191,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
                 initialOption={statusReason ? getAnotherOptionStringFromNumericValue(statusReason) : ''}
                 style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
               />
-            )}
+            )} */}
 
             <View style={{ backgroundColor: "white", marginTop: 15 }}>
               <View style={{ marginVertical: 3 }}>
@@ -1214,13 +1233,13 @@ const EditPersonalLoan = ({ route, navigation }) => {
               </View>
             </View>
           </View>
-          <View style={{width: "100%", paddingHorizontal: 20}}>
-          <RenderAnnotation
-            annotations={annotations}
-            filteredAnnotations={filteredAnnotations}
-            showImage={showImage}
-            handleViewImages={handleViewImages}
-          />
+          <View style={{ width: "100%", paddingHorizontal: 20 }}>
+            <RenderAnnotation
+              annotations={annotations}
+              filteredAnnotations={filteredAnnotations}
+              showImage={showImage}
+              handleViewImages={handleViewImages}
+            />
           </View>
           {/* <SendNotification sendApproval={sendApproval} /> */}
         </View>

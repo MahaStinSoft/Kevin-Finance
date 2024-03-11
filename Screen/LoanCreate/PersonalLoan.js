@@ -88,6 +88,51 @@ export const PersonalLoan = () => {
     setKf_emi(EMI.toFixed(2));
 };
 
+useEffect(() => {
+  // Function to calculate EMI
+  const calculateEMI = () => {
+    // Check if all required values are available
+    if (kf_loanamountrequested && kf_interestrate && kf_emischedule && kf_numberofemi) {
+      const P = parseFloat(kf_loanamountrequested); // Principal loan amount
+      const r = parseFloat(kf_interestrate) / 100; // Annual interest rate (expressed as a decimal)
+      let n = null; // Number of payments per year
+      let N = null; // Total number of payments over the loan tenure
+      let t = null; // Loan tenure in years
+
+      // Determine the number of payments per year based on the selected EMI schedule
+      switch (kf_emischedule) {
+        case 1: // Daily
+          n = 365;
+          break;
+        case 2: // Weekly
+          n = 52;
+          break;
+        case 3: // Monthly
+          n = 12;
+          break;
+        default:
+          n = 12; // Default to monthly
+      }
+
+      // Total number of payments over the loan tenure
+      N = parseInt(kf_numberofemi);
+
+      // Loan tenure in years
+      t = N / n;
+
+      // Calculate EMI
+      const R = r / n; // Monthly interest rate
+      const EMI = (P * R * Math.pow((1 + R), N)) / (Math.pow((1 + R), N) - 1);
+
+      // Update state with calculated EMI
+      setKf_emi(EMI.toFixed(2));
+    }
+  };
+
+  // Call the calculateEMI function whenever any of the dependent values change
+  calculateEMI();
+}, [kf_loanamountrequested, kf_interestrate, kf_emischedule, kf_numberofemi]);
+
 // Function to handle changes in loan amount requested or interest rate
 const handleLoanChange = () => {
   // Check if loan amount and interest rate are provided
@@ -179,7 +224,7 @@ const handleInterestRateChange = (text) => {
           text: 'Discard',
           onPress: () => {
             key = { resetFormKey }
-            navigation.navigate('Dashboard', { resetState: true }); 
+            navigation.goBack({ resetState: true }); 
           },
         },
       ],
@@ -386,7 +431,7 @@ const handleInterestRateChange = (text) => {
     else {
       setErrorMessages({
         ...errorMessages,
-        // loanAmountRequested: `Loan amount should be between ${minLoanAmount} and ${maxLoanAmount} INR.`,
+        loanAmountRequested: '',
       });
     }
   };
@@ -428,7 +473,7 @@ const handleInterestRateChange = (text) => {
     } else {
       setErrorMessages({
         ...errorMessages,
-        NoOfEMIs: `Enter a Valid No of EMI payment`,
+        NoOfEMIs: `Enter a No of EMI payment`,
       });
     }
   };
@@ -529,10 +574,10 @@ const handleInterestRateChange = (text) => {
       loanAmountRequested: !kf_loanamountrequested ? ' Enter Loan Amount Requested' : '',
       aadharCardNumber: !/^\d{12}$/.test(kf_aadharnumber) ? 'Enter Valid Aadharcard Number' : '',
       panCardNumber: !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(kf_pannumber) ? 'Enter Valid PAN Card Number' : '',
-      interestRate: !/^\d+$/.test(kf_interestrate) ? 'Enter a Valid Interest Rate' : '',
+      interestRate: !/^\d+$/.test(kf_interestrate) ? 'Enter a Interest Rate' : '',
       emiSchedule: !kf_emischedule ? 'select a EMISchedule' : '',
-      NoOfEMIs: !/^\d+$/.test(kf_numberofemi) ? 'Enter a Valid No of EMI payment' : '',
-      emiCollectionDate: !kf_emicollectiondate ? 'select a EMI Collection Date' : ''
+      NoOfEMIs: !/^\d+$/.test(kf_numberofemi) ? 'Enter a No of EMI payment' : '',
+      // emiCollectionDate: !kf_emicollectiondate ? 'select a EMI Collection Date' : ''
     };
     setErrorMessages(newErrorMessages);
     if (Object.values(newErrorMessages).some(message => message !== '')) {
@@ -774,6 +819,7 @@ const handleInterestRateChange = (text) => {
             value={kf_loanamountrequested}
             onChangeText={handleLoanAmountRequestedChange}
             onBlur={handleLoanChange}
+            keyboardType="numeric"
           />
 
           {errorMessages.loanAmountRequested !== '' && (
@@ -786,7 +832,7 @@ const handleInterestRateChange = (text) => {
             value={kf_interestrate}
             onChangeText={handleInterestRate}
             onBlur={handleLoanChange}
-          // keyboardType="numeric" 
+          keyboardType="numeric" 
           />
           {errorMessages.interestRate !== '' && (
             <Text style={styles.errorText}>{errorMessages.interestRate}</Text>
@@ -807,7 +853,7 @@ const handleInterestRateChange = (text) => {
             value={kf_numberofemi}
             onChangeText={handleNoOfEMIs}
             onBlur={handleEMIScheduleChange}
-          // keyboardType="numeric"
+          keyboardType="numeric"
           />
           {errorMessages.NoOfEMIs !== '' && (
             <Text style={styles.errorText}>{errorMessages.NoOfEMIs}</Text>
@@ -815,7 +861,7 @@ const handleInterestRateChange = (text) => {
 
           <Text style={[styles.textInputContainer, { marginVertical: 10, height: 48, color: "gray" }]}>EMI: {kf_emi}</Text>
 
-          <ComponentDatePicker
+          {/* <ComponentDatePicker
             style={{ height: 48, marginBottom: 15 }}
             selectedDate={kf_emicollectiondate}
             onDateChange={handleEmiCollectionDateChange}
@@ -823,7 +869,7 @@ const handleInterestRateChange = (text) => {
           />
           {errorMessages.emiCollectionDate !== '' && (
             <Text style={styles.errorText}>{errorMessages.emiCollectionDate}</Text>
-          )}
+          )} */}
 
           {/* <TextInputComponent
             placeholder="Other Charges"
