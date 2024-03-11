@@ -923,7 +923,7 @@ const EditHomeLoan = ({ route, navigation }) => {
         <View style={styles.container}>
           <View style={styles.wrapper}>
             {/* <Button title="Send Notification" onPress={handleSendNotification} /> */}
-            <Button title="Send Notification to Manager" onPress={handleSendNotificationToManager} />
+            {/* <Button title="Send Notification to Manager" onPress={handleSendNotificationToManager} /> */}
 
             <LoanStatusPicker
               onOptionChange={handleSendApproval}

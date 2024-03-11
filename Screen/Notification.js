@@ -4,6 +4,7 @@ import axios from 'axios';
 import { ScrollView } from 'react-native-gesture-handler';
 import querystring from 'querystring';
 import moment from 'moment'; // Import moment.js for date formatting
+import { schedulePushNotification } from '../common/notificationUtils';
 
 const Notification = ({loanApplication, navigation, personalLoan,route}) => {
   const [loanApplications, setLoanApplications] = useState([]);
@@ -50,6 +51,11 @@ const [selectedPersonalLoanId, setSelectedPersonalLoanId] = useState(null);
         // Filter loan applications where kf_sendapproval is equal to 1
         const filteredApplications = response.data.value.filter(application => application.kf_sendapproval == 1);
         setLoanApplications(filteredApplications);
+
+        if (loanApplications.length < filteredApplications.length) {
+          const newApplication = filteredApplications[filteredApplications.length - 1]; // Assuming the last fetched application is the new one
+          schedulePushNotification(newApplication.kf_applicationnumber, newApplication.kf_name, newApplication.kf_lastname, newApplication.kf_amount, newApplication.kf_createdby); // Schedule push notification with relevant data
+        }
       } else {
         console.error('Invalid loan applications response format:', response.data);
       }
@@ -86,6 +92,12 @@ const [selectedPersonalLoanId, setSelectedPersonalLoanId] = useState(null);
         // Filter personal loan notifications where kf_sendapproval is equal to 1
         const filteredNotifications = response.data.value.filter(notification => notification.kf_sendapproval == 1);
         setNotifications(filteredNotifications);
+
+        // Schedule push notification if new notifications are fetched
+      if (notifications.length < filteredNotifications.length) {
+        const newNotification = filteredNotifications[filteredNotifications.length - 1]; // Assuming the last fetched notification is the new one
+        schedulePushNotification(newNotification.kf_applicationnumber, newNotification.kf_firstname, newNotification.kf_lastname, newNotification.kf_amount, newNotification.kf_createdby); // Schedule push notification with relevant data
+      }
       } else {
         console.error('Invalid notifications response format:', response.data);
       }
