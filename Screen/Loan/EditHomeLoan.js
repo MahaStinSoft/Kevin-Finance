@@ -11,6 +11,7 @@ import SignatureScreen from '../Signature/signature';
 import CardImageSignature from '../../common/CardImageSignature';
 import RenderAnnotation from '../Annotations/renderAnnotationItem';
 import SendNotification from '../../common/SendNotification';
+import { schedulePushNotification } from '../../common/notificationUtils';
 
 const EditHomeLoan = ({ route, navigation }) => {
   const { loanApplication, onUpdateSuccess } = route.params || {};
@@ -489,7 +490,7 @@ const EditHomeLoan = ({ route, navigation }) => {
       case 'Cancelled':
         numericValue = 123950003;
         break;
-      case 'Expired':
+      case 'Rejected':
         numericValue = 123950004;
         break;
       default:
@@ -509,7 +510,7 @@ const EditHomeLoan = ({ route, navigation }) => {
       case 123950003:
         return 'Cancelled';
       case 123950004:
-        return 'Expired';
+        return 'Rejected';
       default:
         return 'Pending Approval';
     }
@@ -888,6 +889,28 @@ const EditHomeLoan = ({ route, navigation }) => {
   const date = emiCollectionDate ? new Date(emiCollectionDate) : null;
   const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
 
+  //   const handleSendNotification = () => {
+  //   schedulePushNotification(applicationnumber, firstname, lastname, loanAmountRequested, createdby); // Trigger push notification
+  // };
+
+  const handleSendNotificationToManager = () => {
+    // Replace managerRecipient with the actual manager's device token or identifier
+    const managerRecipient = 'manager-device-token-or-identifier';
+
+    // Replace these dummy values with actual values from your application
+    const applicationNumber = '123456';
+    const firstName = 'John';
+    const lastName = 'Doe';
+    const loanAmount = '$10000';
+    const createdBy = 'Admin';
+
+    // Call the function to schedule the push notification to the manager
+    schedulePushNotification(managerRecipient, applicationNumber, firstName, lastName, loanAmount, createdBy);
+
+    // Alert the admin that the notification has been scheduled
+    Alert.alert('Notification Sent', 'Notification has been sent to the manager.');
+  };
+
   return (
     <View>
       <HeaderComponent titleText="Edit Home Screen"
@@ -899,6 +922,9 @@ const EditHomeLoan = ({ route, navigation }) => {
       <ScrollView>
         <View style={styles.container}>
           <View style={styles.wrapper}>
+            {/* <Button title="Send Notification" onPress={handleSendNotification} /> */}
+            <Button title="Send Notification to Manager" onPress={handleSendNotificationToManager} />
+
             <LoanStatusPicker
               onOptionChange={handleSendApproval}
               title="Send Approval"
