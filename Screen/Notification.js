@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, Modal, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, Button, Modal, TextInput } from 'react-native';
 import axios from 'axios';
 import { ScrollView } from 'react-native-gesture-handler';
 import querystring from 'querystring';
 import moment from 'moment'; // Import moment.js for date formatting
 import { schedulePushNotification } from '../common/notificationUtils';
-import SendNotificationScreen from '../common/notificationUtils';
 import PushNotification from 'react-native-push-notification';
 
 const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
@@ -18,6 +17,7 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
   const [selectedApplicationId, setSelectedApplicationId] = useState(null);
   const [selectedPersonalLoanId, setSelectedPersonalLoanId] = useState(null);
   const { kf_adminname } = route.params;
+
 
   useEffect(() => {
     fetchLoanApplications();
@@ -161,15 +161,20 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
     }
   };
 
+
+
   const handleRejectLoan = async (applicationId) => {
     setSelectedApplicationId(applicationId);
     setShowRejectCommentBox(true);
   };
 
+
   const handleRejectNotification = async (personalLoanId) => {
     setSelectedPersonalLoanId(personalLoanId); // Set the selected personal loan ID
     setShowRejectCommentBox(true); // Open the comment box
   };
+
+  // For Personal Loan 
 
   // Add functions to handle personal loan approvals, drafts, pending approvals, and rejections
   const handleApproveNotification = async (personalLoanId) => {
