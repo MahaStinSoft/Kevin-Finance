@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button ,Modal ,TextInput} from 'react-native';
+import { View, Text, StyleSheet, Button ,Modal ,TextInput, Alert} from 'react-native';
 import axios from 'axios';
 import { ScrollView } from 'react-native-gesture-handler';
 import querystring from 'querystring';
 import moment from 'moment'; // Import moment.js for date formatting
 import { schedulePushNotification } from '../common/notificationUtils';
+import SendNotificationScreen from '../common/notificationUtils';
+import PushNotification from 'react-native-push-notification';
 
 const Notification = ({loanApplication, navigation, personalLoan,route}) => {
   const [loanApplications, setLoanApplications] = useState([]);
@@ -12,16 +14,36 @@ const Notification = ({loanApplication, navigation, personalLoan,route}) => {
   // const [approverName, setApproverName] = useState('');
   const [sendApproval, setSendApproval] = useState(null);
   const [showRejectCommentBox, setShowRejectCommentBox] = useState(false);
-const [rejectComment, setRejectComment] = useState('');
-const [selectedApplicationId, setSelectedApplicationId] = useState(null);
-const [selectedPersonalLoanId, setSelectedPersonalLoanId] = useState(null); 
+  const [rejectComment, setRejectComment] = useState('');
+  const [selectedApplicationId, setSelectedApplicationId] = useState(null);
+  const [selectedPersonalLoanId, setSelectedPersonalLoanId] = useState(null);
   const { kf_adminname } = route.params;
-
 
   useEffect(() => {
     fetchLoanApplications();
     fetchNotifications();
   }, []);
+
+  useEffect(() => {
+    configureNotifications();
+  }, []);
+
+  const configureNotifications = () => {
+    PushNotification.configure({
+      // Configure notification settings
+      onNotification: function (notification) {
+        console.log('Notification received:', notification);
+        // Handle notification when received in the background
+      },
+      permissions: {
+        alert: true,
+        badge: true,
+        sound: true,
+      },
+      popInitialNotification: true,
+    });
+  };
+
 
   const fetchLoanApplications = async () => {
     try {
