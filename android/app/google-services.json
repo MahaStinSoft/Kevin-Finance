@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "568359651963",
+    "project_id": "crm-financeapp",
+    "storage_bucket": "crm-financeapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:568359651963:android:9b420a28c2436576ceb0de",
+        "android_client_info": {
+          "package_name": "com.anonymous.KevinFinance"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXW7aUGrXkTO6FV0DeSFfDwhovMTemITE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

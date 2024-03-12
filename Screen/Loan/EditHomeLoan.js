@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, TouchableOpacity, Alert, StyleSheet, ScrollView, Text, FlatList, Linking, Platform, Image, Button } from 'react-native';
 import axios from 'axios';
+import { Notification } from 'expo-notifications';
 
 import HeaderComponent from '../../common/Header';
 import ButtonComponent from '../../common/ButtonComponent';
@@ -889,26 +890,8 @@ const EditHomeLoan = ({ route, navigation }) => {
   const date = emiCollectionDate ? new Date(emiCollectionDate) : null;
   const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
 
-  //   const handleSendNotification = () => {
-  //   schedulePushNotification(applicationnumber, firstname, lastname, loanAmountRequested, createdby); // Trigger push notification
-  // };
-
-  const handleSendNotificationToManager = () => {
-    // Replace managerRecipient with the actual manager's device token or identifier
-    const managerRecipient = 'manager-device-token-or-identifier';
-
-    // Replace these dummy values with actual values from your application
-    const applicationNumber = '123456';
-    const firstName = 'John';
-    const lastName = 'Doe';
-    const loanAmount = '$10000';
-    const createdBy = 'Admin';
-
-    // Call the function to schedule the push notification to the manager
-    schedulePushNotification(managerRecipient, applicationNumber, firstName, lastName, loanAmount, createdBy);
-
-    // Alert the admin that the notification has been scheduled
-    Alert.alert('Notification Sent', 'Notification has been sent to the manager.');
+    const handleSendNotification = () => {
+    schedulePushNotification(applicationnumber, firstname, lastname, loanAmountRequested, createdby); // Trigger push notification
   };
 
   return (
@@ -923,8 +906,6 @@ const EditHomeLoan = ({ route, navigation }) => {
         <View style={styles.container}>
           <View style={styles.wrapper}>
             {/* <Button title="Send Notification" onPress={handleSendNotification} /> */}
-            {/* <Button title="Send Notification to Manager" onPress={handleSendNotificationToManager} /> */}
-
             <LoanStatusPicker
               onOptionChange={handleSendApproval}
               title="Send Approval"
