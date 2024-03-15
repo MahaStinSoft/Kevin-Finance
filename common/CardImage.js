@@ -207,28 +207,28 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const CardImage = ({ title, imageContent, setImageContent }) => {
   const [modalVisible, setModalVisible] = useState(false);
 
-  useEffect(() => {
-    // Load image content from AsyncStorage when component mounts
-    const loadStoredImage = async () => {
-      try {
-        const storedImage = await AsyncStorage.getItem(`${title}_image`);
-        if (storedImage) {
-          setImageContent(JSON.parse(storedImage));
-        }
-      } catch (error) {
-        console.error('Error loading image from storage:', error);
-      }
-    };
-    loadStoredImage();
-  }, [title, setImageContent]);
+  // useEffect(() => {
+  //   // Load image content from AsyncStorage when component mounts
+  //   const loadStoredImage = async () => {
+  //     try {
+  //       const storedImage = await AsyncStorage.getItem(`${title}_image`);
+  //       if (storedImage) {
+  //         setImageContent(JSON.parse(storedImage));
+  //       }
+  //     } catch (error) {
+  //       console.error('Error loading image from storage:', error);
+  //     }
+  //   };
+  //   loadStoredImage();r
+  // }, [title, setImageContent]);
 
-  const saveImageToStorage = async (image) => {
-    try {
-      await AsyncStorage.setItem(`${title}_image`, JSON.stringify(image));
-    } catch (error) {
-      console.error('Error saving image to storage:', error);
-    }
-  };
+  // const saveImageToStorage = async (image) => {
+  //   try {
+  //     await AsyncStorage.setItem(`${title}_image`, JSON.stringify(image));
+  //   } catch (error) {
+  //     console.error('Error saving image to storage:', error);
+  //   }
+  // };
 
     const takePictureWithCamera = async () => {
     try {
@@ -278,8 +278,8 @@ const CardImage = ({ title, imageContent, setImageContent }) => {
 
   return (
     <View style={{ flexDirection: 'row', marginTop: 15, alignContent: 'space-around' }}>
-      <View style={{ marginHorizontal: 10, width: 140 }}>
-        {/* <Text>{title} Image</Text> */}
+      <View style={{ marginHorizontal: 15, width: 140 }}>
+        <Text>{title}</Text>
       </View>
       <View style={{}}>
         {imageContent.fileContent && (
@@ -317,7 +317,7 @@ const CardImage = ({ title, imageContent, setImageContent }) => {
         <TouchableOpacity onPress={onViewImage} style={styles.button}>
           <Text style={styles.buttonText}>View</Text>
         </TouchableOpacity> */}
-        <TouchableOpacity onPress={pickImage} style={{ backgroundColor: 'red', padding: 10, borderRadius: 25, width: 85, marginLeft: -10, height: 30, marginTop: -5 }}>
+        <TouchableOpacity onPress={pickImage} style={{ backgroundColor: 'red', padding: 10, borderRadius: 25, width: 85, marginLeft: -25, height: 30, marginTop: -5 }}>
           <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold', marginVertical: -7 }}>Gallery</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={takePictureWithCamera} style={{ backgroundColor: 'red', padding: 10, borderRadius: 25, width: 85, marginLeft: 15, height: 30, marginTop: -5 }}>

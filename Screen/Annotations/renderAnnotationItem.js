@@ -517,7 +517,7 @@ const RenderAnnotation = ({ annotations, filteredAnnotations, showImage, handleV
       ) : (
         <Text style={{textAlign: "center", marginBottom: 15}}>No PanCard Image to display</Text>
       )}
-      {latestApplicantAnnotation ? (
+      {/* {latestApplicantAnnotation ? (
         <TouchableOpacity onPress={() => onViewImage(`data:image/png;base64,${latestApplicantAnnotation.documentbody}`)}>
           <View style={styles.annotation}>
             <Text>Subject: {latestApplicantAnnotation.subject}</Text>
@@ -525,7 +525,7 @@ const RenderAnnotation = ({ annotations, filteredAnnotations, showImage, handleV
         </TouchableOpacity>
       ) : (
         <Text style={{textAlign: "center", marginBottom: 15}}>No Applicant Image to display</Text>
-      )}
+      )} */}
       {latestSignatureAnnotation ? (
         <TouchableOpacity onPress={() => onViewImage(`data:image/png;base64,${latestSignatureAnnotation.documentbody}`)}>
           <View style={styles.annotation}>

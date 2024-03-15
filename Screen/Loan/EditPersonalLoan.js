@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, Alert, StyleSheet, ScrollView, Text, Image } from 'react-native';
+import { View, TextInput, Button, Alert, StyleSheet, ScrollView, Text,Image} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 
@@ -48,8 +48,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
   const [eminAmount, setEmiAmount] = useState(personalLoan?.kf_emi || '');
   const [aadharcard, setAadharcard] = useState({ fileName: null, fileContent: null });
   const [pancard, setPancard] = useState({ fileName: null, fileContent: null });
-  // const [applicantImage, setapplicantImage] = useState({ fileName: null, fileContent: null });
-  const [applicantImage, setapplicantImage] = useState(personalLoan?.kf_applicantimage || { fileName: null, fileContent: null });
+  const [applicantImage, setapplicantImage] = useState({ fileName: null, fileContent: null });
+  const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fileContent: null });
   const [signature, setSignature] = useState({ fileName: null });
   const [sendApproval, setSendApproval] = useState(personalLoan?.kf_sendapproval || '');
   const [reason, setReason] = useState(personalLoan?.kf_reason || '');
@@ -124,7 +124,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
     setSendApproval(personalLoan.kf_sendapproval);
     setAadharcard({ fileName: null, fileContent: null });
     setPancard({ fileName: null, fileContent: null });
-    setapplicantImage(personalLoan.kf_applicantimage);
+    setapplicantImage({ fileName: null, fileContent: null });
     setSignature({ fileName: null })
     console.log('State updated:', {
       applicationnumber,
@@ -243,7 +243,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
           kf_numberofemi: numberOfEMI,
           kf_sendapproval: sendApproval,
           kf_reason: reason,
-          kf_applicantimage: applicantImage.fileContent
+          kf_applicantimage: applicantImage.fileContent,
         },
         {
           headers: {
@@ -289,7 +289,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
             kf_numberofemi: numberOfEMI,
             kf_sendapproval: sendApproval,
             kf_reason: reason,
-            applicantImage: applicantImage.fileContent
+            kf_applicantimage: applicantImage.fileContent,
           });
         }
         // console.log(age);
@@ -672,65 +672,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
   //     Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
   //   }
   // };
+  
 
-  // const renderImage = () => {
-  //   if (applicantImage && applicantImage.fileContent) {
-  //     return (
-  //       <Image
-  //         source={{ uri: `data:image/png;base64,${applicantImage.fileContent}` }}
-  //         style={{ width: 100, height: 100, borderRadius: 50, objectFit: "fill", marginTop: 15, marginLeft: 15 }}
-  //       />
-  //     );
-  //   } else {
-  //     // Handle case where imageContent is null or undefined
-  //     return (
-  //       <View style={[styles.cardImage, { backgroundColor: "gray", width: "100%", height: "100%" }]}>
-  //         {/* Display placeholder or default content */}
-  //       </View>
-  //     );
-  //   }
-  // };
-
-  // Suppose you have a function to fetch image data based on record ID
-const fetchImageData = async (recordId) => {
-  try {
-    // Fetch image data from your data source using the record ID
-    const imageData = await YourImageDataFetchingFunction(recordId);
-    return imageData;
-  } catch (error) {
-    console.error('Error fetching image data:', error);
-    return null;
-  }
-};
-
-// Inside your EditHomeLoanScreen component
-const [imageData, setImageData] = useState(null); // State to store image data
-
-// useEffect to fetch image data when the component mounts or when the record ID changes
-useEffect(() => {
-  // Fetch image data based on the record ID
-  fetchImageData(recordId).then((data) => {
-    setImageData(data);
-  });
-}, [recordId]); // Include recordId as a dependency
-
-// Render function to display the image
-const renderImage = () => {
-  if (imageData) {
-    return (
-      <Image
-        source={{ uri: `data:image/png;base64,${imageData}` }} // Assuming imageData is a base64 string
-        style={{ width: 100, height: 100, borderRadius: 50 }}
-      />
-    );
-  } else {
-    return (
-      <View style={{ width: 100, height: 100, borderRadius: 50, backgroundColor: 'gray' }}>
-        {/* Placeholder or default content */}
-      </View>
-    );
-  }
-};
   useEffect(() => {
     fetchAnnotations1();
   }, []);
@@ -926,6 +869,7 @@ const renderImage = () => {
   //   }
   // };
 
+
   const sendAnnotation3 = async () => {
     try {
       const tokenResponse = await axios.post(
@@ -1006,8 +950,28 @@ const renderImage = () => {
   const date = emiCollectionDate ? new Date(emiCollectionDate) : null;
   const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
 
+
+  const renderImage = () => {
+    if (personalLoan.kf_applicantimage) {
+      return (
+        <Image
+          source={{ uri: `data:image/png;base64,${personalLoan.kf_applicantimage}` }}
+          style={{width:100, height: 100, borderRadius: 50, objectFit:"fill", marginTop: 15, marginLeft: 15 }}
+        />
+      );
+    } else {
+      const initials = personalLoan ? `${personalLoan.kf_name[0]}${personalLoan.kf_lastname[0]}` : '';
+      return (
+        <View style={[styles.cardImage,{backgroundColor:"gray",width: "100%", height: "100%"} ]}>
+          <Text style={styles.placeholderText}>{initials}</Text>
+        </View>
+      );
+    }
+  };
+
+
   return (
-    <View>
+    <View style={styles.container}>
       <HeaderComponent
         titleText="Edit Personal Loan"
         onPress={handleGoBack}
@@ -1015,9 +979,11 @@ const renderImage = () => {
         screenIcon="md-save"
         screenIconStyle={{ marginTop: 5 }}
       />
-            <View style={{ flexDirection: "row", justifyContent:"space-evenly", marginBottom: 30,backgroundColor:"white", marginHorizontal: 20}}>
-         <View style={{ width:"50%", height: "auto",left: 50,}}>{renderImage()}</View>
-         <View style={{right: 70, top: 30}}>
+
+      <ScrollView>
+      <View style={styles.imageContent}>
+           <View style={{ width:"50%", height: "100%",left: 60, bottom: 5}}>{renderImage()}</View>
+           <View style={{right: 80, top: 30}}>
          <CardImage
               // title="Applicant"
               imageContent={applicantImage}
@@ -1026,8 +992,7 @@ const renderImage = () => {
             />
             </View>
          </View>
-      <ScrollView>
-        <View style={styles.container}>
+      <View style={styles.detailContainer}>
           <View style={styles.wrapper}>
             <LoanStatusPicker
               onOptionChange={handleSendApproval}
@@ -1264,8 +1229,8 @@ const renderImage = () => {
               />
             )} */}
 
-            <View style={{ backgroundColor: "white", marginTop: 15 }}>
-              <View style={{ marginVertical: 3 }}>
+<View style={styles.indentityImage}>
+                <View style={{ marginVertical: 3 }}>
                 <CardImage
                   title="AadharCard"
                   imageContent={aadharcard}
@@ -1280,13 +1245,13 @@ const renderImage = () => {
                   setImageContent={setPancard}
                 />
               </View>
-              {/* <View style={{ marginVertical: 3 }}>
-                <CardImage
+              <View style={{ marginVertical: 3 }}>
+                {/* <CardImage
                   title="Applicant"
                   imageContent={applicantImage}
                   setImageContent={setapplicantImage}
-                />
-              </View> */}
+                /> */}
+              </View>
               <View style={{ marginBottom: 15 }}>
                 {/* <CardImageSignature
                   title="Draw Signature"
@@ -1320,22 +1285,40 @@ const renderImage = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  container:{
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 20,
-    marginBottom: 40
+    width: "100%",
+    marginBottom: 20
+  },
+  imageContent: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    backgroundColor: "white",
+     elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  indentityImage:{
+    backgroundColor:"white",
+    marginTop:5,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   wrapper: {
-    width: '90%',
-  },
-  textInputContainer: {
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#bbb',
-    borderRadius: 5,
-    paddingHorizontal: 14,
+    width: '100%',
+    paddingHorizontal: 20,
+    marginTop:5
   },
   errorText: {
     color: 'red',
@@ -1356,6 +1339,47 @@ const styles = StyleSheet.create({
     backgroundColor: '#FBFCFC',
     padding: 10,
   },
+  heading: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  annotation: {
+    backgroundColor:"white",
+    marginTop:5,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  cardImage: {
+    // borderRadius: 40,
+    width: 200,
+    height: 200,
+  },
+  profileContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    marginTop: 0,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    minWidth: "100%",
+    marginBottom: 20,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  }
 });
+
 
 export default EditPersonalLoan;

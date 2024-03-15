@@ -47,6 +47,7 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [aadharcard, setAadharcard] = useState({ fileName: null, fileContent: null });
   const [pancard, setPancard] = useState({ fileName: null, fileContent: null });
   const [applicantImage, setapplicantImage] = useState({ fileName: null, fileContent: null });
+  const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fileContent: null });
   const [signature, setSignature] = useState({ fileName: null });
   const [sendApproval, setSendApproval] = useState(loanApplication?.kf_sendapproval || '');
   const [reason, setReason] = useState(loanApplication?.kf_reason || '');
@@ -237,7 +238,8 @@ const EditHomeLoan = ({ route, navigation }) => {
           kf_othercharges: otherCharges,
           kf_numberofemi: numberOfEMI,
           kf_sendapproval: sendApproval,
-          kf_reason: reason
+          kf_reason: reason,
+          kf_applicantimage:applicantImage.fileContent
         },
         {
           headers: {
@@ -283,7 +285,8 @@ const EditHomeLoan = ({ route, navigation }) => {
             kf_othercharges: otherCharges,
             kf_numberofemi: numberOfEMI,
             kf_sendapproval: sendApproval,
-            kf_reason: reason
+            kf_reason: reason,
+            kf_applicantimage:applicantImage.fileContent
           });
         }
         // console.log(loanAmountRequested)
@@ -872,7 +875,7 @@ const EditHomeLoan = ({ route, navigation }) => {
   const handleUpdateRecordAndSendAnnotation = () => {
     sendAnnotation();
     sendAnnotation1();
-    sendAnnotation2();
+    // sendAnnotation2();
     sendAnnotation3();
     handleUpdateRecord();
   };
@@ -894,16 +897,46 @@ const EditHomeLoan = ({ route, navigation }) => {
     schedulePushNotification(applicationnumber, firstname, lastname, loanAmountRequested, createdby); // Trigger push notification
   };
 
+  const renderImage = () => {
+    if (loanApplication.kf_applicantimage) {
+      return (
+        <Image
+          source={{ uri: `data:image/png;base64,${loanApplication.kf_applicantimage}` }}
+          style={{width:100, height: 100, borderRadius: 50, objectFit:"fill", marginTop: 15, marginLeft: 15 }}
+        />
+      );
+    } else {
+      const initials = loanApplication ? `${loanApplication.kf_name[0]}${loanApplication.kf_lastname[0]}` : '';
+      return (
+        <View style={[styles.cardImage,{backgroundColor:"gray",width: "100%", height: "100%"} ]}>
+          <Text style={styles.placeholderText}>{initials}</Text>
+        </View>
+      );
+    }
+  };
+
   return (
-    <View>
+    <View style={styles.container}>
       <HeaderComponent titleText="Edit Home Screen"
         onPress={handleGoBack}
         onIconPress={handleUpdateRecordAndSendAnnotation}
         screenIcon="md-save"
         screenIconStyle={{ marginTop: 5 }}
       />
+     
       <ScrollView>
-        <View style={styles.container}>
+      <View style={styles.imageContent}>
+         <View style={{ width:"50%", height: "100%",left: 60, bottom: 5}}>{renderImage()}</View>
+         <View style={{right: 80, top: 30}}>
+         <CardImage
+              // title="Applicant"
+              imageContent={applicantImage}
+              setImageContent={setapplicantImage}
+            // onViewImage={onViewImage}
+            />
+            </View>
+         </View>
+        <View style={styles.detailContainer}>
           <View style={styles.wrapper}>
             {/* <Button title="Send Notification" onPress={handleSendNotification} /> */}
             <LoanStatusPicker
@@ -1145,7 +1178,7 @@ const EditHomeLoan = ({ route, navigation }) => {
               editable={false}
             />
 
-            <View style={{ backgroundColor: "white", marginTop: 15 }}>
+            <View style={styles.indentityImage}>
               <View style={{ marginVertical: 3 }}>
                 <CardImage
                   title="AadharCard"
@@ -1162,19 +1195,13 @@ const EditHomeLoan = ({ route, navigation }) => {
                 />
               </View>
               <View style={{ marginVertical: 3 }}>
-                <CardImage
+                {/* <CardImage
                   title="Applicant"
                   imageContent={applicantImage}
                   setImageContent={setapplicantImage}
-                />
+                /> */}
               </View>
               <View style={{ marginBottom: 15 }}>
-                {/* <CardImageSignature
-                  title="Draw Signature"
-                  imageContent={signatureImage}
-                  pickImage={handleNavigateToSignatureScreen}
-                /> */}
-
                 <CardImageSignature
                   title="Signature"
                   imageContent={signatureImage}
@@ -1193,9 +1220,6 @@ const EditHomeLoan = ({ route, navigation }) => {
               showImage={showImage}
               handleViewImages={handleViewImages}
             />
-            {/* <SendNotification sendApproval={sendApproval} /> */}
-
-            {/* <Text> annotation</Text> */}
           </View>
         </View>
       </ScrollView>
@@ -1205,15 +1229,40 @@ const EditHomeLoan = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  container:{
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 20,
-    marginBottom: 80
+    width: "100%",
+    marginBottom: 20
+  },
+  imageContent: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    backgroundColor: "white",
+     elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  indentityImage:{
+    backgroundColor:"white",
+    marginTop:5,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   wrapper: {
-    width: '90%',
+    width: '100%',
+    paddingHorizontal: 20,
+    marginTop:5
   },
   errorText: {
     color: 'red',
@@ -1240,12 +1289,40 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   annotation: {
-    marginBottom: 15,
-    padding: 10,
-    // borderWidth: 1,
-    // borderColor: '#ccc',
-    borderRadius: 5,
+    backgroundColor:"white",
+    marginTop:5,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
+  cardImage: {
+    // borderRadius: 40,
+    width: 200,
+    height: 200,
+  },
+  profileContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    marginTop: 0,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    minWidth: "100%",
+    marginBottom: 20,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  }
 });
 
 export default EditHomeLoan;

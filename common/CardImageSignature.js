@@ -235,10 +235,10 @@ const CardImageSignature = ({ title, imageContent, pickImage, sendAnnotation }) 
 
   return (
     <View style={{ flexDirection: 'row', marginTop: 15, alignContent: 'space-around' }}>
-      <View style={{ marginHorizontal: 10, width: 140 }}>
-        <Text>{title} Image</Text>
+      <View style={{ marginHorizontal: 15, width: 140 }}>
+        <Text>{title}</Text>
       </View>
-      <TouchableOpacity onPress={pickImage} style={{ backgroundColor: 'red', padding: 10, borderRadius: 25, width: 85, marginLeft: -10, height: 30, marginTop: -5 }}>
+      <TouchableOpacity onPress={pickImage} style={{ backgroundColor: 'red', padding: 10, borderRadius: 25, width: 85, marginLeft: -25, height: 30, marginTop: -5 }}>
         <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold', marginVertical: -7 }}>Click</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={takePictureWithCamera} style={{ backgroundColor: 'red', padding: 10, borderRadius: 25, width: 85, marginLeft: 15, height: 30, marginTop: -5 }}>
