@@ -22,10 +22,10 @@ const HomeLoanCard = ({ loanApplication, onPress, onDelete }) => {
   };
 
   const renderImage = () => {
-    if (loanApplication.entityimage) {
+    if (loanApplication.kf_applicantimage) {
       return (
         <Image
-          source={{ uri: `data:image/png;base64,${loanApplication.entityimage}` }}
+          source={{ uri: `data:image/png;base64,${loanApplication.kf_applicantimage}` }}
           style={styles.cardImage}
           onError={(error) => console.error('Image load error:', error.nativeEvent.error)}
         />

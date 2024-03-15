@@ -40,6 +40,7 @@ import Gurantee1SignatureHome from '../Screen/Signature/Gurantee1SignatureHome';
 import Gurantee2SignatureHome from '../Screen/Signature/Gurantee2SignatureHome';
 import Gurantee1SignaturePersonal from '../Screen/Signature/Gurantee1SignaturePersonal';
 import Gurantee2SignaturePersonal from '../Screen/Signature/Gurantee2SignaturePersonal';
+import LoginForm from '../Screen/LoginPages/LoginForm';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -55,7 +56,7 @@ const StackNavigator = () => (
     <Stack.Screen name="AuthNavigator" component={AuthNavigator} options={{ headerShown: false }} />
     <Stack.Screen name="Dashboard" component={DashboardScreen} options={{ headerShown: false }} />
     <Stack.Screen name="ManagerDashboard" component={ManagerDashboard} options={{ headerShown: false }} />
-    <Stack.Screen name="ToggleFormScreen" component={ToggleFormScreen} options={{ headerShown: false }} />
+    <Stack.Screen name="LoginForm" component={LoginForm} options={{ headerShown: false }} />
     <Stack.Screen name="LoginManagerScreen" component={LoginManagerScreen} options={{ headerShown: false }} />
     <Stack.Screen name="HomeLoanDetailsScreen" component={HomeLoanDetailsScreen} options={{ headerShown: false }} />
     <Stack.Screen name="PersonalLoanDetailsScreen" component={PersonalLoanDetailsScreen} options={{ headerShown: false }} />

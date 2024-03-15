@@ -9,6 +9,7 @@ import TextInputComponent from '../../common/TextInput';
 import ButtonComponent from '../../common/ButtonComponent';
 import LoanStatusPicker from '../../common/LoanStatusPicker ';
 import ComponentDatePicker from '../../common/ComponentDatePicker';
+import CardImage from '../../common/CardImage';
 
 export const PersonalLoan = () => {
   const [kf_firstname, setkf_firstname] = useState('');
@@ -31,6 +32,7 @@ export const PersonalLoan = () => {
   const [authenticatedUser, setAuthenticatedUser] = useState(null);
   const [resetFormKey, setResetFormKey] = useState(0);
   const [image, setImage] = useState(null);
+  const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fileContent: null });
   const [kf_interestamount, setkf_interestamount] = useState(null);
   const [kf_totalamount, setkf_totalamount] = useState(null);
   const [kf_othercharges, setKf_othercharges] = useState(null);
@@ -42,7 +44,7 @@ export const PersonalLoan = () => {
   const [kf_emi, setKf_emi] = useState('');
   const [formDisabled, setFormDisabled] = useState(false);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
-
+  const [showImage, setShowImage] = useState(false);
   const [isfirstnameValid, setIsfirstnameValid] = useState(true);
   const [isLastNameValid, setIsLastNameValid] = useState(true);
   const [isMobileNumberValid, setIsMobileNumberValid] = useState(true);
@@ -207,7 +209,8 @@ const handleInterestRateChange = (text) => {
     setKf_emi(null);
     setKf_numberofemi(null);
     setKf_emischedule(null);
-    setKf_interestrate(null);
+    setKf_interestrate(null);    
+    setkf_applicantimage({ fileName: null, fileContent: null });
     setResetFormKey((prevKey) => prevKey + 1);
   };
 
@@ -239,10 +242,10 @@ const handleInterestRateChange = (text) => {
     return unsubscribe;
   }, [navigation]);
 
-  console.log("Request Payload to CRM:", {
-    kf_mobile: kf_mobile,
-    kf_name: kf_name
-  });
+  // console.log("Request Payload to CRM:", {
+  //   kf_mobile: kf_mobile,
+  //   kf_name: kf_name
+  // });
 
   const handleGenderOptionset = (selectedOptionGender) => {
     let numericValue;
@@ -533,14 +536,14 @@ const handleInterestRateChange = (text) => {
   const getAuthenticatedUser = async () => {
     try {
       const userString = await AsyncStorage.getItem('authenticatedUser');
-      console.log("getAuthenticatedUser:", userString);
+      // console.log("getAuthenticatedUser:", userString);
 
       if (userString) {
         const user = JSON.parse(userString);
         setAuthenticatedUser(user);
       }
     } catch (error) {
-      console.error('Error getting authenticated user:', error);
+      // console.error('Error getting authenticated user:', error);
     }
   };
 
@@ -603,7 +606,7 @@ const handleInterestRateChange = (text) => {
       const formattedDateOfBirth = kf_dateofbirth ? kf_dateofbirth.toISOString() : null;
       const loanAmount = parseFloat(kf_loanamountrequested);
       const userAdminname = authenticatedUser ? authenticatedUser.kf_adminname : '';
-      console.log("created by", userAdminname);
+      // console.log("created by", userAdminname);
 
       const createRecordResponse = await axios.post(
         "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans",  // Updated entity name
@@ -631,6 +634,7 @@ const handleInterestRateChange = (text) => {
           kf_numberofemi: kf_numberofemi,
           kf_emicollectiondate: kf_emicollectiondate,
           kf_othercharges: kf_othercharges,
+          kf_applicantimage:kf_applicantimage.fileContent,
         },
         {
           headers: {
@@ -660,7 +664,7 @@ const handleInterestRateChange = (text) => {
       }
     } catch (error) {
       console.error("Error during record creation:", error);
-      console.log("Detailed Error Response:", error.response);
+      // console.log("Detailed Error Response:", error.response);
       Alert.alert("Error", "An unexpected error occurred.  try again later.");
     }
   };
@@ -877,6 +881,15 @@ const handleInterestRateChange = (text) => {
             value={kf_othercharges}
             onChangeText={(text) => setKf_othercharges(parseFloat(text))}
           /> */}
+
+<View style={{marginLeft: 20}}>
+            <CardImage
+              title="Applicant"
+              imageContent={kf_applicantimage}
+              setImageContent={setkf_applicantimage}
+            // onViewImage={onViewImage}
+            />
+          </View>
 
           <ButtonComponent
             title="SUBMIT"

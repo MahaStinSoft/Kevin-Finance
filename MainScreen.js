@@ -40,6 +40,7 @@ import Gurantee1SignatureHome from './Screen/Signature/Gurantee1SignatureHome';
 import Gurantee2SignatureHome from './Screen/Signature/Gurantee2SignatureHome';
 import Gurantee1SignaturePersonal from './Screen/Signature/Gurantee1SignaturePersonal';
 import Gurantee2SignaturePersonal from './Screen/Signature/Gurantee2SignaturePersonal';
+import LoginForm from './Screen/LoginPages/LoginForm';
 
 const Stack = createNativeStackNavigator();
 
@@ -82,7 +83,7 @@ const MainScreen = () => {
       ) : (
         <>
           <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="ToggleFormScreen" component={ToggleFormScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="LoginForm" component={LoginForm} options={{ headerShown: false }} />
           <Stack.Screen name="Dashboard" component={DashboardScreen} options={{ headerShown: false }} />
           <Stack.Screen name="HomeLoan" component={HomeScreen} options={{ headerShown: false }} />
           <Stack.Screen name="PersonalLoan" component={PersonalLoan} options={{ headerShown: false }} />

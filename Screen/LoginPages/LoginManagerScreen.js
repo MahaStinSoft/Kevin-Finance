@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, TouchableOpacity, Text, TextInput, StyleSheet, ScrollView, Alert, Button, KeyboardAvoidingView, ImageBackground, Platform } from 'react-native';
+import { View, TouchableOpacity, Text, TextInput, StyleSheet, ScrollView, Alert, Button, KeyboardAvoidingView, ImageBackground, Platform, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -81,7 +81,7 @@ export const LoginManagerScreen = () => {
             }
 
             console.log("Authenticated user:", matchedUser);
-            console.log("response.data", response.data);
+            // console.log("response.data", response.data);
             navigation.navigate("ManagerDashboard", { authenticatedUser: matchedUser });
           } else {
             // User is not a Manager, display an error message
@@ -154,7 +154,7 @@ export const LoginManagerScreen = () => {
               <Text style={styles.ForgotText}>Forgot Password?</Text>
               </TouchableOpacity>
               <ButtonComponent
-                title="Login IN"
+                title="SIGN IN"
                 onPress={handleLogin}
                 disabled={isSignInDisabled}
               />
@@ -237,10 +237,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 100,
   },
   backgroundImage: {
-    width: '100%',
-    height: '100%',
+    flex: 1,
     resizeMode: 'cover',
-    maxWidth: 900
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height
   },
   backgroundContainer: {
     backgroundColor: 'white',

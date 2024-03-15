@@ -6,7 +6,7 @@ const LoginScreen = () => {
   const navigation = useNavigation();
 
   const handleAdminLogin = () => {
-    navigation.navigate('ToggleFormScreen');
+    navigation.navigate('LoginForm');
   };
   const handleUserLogin = () => {
     navigation.navigate('LoginManagerScreen');

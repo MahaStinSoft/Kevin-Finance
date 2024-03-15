@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Alert, Image, Text, TouchableOpacity, StatusBar, TextInput } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, Image, Text, TouchableOpacity, StatusBar, TextInput, Modal } from 'react-native';
 import { useNavigation, useIsFocused, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
+// import { Ionicons } from '@expo/vector-icons';
+import CardImage from '../../common/CardImage';
 
 import HeaderComponent from '../../common/Header';
 import TextInputComponent from '../../common/TextInput';
@@ -45,7 +47,7 @@ export const HomeScreen = ({ route }) => {
   const [kf_emi, setKf_emi] = useState('');
   const [formDisabled, setFormDisabled] = useState(false);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
-
+  const [showImage, setShowImage] = useState(false);
   const [isfirstnameValid, setIsfirstnameValid] = useState(true);
   const [isLastNameValid, setIsLastNameValid] = useState(true);
   const [isMobileNumberValid, setIsMobileNumberValid] = useState(true);
@@ -104,6 +106,55 @@ export const HomeScreen = ({ route }) => {
     setKf_emischedule(null);
     setKf_interestrate(null);
     setResetFormKey((prevKey) => prevKey + 1);
+  };
+
+  const pickImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+        base64: true,
+      });
+  
+      if (result.canceled) {
+        return;
+      }
+  
+      const byteArray = result.base64; // Use result.base64 directly
+  
+      setkf_applicantimage({
+        fileName: 'payslip.jpg', // You can set a default file name
+        fileContent: byteArray,
+      });
+    } catch (error) {
+      console.error('Error picking or processing the image:', error);
+      Alert.alert('Error', 'Failed to pick or process the image.');
+    }
+  };
+
+  const takePictureWithCamera = async () => {
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+        base64: true,
+      });
+
+      if (!result.cancelled) {
+        setImageContent({ fileName: result.uri.split('/').pop(), fileContent: result.base64 });
+        await AsyncStorage.setItem('selectedImage', JSON.stringify({ fileName: result.uri.split('/').pop(), fileContent: result.base64 }));
+      }
+    } catch (error) {
+      console.error('Error taking picture:', error);
+    }
+  };
+
+  const handleViewImages = () => {
+    setShowImage(!showImage); 
   };
 
   const handleGoBack = () => {
@@ -626,7 +677,7 @@ export const HomeScreen = ({ route }) => {
           kf_pannumber: kf_pannumber,
           // kf_aadharcard: aadharcardImageData,
           // kf_pancard: pancardImageData,
-          // kf_applicantimage: applicantImageData,
+          kf_applicantimage:kf_applicantimage.fileContent,
           kf_emischedule: kf_emischedule,
           kf_interestrate: kf_interestrate,
           kf_emi: kf_emi,
@@ -905,7 +956,56 @@ export const HomeScreen = ({ route }) => {
             value={kf_othercharges}
             onChangeText={(text) => setKf_othercharges(parseFloat(text))}
           /> */}
+          
 
+
+          {/* <View style={{flexDirection:"row", justifyContent:"space-evenly", width: "100%", marginTop: 20 }}>  
+<View>
+<Text>Applicant Image</Text>
+</View>
+
+       <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+      
+        <TouchableOpacity onPress={pickImage} style={{ backgroundColor: 'red', padding: 10, borderRadius: 25, width: 85, marginLeft: -10, height: 30, marginTop: -5 }}>
+          <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold', marginVertical: -7 }}>Gallery</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={takePictureWithCamera} style={{ backgroundColor: 'red', padding: 10, borderRadius: 25, width: 85, marginLeft: 15, height: 30, marginTop: -5 }}>
+          <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold', marginVertical: -7 }}>View</Text>
+        </TouchableOpacity>
+
+      </View>
+      
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showImage}
+        onRequestClose={() => setShowImage(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity onPress={() => setShowImage(false)} style={styles.closeButton}>
+            <Ionicons name="close" size={20} color="white" />
+            </TouchableOpacity>
+            {kf_applicantimage.fileContent ? (
+              <Image
+                style={styles.fullscreenImage}
+                source={{ uri: `data:image/jpeg;base64,${kf_applicantimage.fileContent}` }}
+              />
+            ) : (
+              <Text style={styles.noImageText}>No image found</Text>
+            )}
+          </View>
+        </View>
+      </Modal>
+          </View> */}
+          <View style={{marginLeft: 20}}>
+            <CardImage
+              title="Applicant"
+              imageContent={kf_applicantimage}
+              setImageContent={setkf_applicantimage}
+            // onViewImage={onViewImage}
+            />
+          </View>
           <ButtonComponent
             title="SUBMIT"
             onPress={handleSaveRecord}
@@ -965,6 +1065,45 @@ const styles = StyleSheet.create({
     padding: 10,
     marginHorizontal: 20,
   },
+  button: {
+    backgroundColor: 'red',
+    borderRadius: 15,
+    width: "100%",
+  },
+  buttonView: {
+    backgroundColor: 'red', padding: 10, borderRadius: 25, width: 85, marginLeft: -10, height: 30, marginTop: -5 
+  },
+  buttonText: {
+    fontSize: 16,
+    color: 'white',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 15,
+    padding: 20,
+    alignItems: 'center',
+  },
+  closeButton: {
+    alignSelf: 'flex-end',
+    backgroundColor:'red'
+  },
+  closeButtonText: {
+    fontSize: 16,
+    color: 'red',
+  },
+  fullscreenImage: {
+    width: 350,
+    height: 300,
+  },
+  topText:{
+  // position:"absolute"
+  }
 });
 
 export default HomeScreen;

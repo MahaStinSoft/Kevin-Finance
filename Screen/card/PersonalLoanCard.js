@@ -22,10 +22,10 @@ const PersonalLoanCard = ({ personalLoan, onPress, onDelete }) => {
   };
 
   const renderImage = () => {
-    if (personalLoan.entityimage) {
+    if (personalLoan.kf_applicantimage) {
       return (
         <Image
-          source={{ uri: `data:image/png;base64,${personalLoan.entityimage}` }}
+          source={{ uri: `data:image/png;base64,${personalLoan.kf_applicantimage}` }}
           style={styles.cardImage}
           onError={(error) => console.error('Image load error:', error.nativeEvent.error)}
         />

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, ImageBackground, Platform, KeyboardAvoidingView } from 'react-native';
+import { View, TouchableOpacity, Text, StyleSheet, ImageBackground, Platform, KeyboardAvoidingView, Dimensions } from 'react-native';
 import RegisterForm from './RegisterScreen';
 import LoginForm from './LoginPages/LoginForm';
 
@@ -80,9 +80,10 @@ const styles = StyleSheet.create({
   //   color: 'white', // active text color
   // },
   backgroundImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover', 
+    flex: 1,
+    resizeMode: 'cover',
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height
   },
   backgroundContainer: {
     backgroundColor: 'white',

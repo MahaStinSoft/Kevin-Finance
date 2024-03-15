@@ -98,17 +98,17 @@ const HomeLoanDetailsScreen = ({ route }) => {
   };
 
   const renderImage = () => {
-    if (loanApplication.entityimage) {
+    if (loanApplication.kf_applicantimage) {
       return (
         <Image
-          source={{ uri: `data:image/png;base64,${loanApplication.entityimage}` }}
+          source={{ uri: `data:image/png;base64,${loanApplication.kf_applicantimage}` }}
           style={styles.cardImage}
         />
       );
     } else {
       const initials = loanApplication ? `${loanApplication.kf_name[0]}${loanApplication.kf_lastname[0]}` : '';
       return (
-        <View style={styles.cardImage}>
+        <View style={[styles.cardImage,{backgroundColor:"gray",width: "100%", height: "100%"} ]}>
           <Text style={styles.placeholderText}>{initials}</Text>
           {/* <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={styles.buttonContainer}>
             <Text style={styles.buttonText}>Guarantee</Text>
@@ -193,16 +193,16 @@ navigation.navigate('HomeLoanGurantee2', { loanApplication,
       >
 
         <View style={styles.imageContainer}>
-          <View style={{ marginLeft: -12, position:"relative" }}>{renderImage()}</View>
+          <View style={{ marginLeft: -12, position:'relative', width: "32%", height: "100%" }}>{renderImage()}</View>
 
-          <View style={{ marginLeft: 12, marginTop: 0, width: 200, position:"relative" }}>
+          <View style={{ marginLeft: 20, marginTop: 0, width: 200, position:"relative" }}>
           <Text style={styles.cardTitle}>{loanApplication.kf_applicationnumber}</Text>
           <Text style={[styles.cardTitle]}>{`${loanApplication.kf_name} ${loanApplication.kf_lastname}`}</Text>
             <View style={{flexDirection: "row", marginTop: 30}}>
             <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={[styles.buttonContainer, {width: "42%", marginLeft: -5}]}>
             <Text style={styles.buttonText}>Guarantee1</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleNavigateToGuaranteeScreen2} style={[styles.buttonContainer, {width: "42%", marginLeft: 2}]}>
+          <TouchableOpacity onPress={handleNavigateToGuaranteeScreen2} style={[styles.buttonContainer, {width: "42%", marginLeft: 10}]}>
             <Text style={styles.buttonText}>Guarantee2</Text>
           </TouchableOpacity>
           </View>
@@ -373,7 +373,9 @@ const styles = StyleSheet.create({
     elevation: 5
   },
   cardImage: {
-    borderRadius: 40
+    // borderRadius: 40,
+    width:"100%",
+    height: "100%",
   },
   cardTitle: {
     color: "red",
@@ -386,16 +388,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginLeft: 10
   },
-  placeholderText: {
-    fontSize: 60,
-    fontWeight: 'bold',
-    color: '#707070',
-    textAlign: 'center',
-    backgroundColor: 'gray',
-    color: 'white',
-    // borderRadius: 100,
-    padding: 15
-  },
+    placeholderText: {
+      fontSize: 40,
+      fontWeight: 'bold',
+      color: '#707070',
+      textAlign: 'center',
+      justifyContent:"center",
+      color: 'white',
+      marginVertical: 25
+    },
   buttonContainer: {
     backgroundColor: 'red',
     padding: 10,

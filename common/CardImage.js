@@ -279,7 +279,7 @@ const CardImage = ({ title, imageContent, setImageContent }) => {
   return (
     <View style={{ flexDirection: 'row', marginTop: 15, alignContent: 'space-around' }}>
       <View style={{ marginHorizontal: 10, width: 140 }}>
-        <Text>{title} Image</Text>
+        {/* <Text>{title} Image</Text> */}
       </View>
       <View style={{}}>
         {imageContent.fileContent && (

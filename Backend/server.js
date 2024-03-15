@@ -38,6 +38,7 @@ const schedulePushNotification = async (deviceToken, scheduledTime, title, body,
   };
   
 // Example usage
+// const deviceToken = 'elDCLl4kTwqKEqP07d4dtw:APA91bHwZxa5g1eQtLxQef8XrppLnj5I2JQng-Z-0-1xb_LzvfK6HV_m8oVsKc437qaUIBlcPUQ3DXsHuF6Oxwgb2ALiOWkgxjpyobV7izIQLiS5jhIsHwQBKAz5LrsRH4PibuuP1Wux';
 const deviceToken = 'dsZi_WSXQq-trObekZN7pQ:APA91bHU0xpxwOLs12_ioM1Ji8LhJFIuqMvgyBkLaIsicjlJ3GpSx7P3632c7yVUmZo1Rn-6AiC_qMU-rRxlioWUa90YaTeHLPuuZGYZTVT_8vn8_HsvDgbiNWOYSHXbG3q4r-cZlDR6';
 const scheduledTime = Date.now() + (60 * 1000); // Current time + 1 minute
 const title = 'Scheduled Notification';

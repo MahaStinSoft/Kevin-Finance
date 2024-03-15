@@ -108,17 +108,17 @@ const PersonalLoanDetailsScreen = ({ route }) => {
   };
 
 const renderImage = () => {
-  if (personalLoan && personalLoan.entityimage) {
+  if (personalLoan && personalLoan.kf_applicantimage) {
     return (
       <Image
-        source={{ uri: `data:image/png;base64,${personalLoan.entityimage}` }}
+        source={{ uri: `data:image/png;base64,${personalLoan.kf_applicantimage}` }}
         style={styles.cardImage}
       />
     );
   } else {
     const initials = personalLoan ? `${personalLoan.kf_firstname[0]}${personalLoan.kf_lastname[0]}` : '';
     return (
-      <View style={styles.cardImage}>
+      <View style={[styles.cardImage,{backgroundColor:"gray",width: "100%", height: "100%"} ]}>
         <Text style={styles.placeholderText}>{initials}</Text>
       </View>
     );
@@ -214,16 +214,16 @@ navigation.navigate('PersonalLoanGurantee2', { personalLoan,
       >
 
 <View style={styles.imageContainer}>
-          <View style={{ marginLeft: -12, position:"relative" }}>{renderImage()}</View>
+          <View style={{ marginLeft: -12, position:"relative",  width: "32%", height: "100%"  }}>{renderImage()}</View>
 
-          <View style={{ marginLeft: 12, marginTop: 0, width: 200, position:"relative" }}>
+          <View style={{ marginLeft: 20, marginTop: 0, width: 200, position:"relative" }}>
           <Text style={styles.cardTitle}>{personalLoan.kf_applicationnumber}</Text>
           <Text style={[styles.cardTitle]}>{`${personalLoan.kf_firstname} ${personalLoan.kf_lastname}`}</Text>
             <View style={{flexDirection: "row", marginTop: 30}}>
             <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={[styles.buttonContainer, {width: "42%", marginLeft: -5}]}>
             <Text style={styles.buttonText}>Guarantee1</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleNavigateToGuaranteeScreen2} style={[styles.buttonContainer, {width: "42%", marginLeft: 2}]}>
+          <TouchableOpacity onPress={handleNavigateToGuaranteeScreen2} style={[styles.buttonContainer, {width: "42%", marginLeft: 10}]}>
             <Text style={styles.buttonText}>Guarantee2</Text>
           </TouchableOpacity>
           </View>
@@ -408,7 +408,9 @@ const styles = StyleSheet.create({
     elevation: 5
   },
   cardImage: {
-    borderRadius: 40
+    // borderRadius: 40
+    width:"100%",
+    height: "100%",
   },
   cardTitle: {
     color: "red",
@@ -421,14 +423,13 @@ const styles = StyleSheet.create({
     marginLeft: 10
   },
   placeholderText: {
-    fontSize: 60,
+    fontSize: 40,
     fontWeight: 'bold',
     color: '#707070',
     textAlign: 'center',
-    backgroundColor: 'gray',
+    justifyContent:"center",
     color: 'white',
-    // borderRadius: 100,
-    padding: 15
+    marginVertical: 25
   },
   buttonContainer: {
     backgroundColor: 'red',

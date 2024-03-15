@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, Alert, StyleSheet, ScrollView, Text } from 'react-native';
+import { View, TextInput, Button, Alert, StyleSheet, ScrollView, Text, Image } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 
@@ -48,7 +48,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
   const [eminAmount, setEmiAmount] = useState(personalLoan?.kf_emi || '');
   const [aadharcard, setAadharcard] = useState({ fileName: null, fileContent: null });
   const [pancard, setPancard] = useState({ fileName: null, fileContent: null });
-  const [applicantImage, setapplicantImage] = useState({ fileName: null, fileContent: null });
+  // const [applicantImage, setapplicantImage] = useState({ fileName: null, fileContent: null });
+  const [applicantImage, setapplicantImage] = useState(personalLoan?.kf_applicantimage || { fileName: null, fileContent: null });
   const [signature, setSignature] = useState({ fileName: null });
   const [sendApproval, setSendApproval] = useState(personalLoan?.kf_sendapproval || '');
   const [reason, setReason] = useState(personalLoan?.kf_reason || '');
@@ -123,7 +124,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
     setSendApproval(personalLoan.kf_sendapproval);
     setAadharcard({ fileName: null, fileContent: null });
     setPancard({ fileName: null, fileContent: null });
-    setapplicantImage({ fileName: null, fileContent: null });
+    setapplicantImage(personalLoan.kf_applicantimage);
     setSignature({ fileName: null })
     console.log('State updated:', {
       applicationnumber,
@@ -241,7 +242,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
           kf_othercharges: otherCharges,
           kf_numberofemi: numberOfEMI,
           kf_sendapproval: sendApproval,
-          kf_reason: reason
+          kf_reason: reason,
+          kf_applicantimage: applicantImage.fileContent
         },
         {
           headers: {
@@ -286,7 +288,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
             kf_othercharges: otherCharges,
             kf_numberofemi: numberOfEMI,
             kf_sendapproval: sendApproval,
-            kf_reason: reason
+            kf_reason: reason,
+            applicantImage: applicantImage.fileContent
           });
         }
         // console.log(age);
@@ -670,6 +673,64 @@ const EditPersonalLoan = ({ route, navigation }) => {
   //   }
   // };
 
+  // const renderImage = () => {
+  //   if (applicantImage && applicantImage.fileContent) {
+  //     return (
+  //       <Image
+  //         source={{ uri: `data:image/png;base64,${applicantImage.fileContent}` }}
+  //         style={{ width: 100, height: 100, borderRadius: 50, objectFit: "fill", marginTop: 15, marginLeft: 15 }}
+  //       />
+  //     );
+  //   } else {
+  //     // Handle case where imageContent is null or undefined
+  //     return (
+  //       <View style={[styles.cardImage, { backgroundColor: "gray", width: "100%", height: "100%" }]}>
+  //         {/* Display placeholder or default content */}
+  //       </View>
+  //     );
+  //   }
+  // };
+
+  // Suppose you have a function to fetch image data based on record ID
+const fetchImageData = async (recordId) => {
+  try {
+    // Fetch image data from your data source using the record ID
+    const imageData = await YourImageDataFetchingFunction(recordId);
+    return imageData;
+  } catch (error) {
+    console.error('Error fetching image data:', error);
+    return null;
+  }
+};
+
+// Inside your EditHomeLoanScreen component
+const [imageData, setImageData] = useState(null); // State to store image data
+
+// useEffect to fetch image data when the component mounts or when the record ID changes
+useEffect(() => {
+  // Fetch image data based on the record ID
+  fetchImageData(recordId).then((data) => {
+    setImageData(data);
+  });
+}, [recordId]); // Include recordId as a dependency
+
+// Render function to display the image
+const renderImage = () => {
+  if (imageData) {
+    return (
+      <Image
+        source={{ uri: `data:image/png;base64,${imageData}` }} // Assuming imageData is a base64 string
+        style={{ width: 100, height: 100, borderRadius: 50 }}
+      />
+    );
+  } else {
+    return (
+      <View style={{ width: 100, height: 100, borderRadius: 50, backgroundColor: 'gray' }}>
+        {/* Placeholder or default content */}
+      </View>
+    );
+  }
+};
   useEffect(() => {
     fetchAnnotations1();
   }, []);
@@ -812,59 +873,58 @@ const EditPersonalLoan = ({ route, navigation }) => {
     }
   };
 
-  const sendAnnotation2 = async () => {
-    try {
-      const tokenResponse = await axios.post(
-        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
-        {
-          grant_type: 'client_credentials',
-          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
-          resource: 'https://org0f7e6203.crm5.dynamics.com',
-          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
-          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
-        },
-        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
-      );
+  // const sendAnnotation2 = async () => {
+  //   try {
+  //     const tokenResponse = await axios.post(
+  //       'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+  //       {
+  //         grant_type: 'client_credentials',
+  //         client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+  //         resource: 'https://org0f7e6203.crm5.dynamics.com',
+  //         scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+  //         client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+  //       },
+  //       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+  //     );
 
-      const accessToken = tokenResponse.data.access_token;
+  //     const accessToken = tokenResponse.data.access_token;
 
-      // Create a new annotation
-      const annotations = [
-        {
-          subject: 'Applicant Image',
-          filename: applicantImage.fileName || 'Applicant.jpg',
-          isdocument: true,
-          'objectid_kf_personalloan@odata.bind': `/kf_personalloans(${recordId})`,
-          documentbody: applicantImage.fileContent,
-        },
-      ];
+  //     // Create a new annotation
+  //     const annotations = [
+  //       {
+  //         subject: 'Applicant Image',
+  //         filename: applicantImage.fileName || 'Applicant.jpg',
+  //         isdocument: true,
+  //         'objectid_kf_personalloan@odata.bind': `/kf_personalloans(${recordId})`,
+  //         documentbody: applicantImage.fileContent,
+  //       },
+  //     ];
 
-      const createAnnotationResponse = await axios.post(
-        'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
-        annotations,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+  //     const createAnnotationResponse = await axios.post(
+  //       'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
+  //       annotations,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${accessToken}`,
+  //           'Content-Type': 'application/json',
+  //         },
+  //       }
+  //     );
 
-      if (createAnnotationResponse.status === 204) {
-        console.log('ApplicantImage image annotation created successfully.');
-        // Alert.alert('Sucess', '');
+  //     if (createAnnotationResponse.status === 204) {
+  //       console.log('ApplicantImage image annotation created successfully.');
+  //       // Alert.alert('Sucess', '');
 
-      } else {
-        console.error('Failed to create Applicant image annotation. Response:', createAnnotationResponse.data);
-        Alert.alert('Error', 'Failed to create Aadhar image annotation.');
-      }
+  //     } else {
+  //       console.error('Failed to create Applicant image annotation. Response:', createAnnotationResponse.data);
+  //       Alert.alert('Error', 'Failed to create Aadhar image annotation.');
+  //     }
 
-    } catch (error) {
-      console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
-      Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
-    }
-  };
-
+  //   } catch (error) {
+  //     console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
+  //     Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+  //   }
+  // };
 
   const sendAnnotation3 = async () => {
     try {
@@ -927,7 +987,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
   const handleUpdateRecordAndSendAnnotation = () => {
     sendAnnotation();
     sendAnnotation1();
-    sendAnnotation2();
+    // sendAnnotation2();
     sendAnnotation3();
     handleUpdateRecord();
 
@@ -955,6 +1015,17 @@ const EditPersonalLoan = ({ route, navigation }) => {
         screenIcon="md-save"
         screenIconStyle={{ marginTop: 5 }}
       />
+            <View style={{ flexDirection: "row", justifyContent:"space-evenly", marginBottom: 30,backgroundColor:"white", marginHorizontal: 20}}>
+         <View style={{ width:"50%", height: "auto",left: 50,}}>{renderImage()}</View>
+         <View style={{right: 70, top: 30}}>
+         <CardImage
+              // title="Applicant"
+              imageContent={applicantImage}
+              setImageContent={setapplicantImage}
+            // onViewImage={onViewImage}
+            />
+            </View>
+         </View>
       <ScrollView>
         <View style={styles.container}>
           <View style={styles.wrapper}>
@@ -1209,13 +1280,13 @@ const EditPersonalLoan = ({ route, navigation }) => {
                   setImageContent={setPancard}
                 />
               </View>
-              <View style={{ marginVertical: 3 }}>
+              {/* <View style={{ marginVertical: 3 }}>
                 <CardImage
                   title="Applicant"
                   imageContent={applicantImage}
                   setImageContent={setapplicantImage}
                 />
-              </View>
+              </View> */}
               <View style={{ marginBottom: 15 }}>
                 {/* <CardImageSignature
                   title="Draw Signature"
