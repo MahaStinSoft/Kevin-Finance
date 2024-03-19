@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, Alert, StyleSheet, ScrollView, Text,Image} from 'react-native';
+import { View, TextInput, Button, Alert, StyleSheet, ScrollView, Text,Image,TouchableOpacity} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
+import { Ionicons } from '@expo/vector-icons';
 
 import HeaderComponent from '../../common/Header';
 import ButtonComponent from '../../common/ButtonComponent';
@@ -41,7 +42,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
   const [aadharcardNumber, setAadharcardNumber] = useState(personalLoan?.kf_aadharnumber || '');
   const [pancardNumber, setPancardNumber] = useState(personalLoan?.kf_pannumber || '');
   const [otherCharges, setOtherCharges] = useState(personalLoan?.kf_othercharges || '');
-  const [emiCollectionDate, setEmiCollectionDate] = useState(personalLoan?.kf_emicollectiondate || '');
+  const [emiCollectionDate, setEmiCollectionDate] = useState(new Date()); // Initialize with today's date
   const [interestRate, setInterestRate] = useState(personalLoan?.kf_interestrate || '');
   const [emiSchedule, setEmiSchedule] = useState(personalLoan?.kf_emischedule || '');
   const [numberOfEMI, setNumberOfEMI] = useState(personalLoan?.kf_numberofemi || '');
@@ -124,7 +125,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
     setSendApproval(personalLoan.kf_sendapproval);
     setAadharcard({ fileName: null, fileContent: null });
     setPancard({ fileName: null, fileContent: null });
-    setapplicantImage({ fileName: null, fileContent: null });
+    setkf_applicantimage({ fileName: null, fileContent: null });
     setSignature({ fileName: null })
     console.log('State updated:', {
       applicationnumber,
@@ -243,7 +244,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
           kf_numberofemi: numberOfEMI,
           kf_sendapproval: sendApproval,
           kf_reason: reason,
-          kf_applicantimage: applicantImage.fileContent,
+          // kf_applicantimage: applicantImage.fileContent,
         },
         {
           headers: {
@@ -289,15 +290,15 @@ const EditPersonalLoan = ({ route, navigation }) => {
             kf_numberofemi: numberOfEMI,
             kf_sendapproval: sendApproval,
             kf_reason: reason,
-            kf_applicantimage: applicantImage.fileContent,
+            // kf_applicantimage: applicantImage.fileContent,
           });
         }
         // console.log(age);
 
         Alert.alert('Updated the record Successfully.', '', [
-          // {
-          //   text: 'cancel'
-          // },
+          {
+            text: 'cancel'
+          },
           {
             text: 'OK',
             onPress: () => {
@@ -311,6 +312,60 @@ const EditPersonalLoan = ({ route, navigation }) => {
       }
     } catch (error) {
       console.error('Error during update:', error);
+    }
+  };
+
+  const handleUpdateField = async () => {
+
+    try {
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        {
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        },
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      );
+
+      const accessToken = tokenResponse.data.access_token;
+
+      const updateFieldResponse = await axios.patch(
+        `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans(${recordId})`,
+        {
+          kf_applicantimage: kf_applicantimage.fileContent,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (updateFieldResponse.status === 204) {
+        console.log('Field updated successfully in CRM');
+
+        if (onUpdateSuccess) {
+          onUpdateSuccess({
+            ...personalLoan,
+            kf_applicantimage: kf_applicantimage.fileContent,
+
+          });
+        }
+        Alert.alert('Updated the field Successfully.', '', [
+          {
+            text: 'OK',
+          },
+        ]);
+      } else {
+        console.log('Error updating field in CRM:', updateFieldResponse);
+        Alert.alert('Error', 'Failed to update the field in CRM.');
+      }
+    } catch (error) {
+      console.error('Error during field update:', error);
     }
   };
 
@@ -926,7 +981,10 @@ const EditPersonalLoan = ({ route, navigation }) => {
     }
   };
 
-
+  const handleEmiCollectionDateChange = (date) => {
+    setEmiCollectionDate(date);
+    // Additional handling if needed
+  };
 
   const handleUpdateRecordAndSendAnnotation = () => {
     sendAnnotation();
@@ -962,13 +1020,63 @@ const EditPersonalLoan = ({ route, navigation }) => {
     } else {
       const initials = personalLoan ? `${personalLoan.kf_name[0]}${personalLoan.kf_lastname[0]}` : '';
       return (
-        <View style={[styles.cardImage,{backgroundColor:"gray",width: "100%", height: "100%"} ]}>
+        <View style={[styles.cardImage,{ backgroundColor:"gray",width: "100%", height: "100%" } ]}>
           <Text style={styles.placeholderText}>{initials}</Text>
         </View>
       );
     }
   };
 
+  const takePictureWithCamera = async () => {
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+        base64: true,
+      });
+
+      if (result.canceled) {
+        return;
+      }
+  
+      const byteArray = result.base64; // Use result.base64 directly
+  
+      setkf_applicantimage({
+        fileName: 'payslip.jpg', // You can set a default file name
+        fileContent: byteArray,
+      });
+    } catch (error) {
+      console.error('Error taking picture:', error);
+    }
+  };
+
+  const pickImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+        base64: true,
+      });
+  
+      if (result.canceled) {
+        return;
+      }
+  
+      const byteArray = result.base64; // Use result.base64 directly
+  
+      setkf_applicantimage({
+        fileName: 'payslip.jpg', // You can set a default file name
+        fileContent: byteArray,
+      });
+    } catch (error) {
+      console.error('Error picking or processing the image:', error);
+      Alert.alert('Error', 'Failed to pick or process the image.');
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -981,17 +1089,25 @@ const EditPersonalLoan = ({ route, navigation }) => {
       />
 
       <ScrollView>
-      <View style={styles.imageContent}>
-           <View style={{ width:"50%", height: "100%",left: 60, bottom: 5}}>{renderImage()}</View>
-           <View style={{right: 80, top: 30}}>
-         <CardImage
-              // title="Applicant"
-              imageContent={applicantImage}
-              setImageContent={setapplicantImage}
-            // onViewImage={onViewImage}
-            />
+      <View style={styles.Imagepart}>
+          <View style={{ width: 100, height:100, left: 0, bottom: 5 }}>{renderImage()}</View>
+          <View style={{ right: 25, top: 30 }}>
+            <View style={styles.touch}>
+              <TouchableOpacity onPress={pickImage} style={styles.button}>
+                <Text style={styles.buttonText}>Choose File</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={takePictureWithCamera} style={styles.button}>
+                <Text style={styles.buttonText}>Camera</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={handleUpdateField} style={{marginLeft:10}} >
+                <Ionicons name="save" size={26} color="red" />
+              </TouchableOpacity>
+
             </View>
-         </View>
+          </View>
+        </View>
       <View style={styles.detailContainer}>
           <View style={styles.wrapper}>
             <LoanStatusPicker
@@ -1024,7 +1140,10 @@ const EditPersonalLoan = ({ route, navigation }) => {
             />
 
             <TextInput
-              style={styles.textInputContainer}
+               style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={firstname}
               placeholder="First Name"
               onChangeText={(text) => {
@@ -1037,11 +1156,15 @@ const EditPersonalLoan = ({ route, navigation }) => {
                   firstNameEdit: text.trim() !== '' ? '' : 'Enter First Name',
                 });
               }}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'} 
             />
             {errorMessages.firstNameEdit !== '' && <Text style={styles.errorText}>{errorMessages.firstNameEdit}</Text>}
 
             <TextInput
-              style={styles.textInputContainer}
+               style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={lastname}
               placeholder="Last Name"
               onChangeText={(text) => {
@@ -1053,109 +1176,203 @@ const EditPersonalLoan = ({ route, navigation }) => {
                   lastNameEdit: text.trim() !== '' ? '' : 'Enter Last Name',
                 });
               }}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             {errorMessages.lastNameEdit !== '' && <Text style={styles.errorText}>{errorMessages.lastNameEdit}</Text>}
 
 
-            <LoanStatusPicker
+            {/* <LoanStatusPicker
               onOptionChange={handleGenderOptionset}
               title="Gender"
               options={['Male', 'Female']}
               initialOption={gender === 123950000 ? 'Male' : 'Female'}
               style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
-            />
+            /> */}
 
-            <ComponentDatePicker
+<View style={{ position: 'relative' }}>
+  <LoanStatusPicker
+    onOptionChange={handleGenderOptionset}
+    title="Gender"
+    options={['Male', 'Female']}
+    initialOption={gender === 123950000 ? 'Male' : 'Female'}
+    style={[
+      { width: "100%", marginLeft: 0, marginTop: 5 },
+      getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' } // Change text color to gray based on loan status
+    ]}
+    disabled={getStatusStringFromNumericValue(status) === 'Approved'} // Disable the picker based on loan status
+  />
+  {getStatusStringFromNumericValue(status) === 'Approved' && (
+    <View
+      style={{
+        position: 'absolute',
+        backgroundColor: 'transparent',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+      }}
+    />
+  )}
+</View>
+
+
+            {/* <ComponentDatePicker
               selectedDate={dateofbirth}
               onDateChange={handleDateOfBirth}
               placeholder="Date of Birth"
               style={{ width: "100%", height: 45, marginTop: 5, marginLeft: 0 }}
             />
+            {errorMessages.dateOfBirthEdit !== '' && <Text style={styles.errorText}>{errorMessages.dateOfBirthEdit}</Text>} */}
+
+<View style={{ position: 'relative' }}>
+              <ComponentDatePicker
+                selectedDate={dateofbirth}
+                onDateChange={handleDateOfBirth}
+                placeholder="Date of Birth"
+                style={[
+                  { width: "100%", height: 45, marginTop: 5, marginLeft: 0 },
+                  getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' } // Change text color to gray based on loan status
+                ]}
+                onPress={() => getStatusStringFromNumericValue(status) === 'Approved' && handleDateOfBirth()} // Prevent opening date picker when disabled
+              />
+              {getStatusStringFromNumericValue(status) === 'Approved' && (
+                <View
+                  style={{
+                    position: 'absolute',
+                    backgroundColor: 'transparent',
+                    top: 0,
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                  }}
+                />
+              )}
+            </View>
             {errorMessages.dateOfBirthEdit !== '' && <Text style={styles.errorText}>{errorMessages.dateOfBirthEdit}</Text>}
 
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer, {color:"gray"}]}
               value={age.toString()}
               placeholder="Age"
               onChangeText={(text) => setage(text)}
+              editable={false}
             />
 
             <TextInput
-              style={styles.textInputContainer}
+               style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={mobileNumber}
               placeholder="Mobile Number"
               onChangeText={handleMobileNumberChange}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             {errorMessages.mobileNumberEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.mobileNumberEdit}</Text>
             )}
 
             <TextInput
-              style={styles.textInputContainer}
+               style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={email}
               placeholder="Email"
               onChangeText={handleEmailChange}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             {errorMessages.emailEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.emailEdit}</Text>
             )}
 
             <TextInput
-              style={styles.textInputContainer}
+               style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={address1}
               placeholder="Address Line 1"
               onChangeText={(text) => setAddress1(text)}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             <TextInput
-              style={styles.textInputContainer}
+               style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={address2}
               placeholder="Address Line 2"
               onChangeText={(text) => setAddress2(text)}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             <TextInput
-              style={styles.textInputContainer}
+              style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={address3}
               placeholder="Address Line 3"
               onChangeText={(text) => setAddress3(text)}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             <TextInput
-              style={styles.textInputContainer}
+              style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={city}
               placeholder="City"
               onChangeText={(text) => setCity(text)}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             <TextInput
-              style={styles.textInputContainer}
+               style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={state}
               placeholder="State"
               onChangeText={(text) => setState(text)}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             <TextInput
-              style={styles.textInputContainer}
+               style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={aadharcardNumber}
               placeholder="Aadharcard Number"
               onChangeText={handleAadharCardNumberChange}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             {errorMessages.aadharCardNumberEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.aadharCardNumberEdit}</Text>
             )}
 
-
             <TextInput
-              style={styles.textInputContainer}
+               style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={pancardNumber}
               placeholder="PAN Card Number"
               onChangeText={handlePancardNumberValid}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             {errorMessages.panCardNumberEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.panCardNumberEdit}</Text>
             )}
 
             <TextInput
-              style={styles.textInputContainer}
+              style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               placeholder="Loan Amount Request"
               value={loanAmountRequested ? loanAmountRequested.toString() : ''}
               onChangeText={handleLoanAmountRequestedChange}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             {errorMessages.loanAmountRequestedEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.loanAmountRequestedEdit}</Text>
@@ -1175,14 +1392,14 @@ const EditPersonalLoan = ({ route, navigation }) => {
               placeholder="Interest Rate%"
               value={interestRate}
               editable={false}
-            />
-            <TextInput
+            /> 
+            {/* <TextInput
               style={[styles.textInputContainer, { color: "gray" }]}
               placeholder="EMI Collection Date"
               // value={emiCollectionDate}
               value={formattedDate}
               editable={false}
-            />
+            /> */}
             <TextInput
               style={[styles.textInputContainer, { color: "gray" }]}
               placeholder="EMI Amount "
@@ -1190,10 +1407,14 @@ const EditPersonalLoan = ({ route, navigation }) => {
               editable={false}
             />
             <TextInput
-              style={styles.textInputContainer}
+              style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               placeholder="Other Charges"
               value={otherCharges ? otherCharges.toString() : ""}
               onChangeText={(text) => setOtherCharges(text)}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
 
             {/* <LoanStatusPicker
@@ -1212,11 +1433,20 @@ const EditPersonalLoan = ({ route, navigation }) => {
               editable={false}
             />
 
-            <TextInput
-              style={[styles.textInputContainer, { color: "red" }]}
-              placeholder="Resaon"
-              value={reason}
-              editable={false}
+            {status === 123950004 && ( // Display reason column only when status is 'Rejected'
+              <TextInput
+                style={[styles.textInputContainer, { color: "red" }]}
+                placeholder="Reason"
+                value={reason}
+                editable={false}
+              />
+            )}
+
+            <ComponentDatePicker
+              selectedDate={date} // Pass the Date object directly
+              onDateChange={handleEmiCollectionDateChange}
+              placeholder="Select EMI Collection Date"
+              style={{ width: "100%", height: 45, marginTop: 5, marginLeft: 0 }}
             />
 
             {/* {statusReason && (
@@ -1229,8 +1459,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
               />
             )} */}
 
-<View style={styles.indentityImage}>
-                <View style={{ marginVertical: 3 }}>
+            <View style={styles.indentityImage}>
+              <View style={{ marginVertical: 3 }}>
                 <CardImage
                   title="AadharCard"
                   imageContent={aadharcard}
@@ -1378,7 +1608,38 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-  }
+  },
+  placeholderText:{
+    fontSize: 25,
+    color: "white",
+    textAlign: "center",
+    margin: 32,
+    fontWeight:"bold"
+  },
+  Imagepart:{
+    flexDirection:'row',
+    marginRight:10,
+    marginBottom: 20
+  },
+  touch:{
+    flexDirection:'row',
+    marginLeft:40,
+    marginTop:15,
+  },
+  button:{
+    marginLeft: 10, 
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    backgroundColor: 'red',
+    borderRadius: 50,
+    width: "33%"
+  },
+  buttonText:{
+    fontSize: 14,
+    color: 'white',
+    padding: 5,
+    fontWeight: "bold"
+  },
 });
 
 

@@ -144,9 +144,9 @@ export const LoginForm = () => {
                   <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={24} color="#888" style={styles.eyeIcon} />
                 </TouchableOpacity>
               </View>
-              <TouchableOpacity style={styles.Forgotpassword} onPress={() => console.log('Forgot password')}>
+              {/* <TouchableOpacity style={styles.Forgotpassword} onPress={() => console.log('Forgot password')}>
               <Text style={styles.ForgotText}>Forgot Password?</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               <ButtonComponent
                 title="SIGN IN"
                 onPress={handleLogin}

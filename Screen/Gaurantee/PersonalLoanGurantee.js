@@ -277,12 +277,12 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
         console.log('Aadhar image annotation created successfully.');
       } else {
         console.error('Failed to create Aadhar image annotation. Response:', createAnnotationResponse.data);
-        Alert.alert('Error', 'Failed to create Aadhar image annotation.');
+        // Alert.alert('Error', 'Failed to create Aadhar image annotation.');
       }
 
     } catch (error) {
       console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
-      Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+      // Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
     }
   };
 
@@ -328,12 +328,12 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
         console.log('PanCard image annotation created successfully.');
       } else {
         console.error('Failed to create Aadhar image annotation. Response:', createAnnotationResponse.data);
-        Alert.alert('Error', 'Failed to create Aadhar image annotation.');
+        // Alert.alert('Error', 'Failed to create Aadhar image annotation.');
       }
 
     } catch (error) {
       console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
-      Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+      // Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
     }
   };
 
@@ -369,7 +369,7 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
 
     } catch (error) {
       console.error('Error fetching annotations:', error.response?.data || error.message);
-      Alert.alert('Error', 'An error occurred while fetching annotations.');
+      // Alert.alert('Error', 'An error occurred while fetching annotations.');
     }
   };
 
@@ -417,12 +417,12 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
 
       } else {
         console.error('Failed to create Applicant image annotation. Response:', createAnnotationResponse.data);
-        Alert.alert('Error', 'Failed to create Aadhar image annotation.');
+        // Alert.alert('Error', 'Failed to create Aadhar image annotation.');
       }
 
     } catch (error) {
       console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
-      Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+      // Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
     }
   };
 
@@ -472,13 +472,13 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
 
       } else {
         console.error('Failed to create Signature image annotation. Response:', createAnnotationResponse.data);
-        Alert.alert('Error', 'Failed to create Aadhar image annotation.');
+        // Alert.alert('Error', 'Failed to create Aadhar image annotation.');
       }
 
       // Fetch and display the updated annotations
     } catch (error) {
-      console.error('Error sending Signature image annotation:', error.response?.data || error.message);
-      Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+      // console.error('Error sending Signature image annotation:', error.response?.data || error.message);
+      // Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
     }
   };
 
@@ -737,7 +737,7 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
   return (
     <>
       <HeaderComponent
-        titleText="PersonalLoan Gaurantee"
+        titleText="PersonalLoan Gaurantee1"
         onPress={handleGoBack}
         // onIconPress={handleUpdateRecord}
         onIconPress={handleUpdateRecordAndSendAnnotation}

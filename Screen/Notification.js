@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, Modal, TextInput } from 'react-native';
+import { View, Text, StyleSheet, Button, Modal, TextInput, Alert } from 'react-native';
 import axios from 'axios';
 import { ScrollView } from 'react-native-gesture-handler';
 import querystring from 'querystring';
@@ -334,7 +334,7 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
     123950001: 'Pending Approval',
     123950002: 'Draft',
     123950003: 'Cancelled',
-    123950004: 'Expired',
+    123950004: 'Rejected',
   };
 
   const handleSendApproval = (selectedOption) => {

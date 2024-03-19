@@ -199,7 +199,7 @@ const EditLoanDetail = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <HeaderComponent titleText="Edit Loan Details(EMI)" onPress={handleGoBackPersonaldetails} />
+      <HeaderComponent titleText="EMI Details" onPress={handleGoBackPersonaldetails} />
       <View style={styles.detailsContainer}>
         <View style={styles.row}>
           <Text style={styles.label}>Application Number:</Text>

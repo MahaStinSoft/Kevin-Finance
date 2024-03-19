@@ -12,7 +12,9 @@ import {
   ActivityIndicator,
   StatusBar,
   Platform,
-  RefreshControl
+  RefreshControl,
+  Alert,
+  BackHandler
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -69,6 +71,49 @@ const ManagerDashboard = ({ navigation, route }) => {
   useEffect(() => {
     getAuthenticatedUser();
   }, [isFocused, getAuthenticatedUser]);
+
+  
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (navigation.isFocused()) {
+        // If the user is on the login screen, show the exit confirmation alert
+        Alert.alert(
+          'Exit App',
+          'Are you sure you want to exit the app?',
+          [
+            {
+              text: 'Cancel',
+              onPress: () => null,
+              style: 'cancel',
+            },
+            {
+              text: 'Exit',
+              onPress: () => BackHandler.exitApp(),
+            },
+          ],
+          { cancelable: false }
+        );
+        return true; // Prevent default back button behavior
+      }
+    });
+
+    return () => backHandler.remove();
+  }, [navigation]);
+
+  
+// useEffect(() => {
+  //   const backAction = () => {
+  //     // navigation.navigate('Login'); 
+  //     return true;
+  //   };
+
+  //   const backHandler = BackHandler.addEventListener(
+  //     'hardwareBackPress',
+  //     backAction
+  //   );
+
+  //   return () => backHandler.remove();
+  // }, []);
 
   // Update displayed loans based on showAllLoans state
   useEffect(() => {
@@ -159,6 +204,12 @@ const ManagerDashboard = ({ navigation, route }) => {
         const homeLoans = responseLoanApplications.data.value;
         const personalLoans = responsePersonalLoans.data.value;
 
+        const sortedHomeLoans = homeLoans.sort((a, b) => new Date(b.createdon) - new Date(a.createdon));
+        const sortedPersonalLoans = personalLoans.sort((a, b) => new Date(b.createdon) - new Date(a.createdon));
+  
+        const latestHomeLoans = sortedHomeLoans.slice(0, 3);
+        const latestPersonalLoans = sortedPersonalLoans.slice(0, 3);
+
         const userAdmin = authenticatedUser ? authenticatedUser.kf_adminname : '';
 
         const homeLoanRecords = homeLoans.filter(
@@ -182,6 +233,9 @@ const ManagerDashboard = ({ navigation, route }) => {
             (personalLoan.kf_aadharnumber && personalLoan.kf_aadharnumber.toLowerCase().includes(searchQuery.toLowerCase()))
           )
         );
+
+        setDisplayedHomeLoans(latestHomeLoans);
+        setDisplayedPersonalLoans(latestPersonalLoans);
 
         setHomeLoanRecords(homeLoanRecords);
         setPersonalLoanRecords(personalLoanRecords);
@@ -416,12 +470,12 @@ const ManagerDashboard = ({ navigation, route }) => {
 
             <View>
               {/* {authenticatedUser && ( */}
-              <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 2, textAlign: "center" }}>Created By: {kf_adminname}</Text>
+              {/* <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 2, textAlign: "center" }}>Created By: {kf_adminname}</Text> */}
               {/* // )} */}
             </View>
             {/* <LogoutButton navigation={navigation}/> */}
 
-            <Text style={{ textAlign: "center", marginVertical: 10, fontSize: 18, fontWeight: "bold", color: "red" }}>MANAGER DASHBOARD</Text>
+            {/* <Text style={{ textAlign: "center", marginVertical: 10, fontSize: 18, fontWeight: "bold", color: "red" }}>MANAGER DASHBOARD</Text> */}
 
 
             <View style={styles.chart}>
@@ -585,7 +639,7 @@ const ManagerDashboard = ({ navigation, route }) => {
 
           </ScrollView>
         </View>
-        <Modal
+        {/* <Modal
           animationType="slide"
           transparent={true}
           visible={showLoanModal}
@@ -610,12 +664,12 @@ const ManagerDashboard = ({ navigation, route }) => {
               </View>
             </View>
           </View>
-        </Modal>
-        <View style={styles.plusIconScetion}>
+        </Modal> */}
+        {/* <View style={styles.plusIconScetion}>
           <TouchableOpacity style={styles.plusIcon} onPress={() => setShowLoanModal(!showLoanModal)}>
             <Text style={styles.plusIconText}>+</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
       </KeyboardAvoidingView>
     </>
   );

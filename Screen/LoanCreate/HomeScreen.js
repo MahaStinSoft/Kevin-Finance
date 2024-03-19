@@ -1005,6 +1005,7 @@ export const HomeScreen = ({ route }) => {
               setImageContent={setkf_applicantimage}
             // onViewImage={onViewImage}
             />
+
           </View>
           <ButtonComponent
             title="SUBMIT"

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, TouchableOpacity, Alert, StyleSheet, ScrollView, Text, FlatList, Linking, Platform, Image, Button } from 'react-native';
+import { View, TextInput, TouchableOpacity, Alert, StyleSheet, ScrollView, Text, FlatList, Linking, Platform, Image, Modal } from 'react-native';
 import axios from 'axios';
 import { Notification } from 'expo-notifications';
+import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 
 import HeaderComponent from '../../common/Header';
 import ButtonComponent from '../../common/ButtonComponent';
@@ -39,7 +41,8 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [aadharcardNumber, setAadharcardNumber] = useState(loanApplication?.kf_aadharnumber || '');
   const [pancardNumber, setPancardNumber] = useState(loanApplication?.kf_pannumber || '');
   const [otherCharges, setOtherCharges] = useState(loanApplication?.kf_othercharges || '');
-  const [emiCollectionDate, setEmiCollectionDate] = useState(loanApplication?.kf_emicollectiondate || '');
+  // const [emiCollectionDate, setEmiCollectionDate] = useState(loanApplication?.kf_emicollectiondate || '');
+  const [emiCollectionDate, setEmiCollectionDate] = useState(new Date()); // Initialize with today's date
   const [interestRate, setInterestRate] = useState(loanApplication?.kf_interestrate || '');
   const [emiSchedule, setEmiSchedule] = useState(loanApplication?.kf_emischedule || '');
   const [numberOfEMI, setNumberOfEMI] = useState(loanApplication?.kf_numberofemi || '');
@@ -47,10 +50,11 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [aadharcard, setAadharcard] = useState({ fileName: null, fileContent: null });
   const [pancard, setPancard] = useState({ fileName: null, fileContent: null });
   const [applicantImage, setapplicantImage] = useState({ fileName: null, fileContent: null });
-  const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fileContent: null });
+  // const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fileContent: null });
   const [signature, setSignature] = useState({ fileName: null });
   const [sendApproval, setSendApproval] = useState(loanApplication?.kf_sendapproval || '');
   const [reason, setReason] = useState(loanApplication?.kf_reason || '');
+  const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fileContent: null });
 
   const [isfirstnameValid, setIsfirstnameValid] = useState(true);
   const [isLastNameValid, setIsLastNameValid] = useState(true);
@@ -62,7 +66,7 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [ModalVisible, setModalVisible] = useState(true);
   const [annotations, setAnnotations] = useState([]);
   const [showImageModal, setShowImageModal] = useState(false);
-  const [showImage, setShowImage] = useState(true);
+  const [showImage, setShowImage] = useState(false);
   const [item, setItem] = useState(null); // Assuming you have some state to store the current item
   const [imageContent, setImageContent] = useState(null);
   const [aadharImageContent, setAadharImageContent] = useState(null);
@@ -123,7 +127,7 @@ const EditHomeLoan = ({ route, navigation }) => {
     setRecordId(loanApplication.kf_loanapplicationid);
     setAadharcard({ fileName: null, fileContent: null });
     setPancard({ fileName: null, fileContent: null });
-    setapplicantImage({ fileName: null, fileContent: null });
+    setkf_applicantimage({ fileName: null, fileContent: null });
     setSignature({ fileName: null })
     console.log('State updated:', {
       applicationnumber,
@@ -239,7 +243,6 @@ const EditHomeLoan = ({ route, navigation }) => {
           kf_numberofemi: numberOfEMI,
           kf_sendapproval: sendApproval,
           kf_reason: reason,
-          kf_applicantimage:applicantImage.fileContent
         },
         {
           headers: {
@@ -286,7 +289,6 @@ const EditHomeLoan = ({ route, navigation }) => {
             kf_numberofemi: numberOfEMI,
             kf_sendapproval: sendApproval,
             kf_reason: reason,
-            kf_applicantimage:applicantImage.fileContent
           });
         }
         // console.log(loanAmountRequested)
@@ -308,6 +310,60 @@ const EditHomeLoan = ({ route, navigation }) => {
     } catch (error) {
       console.error('Error during update:', error.response?.data || error.message);
       Alert.alert('Error', 'An unexpected error occurred. Please try again later.');
+    }
+  };
+
+  const handleUpdateField = async () => {
+    try {
+
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        {
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        },
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      );
+
+      const accessToken = tokenResponse.data.access_token;
+
+      const updateFieldResponse = await axios.patch(
+        `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications(${recordId})`,
+        {
+          kf_applicantimage: kf_applicantimage.fileContent,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (updateFieldResponse.status === 204) {
+        console.log('Field updated successfully in CRM');
+
+        if (onUpdateSuccess) {
+          onUpdateSuccess({
+            ...loanApplication,
+            kf_applicantimage: kf_applicantimage.fileContent,
+
+          });
+        }
+        Alert.alert('Applicant Image Updated Successfully.', '', [
+          {
+            text: 'OK',
+          },
+        ]);
+      } else {
+        console.log('Error updating field in CRM:', updateFieldResponse);
+        Alert.alert('Error', 'Failed to update the field in CRM.');
+      }
+    } catch (error) {
+      console.error('Error during field update:', error);
     }
   };
 
@@ -763,59 +819,6 @@ const EditHomeLoan = ({ route, navigation }) => {
     }
   };
 
-  const sendAnnotation2 = async () => {
-    try {
-      const tokenResponse = await axios.post(
-        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
-        {
-          grant_type: 'client_credentials',
-          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
-          resource: 'https://org0f7e6203.crm5.dynamics.com',
-          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
-          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
-        },
-        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
-      );
-
-      const accessToken = tokenResponse.data.access_token;
-
-      // Create a new annotation
-      const annotations = [
-        {
-          subject: 'Applicant Image',
-          filename: applicantImage.fileName || 'Applicant.jpg',
-          isdocument: true,
-          'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
-          documentbody: applicantImage.fileContent,
-        },
-      ];
-
-      const createAnnotationResponse = await axios.post(
-        'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
-        annotations,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      if (createAnnotationResponse.status === 204) {
-        console.log('ApplicantImage image annotation created successfully.');
-        // Alert.alert('Sucess', '');
-
-      } else {
-        console.error('Failed to create Applicant image annotation. Response:', createAnnotationResponse.data);
-        Alert.alert('Error', 'Failed to create Aadhar image annotation.');
-      }
-
-    } catch (error) {
-      console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
-      Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
-    }
-  };
-
   const sendAnnotation3 = async () => {
     try {
       const tokenResponse = await axios.post(
@@ -872,12 +875,17 @@ const EditHomeLoan = ({ route, navigation }) => {
     }
   };
 
+  const handleEmiCollectionDateChange = (date) => {
+    setEmiCollectionDate(date);
+    // Additional handling if needed
+  };
   const handleUpdateRecordAndSendAnnotation = () => {
     sendAnnotation();
     sendAnnotation1();
-    // sendAnnotation2();
     sendAnnotation3();
+    // handleUpdateRecord();
     handleUpdateRecord();
+    // updateApplicantImage();
   };
 
   const handleViewImages = () => {
@@ -908,13 +916,64 @@ const EditHomeLoan = ({ route, navigation }) => {
     } else {
       const initials = loanApplication ? `${loanApplication.kf_name[0]}${loanApplication.kf_lastname[0]}` : '';
       return (
-        <View style={[styles.cardImage,{backgroundColor:"gray",width: "100%", height: "100%"} ]}>
+        <View style={[styles.cardImage,{ backgroundColor:"gray",width: "100%", height: "100%" } ]}>
           <Text style={styles.placeholderText}>{initials}</Text>
         </View>
       );
     }
   };
 
+  const takePictureWithCamera = async () => {
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+        base64: true,
+      });
+
+      if (result.canceled) {
+        return;
+      }
+  
+      const byteArray = result.base64; // Use result.base64 directly
+  
+      setkf_applicantimage({
+        fileName: 'payslip.jpg', // You can set a default file name
+        fileContent: byteArray,
+      });
+    } catch (error) {
+      console.error('Error taking picture:', error);
+    }
+  };
+
+  const pickImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+        base64: true,
+      });
+  
+      if (result.canceled) {
+        return;
+      }
+  
+      const byteArray = result.base64; // Use result.base64 directly
+  
+      setkf_applicantimage({
+        fileName: 'payslip.jpg', // You can set a default file name
+        fileContent: byteArray,
+      });
+    } catch (error) {
+      console.error('Error picking or processing the image:', error);
+      Alert.alert('Error', 'Failed to pick or process the image.');
+    }
+  };
+  
   return (
     <View style={styles.container}>
       <HeaderComponent titleText="Edit Home Screen"
@@ -925,17 +984,27 @@ const EditHomeLoan = ({ route, navigation }) => {
       />
      
       <ScrollView>
-      <View style={styles.imageContent}>
-         <View style={{ width:"50%", height: "100%",left: 60, bottom: 5}}>{renderImage()}</View>
-         <View style={{right: 80, top: 30}}>
-         <CardImage
-              // title="Applicant"
-              imageContent={applicantImage}
-              setImageContent={setapplicantImage}
-            // onViewImage={onViewImage}
-            />
+      
+        <View style={styles.Imagepart}>
+          <View style={{ width: 100, height:100, left: 0, bottom: 5 }}>{renderImage()}</View>
+          <View style={{ right: 25, top: 30 }}>
+            <View style={styles.touch}>
+              <TouchableOpacity onPress={pickImage} style={styles.button}>
+                <Text style={styles.buttonText}>Choose File</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={takePictureWithCamera} style={styles.button}>
+                <Text style={styles.buttonText}>Camera</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={handleUpdateField} style={{marginLeft:10}} >
+                <Ionicons name="save" size={26} color="red" />
+              </TouchableOpacity>
+
             </View>
-         </View>
+          </View>
+        </View>
+
         <View style={styles.detailContainer}>
           <View style={styles.wrapper}>
             {/* <Button title="Send Notification" onPress={handleSendNotification} /> */}
@@ -969,54 +1038,98 @@ const EditHomeLoan = ({ route, navigation }) => {
             />
 
             <TextInput
-              style={styles.textInputContainer}
+             style={[
+              styles.textInputContainer,
+              getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+            ]}
               value={firstname}
               placeholder="First Name"
               onChangeText={(text) => {
                 setfirstname(text);
                 setIsfirstnameValid(text.trim() !== '');
-
-                // Update error message
                 setErrorMessages({
                   ...errorMessages,
                   firstNameEdit: text.trim() !== '' ? '' : 'Enter First Name',
                 });
               }}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'} 
             />
             {errorMessages.firstNameEdit !== '' && <Text style={styles.errorText}>{errorMessages.firstNameEdit}</Text>}
 
             <TextInput
-              style={styles.textInputContainer}
+              style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={lastname}
               placeholder="Last Name"
               onChangeText={(text) => {
                 setLastname(text);
                 setIsLastNameValid(text.trim() !== '')
-
                 setErrorMessages({
                   ...errorMessages,
                   lastNameEdit: text.trim() !== '' ? '' : 'Enter Last Name',
                 });
               }}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'} 
             />
             {errorMessages.lastNameEdit !== '' && <Text style={styles.errorText}>{errorMessages.lastNameEdit}</Text>}
 
-            <LoanStatusPicker
+            {/* <LoanStatusPicker
               onOptionChange={handleGenderOptionset}
               title="Gender"
               options={['Male', 'Female']}
               initialOption={gender ? getGenderOptionsetStringFromNumericValue(gender) : ''}
               style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
+            /> */}
+
+            
+            <LoanStatusPicker
+              onOptionChange={handleGenderOptionset}
+              title="Gender"
+              options={['Male', 'Female']}
+              initialOption={gender ? getGenderOptionsetStringFromNumericValue(gender) : ''}
+              style={[
+                { width: "100%", marginLeft: 0, marginTop: 5 },
+                getStatusStringFromNumericValue(status) === 'Approved' && { opacity: 0.5 } // Change the styling to indicate it's disabled
+              ]}
+              disabled={getStatusStringFromNumericValue(status) === 'Approved'} // Disable the picker based on loan status
             />
 
-            <ComponentDatePicker
+            {/* <ComponentDatePicker
               selectedDate={dateofbirth}
               onDateChange={handleDateOfBirth}
               placeholder="Date of Birth"
               style={{ width: "100%", height: 45, marginTop: 5, marginLeft: 0 }}
             />
-            {errorMessages.dateOfBirthEdit !== '' && <Text style={styles.errorText}>{errorMessages.dateOfBirthEdit}</Text>}
+            {errorMessages.dateOfBirthEdit !== '' && <Text style={styles.errorText}>{errorMessages.dateOfBirthEdit}</Text>} */}
 
+
+            <View style={{ position: 'relative' }}>
+              <ComponentDatePicker
+                selectedDate={dateofbirth}
+                onDateChange={handleDateOfBirth}
+                placeholder="Date of Birth"
+                style={[
+                  { width: "100%", height: 45, marginTop: 5, marginLeft: 0 },
+                  getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' } // Change text color to gray based on loan status
+                ]}
+                onPress={() => getStatusStringFromNumericValue(status) === 'Approved' && handleDateOfBirth()} // Prevent opening date picker when disabled
+              />
+              {getStatusStringFromNumericValue(status) === 'Approved' && (
+                <View
+                  style={{
+                    position: 'absolute',
+                    backgroundColor: 'transparent',
+                    top: 0,
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                  }}
+                />
+              )}
+            </View>
+            {errorMessages.dateOfBirthEdit !== '' && <Text style={styles.errorText}>{errorMessages.dateOfBirthEdit}</Text>}
 
             <TextInput
               style={[styles.textInputContainer, { color: "gray" }]}
@@ -1027,61 +1140,93 @@ const EditHomeLoan = ({ route, navigation }) => {
             />
 
             <TextInput
-              style={styles.textInputContainer}
+             style={[
+              styles.textInputContainer,
+              getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+            ]}
               value={mobileNumber}
               placeholder="Mobile Number"
               onChangeText={handleMobileNumberChange}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'} 
             />
             {errorMessages.mobileNumberEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.mobileNumberEdit}</Text>
             )}
 
             <TextInput
-              style={styles.textInputContainer}
+              style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={email}
               placeholder="Email"
               onChangeText={handleEmailChange}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'} 
             />
             {errorMessages.emailEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.emailEdit}</Text>
             )}
 
             <TextInput
-              style={styles.textInputContainer}
+              style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={address1}
               placeholder="Address Line 1"
               onChangeText={(text) => setAddress1(text)}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'} 
             />
             <TextInput
-              style={styles.textInputContainer}
+              style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={address2}
               placeholder="Address Line 2"
               onChangeText={(text) => setAddress2(text)}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             <TextInput
-              style={styles.textInputContainer}
+             style={[
+              styles.textInputContainer,
+              getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+            ]}
               value={address3}
               placeholder="Address Line 3"
               onChangeText={(text) => setAddress3(text)}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             <TextInput
-              style={styles.textInputContainer}
+              style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={city}
               placeholder="City"
               onChangeText={(text) => setCity(text)}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             <TextInput
-              style={styles.textInputContainer}
+              style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={state}
               placeholder="State"
               onChangeText={(text) => setState(text)}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
 
             <TextInput
-              style={styles.textInputContainer}
+             style={[
+              styles.textInputContainer,
+              getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+            ]}
               value={aadharcardNumber}
               placeholder="Aadharcard Number"
               onChangeText={handleAadharCardNumberChange}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             {errorMessages.aadharCardNumberEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.aadharCardNumberEdit}</Text>
@@ -1089,20 +1234,28 @@ const EditHomeLoan = ({ route, navigation }) => {
 
 
             <TextInput
-              style={styles.textInputContainer}
+             style={[
+              styles.textInputContainer,
+              getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+            ]}
               value={pancardNumber}
               placeholder="PAN Card Number"
               onChangeText={handlePancardNumberValid}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             {errorMessages.panCardNumberEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.panCardNumberEdit}</Text>
             )}
 
             <TextInput
-              style={styles.textInputContainer}
+              style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               placeholder="Loan Amount Request"
               value={loanAmountRequested ? loanAmountRequested.toString() : ''}
               onChangeText={handleLoanAmountRequestedChange}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             {errorMessages.loanAmountRequestedEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.loanAmountRequestedEdit}</Text>
@@ -1125,13 +1278,13 @@ const EditHomeLoan = ({ route, navigation }) => {
               editable={false}
             />
 
-            <TextInput
+            {/* <TextInput
               style={[styles.textInputContainer, { color: "gray" }]}
               placeholder="EMI Collection Date"
               // value={emiCollectionDate}
               value={formattedDate}
               editable={false}
-            />
+            /> */}
 
             <TextInput
               style={[styles.textInputContainer, { color: "gray" }]}
@@ -1141,10 +1294,14 @@ const EditHomeLoan = ({ route, navigation }) => {
             />
 
             <TextInput
-              style={styles.textInputContainer}
+              style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               placeholder="Other Charges"
               value={otherCharges ? otherCharges.toString() : ""}
               onChangeText={(text) => setOtherCharges(text)}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
 
             {/* <LoanStatusPicker
@@ -1171,12 +1328,46 @@ const EditHomeLoan = ({ route, navigation }) => {
               editable={false}
             />
 
-            <TextInput
-              style={[styles.textInputContainer, { color: "red" }]}
-              placeholder="Resaon"
-              value={reason}
-              editable={false}
-            />
+            {status === 123950004 && ( // Display reason column only when status is 'Rejected'
+              <TextInput
+                style={[styles.textInputContainer, { color: "red" }]}
+                placeholder="Reason"
+                value={reason}
+                editable={false}
+              />
+            )}
+
+              <ComponentDatePicker
+                selectedDate={date} // Pass the Date object directly
+                onDateChange={handleEmiCollectionDateChange}
+                placeholder="Select EMI Collection Date"
+                style={{ width: "100%", height: 45, marginTop: 5, marginLeft: 0 }}
+              />        
+
+    {/* <View style={{ position: 'relative' }}>
+              <ComponentDatePicker
+                selectedDate={emiCollectionDate}
+                onDateChange={handleEmiCollectionDateChange}
+                placeholder="Select EMI Collection Date"
+                style={[
+                  { width: "100%", height: 45, marginTop: 5, marginLeft: 0 },
+                  getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' } // Change text color to gray based on loan status
+                ]}
+                onPress={() => getStatusStringFromNumericValue(status) === 'Approved' && handleEmiCollectionDateChange()} // Prevent opening date picker when disabled
+              />
+              {getStatusStringFromNumericValue(status) === 'Approved' && (
+                <View
+                  style={{
+                    position: 'absolute',
+                    backgroundColor: 'transparent',
+                    top: 0,
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                  }}
+                />
+              )}
+            </View> */}
 
             <View style={styles.indentityImage}>
               <View style={{ marginVertical: 3 }}>
@@ -1322,7 +1513,38 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-  }
+  },
+  placeholderText:{
+    fontSize: 25,
+    color: "white",
+    textAlign: "center",
+    margin: 32,
+    fontWeight:"bold"
+  },
+  Imagepart:{
+    flexDirection:'row',
+    marginRight:10,
+    marginBottom: 20
+  },
+  touch:{
+    flexDirection:'row',
+    marginLeft:40,
+    marginTop:15,
+  },
+  button:{
+    marginLeft: 10, 
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    backgroundColor: 'red',
+    borderRadius: 50,
+    width: "33%"
+  },
+  buttonText:{
+    fontSize: 14,
+    color: 'white',
+    padding: 5,
+    fontWeight: "bold"
+  },
 });
 
 export default EditHomeLoan;

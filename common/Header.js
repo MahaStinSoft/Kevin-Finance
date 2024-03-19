@@ -64,7 +64,7 @@ const HeaderComponent = (props) => {
 
         {onIconPress && (
           <TouchableOpacity style={[styles.iconButton, screenIconStyle]} onPress={onIconPress}>
-            <Ionicons name={screenIcon} size={30} color="#fff" />
+            <Ionicons name={screenIcon} size={26} color="#fff" />
           </TouchableOpacity>
         )}
       </View>

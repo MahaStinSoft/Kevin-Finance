@@ -336,7 +336,7 @@ const handlePendingApprovals = async (personalLoanId) => {
     123950001: 'Pending Approval',
     123950002: 'Draft',
     123950003: 'Cancelled',
-    123950004: 'Expired',
+    123950004: 'Rejected',
   };
 
   const handleSendApproval = (selectedOption) => {

@@ -41,6 +41,9 @@ import Gurantee2SignatureHome from '../Screen/Signature/Gurantee2SignatureHome';
 import Gurantee1SignaturePersonal from '../Screen/Signature/Gurantee1SignaturePersonal';
 import Gurantee2SignaturePersonal from '../Screen/Signature/Gurantee2SignaturePersonal';
 import LoginForm from '../Screen/LoginPages/LoginForm';
+import LoginUserForm from '../Screen/LoginPages/LoginUser';
+import UserDashboard from '../Screen/Dashboards/UserDashboard';
+import UserLoanDetails from '../Screen/EMI/UserLoanDetails';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -85,6 +88,10 @@ const StackNavigator = () => (
     <Stack.Screen name="Gurantee2SignatureHome" component={Gurantee2SignatureHome} options={{ headerShown: false }} />
     <Stack.Screen name="Gurantee1SignaturePersonal" component={Gurantee1SignaturePersonal} options={{ headerShown: false }} />
     <Stack.Screen name="Gurantee2SignaturePersonal" component={Gurantee2SignaturePersonal} options={{ headerShown: false }} />
+    <Stack.Screen name="LoginUserForm" component={LoginUserForm} options={{ headerShown: false }} />
+    <Stack.Screen name="UserDashboard" component={UserDashboard} options={{ headerShown: false }} />
+    <Stack.Screen name="UserLoanDetails" component={UserLoanDetails} options={{ headerShown: false }} />
+
     <Stack.Screen name="DynamicDashboardScreen" component={DynamicDashboardScreen} options={{
       headerShown: false,
       unmountOnBlur: true,

@@ -12,7 +12,9 @@ import {
   ActivityIndicator,
   StatusBar,
   Platform,
-RefreshControl
+  RefreshControl, 
+  Alert,
+  BackHandler
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -72,7 +74,33 @@ const DashboardScreen = ({ navigation, route }) => {
     getAuthenticatedUser();
   }, [isFocused, getAuthenticatedUser]);
 
-  // Update displayed loans based on showAllLoans state
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (navigation.isFocused()) {
+        // If the user is on the login screen, show the exit confirmation alert
+        Alert.alert(
+          'Exit App',
+          'Are you sure you want to exit the app?',
+          [
+            {
+              text: 'Cancel',
+              onPress: () => null,
+              style: 'cancel',
+            },
+            {
+              text: 'Exit',
+              onPress: () => BackHandler.exitApp(),
+            },
+          ],
+          { cancelable: false }
+        );
+        return true; // Prevent default back button behavior
+      }
+    });
+
+    return () => backHandler.remove();
+  }, [navigation]);
+
   useEffect(() => {
     setDisplayedHomeLoans(showAllLoans ? HomeLoanRecords : HomeLoanRecords.slice(0, 3));
     setDisplayedPersonalLoans(showAllLoans ? PersonalLoanRecords : PersonalLoanRecords.slice(0, 3));
@@ -161,6 +189,12 @@ const DashboardScreen = ({ navigation, route }) => {
         const homeLoans = responseLoanApplications.data.value;
         const personalLoans = responsePersonalLoans.data.value;
 
+        const sortedHomeLoans = homeLoans.sort((a, b) => new Date(b.createdon) - new Date(a.createdon));
+        const sortedPersonalLoans = personalLoans.sort((a, b) => new Date(b.createdon) - new Date(a.createdon));
+  
+        const latestHomeLoans = sortedHomeLoans.slice(0, 3);
+        const latestPersonalLoans = sortedPersonalLoans.slice(0, 3);
+      
         const userAdmin = authenticatedUser ? authenticatedUser.kf_adminname : '';
 
         const homeLoanRecords = homeLoans.filter(
@@ -184,7 +218,10 @@ const DashboardScreen = ({ navigation, route }) => {
               (personalLoan.kf_aadharnumber && personalLoan.kf_aadharnumber.toLowerCase().includes(searchQuery.toLowerCase()))
             )
         );
-    
+        
+        setDisplayedHomeLoans(latestHomeLoans);
+        setDisplayedPersonalLoans(latestPersonalLoans);
+
         setHomeLoanRecords(homeLoanRecords);
         setPersonalLoanRecords(personalLoanRecords);
     
@@ -416,13 +453,13 @@ const handleNavigation = () => {
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
           >
-          <Text style={{textAlign: "center", marginBottom: 40, fontSize: 18, fontWeight: "bold",color: "red"}}>ADMIN DASHBOARD</Text>
+          {/* <Text style={{textAlign: "center", marginBottom: 10, fontSize: 18, fontWeight: "bold",color: "red"}}>ADMIN DASHBOARD</Text> */}
 
-            <View>
+            {/* <View>
               {authenticatedUser && (
                 <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 2, textAlign: "center" }}>Created By: {authenticatedUser.kf_adminname}</Text>
               )}
-            </View>
+            </View> */}
             {/* <LogoutButton navigation={navigation}/> */}
 
             <View style={styles.chart}>

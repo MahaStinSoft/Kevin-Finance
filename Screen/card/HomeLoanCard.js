@@ -15,7 +15,7 @@ const HomeLoanCard = ({ loanApplication, onPress, onDelete }) => {
       case 123950003:
         return 'Cancelled';
       case 123950004:
-        return 'Expired';
+        return 'Rejected';
       default:
         return 'Pending Approval';
     }

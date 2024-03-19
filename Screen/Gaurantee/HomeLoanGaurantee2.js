@@ -281,12 +281,12 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
         console.log('Aadhar image annotation created successfully.');
       } else {
         console.error('Failed to create Aadhar image annotation. Response:', createAnnotationResponse.data);
-        Alert.alert('Error', 'Failed to create Aadhar image annotation.');
+        // Alert.alert('Error', 'Failed to create Aadhar image annotation.');
       }
 
     } catch (error) {
       console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
-      Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+      // Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
     }
   };
 
@@ -332,12 +332,12 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
         console.log('PanCard image annotation created successfully.');
       } else {
         console.error('Failed to create Aadhar image annotation. Response:', createAnnotationResponse.data);
-        Alert.alert('Error', 'Failed to create Aadhar image annotation.');
+        // Alert.alert('Error', 'Failed to create Aadhar image annotation.');
       }
 
     } catch (error) {
       console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
-      Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+      // Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
     }
   };
 
@@ -373,7 +373,7 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
 
     } catch (error) {
       console.error('Error fetching annotations:', error.response?.data || error.message);
-      Alert.alert('Error', 'An error occurred while fetching annotations.');
+      // Alert.alert('Error', 'An error occurred while fetching annotations.');
     }
   };
 
@@ -421,12 +421,12 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
 
       } else {
         console.error('Failed to create Applicant image annotation. Response:', createAnnotationResponse.data);
-        Alert.alert('Error', 'Failed to create Aadhar image annotation.');
+        // Alert.alert('Error', 'Failed to create Aadhar image annotation.');
       }
 
     } catch (error) {
       console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
-      Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+      // Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
     }
   };
 
@@ -476,13 +476,13 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
 
       } else {
         console.error('Failed to create Signature image annotation. Response:', createAnnotationResponse.data);
-        Alert.alert('Error', 'Failed to create Aadhar image annotation.');
+        // Alert.alert('Error', 'Failed to create Aadhar image annotation.');
       }
 
       // Fetch and display the updated annotations
     } catch (error) {
-      console.error('Error sending Signature image annotation:', error.response?.data || error.message);
-      Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+      // console.error('Error sending Signature image annotation:', error.response?.data || error.message);
+      // Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
     }
   };
 
@@ -628,7 +628,7 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
       case 'Cancelled':
         numericValue = 123950003;
         break;
-      case 'Expired':
+      case 'Rejected':
         numericValue = 123950004;
         break;
       default:
@@ -648,7 +648,7 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
       case 123950003:
         return 'Cancelled';
       case 123950004:
-        return 'Expired';
+        return 'Rejected';
       default:
         return 'Pending Approval';
     }
