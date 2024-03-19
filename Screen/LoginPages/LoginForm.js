@@ -123,7 +123,7 @@ export const LoginForm = () => {
               <View style={styles.passwordContainer}>
                 <Ionicons name="person" size={20} color="#888" style={styles.icon} />
                 <TextInput
-                  placeholder="Enter Email"
+                  placeholder="Enter Email Address"
                   autoCapitalize="none"
                   style={styles.input}
                   value={kf_name}
