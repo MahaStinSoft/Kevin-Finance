@@ -209,7 +209,7 @@ const EditLoanDetail = ({ route, navigation }) => {
         <View style={styles.row}>
           <Text style={styles.label}>Penalty:</Text>
           <TextInput
-            style={[styles.valueInput, { color: "black" }]}
+            style={[styles.valueInput, { color: kf_paidstatus ? "gray" : "black" }]}
             value={record.kf_penalty}
             onChangeText={(text) => setPenalty(text)}
             editable={!kf_paidstatus}

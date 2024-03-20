@@ -479,7 +479,7 @@ const ManagerDashboard = ({ navigation, route }) => {
 
 
             <View style={styles.chart}>
-              <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 10, marginBottom: 10 }}>Loan Status Chart</Text>
+              <Text style={styles.heading}>Loan Status Chart</Text>
               {/* <Text style={styles.totalLoans}>Total Loans: {filteredData.length}</Text> */}
 
               <View style={styles.statusContainer}>
@@ -496,10 +496,10 @@ const ManagerDashboard = ({ navigation, route }) => {
                   <Text style={styles.statusText}>Canceled: {statusCounts.canceled}</Text>
                 </TouchableOpacity> */}
                 <TouchableOpacity onPress={() => handleStatusClick(123950004)}>
-                  <Text style={styles.statusText}>expired: {statusCounts.expired}</Text>
+                  <Text style={styles.statusText}>Rejected: {statusCounts.expired}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => handleStatusClick(null)}>
-                  <Text style={styles.statusText}>All: {filteredData.length}</Text>
+                  <Text style={[styles.statusText, {right: 10,}]}>All: {filteredData.length}</Text>
                 </TouchableOpacity>
               </View>
 
@@ -541,7 +541,7 @@ const ManagerDashboard = ({ navigation, route }) => {
                 <Text style={styles.dynamicDashboardButtonText}>Dynamic Dashboard</Text>
               </TouchableOpacity> */}
 
-            <View style={{ marginLeft: 0 }}>
+            <View style={{ marginRight: 10 }}>
               <TouchableOpacity
                 onPress={() => setShowAllLoans(!showAllLoans)}
                 style={styles.viewButton}
@@ -580,7 +580,7 @@ const ManagerDashboard = ({ navigation, route }) => {
             )}
           </View> */}
 
-            <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10 }}>
+            <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 5 }}>
               {initialLoading ? (
                 <ActivityIndicator size="large" color="#0000ff" />
               ) : (
@@ -593,7 +593,7 @@ const ManagerDashboard = ({ navigation, route }) => {
 
                   {displayedHomeLoans.length > 0 && (
                     <>
-                      <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Home Loans</Text>
+                      <Text style={[styles.heading, { paddingHorizontal: 5, }]}>Home Loans</Text>
                       {displayedHomeLoans.map((homeLoan, index) => (
                         <HomeLoanCard
                           key={index}
@@ -606,7 +606,7 @@ const ManagerDashboard = ({ navigation, route }) => {
 
                   {displayedPersonalLoans.length > 0 && (
                     <>
-                      <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 20, marginBottom: 10 }}>Personal Loans</Text>
+                      <Text style={[styles.heading, { paddingHorizontal: 5}]}>Personal Loans</Text>
                       {displayedPersonalLoans.map((personalLoan, index) => (
                         <PersonalLoanCard
                           key={index}
@@ -701,7 +701,14 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 14,
     color: "#007bff",
-    marginHorizontal: 20
+    marginHorizontal: 15
+  },
+  heading: { 
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 20,
+    marginBottom: 10,
+    color: "red"
   },
   iconButton: {
     marginHorizontal: 10,
@@ -799,6 +806,9 @@ const styles = StyleSheet.create({
     width: 100,
     alignSelf: "flex-end"
   },
+  chart: {
+    marginLeft: 10
+  }
 });
 
 export default ManagerDashboard;

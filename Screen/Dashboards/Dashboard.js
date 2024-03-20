@@ -523,7 +523,7 @@ const handleNavigation = () => {
                 <Text style={styles.dynamicDashboardButtonText}>Dynamic Dashboard</Text>
               </TouchableOpacity> */}
 
-              <View style={{ marginLeft: 10 }}>
+              <View style={{ marginRight: 10 }}>
                 <TouchableOpacity
                   onPress={() => setShowAllLoans(!showAllLoans)}
                   style={styles.viewButton}
@@ -562,7 +562,7 @@ const handleNavigation = () => {
             )}
           </View> */}
 
-            <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10 }}>
+            <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10,  paddingHorizontal: 5 }}>
             {initialLoading ? (
                 <ActivityIndicator size="large" color="#0000ff" />
               ) : (
