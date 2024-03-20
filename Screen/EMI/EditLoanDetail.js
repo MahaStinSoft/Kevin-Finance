@@ -258,7 +258,7 @@ const EditLoanDetail = ({ route, navigation }) => {
             <ComponentDatePicker
               selectedDate={date}
               onDateChange={handleReceivedDate}
-              placeholder="DatePicker"
+              placeholder="Select Date"
             // style={{ width: "100%", height: 45, marginTop: 5, marginLeft: 0 }}
             />
           </View>
