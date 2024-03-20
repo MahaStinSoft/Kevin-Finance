@@ -252,7 +252,8 @@ const AccountScreen = () => {
   const navigation = useNavigation();
 
   const handleGoBack = () => {
-    navigation.navigate("Dashboard");
+    // navigation.navigate("Dashboard");
+    navigation.goBack();
   };
 
   const mapGenderLabel = (genderCode) => {
