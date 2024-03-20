@@ -24,6 +24,7 @@ const EditLoanDetail = ({ route, navigation }) => {
   const emiStatusOptions = ['Paid', 'Unpaid'];
   const [statusUpdated, setStatusUpdated] = useState(false); // New state variable
   const [emiStatusUpdated, setEmiStatusUpdated] = useState(false); // New state variable
+  const [kf_datepicker, setkf_datepicker] = useState(record.kf_datepicker);
   
   useEffect(() => {
     console.log('Penalty updated:', penalty);
@@ -59,78 +60,18 @@ const EditLoanDetail = ({ route, navigation }) => {
     }
   };
 
-  // const handleUpdate = async () => {
-  //   setIsLoading(true);
-  //   if (!kf_paidstatus) {
-  //     // If EMI status is unpaid, show an alert and return
-  //     Alert.alert('Cannot Update', 'EMI status is unpaid. Cannot update.');
-  //     setIsLoading(false);
-  //     return;
-  //   }
-  //   try {
-  //     const tokenResponse = await axios.post(
-  //       'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
-  //       {
-  //         grant_type: 'client_credentials',
-  //         client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
-  //         resource: 'https://org0f7e6203.crm5.dynamics.com',
-  //         scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
-  //         client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
-  //       },
-  //       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
-  //     );
+  const handleReceivedDate = (date) => {
+    console.log('New Date:', date); // Add this console log
+    setkf_datepicker(date);
+  };
 
-  //     const accessToken = tokenResponse.data.access_token;
-  //     const updatedKfPaidStatus = kf_paidstatus ? true : false;
+  console.log('Selected Date:', kf_datepicker);
 
-  //     const payload = {
-  //       kf_applicationnumber: applicationNumber,
-  //       kf_principalloanamount: principalLoanAmount,
-  //       kf_receiveddate: receivedDate,
-  //       kf_emiamount: emiAmount,
-  //       kf_remainingbalance: remainingBalance,
-  //       kf_paidstatus: updatedKfPaidStatus,
-  //     };
 
-  //     console.log('Payload:', payload);
-  //     const updateRecordResponse = await axios.patch(
-  //       `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loans(${record.kf_loanid})`,
-  //       payload,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${accessToken}`,
-  //           'Content-Type': 'application/json',
-  //         },
-  //       }
-  //     );
-
-  //     if (updateRecordResponse.status === 204) {
-  //       console.log('Record updated successfully in CRM');
-  //       setIsPaid(true);
-  //       await AsyncStorage.setItem(`paid_${record.kf_loanid}`, 'true');
-  //       Alert.alert('EMI Amount Is Paided Successfully.', '', [
-  //         {
-  //           text: 'OK',
-  //           onPress: () => {
-  //             setIsPaid(true);
-  //             setIsLoading(false);
-  //             setEmiStatusUpdated(true);
-  //             navigation.goBack({ isPaid })
-  //           },
-  //         },
-  //       ]);
-  //     } else {
-  //       console.log('Error updating record in CRM:', updateRecordResponse);
-  //       Alert.alert('Error', 'Failed to update the record in CRM.');
-  //     }
-  //     setkf_paidstatus(kf_paidstatus);
-  //   } catch (error) {
-  //     console.error('Error during update:', error.response?.data || error.message);
-  //     Alert.alert('Error', 'An unexpected error occurred. Please try again later.');
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
+  const formatDate = (date) => {
+    const formattedDate = new Date(date).toLocaleDateString();
+    return formattedDate;
+  };
 
   const handleUpdate = async () => {
     setIsLoading(true);
@@ -162,7 +103,8 @@ const EditLoanDetail = ({ route, navigation }) => {
         kf_emiamount: emiAmount,
         kf_remainingbalance: remainingBalance,
         kf_paidstatus: updatedKfPaidStatus,
-        kf_penalty: penalty
+        kf_penalty: penalty,
+        kf_datepicker: kf_datepicker
       };
 
       const updateRecordResponse = await axios.patch(
@@ -205,10 +147,11 @@ const EditLoanDetail = ({ route, navigation }) => {
     }
   };
 
-
   const handleGoBackPersonaldetails = () => {
     navigation.goBack();
   };
+
+  const date = kf_datepicker ? new Date(kf_datepicker) : null;
 
   return (
     <View style={styles.container}>
@@ -274,20 +217,6 @@ const EditLoanDetail = ({ route, navigation }) => {
           />
         </View>
 
-{/* <View style={styles.row}>
-  <Text style={styles.label}>Penalty:</Text>
-  <TextInput
-    style={[styles.valueInput, { color: "black" }]}
-    value={kf_penalty}
-    onChangeText={(text) => setPenalty(text)}
-    keyboardType="numeric"
-    editable={!kf_paidstatus} // Set editable to false if EMI status is Paid
-  />
-</View>
-
-<Text>hii{penalty}</Text> */}
-
-
         <View style={styles.row}>
           <Text style={styles.label}>EMI Amount:</Text>
           <TextInput
@@ -308,6 +237,7 @@ const EditLoanDetail = ({ route, navigation }) => {
             editable={false}
           />
         </View>
+
         <View style={styles.row}>
           <Text style={styles.label}>EMI Status</Text>
           <Picker
@@ -322,13 +252,17 @@ const EditLoanDetail = ({ route, navigation }) => {
           </Picker>
         </View>
 
-        {/* <TouchableOpacity
-  style={[styles.button, { backgroundColor: kf_paidstatus ? 'green' : 'blue' }]}
-  onPress={handleUpdate}
-  disabled={isLoading || kf_paidstatus === 'Paid' || statusUpdated} 
->
-  <Text style={styles.buttonText}>Paid</Text>
-</TouchableOpacity> */}
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <Text style={styles.label}>Received Date:</Text>
+          <View style={styles.datepicker}>
+            <ComponentDatePicker
+              selectedDate={date}
+              onDateChange={handleReceivedDate}
+              placeholder="DatePicker"
+            // style={{ width: "100%", height: 45, marginTop: 5, marginLeft: 0 }}
+            />
+          </View>
+        </View>
 
         <ButtonComponent title="Update"
           onPress={handleUpdate}
@@ -362,6 +296,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginBottom: 15,
     alignItems: 'center',
+    width: "100%"
   },
   label: {
     flex: 1,
@@ -373,7 +308,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 5,
-    paddingHorizontal: 5,
+    paddingHorizontal: 9,
     fontSize: 14,
     color: "gray"
   },
@@ -388,6 +323,11 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
   },
+  datepicker: {
+    width: "83%",
+    marginRight: -20,
+    marginTop: -10,
+  }
 });
 
 export default EditLoanDetail;
