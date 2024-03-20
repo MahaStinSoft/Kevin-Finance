@@ -5,6 +5,7 @@ import HeaderComponent from '../../common/Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
 import ButtonComponent from '../../common/ButtonComponent';
+import ComponentDatePicker from '../../common/ComponentDatePicker';
 
 const EditLoanDetail = ({ route, navigation }) => {
   const { record, recordId } = route.params;
@@ -18,15 +19,18 @@ const EditLoanDetail = ({ route, navigation }) => {
   const [interestPayment, setInterestPayment] = useState(record.kf_annualinterest);
   const [emiAmount, setEmiAmount] = useState(record.kf_emiamount.toString());
   const [applicationNumber, setApplicationNumber] = useState(record.kf_applicationnumber);
-  const [penalty, setPenalty] = useState(record.kf_penalty || '0');
+  const [penalty, setPenalty] = useState(record.kf_penalty);
   const [isLoading, setIsLoading] = useState(false);
   const emiStatusOptions = ['Paid', 'Unpaid'];
   const [statusUpdated, setStatusUpdated] = useState(false); // New state variable
   const [emiStatusUpdated, setEmiStatusUpdated] = useState(false); // New state variable
-
+  
   useEffect(() => {
+    console.log('Penalty updated:', penalty);
+  
     if (penalty) {
-      const updatedEmiAmount = parseFloat(emiAmount) + parseFloat(penalty);
+      const updatedEmiAmount = parseFloat(record.kf_emiamount) + parseFloat(penalty);
+      console.log('Updated EMI amount with penalty:', updatedEmiAmount);
       setEmiAmount(updatedEmiAmount.toString());
     } else {
       // Reset EMI amount to its original value
@@ -46,6 +50,14 @@ const EditLoanDetail = ({ route, navigation }) => {
 
     retrievePaidStatus();
   }, []);
+
+  const handleEmiStatusChange = (value) => {
+    setkf_paidstatus(value === 'Paid');
+    // Disable the Penalty input if EMI status is Paid
+    if (value === 'Paid') {
+      setPenalty(''); // Clear the Penalty value
+    }
+  };
 
   // const handleUpdate = async () => {
   //   setIsLoading(true);
@@ -150,6 +162,7 @@ const EditLoanDetail = ({ route, navigation }) => {
         kf_emiamount: emiAmount,
         kf_remainingbalance: remainingBalance,
         kf_paidstatus: updatedKfPaidStatus,
+        kf_penalty: penalty
       };
 
       const updateRecordResponse = await axios.patch(
@@ -249,15 +262,32 @@ const EditLoanDetail = ({ route, navigation }) => {
             editable={false}
           />
         </View>
+
         <View style={styles.row}>
           <Text style={styles.label}>Penalty:</Text>
           <TextInput
             style={[styles.valueInput, { color: "black" }]}
-            value={penalty}
+            value={record.kf_penalty}
             onChangeText={(text) => setPenalty(text)}
-            keyboardType="numeric"
+            editable={!kf_paidstatus}
+        
           />
         </View>
+
+{/* <View style={styles.row}>
+  <Text style={styles.label}>Penalty:</Text>
+  <TextInput
+    style={[styles.valueInput, { color: "black" }]}
+    value={kf_penalty}
+    onChangeText={(text) => setPenalty(text)}
+    keyboardType="numeric"
+    editable={!kf_paidstatus} // Set editable to false if EMI status is Paid
+  />
+</View>
+
+<Text>hii{penalty}</Text> */}
+
+
         <View style={styles.row}>
           <Text style={styles.label}>EMI Amount:</Text>
           <TextInput
@@ -291,6 +321,7 @@ const EditLoanDetail = ({ route, navigation }) => {
             ))}
           </Picker>
         </View>
+
         {/* <TouchableOpacity
   style={[styles.button, { backgroundColor: kf_paidstatus ? 'green' : 'blue' }]}
   onPress={handleUpdate}
