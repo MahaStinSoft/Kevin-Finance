@@ -300,7 +300,12 @@ const PersonalLoanDetailsScreen = ({ route }) => {
             <Text style={styles.label}>Loan Amount Requested</Text>
             <Text style={styles.value}>{personalLoan.kf_loanamountrequested}</Text>
           </View>
-    
+
+          <View style={styles.detailItem}>
+            <Text style={styles.label}>Loan Status:</Text>
+            <Text style={styles.value}>{getLoanStatus()}</Text>
+          </View>
+        
       </View>
 
       <View style={styles.IndentityProofField}>
