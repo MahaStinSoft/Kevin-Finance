@@ -3,12 +3,10 @@ import { View, TextInput, Button, Alert, StyleSheet, ScrollView, Text } from 're
 import axios from 'axios';
 
 import HeaderComponent from '../../common/Header';
-import ButtonComponent from '../../common/ButtonComponent';
 import ComponentDatePicker from '../../common/ComponentDatePicker';
 import LoanStatusPicker from '../../common/LoanStatusPicker ';
 import CardImage from '../../common/CardImage';
 import Gurantee1AnnotationHome from '../Annotations/Gurantee1Annotation';
-import Gurantee1SignatureHome from '../Signature/Gurantee1SignatureHome';
 import CardImageSignature from '../../common/CardImageSignature';
 
 const HomeLoanGurantee = ({ route, navigation }) => {
@@ -47,8 +45,9 @@ const HomeLoanGurantee = ({ route, navigation }) => {
 
   const [recordId, setRecordId] = useState(loanApplication.kf_loanapplicationid);
 
-  const { signatureImage } = route.params;
-  console.log('signature',signatureImage);
+  const { signatureImage  } = route.params;
+  const { loanStatus } = route.params;
+  console.log('signature',loanStatus);
 
   const [errorMessages, setErrorMessages] = useState({
     guarantorFirstNameEdit: '',
@@ -229,13 +228,6 @@ const HomeLoanGurantee = ({ route, navigation }) => {
       Alert.alert('Error', 'An unexpected error occurred. Please try again later.');
     }
   };
-
-
-  // Define onUpdateSuccess function in your component
-  // const onUpdateSuccess = (updatedData) => {
-  //     // Handle the updated data here, such as updating the state or performing any other action
-  //     console.log('Record updated successfully:', updatedData);
-  //   };
 
   useEffect(() => {
     fetchAnnotations1();
@@ -481,7 +473,6 @@ const HomeLoanGurantee = ({ route, navigation }) => {
         Alert.alert('Error', 'Failed to create Aadhar image annotation.');
       }
 
-      // Fetch and display the updated annotations
     } catch (error) {
       // console.error('Error sending Signature image annotation:', error.response?.data || error.message);
       // Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
@@ -588,7 +579,6 @@ const HomeLoanGurantee = ({ route, navigation }) => {
     }
   };
 
-
   const handleGenderOptionset = (selectedOptionGender) => {
     let numericValue;
     switch (selectedOptionGender) {
@@ -610,73 +600,6 @@ const HomeLoanGurantee = ({ route, navigation }) => {
         return 'Male';
       case 123950001:
         return 'Female';
-      default:
-        return '';
-    }
-  };
-
-  const handleLoanStatusChange = (selectedOptionLoan) => {
-    let numericValue;
-    switch (selectedOptionLoan) {
-      case 'Approved':
-        numericValue = 123950000;
-        break;
-      case 'PendingApproval':
-        numericValue = 123950001;
-        break;
-      case 'Draft':
-        numericValue = 123950002;
-        break;
-      case 'Cancelled':
-        numericValue = 123950003;
-        break;
-      case 'Rejected':
-        numericValue = 123950004;
-        break;
-      default:
-        numericValue = null;
-    }
-    setStatus(numericValue);
-  };
-
-  const getStatusStringFromNumericValue = (numericValue) => {
-    switch (numericValue) {
-      case 123950000:
-        return 'Approved';
-      case 123950001:
-        return 'Pending Approval';
-      case 123950002:
-        return 'Draft';
-      case 123950003:
-        return 'Cancelled';
-      case 123950004:
-        return 'Rejected';
-      default:
-        return 'Pending Approval';
-    }
-  };
-
-  const handleAnotherOptionChange = (selectedOptionStatusReason) => {
-    let numericValue;
-    switch (selectedOptionStatusReason) {
-      case 'AadharNotMatching':
-        numericValue = 123950000;
-        break;
-      case 'InvalidDocuments':
-        numericValue = 123950001;
-        break;
-      default:
-        numericValue = null;
-    }
-    setstatusReason(numericValue);
-  };
-
-  const getAnotherOptionStringFromNumericValue = (numericValue) => {
-    switch (numericValue) {
-      case 123950000:
-        return 'AadharNotMatching';
-      case 123950001:
-        return 'InvalidDocuments';
       default:
         return '';
     }
@@ -725,6 +648,8 @@ const HomeLoanGurantee = ({ route, navigation }) => {
     navigation.navigate('Gurantee1SignatureHome', { loanApplication });
   };
 
+  const isEditable = loanStatus !== 'Approved';
+
   return (
     <>
       <HeaderComponent titleText="HomeLoan Gurantee1"
@@ -734,16 +659,10 @@ const HomeLoanGurantee = ({ route, navigation }) => {
         screenIcon="md-save"
         screenIconStyle={{ marginTop: 5 }}
       />
-
-      {/* <HeaderComponent titleText="Edit Home Screen"
-        onPress={handleGoBack}
-        onIconPress={handleUpdateRecordAndSendAnnotation}
-        screenIcon="md-save"
-        screenIconStyle={{ marginTop: 5 }}
-      /> */}
       <ScrollView>
         <View style={styles.container}>
           <View style={styles.wrapper}>
+          {/* <Text>Loan Status: {loanStatus}</Text> */}
             <TextInput
               style={[styles.textInputContainer, { color: "gray" }]}
               value={applicationnumber}
@@ -753,67 +672,75 @@ const HomeLoanGurantee = ({ route, navigation }) => {
               }}
               editable={false}
             />
-
             <TextInput
               style={[styles.textInputContainer, { color: "gray" }]}
               value={createdby}
               placeholder="Created By"
-              onChangeText={(text) => {
-                setcreatedby(text);
-              }}
+              onChangeText={(text) => {setcreatedby(text)}}
               editable={false}
             />
-
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
               value={guarantorfirstname}
               placeholder="First Name"
               onChangeText={(text) => {
                 setfirstname(text);
                 setIsfirstnameValid(text.trim() !== '');
-
-                // Update error message
                 setErrorMessages({
                   ...errorMessages,
                   guarantorFirstNameEdit: text.trim() !== '' ? '' : 'Enter First Name',
                 });
               }}
+              editable={isEditable}
             />
             {errorMessages.guarantorFirstNameEdit !== '' && <Text style={styles.errorText}>{errorMessages.guarantorFirstNameEdit}</Text>}
-
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
               value={guarantorlastname}
               placeholder="Last Name"
               onChangeText={(text) => {
                 setLastname(text);
                 setIsLastNameValid(text.trim() !== '')
-
                 setErrorMessages({
                   ...errorMessages,
                   guarantorLastNameEdit: text.trim() !== '' ? '' : 'Enter Last Name',
                 });
               }}
+              editable={isEditable}
             />
             {errorMessages.guarantorLastNameEdit !== '' && <Text style={styles.errorText}>{errorMessages.guarantorLastNameEdit}</Text>}
-
-            <LoanStatusPicker
-              onOptionChange={handleGenderOptionset}
-              title="Gender"
-              options={['Male', 'Female']}
-              initialOption={guarantorgender ? getGenderOptionsetStringFromNumericValue(guarantorgender) : ''}
-              style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
-            />
-
-            <ComponentDatePicker
+            {isEditable ? (
+              <LoanStatusPicker
+                onOptionChange={handleGenderOptionset}
+                title="Gender"
+                options={['Male', 'Female']}
+                initialOption={guarantorgender ? getGenderOptionsetStringFromNumericValue(guarantorgender) : ''}
+                style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
+              />
+            ) : (
+              <Text style={[styles.textInputContainer, { color: isEditable ? "black" : "gray", height: 45 }]}>
+                {getGenderOptionsetStringFromNumericValue(guarantorgender)}
+              </Text>
+            )}
+            {/* <ComponentDatePicker
               selectedDate={guarantordateofbirth}
               onDateChange={handleDateOfBirth}
               placeholder="Date of Birth"
               style={{ width: "100%", height: 45, marginTop: 5, marginLeft: 0 }}
-            />
+            /> */}
+            {isEditable ? (
+          <ComponentDatePicker
+            selectedDate={guarantordateofbirth}
+            onDateChange={handleDateOfBirth}
+            placeholder="Date of Birth"
+            style={{ width: "100%", height: 45, marginTop: 5, marginLeft: 0 }}
+          />
+        ) : (
+              <Text style={[styles.textInputContainer, { color: isEditable ? "black" : "gray", height: 45 }]}>
+                {guarantordateofbirth.toLocaleDateString()} 
+              </Text>
+        )}
             {errorMessages.guarantorDateOfBirthEdit !== '' && <Text style={styles.errorText}>{errorMessages.guarantorDateOfBirthEdit}</Text>}
-
-
             <TextInput
               style={[styles.textInputContainer, { color: "gray" }]}
               value={guarantorage.toString()}
@@ -821,74 +748,77 @@ const HomeLoanGurantee = ({ route, navigation }) => {
               onChangeText={(text) => setage(text)}
               editable={false}
             />
-
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
               value={guarantormobilenumber}
               placeholder="Mobile Number"
               onChangeText={handleMobileNumberChange}
+              editable={isEditable}
             />
             {errorMessages.guarantorMobileNumberEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.guarantorMobileNumberEdit}</Text>
             )}
-
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
               value={guarantoremail}
               placeholder="Email"
               onChangeText={handleEmailChange}
+              editable={isEditable}
             />
             {errorMessages.guarantorEmailEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.guarantorEmailEdit}</Text>
             )}
-
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
               value={guarantoraddress1}
               placeholder="Address Line 1"
               onChangeText={(text) => setAddress1(text)}
+              editable={isEditable}
             />
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
               value={guarantoraddress2}
               placeholder="Address Line 2"
               onChangeText={(text) => setAddress2(text)}
+              editable={isEditable}
             />
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
               value={guarantoraddress3}
               placeholder="Address Line 3"
               onChangeText={(text) => setAddress3(text)}
+              editable={isEditable}
             />
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
               value={guarantorcity}
               placeholder="City"
               onChangeText={(text) => setCity(text)}
+              editable={isEditable}
             />
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
               value={guarantorstate}
               placeholder="State"
               onChangeText={(text) => setState(text)}
+              editable={isEditable}
             />
-
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
               value={guarantoraadharnumber}
               placeholder="Aadharcard Number"
               onChangeText={handleAadharCardNumberChange}
+              editable={isEditable}
             />
             {errorMessages.guarantorAadharCardNumberEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.guarantorAadharCardNumberEdit}</Text>
             )}
-
-
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
               value={guarantorpannumber}
               placeholder="PAN Card Number"
               onChangeText={handlePancardNumberValid}
+              editable={isEditable}
             />
             {errorMessages.guarantorPanCardNumberEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.guarantorPanCardNumberEdit}</Text>
@@ -899,11 +829,8 @@ const HomeLoanGurantee = ({ route, navigation }) => {
                   title=" AadharCard"
                   imageContent={aadharcard}
                   setImageContent={setAadharcard}
-                // onViewImage={onViewImage}
                 />
               </View>
-
-
               <View style={{ marginVertical: 3 }}>
                 <CardImage
                   title=" PanCard"
@@ -928,15 +855,12 @@ const HomeLoanGurantee = ({ route, navigation }) => {
                 />
                 </View>
             </View>
-
             <Gurantee1AnnotationHome
               annotations={annotations}
               filteredAnnotations={filteredAnnotations}
               showImage={showImage}
               handleViewImages={handleViewImages}
             />
-
-            {/* <ButtonComponent title="Update" onPress={handleUpdateRecord} /> */}
           </View>
         </View>
       </ScrollView>
