@@ -523,7 +523,7 @@ const handleNavigation = () => {
                 <Text style={styles.dynamicDashboardButtonText}>Dynamic Dashboard</Text>
               </TouchableOpacity> */}
 
-              <View style={{ marginLeft: 0 }}>
+              <View style={{ marginLeft: 10 }}>
                 <TouchableOpacity
                   onPress={() => setShowAllLoans(!showAllLoans)}
                   style={styles.viewButton}

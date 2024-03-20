@@ -358,9 +358,9 @@ const ManagerDashboard = ({ navigation, route }) => {
 
   const statusCounts = {
     approved: filteredData.filter((item) => item.kf_status === 123950000).length,
-    draft: filteredData.filter((item) => item.kf_status === 123950002).length,
+    // draft: filteredData.filter((item) => item.kf_status === 123950002).length,
     pending: filteredData.filter((item) => item.kf_status === 123950001).length,
-    canceled: filteredData.filter((item) => item.kf_status === 123950003).length,
+    // canceled: filteredData.filter((item) => item.kf_status === 123950003).length,
     expired: filteredData.filter((item) => item.kf_status === 123950004).length,
   };
 
@@ -486,15 +486,15 @@ const ManagerDashboard = ({ navigation, route }) => {
                 <TouchableOpacity onPress={() => handleStatusClick(123950000)}>
                   <Text style={styles.statusText}>Approved: {statusCounts.approved}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleStatusClick(123950002)}>
+                {/* <TouchableOpacity onPress={() => handleStatusClick(123950002)}>
                   <Text style={styles.statusText}>Draft: {statusCounts.draft}</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
                 <TouchableOpacity onPress={() => handleStatusClick(123950001)}>
                   <Text style={styles.statusText}>Pending: {statusCounts.pending}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleStatusClick(123950003)}>
+                {/* <TouchableOpacity onPress={() => handleStatusClick(123950003)}>
                   <Text style={styles.statusText}>Canceled: {statusCounts.canceled}</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
                 <TouchableOpacity onPress={() => handleStatusClick(123950004)}>
                   <Text style={styles.statusText}>expired: {statusCounts.expired}</Text>
                 </TouchableOpacity>
@@ -505,14 +505,14 @@ const ManagerDashboard = ({ navigation, route }) => {
 
               <BarChart
                 data={{
-                  labels: ['Approved', 'Pending', 'Draft', 'Cancelled', 'expired'],
+                  labels: ['Approved', 'Pending', 'Rejected'],
                   datasets: [
                     {
                       data: [
                         statusCounts.approved,
                         statusCounts.pending,
-                        statusCounts.draft,
-                        statusCounts.canceled,
+                        // statusCounts.draft,
+                        // statusCounts.canceled,
                         statusCounts.expired,
                       ],
                     },
@@ -526,6 +526,7 @@ const ManagerDashboard = ({ navigation, route }) => {
                   backgroundGradientTo: '#fff',
                   color: (opacity = 1) => `rgba(255, 28, 53, ${opacity})`,
                   labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                  barPercentage: 1.5,
                 }}
                 bezier
                 style={{
@@ -698,8 +699,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   statusText: {
-    fontSize: 12,
+    fontSize: 14,
     color: "#007bff",
+    marginHorizontal: 20
   },
   iconButton: {
     marginHorizontal: 10,
