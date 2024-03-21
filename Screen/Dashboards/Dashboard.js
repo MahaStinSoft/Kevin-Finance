@@ -23,6 +23,7 @@ import NetInfo from '@react-native-community/netinfo';
 import axios from 'axios';
 import { BarChart } from 'react-native-chart-kit';
 import LogoutButton from '../../common/CustomDrawer';
+import querystring from 'querystring';
 
 import HomeLoanCard from '../card/HomeLoanCard';
 import PersonalLoanCard from '../card/PersonalLoanCard';
@@ -47,7 +48,13 @@ const DashboardScreen = ({ navigation, route }) => {
   const [lastMonthData, setLastMonthData] = useState([]);
   const [selectedLoanStatus, setSelectedLoanStatus] = useState(null);
   const [kf_adminname, setkf_adminname] = useState(null);
+
+  const [loanApplications, setLoanApplications] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const [loanApplicationsCount, setLoanApplicationsCount] = useState(0);
+  const [notificationsCount, setNotificationsCount] = useState(0);
     const [refresh, setRefresh] = useState(false);
+    const [sendApproval, setSendApproval] = useState(null);
 
   const [displayedHomeLoans, setDisplayedHomeLoans] = useState([]);
   const [displayedPersonalLoans, setDisplayedPersonalLoans] = useState([]);
@@ -390,6 +397,92 @@ const handleDynamicDashboard = () => {
 }
 }
 
+// notificaiton badge
+useEffect(() => {
+  fetchLoanApplications();
+  fetchNotifications();
+  // setRefresh(false);
+  }, 
+  // [refresh]
+  );
+
+
+const fetchLoanApplications = async () => {
+  try {
+    const tokenResponse = await axios.post(
+      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+      querystring.stringify({
+        grant_type: 'client_credentials',
+        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+        resource: 'https://org0f7e6203.crm5.dynamics.com',
+        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+      }),
+      {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      }
+    );
+
+    const accessToken = tokenResponse.data.access_token;
+
+    const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (response.data && response.data.value && Array.isArray(response.data.value)) {
+      // Filter loan applications where kf_sendapproval is equal to 1
+      const filteredApplications = response.data.value.filter(application => application.kf_sendapproval == 1);
+      setLoanApplications(filteredApplications);
+      setLoanApplicationsCount(filteredApplications.length);
+      setRefresh(!refresh);
+    } else {
+      console.error('Invalid loan applications response format:', response.data);
+    }
+  } catch (error) {
+    console.error('Error fetching loan applications:', error);
+  }
+};
+
+const fetchNotifications = async () => {
+  try {
+    const tokenResponse = await axios.post(
+      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+      querystring.stringify({
+        grant_type: 'client_credentials',
+        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+        resource: 'https://org0f7e6203.crm5.dynamics.com',
+        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+      }),
+      {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      }
+    );
+
+    const accessToken = tokenResponse.data.access_token;
+
+    const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (response.data && response.data.value && Array.isArray(response.data.value)) {
+      // Filter personal loan notifications where kf_sendapproval is equal to 1
+      const filteredNotifications = response.data.value.filter(notification => notification.kf_sendapproval == 1);
+      setNotifications(filteredNotifications);
+      setNotificationsCount(filteredNotifications.length); // Update count based on the fetched data
+      setRefresh(!refresh);
+    } else {
+      console.error('Invalid notifications response format:', response.data);
+    }
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+  }
+}; 
+
 const handleSettings = () => {
   navigation.navigate( "Setting");
 };
@@ -416,10 +509,47 @@ const handleNavigation = () => {
             </TouchableOpacity>
             <Text style={styles.text}>Kevin Small Finance</Text>
           
-          
-            <TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
-              <Ionicons name="notifications" size={25} color="#fff" />
-            </TouchableOpacity>
+   <TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
+  <Ionicons name="notifications" size={25} color="#fff" />
+  {(
+    loanApplications
+      .filter(
+        application =>
+          (sendApproval === null || application.kf_sendapproval === (sendApproval ? 1 : 0)) &&
+          authenticatedUser &&
+          application.kf_createdby === authenticatedUser.kf_adminname
+      )
+      .length +
+    notifications
+      .filter(
+        notification =>
+          authenticatedUser && notification.kf_createdby === authenticatedUser.kf_adminname
+      )
+      .length
+  ) > 0 && (
+    <View style={styles.badge}>
+      <Text style={styles.badgeText}>
+        {
+          loanApplications
+            .filter(
+              application =>
+                (sendApproval === null || application.kf_sendapproval === (sendApproval ? 1 : 0)) &&
+                authenticatedUser &&
+                application.kf_createdby === authenticatedUser.kf_adminname
+            )
+            .length +
+          notifications
+            .filter(
+              notification =>
+                authenticatedUser && notification.kf_createdby === authenticatedUser.kf_adminname
+            )
+            .length
+        }
+      </Text>
+    </View>
+  )}
+</TouchableOpacity>
+
           </View>
 
           <View style={styles.searchSection}>
@@ -478,7 +608,7 @@ const handleNavigation = () => {
                   <Text style={styles.statusText}>Canceled: {statusCounts.canceled}</Text>
                 </TouchableOpacity> */}
                 <TouchableOpacity onPress={() => handleStatusClick(123950004)}>
-                  <Text style={styles.statusText}>Rejected: {statusCounts.expired}</Text>
+                  <Text style={styles.statusText}>expired: {statusCounts.expired}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => handleStatusClick(null)}>
                   <Text style={styles.statusText}>All: {filteredData.length}</Text>
@@ -562,7 +692,7 @@ const handleNavigation = () => {
             )}
           </View> */}
 
-            <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10,  paddingHorizontal: 5 }}>
+            <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10 }}>
             {initialLoading ? (
                 <ActivityIndicator size="large" color="#0000ff" />
               ) : (
@@ -783,7 +913,26 @@ const styles = StyleSheet.create({
 },
 chart: {
   marginLeft: 10
-}
+},
+badge: {
+    position: 'absolute',
+    top: -7, // Adjust the position of the badge vertically
+    right: -7, // Adjust the position of the badge horizontally
+    backgroundColor: 'red',
+    borderRadius: 50,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1, // Ensure the badge is above the icon
+    borderWidth: 1, // Add border for better visibility
+    borderColor: '#fff', // White border color for better contrast
+  },
+  badgeText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 12, // Adjust font size for better visibility
+  },
 });
 
 export default DashboardScreen;

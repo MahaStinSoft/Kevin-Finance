@@ -1226,10 +1226,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     // justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 5,
+    padding: 12,
     borderBottomWidth: 1,
     borderBottomColor: 'gray',
-    marginHorizontal: 5,
     maxHeight: 100
   },
   column: {

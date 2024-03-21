@@ -31,8 +31,8 @@ const PersonalLoanCard = ({ personalLoan, onPress, onDelete }) => {
         />
       );
     } else {
-      const initials = personalLoan.kf_name && personalLoan.kf_lastname
-        ? `${personalLoan.kf_name[0]}${personalLoan.kf_lastname[0]}`
+      const initials = personalLoan.kf_firstname && personalLoan.kf_lastname
+        ? `${personalLoan.kf_firstname[0]}${personalLoan.kf_lastname[0]}`
         : '';
       return (
         <View style={[styles.cardImage, styles.placeholderImage]}>

@@ -581,6 +581,8 @@ const handleInterestRateChange = (text) => {
       emiSchedule: !kf_emischedule ? 'select a EMISchedule' : '',
       NoOfEMIs: !/^\d+$/.test(kf_numberofemi) ? 'Enter a No of EMI payment' : '',
       // emiCollectionDate: !kf_emicollectiondate ? 'select a EMI Collection Date' : ''
+      applicantImage: !kf_applicantimage.fileContent ? 'Applicant image is required.' : '',  
+
     };
     setErrorMessages(newErrorMessages);
     if (Object.values(newErrorMessages).some(message => message !== '')) {
@@ -884,11 +886,15 @@ const handleInterestRateChange = (text) => {
 
 <View style={{marginLeft: 20}}>
             <CardImage
-              title="Applicant"
+              title="Applicant Image"
               imageContent={kf_applicantimage}
               setImageContent={setkf_applicantimage}
             // onViewImage={onViewImage}
             />
+             {errorMessages.applicantImage !== '' && (
+            <Text style={styles.errorText}>{errorMessages.applicantImage}</Text>
+          )} 
+            
           </View>
 
           <ButtonComponent

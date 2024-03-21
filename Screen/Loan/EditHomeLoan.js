@@ -985,7 +985,7 @@ const EditHomeLoan = ({ route, navigation }) => {
      
       <ScrollView>
       
-        <View style={styles.Imagepart}>
+        {/* <View style={styles.Imagepart}>
           <View style={{ width: 100, height:100, left: 0, bottom: 5 }}>{renderImage()}</View>
           <View style={{ right: 25, top: 30 }}>
             <View style={styles.touch}>
@@ -1001,6 +1001,39 @@ const EditHomeLoan = ({ route, navigation }) => {
                 <Ionicons name="save" size={26} color="red" />
               </TouchableOpacity>
 
+            </View>
+          </View>
+        </View> */}
+
+<View style={styles.Imagepart}>
+          <View style={{ width: 100, height: 100, left: 0, bottom: 5 }}>{renderImage()}</View>
+          <View style={{ right: 25, top: 30 }}>
+            <View style={styles.touch}>
+              <TouchableOpacity
+                onPress={pickImage}
+                style={[styles.button, getStatusStringFromNumericValue(status) === 'Approved' && styles.disabledButton]} // Apply disabled style if status is 'Approved'
+                disabled={getStatusStringFromNumericValue(status) === 'Approved'} // Disable button if status is 'Approved'
+              >
+                <Text style={styles.buttonText}>Choose File</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={takePictureWithCamera}
+                style={[styles.button, getStatusStringFromNumericValue(status) === 'Approved' && styles.disabledButton]} // Apply disabled style if status is 'Approved'
+                disabled={getStatusStringFromNumericValue(status) === 'Approved'} // Disable button if status is 'Approved'
+              >
+                <Text style={styles.buttonText}>Camera</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={handleUpdateField}
+                style={[{ marginLeft: 10 },
+                getStatusStringFromNumericValue(status) === 'Approved' && styles.disabledButton1
+                ]}
+                disabled={getStatusStringFromNumericValue(status) === 'Approved'} // Disable button if status is 'Approved'
+              >
+                <Ionicons name="save" size={26} color={getStatusStringFromNumericValue(status) === 'Approved' ? 'gray' : 'red'} />
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -1368,40 +1401,42 @@ const EditHomeLoan = ({ route, navigation }) => {
                 />
               )}
             </View> */}
-
-            <View style={styles.indentityImage}>
-              <View style={{ marginVertical: 3 }}>
-                <CardImage
-                  title="AadharCard"
-                  imageContent={aadharcard}
-                  setImageContent={setAadharcard}
-                // onViewImage={onViewImage}
-                />
-              </View>
-              <View style={{ marginVertical: 3 }}>
-                <CardImage
-                  title="PanCard"
-                  imageContent={pancard}
-                  setImageContent={setPancard}
-                />
-              </View>
-              <View style={{ marginVertical: 3 }}>
-                {/* <CardImage
+            
+            {getStatusStringFromNumericValue(status) !== 'Approved' && (
+              <View style={styles.indentityImage}>
+                <View style={{ marginVertical: 3 }}>
+                  <CardImage
+                    title="AadharCard"
+                    imageContent={aadharcard}
+                    setImageContent={setAadharcard}
+                  // onViewImage={onViewImage}
+                  />
+                </View>
+                <View style={{ marginVertical: 3 }}>
+                  <CardImage
+                    title="PanCard"
+                    imageContent={pancard}
+                    setImageContent={setPancard}
+                  />
+                </View>
+                <View style={{ marginVertical: 3 }}>
+                  {/* <CardImage
                   title="Applicant"
                   imageContent={applicantImage}
                   setImageContent={setapplicantImage}
                 /> */}
-              </View>
-              <View style={{ marginBottom: 15 }}>
-                <CardImageSignature
-                  title="Signature"
-                  imageContent={signatureImage}
-                  pickImage={handleNavigateToSignatureScreen}
-                  sendAnnotation={sendAnnotation3}
-                />
+                </View>
+                <View style={{ marginBottom: 15 }}>
+                  <CardImageSignature
+                    title="Signature"
+                    imageContent={signatureImage}
+                    pickImage={handleNavigateToSignatureScreen}
+                    sendAnnotation={sendAnnotation3}
+                  />
 
+                </View>
               </View>
-            </View>
+            )}
           </View>
 
           <View style={{ width: "100%", paddingHorizontal: 20 }}>
@@ -1495,6 +1530,9 @@ const styles = StyleSheet.create({
     // borderRadius: 40,
     width: 200,
     height: 200,
+    marginTop: 20,
+    marginLeft: 15,
+    borderRadius: 50
   },
   profileContainer: {
     flexDirection: 'row',
@@ -1544,6 +1582,24 @@ const styles = StyleSheet.create({
     color: 'white',
     padding: 5,
     fontWeight: "bold"
+  },
+  disabledButton: {
+    marginLeft: 10, 
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    backgroundColor: 'red',
+    borderRadius: 50,
+    width: "33%",
+    opacity: 0.5, 
+  },
+  disabledButton1: {
+    marginLeft: 10, 
+    // flexDirection: 'row',
+    // justifyContent: 'space-evenly',
+    // backgroundColor: 'red',
+    borderRadius: 50,
+    width: "10%",
+    opacity: 0.5, 
   },
 });
 

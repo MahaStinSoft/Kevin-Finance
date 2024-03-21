@@ -131,9 +131,9 @@ const HomeLoanDetailsScreen = ({ route }) => {
     // Example navigation code from the previous screen
     navigation.navigate('HomeLoanGurantee2', {
       loanApplication,
+      loanStatus: getLoanStatus(),
       onUpdateSuccess: updatedLoanApplication => setLoanApplication(updatedLoanApplication),
     });
-    // Pass any necessary parameters if needed
   };
 
   const handleGoToAmortizationScreen = () => {

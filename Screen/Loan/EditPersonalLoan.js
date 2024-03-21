@@ -355,7 +355,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
 
           });
         }
-        Alert.alert('Updated the field Successfully.', '', [
+        Alert.alert('Applicant Image Updated Successfully.', '', [
           {
             text: 'OK',
           },
@@ -1009,6 +1009,24 @@ const EditPersonalLoan = ({ route, navigation }) => {
   const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
 
 
+  // const renderImage = () => {
+  //   if (personalLoan.kf_applicantimage) {
+  //     return (
+  //       <Image
+  //         source={{ uri: `data:image/png;base64,${personalLoan.kf_applicantimage}` }}
+  //         style={{width:100, height: 100, borderRadius: 50, objectFit:"fill", marginTop: 15, marginLeft: 15 }}
+  //       />
+  //     );
+  //   } else {
+  //     const initials = personalLoan ? `${personalLoan.kf_firstname[0]}${personalLoan.kf_lastname[0]}` : '';
+  //     return (
+  //       <View style={[styles.cardImage,{ backgroundColor:"gray",width: "100%", height: "100%" } ]}>
+  //         <Text style={styles.placeholderText}>{initials}</Text>
+  //       </View>
+  //     );
+  //   }
+  // };
+
   const renderImage = () => {
     if (personalLoan.kf_applicantimage) {
       return (
@@ -1018,7 +1036,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
         />
       );
     } else {
-      const initials = personalLoan ? `${personalLoan.kf_name[0]}${personalLoan.kf_lastname[0]}` : '';
+      const initials = personalLoan ? `${personalLoan.kf_firstname[0]}${personalLoan.kf_lastname[0]}` : '';
       return (
         <View style={[styles.cardImage,{ backgroundColor:"gray",width: "100%", height: "100%" } ]}>
           <Text style={styles.placeholderText}>{initials}</Text>
@@ -1026,6 +1044,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
       );
     }
   };
+  
 
   const takePictureWithCamera = async () => {
     try {
@@ -1089,25 +1108,40 @@ const EditPersonalLoan = ({ route, navigation }) => {
       />
 
       <ScrollView>
-      <View style={styles.Imagepart}>
-          <View style={{ width: 100, height:100, left: 0, bottom: 5 }}>{renderImage()}</View>
+     
+        <View style={styles.Imagepart}>
+          <View style={{ width: 100, height: 100, left: 0, bottom: 5 }}>{renderImage()}</View>
           <View style={{ right: 25, top: 30 }}>
             <View style={styles.touch}>
-              <TouchableOpacity onPress={pickImage} style={styles.button}>
+              <TouchableOpacity
+                onPress={pickImage}
+                style={[styles.button, getStatusStringFromNumericValue(status) === 'Approved' && styles.disabledButton]} // Apply disabled style if status is 'Approved'
+                disabled={getStatusStringFromNumericValue(status) === 'Approved'} // Disable button if status is 'Approved'
+              >
                 <Text style={styles.buttonText}>Choose File</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={takePictureWithCamera} style={styles.button}>
+              <TouchableOpacity
+                onPress={takePictureWithCamera}
+                style={[styles.button, getStatusStringFromNumericValue(status) === 'Approved' && styles.disabledButton]} // Apply disabled style if status is 'Approved'
+                disabled={getStatusStringFromNumericValue(status) === 'Approved'} // Disable button if status is 'Approved'
+              >
                 <Text style={styles.buttonText}>Camera</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={handleUpdateField} style={{marginLeft:10}} >
-                <Ionicons name="save" size={26} color="red" />
+              <TouchableOpacity
+                onPress={handleUpdateField}
+                style={[{ marginLeft: 10 },
+                getStatusStringFromNumericValue(status) === 'Approved' && styles.disabledButton1
+                ]}
+                disabled={getStatusStringFromNumericValue(status) === 'Approved'} // Disable button if status is 'Approved'
+              >
+                <Ionicons name="save" size={26} color={getStatusStringFromNumericValue(status) === 'Approved' ? 'gray' : 'red'} />
               </TouchableOpacity>
-
             </View>
           </View>
         </View>
+
       <View style={styles.detailContainer}>
           <View style={styles.wrapper}>
             <LoanStatusPicker
@@ -1458,46 +1492,48 @@ const EditPersonalLoan = ({ route, navigation }) => {
                 style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
               />
             )} */}
+            {getStatusStringFromNumericValue(status) !== 'Approved' && (
+              <View style={styles.indentityImage}>
+                <View style={{ marginVertical: 3 }}>
+                  <CardImage
+                    title="AadharCard"
+                    imageContent={aadharcard}
+                    setImageContent={setAadharcard}
+                  // onViewImage={onViewImage}
+                  />
+                </View>
 
-            <View style={styles.indentityImage}>
-              <View style={{ marginVertical: 3 }}>
-                <CardImage
-                  title="AadharCard"
-                  imageContent={aadharcard}
-                  setImageContent={setAadharcard}
-                // onViewImage={onViewImage}
-                />
-              </View>
-              <View style={{ marginVertical: 3 }}>
-                <CardImage
-                  title="PanCard"
-                  imageContent={pancard}
-                  setImageContent={setPancard}
-                />
-              </View>
-              <View style={{ marginVertical: 3 }}>
-                {/* <CardImage
+                <View style={{ marginVertical: 3 }}>
+                  <CardImage
+                    title="PanCard"
+                    imageContent={pancard}
+                    setImageContent={setPancard}
+                  />
+                </View>
+                <View style={{ marginVertical: 3 }}>
+                  {/* <CardImage
                   title="Applicant"
                   imageContent={applicantImage}
                   setImageContent={setapplicantImage}
                 /> */}
-              </View>
-              <View style={{ marginBottom: 15 }}>
-                {/* <CardImageSignature
+                </View>
+                <View style={{ marginBottom: 15 }}>
+                  {/* <CardImageSignature
                   title="Draw Signature"
                   imageContent={signatureFile}
                   pickImage={handleNavigateToSignatureScreen}
                 /> */}
 
-                <CardImageSignature
-                  title="Signature"
-                  imageContent={signatureFile}
-                  pickImage={handleNavigateToSignatureScreen}
-                  sendAnnotation={sendAnnotation3}
-                />
+                  <CardImageSignature
+                    title="Signature"
+                    imageContent={signatureFile}
+                    pickImage={handleNavigateToSignatureScreen}
+                    sendAnnotation={sendAnnotation3}
+                  />
 
+                </View>
               </View>
-            </View>
+            )}
           </View>
           <View style={{ width: "100%", paddingHorizontal: 20 }}>
             <RenderAnnotation
@@ -1590,6 +1626,9 @@ const styles = StyleSheet.create({
     // borderRadius: 40,
     width: 200,
     height: 200,
+    marginTop: 20,
+    marginLeft: 15,
+    borderRadius: 50
   },
   profileContainer: {
     flexDirection: 'row',
@@ -1639,6 +1678,24 @@ const styles = StyleSheet.create({
     color: 'white',
     padding: 5,
     fontWeight: "bold"
+  },
+  disabledButton: {
+    marginLeft: 10, 
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    backgroundColor: 'red',
+    borderRadius: 50,
+    width: "33%",
+    opacity: 0.5, 
+  },
+  disabledButton1: {
+    marginLeft: 10, 
+    // flexDirection: 'row',
+    // justifyContent: 'space-evenly',
+    // backgroundColor: 'red',
+    borderRadius: 50,
+    width: "10%",
+    opacity: 0.5, 
   },
 });
 

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, Modal, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, Button, Modal,TouchableOpacity, TextInput } from 'react-native';
 import axios from 'axios';
 import { ScrollView } from 'react-native-gesture-handler';
 import querystring from 'querystring';
 import moment from 'moment'; // Import moment.js for date formatting
-import { schedulePushNotification } from '../common/notificationUtils';
+// import { schedulePushNotification } from '../common/notificationUtils';
 import PushNotification from 'react-native-push-notification';
+import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'react-native';
 
 const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
   const [loanApplications, setLoanApplications] = useState([]);
@@ -16,33 +18,21 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
   const [rejectComment, setRejectComment] = useState('');
   const [selectedApplicationId, setSelectedApplicationId] = useState(null);
   const [selectedPersonalLoanId, setSelectedPersonalLoanId] = useState(null);
+  const totalRecords = loanApplications.length + notifications.length;
+  const [refresh, setRefresh] = useState(false);
   const { kf_adminname } = route.params;
 
 
   useEffect(() => {
+    // Fetch loan applications and notifications whenever refresh state changes
     fetchLoanApplications();
     fetchNotifications();
-  }, []);
+    
+    // Reset refresh state after re-render
+    setRefresh(false);
+  }, [refresh]);
+  
 
-  useEffect(() => {
-    configureNotifications();
-  }, []);
-
-  const configureNotifications = () => {
-    PushNotification.configure({
-      // Configure notification settings
-      onNotification: function (notification) {
-        console.log('Notification received:', notification);
-        // Handle notification when received in the background
-      },
-      permissions: {
-        alert: true,
-        badge: true,
-        sound: true,
-      },
-      popInitialNotification: true,
-    });
-  };
 
   const fetchLoanApplications = async () => {
     try {
@@ -75,7 +65,7 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
 
         if (loanApplications.length < filteredApplications.length) {
           const newApplication = filteredApplications[filteredApplications.length - 1]; // Assuming the last fetched application is the new one
-          schedulePushNotification(newApplication.kf_applicationnumber, newApplication.kf_name, newApplication.kf_lastname, newApplication.kf_amount, newApplication.kf_createdby); // Schedule push notification with relevant data
+          // schedulePushNotification(newApplication.kf_applicationnumber, newApplication.kf_name, newApplication.kf_lastname, newApplication.kf_amount, newApplication.kf_createdby); // Schedule push notification with relevant data
         }
       } else {
         console.error('Invalid loan applications response format:', response.data);
@@ -117,7 +107,7 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
         // Schedule push notification if new notifications are fetched
         if (notifications.length < filteredNotifications.length) {
           const newNotification = filteredNotifications[filteredNotifications.length - 1]; // Assuming the last fetched notification is the new one
-          schedulePushNotification(newNotification.kf_applicationnumber, newNotification.kf_firstname, newNotification.kf_lastname, newNotification.kf_amount, newNotification.kf_createdby); // Schedule push notification with relevant data
+          // schedulePushNotification(newNotification.kf_applicationnumber, newNotification.kf_firstname, newNotification.kf_lastname, newNotification.kf_amount, newNotification.kf_createdby); // Schedule push notification with relevant data
         }
       } else {
         console.error('Invalid notifications response format:', response.data);
@@ -334,7 +324,7 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
     123950001: 'Pending Approval',
     123950002: 'Draft',
     123950003: 'Cancelled',
-    123950004: 'Rejected',
+    123950004: 'Expired',
   };
 
   const handleSendApproval = (selectedOption) => {
@@ -351,33 +341,167 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
     }
     setSendApproval(booleanValue);
   };
+  // personal loan
 
-  const handleViewPersonalLoan = (personalLoan) => {
-    navigation.navigate('PersonalLoanDetailsScreen', { personalLoan }); // Pass Personal Loan data
+  const handleViewPersonalLoan = async (personalLoan) => {
+    try {
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        querystring.stringify({
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        }),
+        {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        }
+      );
+
+      const accessToken = tokenResponse.data.access_token;
+      // Update kf_markasread field in CRM
+      await updateKfMarkAsRead(personalLoan.kf_personalloanid);
+      // Navigate to PersonalLoanDetailsScreen
+      navigation.navigate('PersonalLoanDetailsScreen', { personalLoan });
+      setRefresh(true);
+    } catch (error) {
+      console.error('Error updating kf_markasread:', error);
+    }
   };
+  
+  // Update handleViewHomeLoan function
+  const handleViewHomeLoan = async (loanApplication) => {
+    try {
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        querystring.stringify({
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        }),
+        {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        }
+      );
 
-  const handleViewHomeLoan = (loanApplication) => {
-    navigation.navigate('HomeLoanDetailsScreen', { loanApplication }); // Pass Home Loan application data
+      const accessToken = tokenResponse.data.access_token;
+      // Update kf_markasread field in CRM
+      await updateKfMarkAsRead(loanApplication.kf_loanapplicationid);
+      // Navigate to HomeLoanDetailsScreen
+      navigation.navigate('HomeLoanDetailsScreen', { loanApplication });
+      setRefresh(true);
+    } catch (error) {
+      console.error('Error updating kf_markasread:', error);
+    }
   };
+  
+  // Function to update kf_markasread field in CRM
+  const updateKfMarkAsRead = async (recordId) => {
+    try {
+      // Send a request to update kf_markasread field in CRM
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        querystring.stringify({
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        }),
+        {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        }
+      );
+  
+      const accessToken = tokenResponse.data.access_token;
+      await axios.patch(`https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans(${recordId})`, {
+        kf_markasread: true, // Assuming true represents read status
+      }, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
+      await axios.patch(`https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications(${recordId})`, {
+        kf_markasread: true, // Assuming true represents read status
+      }, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+    } catch (error) {
+      console.error('Error updating kf_markasread:', error);
+    }
+  };
+  
   // Function to format date and time
   const formatDateTime = (dateTime) => {
     return moment(dateTime).format('MMM DD, YYYY h:mm A'); // Example format: "Mar 05, 2024 11:12 AM"
   };
 
+  const handleSettings = () => {
+    navigation.navigate( "Setting");
+  };
+  const handleNavigation = () => {
+    navigation.navigate("Notification", { kf_adminname });
+  };
+
   return (
+    <View>
+        <View style={styles.navBar}>
+            {/* <TouchableOpacity style={styles.iconButton} onPress={() => navigation.openDrawer()}>
+              <Ionicons name="list-sharp" size={25} color="#fff" />
+            </TouchableOpacity> */}
+            <TouchableOpacity style={styles.iconButton} onPress={handleSettings}>
+              <Ionicons name="list-sharp" size={25} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.text}>Kevin Small Finance</Text>
+          
+          
+            <TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
+  <View> 
+    <Ionicons name="notifications" size={25} color="#fff" />
+    {totalRecords > 0 && ( 
+      <View style={styles.badgeContainer}>
+        <Text style={styles.badgeText}>{totalRecords}</Text>
+      </View>
+    )}
+  </View>
+</TouchableOpacity>
+            </View>
+   
     <ScrollView>
       <View style={styles.container}>
-        <Text style={styles.header}>Loan Applications</Text>
-        {loanApplications
-          .filter(application => sendApproval === null || application.kf_sendapproval === (sendApproval ? 1 : 0))
-          .map((application, index) => (
-            <View key={index} style={styles.itemContainer}>
+        {/* <Text style={styles.header}>Loan Applications</Text> */}
+        {loanApplications.map((application, index) => (
+            <View
+              key={index}
+              style={[
+                styles.itemContainer,
+                application.kf_markasread ? styles.readItemContainer : styles.unreadItemContainer
+              ]}
+            >
               <Text>Application Number: {application.kf_applicationnumber}</Text>
               <Text>Created By: {application.kf_createdby}</Text>
               <Text>Admin Name: {kf_adminname}</Text>
               <Text>Name: {application.kf_name} {application.kf_lastname}</Text>
               {/* Display the status name */}
+              <View style={styles.readIndicatorContainer}>
+  {application.kf_markasread ? (
+    <Image
+    source={require('../assets/read_message.png')}
+    style={styles.twitterImage1}
+  />
+  ) : (
+    <Image
+      source={require('../assets/unread_message.png')}
+      style={styles.twitterImage}
+    />
+  )}
+</View>
               <Text>Status: {statusNames[application.kf_status]}</Text>
               {/* Buttons for actions */}
               <Text>Created At: {formatDateTime(application.created_at)}</Text>
@@ -415,12 +539,31 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
 
         <Text style={styles.header}>Personal Loan Notifications</Text>
         {notifications.map((notification, index) => (
-          <View key={index} style={styles.itemContainer}>
+            <View
+              key={index}
+              style={[
+                styles.itemContainer,
+                notification.kf_markasread ? styles.readItemContainer : styles.unreadItemContainer
+              ]}
+            >
             <Text>Application Number: {notification.kf_applicationnumber}</Text>
             <Text>Admin Name: {kf_adminname}</Text>
             <Text>Created By: {notification.kf_createdby}</Text>
             <Text>Name: {notification.kf_firstname} {notification.kf_lastname}</Text>
             {/* Display the status name */}
+            <View style={styles.readIndicatorContainer}>
+  {notification.kf_markasread ? (
+     <Image
+     source={require('../assets/read_message.png')}
+     style={styles.twitterImage1}
+   />
+  ) : (
+    <Image
+      source={require('../assets/unread_message.png')}
+      style={styles.twitterImage}
+    />
+  )}
+</View>
             <Text>Status: {statusNames[notification.kf_status]}</Text>
             {/* Buttons for actions */}
             <Text>Created At: {formatDateTime(notification.created_at)}</Text>
@@ -456,11 +599,13 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
         ))}
       </View>
     </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    marginTop:35,
     flex: 1,
     padding: 20,
   },
@@ -502,7 +647,81 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginVertical: 10,
+    boxShadow: 'none',
   },
+  navBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    padding: 10,
+    backgroundColor: 'rgba(255, 28, 53, 255)',
+    position: 'absolute',
+    top: 0,
+    zIndex: 10,
+  },
+  text: {
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "bold"
+  },
+  iconButton: {
+    marginHorizontal: 10,
+  },
+  badgeContainer: {
+    position: 'absolute',
+    top: -7, // Adjust the position of the badge vertically
+    right: -7, // Adjust the position of the badge horizontally
+    backgroundColor: 'red',
+    borderRadius: 50,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1, // Ensure the badge is above the icon
+    borderWidth: 1, // Add border for better visibility
+    borderColor: '#fff', // White border color for better contrast
+  },
+  badgeText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 12, // Adjust font size for better visibility
+  },
+  unreadItemContainer: {
+    borderWidth: 1,
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+    opacity: 0.7,
+    backgroundColor:'#c2e7ff',
+  },
+  twitterImage: {
+    width: 28,
+    height: 28,
+    position: 'absolute',
+    top: -55,
+    right: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  twitterImage1: {
+    width: 30,
+    height: 30,
+    position: 'absolute',
+    top: -55,
+    right: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  readItemContainer: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+    backgroundColor:'rgba(243,242,241,255)'
+  },
+  
 });
 
 export default Notification;

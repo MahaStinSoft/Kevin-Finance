@@ -143,6 +143,7 @@ const PersonalLoanDetailsScreen = ({ route }) => {
     // Example navigation code from the previous screen
     navigation.navigate('PersonalLoanGurantee', {
       personalLoan,
+      loanStatus: getLoanStatus(),
       onUpdateSuccess: updatedpersonalLoan => setpersonalLoan(updatedpersonalLoan),
     });
     // Pass any necessary parameters if needed
@@ -152,6 +153,7 @@ const PersonalLoanDetailsScreen = ({ route }) => {
     // Example navigation code from the previous screen
     navigation.navigate('PersonalLoanGurantee2', {
       personalLoan,
+      loanStatus: getLoanStatus(),
       onUpdateSuccess: updatedpersonalLoan => setpersonalLoan(updatedpersonalLoan),
     });
     // Pass any necessary parameters if needed

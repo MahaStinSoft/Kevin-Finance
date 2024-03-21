@@ -719,7 +719,7 @@ const HomeLoanGurantee = ({ route, navigation }) => {
               />
             ) : (
               <Text style={[styles.textInputContainer, { color: isEditable ? "black" : "gray", height: 45 }]}>
-                {getGenderOptionsetStringFromNumericValue(guarantorgender)}
+                {guarantorgender ? getGenderOptionsetStringFromNumericValue(guarantorgender) : ''}
               </Text>
             )}
             {/* <ComponentDatePicker
@@ -737,7 +737,7 @@ const HomeLoanGurantee = ({ route, navigation }) => {
           />
         ) : (
               <Text style={[styles.textInputContainer, { color: isEditable ? "black" : "gray", height: 45 }]}>
-                {guarantordateofbirth.toLocaleDateString()} 
+                {guarantordateofbirth ? guarantordateofbirth.toLocaleDateString(): "Date of Birth"} 
               </Text>
         )}
             {errorMessages.guarantorDateOfBirthEdit !== '' && <Text style={styles.errorText}>{errorMessages.guarantorDateOfBirthEdit}</Text>}
@@ -823,6 +823,7 @@ const HomeLoanGurantee = ({ route, navigation }) => {
             {errorMessages.guarantorPanCardNumberEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.guarantorPanCardNumberEdit}</Text>
             )}
+            {isEditable && (
             <View style={{ backgroundColor: "white", marginTop: 15 }}>
               <View style={{ marginVertical: 3 }}>
                 <CardImage
@@ -855,6 +856,7 @@ const HomeLoanGurantee = ({ route, navigation }) => {
                 />
                 </View>
             </View>
+            )}
             <Gurantee1AnnotationHome
               annotations={annotations}
               filteredAnnotations={filteredAnnotations}

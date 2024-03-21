@@ -51,6 +51,7 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
   const [recordId, setRecordId] = useState(personalLoan.kf_personalloanid);
 
   const { signatureFile } = route.params;
+  const { loanStatus } = route.params;
   console.log('signature',signatureFile);
 
   const [errorMessages, setErrorMessages] = useState({
@@ -734,6 +735,8 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
     navigation.navigate('Gurantee1SignaturePersonal', { personalLoan });
   };
 
+  const isEditable = loanStatus !== 'Approved';
+
   return (
     <>
       <HeaderComponent
@@ -769,7 +772,7 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
             />
 
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
               value={guarantorfirstname}
               placeholder="First Name"
               onChangeText={(text) => {
@@ -782,11 +785,12 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
                   guarantorFirstNameEdit: text.trim() !== '' ? '' : 'Enter First Name',
                 });
               }}
+              editable={isEditable}
             />
             {errorMessages.guarantorFirstNameEdit !== '' && <Text style={styles.errorText}>{errorMessages.guarantorFirstNameEdit}</Text>}
 
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
               value={guarantorlastname}
               placeholder="Last Name"
               onChangeText={(text) => {
@@ -798,10 +802,11 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
                   guarantorLastNameEdit: text.trim() !== '' ? '' : 'Enter Last Name',
                 });
               }}
+              editable={isEditable}
             />
             {errorMessages.guarantorLastNameEdit !== '' && <Text style={styles.errorText}>{errorMessages.guarantorLastNameEdit}</Text>}
 
-
+{isEditable ? (
             <LoanStatusPicker
               onOptionChange={handleGenderOptionset}
               title="Gender"
@@ -809,18 +814,28 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
               initialOption={guarantorgender ? getGenderOptionsetStringFromNumericValue(guarantorgender) : ''}
               style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
             />
-
+            ) : (
+              <Text style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}>
+                {guarantorgender ? getGenderOptionsetStringFromNumericValue(guarantorgender) : ''}
+              </Text>
+            )}
+            {isEditable ? (
             <ComponentDatePicker
               selectedDate={guarantordateofbirth}
               onDateChange={handleDateOfBirth}
               placeholder="Date of Birth"
               style={{ width: "100%", height: 45, marginTop: 5, marginLeft: 0 }}
             />
+            ) : (
+              <Text style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}>
+                {guarantordateofbirth ? guarantordateofbirth.toLocaleDateString() : "Date of Birth"}
+              </Text>
+            )}
             {errorMessages.guarantorDateOfBirthEdit !== '' && <Text style={styles.errorText}>{errorMessages.guarantorDateOfBirthEdit}</Text>}
 
 
             <TextInput
-              style={[styles.textInputContainer, { color: "gray" }]}
+              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
               value={guarantorage.toString()}
               placeholder="Age"
               onChangeText={(text) => setage(text)}
@@ -828,60 +843,68 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
             />
 
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
               value={guarantormobilenumber}
               placeholder="Mobile Number"
               onChangeText={handleMobileNumberChange}
+              editable={isEditable}
             />
             {errorMessages.guarantorMobileNumberEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.guarantorMobileNumberEdit}</Text>
             )}
 
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
               value={guarantoremail}
               placeholder="Email"
               onChangeText={handleEmailChange}
+              editable={isEditable}
             />
             {errorMessages.guarantorEmailEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.guarantorEmailEdit}</Text>
             )}
 
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
               value={guarantoraddress1}
               placeholder="Address Line 1"
               onChangeText={(text) => setAddress1(text)}
+              editable={isEditable}
             />
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
               value={guarantoraddress2}
               placeholder="Address Line 2"
               onChangeText={(text) => setAddress2(text)}
+              editable={isEditable}
             />
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
               value={guarantoraddress3}
               placeholder="Address Line 3"
               onChangeText={(text) => setAddress3(text)}
+              editable={isEditable}
             />
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
               value={guarantorcity}
               placeholder="City"
               onChangeText={(text) => setCity(text)}
+              editable={isEditable}
             />
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
               value={guarantorstate}
               placeholder="State"
               onChangeText={(text) => setState(text)}
+              editable={isEditable}
             />
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
               value={guarantoraadharnumber}
               placeholder="Aadharcard Number"
               onChangeText={handleAadharCardNumberChange}
+              editable={isEditable}
             />
             {errorMessages.guarantorAadharCardNumberEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.guarantorAadharCardNumberEdit}</Text>
@@ -889,15 +912,16 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
 
 
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
               value={guarantorpannumber}
               placeholder="PAN Card Number"
               onChangeText={handlePancardNumberValid}
+              editable={isEditable}
             />
             {errorMessages.guarantorPanCardNumberEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.guarantorPanCardNumberEdit}</Text>
             )}
-
+{isEditable && (
             <View style={{ backgroundColor: "white", flex: 1, width: "100%", marginTop: 10 }}>
               <View style={{ marginVertical: 3 }}>
                 <CardImage
@@ -933,7 +957,7 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
                 />
                 </View>
             </View>
-
+)}
             <Gurantee1AnnotationHome
               annotations={annotations}
               filteredAnnotations={filteredAnnotations}
