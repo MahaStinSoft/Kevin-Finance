@@ -494,7 +494,8 @@ const AmortizationScreenHome = ({ route }) => {
     amortizationSchedule: [],
   });
 
-  const { isPaid, NoOfEMIsPaid } = route.params;
+  // const { isPaid, NoOfEMIsPaid } = route.params;
+  const { receivedDate } = route.params; 
   const [isAmortizationLoaded, setIsAmortizationLoaded] = useState(false);
 
   const [kf_emicollectiondate, setkf_emicollectiondate] = useState(route.params.kf_emicollectiondate);
@@ -984,6 +985,7 @@ const AmortizationScreenHome = ({ route }) => {
     <View style={styles.container}>
       <HeaderComponent titleText="HomeLoan EMI Summary" onPress={handleGoBackHomedetails} />
       <ScrollView>
+        <Text>HII{receivedDate}</Text>
         <Text style={[styles.amortizationTitle, { marginTop: 10 }]}>EMI Details</Text>
         <View style={{ paddingHorizontal: 15, marginBottom: 20 }}>
 

@@ -1097,6 +1097,12 @@ const EditPersonalLoan = ({ route, navigation }) => {
     }
   };
 
+  const isValidInput = (text) => {
+    // Regular expression to allow only alphabets and spaces
+    const onlyAlphabets = /^[a-zA-Z\s]*$/;
+    return onlyAlphabets.test(text);
+  };
+
   return (
     <View style={styles.container}>
       <HeaderComponent
@@ -1181,6 +1187,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
               value={firstname}
               placeholder="First Name"
               onChangeText={(text) => {
+                if (isValidInput(text) || text === '') { // Call isValidInput function
+
                 setfirstname(text);
                 setIsfirstnameValid(text.trim() !== '');
 
@@ -1189,6 +1197,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
                   ...errorMessages,
                   firstNameEdit: text.trim() !== '' ? '' : 'Enter First Name',
                 });
+              }
               }}
               editable={getStatusStringFromNumericValue(status) !== 'Approved'} 
             />
@@ -1202,6 +1211,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
               value={lastname}
               placeholder="Last Name"
               onChangeText={(text) => {
+                if (isValidInput(text) || text === '') { // Call isValidInput function
+
                 setLastname(text);
                 setIsLastNameValid(text.trim() !== '')
 
@@ -1209,6 +1220,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
                   ...errorMessages,
                   lastNameEdit: text.trim() !== '' ? '' : 'Enter Last Name',
                 });
+              }
               }}
               editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />

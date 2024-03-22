@@ -53,7 +53,7 @@ const ManagerDashboard = ({ navigation, route }) => {
   const [notifications, setNotifications] = useState([]);
   const totalRecords = loanApplications.length + notifications.length;
 
-  const [refresh, setRefresh] = useState(false);
+  // const [refresh, setRefresh] = useState(false);
 
   const [displayedHomeLoans, setDisplayedHomeLoans] = useState([]);
   const [displayedPersonalLoans, setDisplayedPersonalLoans] = useState([]);
@@ -402,7 +402,7 @@ const ManagerDashboard = ({ navigation, route }) => {
   };
   const handleRefresh = () => {
     // This function will be called when you want to refresh the page
-    setRefresh(!refresh);
+    // setRefresh(!refresh);
   };
 
   const handleDynamicDashboard = () => {
@@ -413,16 +413,10 @@ const ManagerDashboard = ({ navigation, route }) => {
     }
   }
 
-
-// Notifications Badges
-
-useEffect(() => {
-  fetchLoanApplications();
-  fetchNotifications();
-  setRefresh(false);
-  }, [refresh]);
-
-
+  useEffect(() => {
+    fetchLoanApplications();
+    fetchNotifications();
+  }, []);
 
 const fetchLoanApplications = async () => {
   try {
@@ -452,7 +446,7 @@ const fetchLoanApplications = async () => {
       // Filter loan applications where kf_sendapproval is equal to 1
       const filteredApplications = response.data.value.filter(application => application.kf_sendapproval == 1);
       setLoanApplications(filteredApplications);
-      setRefresh(true);
+      // setRefresh(true);
 
       if (loanApplications.length < filteredApplications.length) {
         const newApplication = filteredApplications[filteredApplications.length - 1]; // Assuming the last fetched application is the new one
@@ -494,7 +488,7 @@ const fetchNotifications = async () => {
       // Filter personal loan notifications where kf_sendapproval is equal to 1
       const filteredNotifications = response.data.value.filter(notification => notification.kf_sendapproval == 1);
       setNotifications(filteredNotifications);
-      setRefresh(true);
+      // setRefresh(true);
 
       // Schedule push notification if new notifications are fetched
       if (notifications.length < filteredNotifications.length) {
@@ -692,7 +686,7 @@ const fetchNotifications = async () => {
             )}
           </View> */}
 
-            <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 5 }}>
+            <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 8 }}>
               {initialLoading ? (
                 <ActivityIndicator size="large" color="#0000ff" />
               ) : (
@@ -929,6 +923,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 12, // Adjust font size for better visibility
   },
+  heading: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 10,
+    marginBottom: 10
+  }
+  
 });
 
 export default ManagerDashboard;

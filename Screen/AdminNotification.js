@@ -523,6 +523,8 @@ const handlePendingApprovals = async (personalLoanId) => {
  {/* </View> */}
     <ScrollView>
       <View style={styles.container}>
+        {loanApplication.length > 0 && (
+          <>
         <Text style={styles.header}>Home Loan</Text>
         {loanApplications
         .filter(application => sendApproval === null || application.kf_sendapproval === (sendApproval ? 1 : 0))
@@ -561,6 +563,9 @@ const handlePendingApprovals = async (personalLoanId) => {
     </View>
     </View>
   ))}
+  </>
+)}
+    {loanApplications.length === 0 && <Text>No Home Loan record found</Text>}
 
         <Text style={styles.header}>Personal Loan</Text>
         {notifications

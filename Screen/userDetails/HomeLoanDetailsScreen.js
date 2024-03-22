@@ -44,6 +44,28 @@ const HomeLoanDetailsScreen = ({ route }) => {
     }
   };
 
+  const getGenderLabelG1 = () => {
+    switch (loanApplication.kf_guarantorgender) {
+      case 123950000:
+        return 'Male';
+      case 123950001:
+        return 'Female';
+      default:
+        return '';
+    }
+  };
+
+  const getGenderLabelG2 = () => {
+    switch (loanApplication.kf_guarantor2gender) {
+      case 123950000:
+        return 'Male';
+      case 123950001:
+        return 'Female';
+      default:
+        return '';
+    }
+  };
+
   const getLoanStatus = () => {
     switch (loanApplication.kf_status) {
       case 123950000:
@@ -338,7 +360,7 @@ const HomeLoanDetailsScreen = ({ route }) => {
 
           <View style={styles.detailItem}>
             <Text style={styles.label}> Gender:</Text>
-            <Text style={styles.value}>{getGenderLabel()}</Text>
+            <Text style={styles.value}>{getGenderLabelG1()}</Text>
           </View>
 
           <View style={styles.detailItem}>
@@ -411,7 +433,7 @@ const HomeLoanDetailsScreen = ({ route }) => {
 
           <View style={styles.detailItem}>
             <Text style={styles.label}> Gender :</Text>
-            <Text style={styles.value}>{getGenderLabel()}</Text>
+            <Text style={styles.value}>{getGenderLabelG2()}</Text>
           </View>
 
           <View style={styles.detailItem}>

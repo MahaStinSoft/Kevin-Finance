@@ -724,6 +724,12 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
     navigation.navigate('Gurantee2SignatureHome', { loanApplication });
   };
 
+  const isValidInput = (text) => {
+    // Regular expression to allow only alphabets and spaces
+    const onlyAlphabets = /^[a-zA-Z\s]*$/;
+    return onlyAlphabets.test(text);
+  };
+
   const isEditable = loanStatus !== 'Approved';
 
   return (
@@ -764,15 +770,15 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
               value={guarantorfirstname}
               placeholder="First Name"
               onChangeText={(text) => {
+                if (isValidInput(text) || text === '') { // Call isValidInput function
                 setfirstname(text);
                 setIsfirstnameValid(text.trim() !== '');
-
-                // Update error message
                 setErrorMessages({
                   ...errorMessages,
                   guarantorFirstNameEdit: text.trim() !== '' ? '' : 'Enter First Name',
                 });
               }}
+            }
               editable={isEditable}
             />
             {errorMessages.guarantorFirstNameEdit !== '' && <Text style={styles.errorText}>{errorMessages.guarantorFirstNameEdit}</Text>}
@@ -782,6 +788,7 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
               value={guarantorlastname}
               placeholder="Last Name"
               onChangeText={(text) => {
+                if (isValidInput(text) || text === '') { // Call isValidInput function
                 setLastname(text);
                 setIsLastNameValid(text.trim() !== '')
 
@@ -789,6 +796,7 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
                   ...errorMessages,
                   guarantorLastNameEdit: text.trim() !== '' ? '' : 'Enter Last Name',
                 });
+              }
               }}
               editable={isEditable}
             />
@@ -800,7 +808,7 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
                 onOptionChange={handleGenderOptionset}
                 title="Gender"
                 options={['Male', 'Female']}
-                initialOption={guarantorgender ? getGenderOptionsetStringFromNumericValue(guarantorgender) : ''}
+                initialOption={guarantorgender ? getGenderOptionsetStringFromNumericValue(guarantorgender) : 'Gender'}
                 style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
               />
             ) : (

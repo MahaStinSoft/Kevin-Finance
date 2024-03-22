@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, Modal,TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, Button, Modal, TouchableOpacity, TextInput } from 'react-native';
 import axios from 'axios';
 import { ScrollView } from 'react-native-gesture-handler';
 import querystring from 'querystring';
@@ -27,11 +27,11 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
     // Fetch loan applications and notifications whenever refresh state changes
     fetchLoanApplications();
     fetchNotifications();
-    
+
     // Reset refresh state after re-render
     setRefresh(false);
   }, [refresh]);
-  
+
 
 
   const fetchLoanApplications = async () => {
@@ -235,6 +235,12 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
   };
 
   const handleRejectWithComment = async () => {
+
+    if (!rejectComment) {
+      alert('Please enter a reject reason.');
+      return; // Exit the function if reject comment is empty
+    }
+    
     try {
       const tokenResponse = await axios.post(
         'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
@@ -369,7 +375,7 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
       console.error('Error updating kf_markasread:', error);
     }
   };
-  
+
   // Update handleViewHomeLoan function
   const handleViewHomeLoan = async (loanApplication) => {
     try {
@@ -397,7 +403,7 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
       console.error('Error updating kf_markasread:', error);
     }
   };
-  
+
   // Function to update kf_markasread field in CRM
   const updateKfMarkAsRead = async (recordId) => {
     try {
@@ -415,7 +421,7 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         }
       );
-  
+
       const accessToken = tokenResponse.data.access_token;
       await axios.patch(`https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans(${recordId})`, {
         kf_markasread: true, // Assuming true represents read status
@@ -436,14 +442,14 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
       console.error('Error updating kf_markasread:', error);
     }
   };
-  
+
   // Function to format date and time
   const formatDateTime = (dateTime) => {
     return moment(dateTime).format('MMM DD, YYYY h:mm A'); // Example format: "Mar 05, 2024 11:12 AM"
   };
 
   const handleSettings = () => {
-    navigation.navigate( "Setting");
+    navigation.navigate("Setting");
   };
   const handleNavigation = () => {
     navigation.navigate("Notification", { kf_adminname });
@@ -451,32 +457,32 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
 
   return (
     <View>
-        <View style={styles.navBar}>
-            {/* <TouchableOpacity style={styles.iconButton} onPress={() => navigation.openDrawer()}>
+      <View style={styles.navBar}>
+        {/* <TouchableOpacity style={styles.iconButton} onPress={() => navigation.openDrawer()}>
               <Ionicons name="list-sharp" size={25} color="#fff" />
             </TouchableOpacity> */}
-            <TouchableOpacity style={styles.iconButton} onPress={handleSettings}>
-              <Ionicons name="list-sharp" size={25} color="#fff" />
-            </TouchableOpacity>
-            <Text style={styles.text}>Kevin Small Finance</Text>
-          
-          
-            <TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
-  <View> 
-    <Ionicons name="notifications" size={25} color="#fff" />
-    {totalRecords > 0 && ( 
-      <View style={styles.badgeContainer}>
-        <Text style={styles.badgeText}>{totalRecords}</Text>
+        <TouchableOpacity style={styles.iconButton} onPress={handleSettings}>
+          <Ionicons name="list-sharp" size={25} color="#fff" />
+        </TouchableOpacity>
+        <Text style={styles.text}>Kevin Small Finance</Text>
+
+
+        <TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
+          <View>
+            <Ionicons name="notifications" size={25} color="#fff" />
+            {totalRecords > 0 && (
+              <View style={styles.badgeContainer}>
+                <Text style={styles.badgeText}>{totalRecords}</Text>
+              </View>
+            )}
+          </View>
+        </TouchableOpacity>
       </View>
-    )}
-  </View>
-</TouchableOpacity>
-            </View>
-   
-    <ScrollView>
-      <View style={styles.container}>
-        {/* <Text style={styles.header}>Loan Applications</Text> */}
-        {loanApplications.map((application, index) => (
+
+      <ScrollView>
+        <View style={styles.container}>
+          {/* <Text style={styles.header}>Loan Applications</Text> */}
+          {loanApplications.map((application, index) => (
             <View
               key={index}
               style={[
@@ -490,18 +496,18 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
               <Text>Name: {application.kf_name} {application.kf_lastname}</Text>
               {/* Display the status name */}
               <View style={styles.readIndicatorContainer}>
-  {application.kf_markasread ? (
-    <Image
-    source={require('../assets/read_message.png')}
-    style={styles.twitterImage1}
-  />
-  ) : (
-    <Image
-      source={require('../assets/unread_message.png')}
-      style={styles.twitterImage}
-    />
-  )}
-</View>
+                {application.kf_markasread ? (
+                  <Image
+                    source={require('../assets/read_message.png')}
+                    style={styles.twitterImage1}
+                  />
+                ) : (
+                  <Image
+                    source={require('../assets/unread_message.png')}
+                    style={styles.twitterImage}
+                  />
+                )}
+              </View>
               <Text>Status: {statusNames[application.kf_status]}</Text>
               {/* Buttons for actions */}
               <Text>Created At: {formatDateTime(application.created_at)}</Text>
@@ -537,8 +543,8 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
           ))}
 
 
-        <Text style={styles.header}>Personal Loan Notifications</Text>
-        {notifications.map((notification, index) => (
+          <Text style={styles.header}>Personal Loan Notifications</Text>
+          {notifications.map((notification, index) => (
             <View
               key={index}
               style={[
@@ -546,66 +552,66 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
                 notification.kf_markasread ? styles.readItemContainer : styles.unreadItemContainer
               ]}
             >
-            <Text>Application Number: {notification.kf_applicationnumber}</Text>
-            <Text>Admin Name: {kf_adminname}</Text>
-            <Text>Created By: {notification.kf_createdby}</Text>
-            <Text>Name: {notification.kf_firstname} {notification.kf_lastname}</Text>
-            {/* Display the status name */}
-            <View style={styles.readIndicatorContainer}>
-  {notification.kf_markasread ? (
-     <Image
-     source={require('../assets/read_message.png')}
-     style={styles.twitterImage1}
-   />
-  ) : (
-    <Image
-      source={require('../assets/unread_message.png')}
-      style={styles.twitterImage}
-    />
-  )}
-</View>
-            <Text>Status: {statusNames[notification.kf_status]}</Text>
-            {/* Buttons for actions */}
-            <Text>Created At: {formatDateTime(notification.created_at)}</Text>
-            <View style={styles.buttonContainer}>
-              <Button title={`✓ Approve`} onPress={() => handleApproveNotification(notification.kf_personalloanid)} color="green" disabled={notification.kf_status === 123950000} />
-              <Button title={`✗ Reject`} onPress={() => handleRejectNotification(notification.kf_personalloanid)} color="red" disabled={notification.kf_status === 123950000} />
-              <Button title="View Record" onPress={() => handleViewPersonalLoan(notification)} />
-              {showRejectCommentBox && selectedPersonalLoanId === notification.kf_personalloanid && (
-                <Modal
-                  transparent
-                  animationType="slide"
-                  visible={showRejectCommentBox}
-                  onRequestClose={() => setShowRejectCommentBox(false)}
-                >
-                  <View style={styles.modalContainer}>
-                    <View style={styles.commentBoxContainer}>
-                      <Text>Enter Reject Reason:</Text>
-                      <TextInput
-                        style={styles.commentInput}
-                        multiline
-                        value={rejectComment}
-                        onChangeText={(text) => setRejectComment(text)}
-                      />
-                      <Button title="Submit Reject Reason" onPress={handleRejectPersonalLoanWithComment} />
-                      <Button title="Cancel" onPress={() => setShowRejectCommentBox(false)} />
+              <Text>Application Number: {notification.kf_applicationnumber}</Text>
+              <Text>Admin Name: {kf_adminname}</Text>
+              <Text>Created By: {notification.kf_createdby}</Text>
+              <Text>Name: {notification.kf_firstname} {notification.kf_lastname}</Text>
+              {/* Display the status name */}
+              <View style={styles.readIndicatorContainer}>
+                {notification.kf_markasread ? (
+                  <Image
+                    source={require('../assets/read_message.png')}
+                    style={styles.twitterImage1}
+                  />
+                ) : (
+                  <Image
+                    source={require('../assets/unread_message.png')}
+                    style={styles.twitterImage}
+                  />
+                )}
+              </View>
+              <Text>Status: {statusNames[notification.kf_status]}</Text>
+              {/* Buttons for actions */}
+              <Text>Created At: {formatDateTime(notification.created_at)}</Text>
+              <View style={styles.buttonContainer}>
+                <Button title={`✓ Approve`} onPress={() => handleApproveNotification(notification.kf_personalloanid)} color="green" disabled={notification.kf_status === 123950000} />
+                <Button title={`✗ Reject`} onPress={() => handleRejectNotification(notification.kf_personalloanid)} color="red" disabled={notification.kf_status === 123950000} />
+                <Button title="View Record" onPress={() => handleViewPersonalLoan(notification)} />
+                {showRejectCommentBox && selectedPersonalLoanId === notification.kf_personalloanid && (
+                  <Modal
+                    transparent
+                    animationType="slide"
+                    visible={showRejectCommentBox}
+                    onRequestClose={() => setShowRejectCommentBox(false)}
+                  >
+                    <View style={styles.modalContainer}>
+                      <View style={styles.commentBoxContainer}>
+                        <Text>Enter Reject Reason:</Text>
+                        <TextInput
+                          style={styles.commentInput}
+                          multiline
+                          value={rejectComment}
+                          onChangeText={(text) => setRejectComment(text)}
+                        />
+                        <Button title="Submit Reject Reason" onPress={handleRejectPersonalLoanWithComment} />
+                        <Button title="Cancel" onPress={() => setShowRejectCommentBox(false)} />
+                      </View>
                     </View>
-                  </View>
-                </Modal>
-              )}
+                  </Modal>
+                )}
 
+              </View>
             </View>
-          </View>
-        ))}
-      </View>
-    </ScrollView>
+          ))}
+        </View>
+      </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    marginTop:35,
+    marginTop: 35,
     flex: 1,
     padding: 20,
   },
@@ -693,7 +699,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 5,
     opacity: 0.7,
-    backgroundColor:'#c2e7ff',
+    backgroundColor: '#c2e7ff',
   },
   twitterImage: {
     width: 28,
@@ -719,9 +725,9 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,
-    backgroundColor:'rgba(243,242,241,255)'
+    backgroundColor: 'rgba(243,242,241,255)'
   },
-  
+
 });
 
 export default Notification;

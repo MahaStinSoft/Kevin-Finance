@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Alert, Image, Text, TouchableOpacity, StatusBar, TextInput, Modal } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, Image, Text, TouchableOpacity, StatusBar, TextInput, Modal, BackHandler } from 'react-native';
 import { useNavigation, useIsFocused, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -78,6 +78,8 @@ export const HomeScreen = ({ route }) => {
     emiCollectionDate: ''
   });
 
+  
+
   useFocusEffect(
     React.useCallback(() => {
       getAuthenticatedUser();
@@ -90,6 +92,7 @@ export const HomeScreen = ({ route }) => {
     setkf_gender(null);
     setkf_mobilenumber(null);
     setkf_email(null);
+    setkf_age(null);
     setkf_address1(null);
     setkf_address2(null);
     setkf_address3(null);
@@ -107,6 +110,33 @@ export const HomeScreen = ({ route }) => {
     setKf_interestrate(null);
     setResetFormKey((prevKey) => prevKey + 1);
   };
+
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (navigation.isFocused()) {
+        // If the user is on the login screen, show the exit confirmation alert
+        Alert.alert(
+          'Discard Changes',
+          'Are you sure want to discard the changes?',
+          [
+            {
+              text: 'cancel',
+              onPress: () => null,
+              style: 'cancel',
+            },
+            {
+              text: 'Discard',
+              onPress: () => BackHandler.exitApp(),
+            },
+          ],
+          { cancelable: false }
+        );
+        return true; // Prevent default back button behavior
+      }
+    });
+
+    return () => backHandler.remove();
+  }, [navigation]);
 
   const pickImage = async () => {
     try {
@@ -223,17 +253,20 @@ export const HomeScreen = ({ route }) => {
   };
 
   const handleFirstNameChange = (text) => {
-    if (text.trim() !== '') {
+    const onlyAlphabets = /^[^!-\/:-@\[-`{-~]+$/;
+    
+    if (onlyAlphabets.test(text) || text === '') {
       setkf_name(text);
       setErrorMessages({ ...errorMessages, firstName: '' });
     } else {
-      setkf_name('');
-      setErrorMessages({ ...errorMessages, firstName: 'Enter a First Name' });
+      setErrorMessages({ ...errorMessages, firstName: 'Enter a valid First Name' });
     }
   };
-
+  
   const handleLastNameChange = (text) => {
-    if (text.trim() !== '') {
+    const onlyAlphabets = /^[^!-\/:-@\[-`{-~]+$/;
+
+    if (onlyAlphabets.test(text) || text.trim() !== '') {
       setkf_lastname(text);
       setErrorMessages({ ...errorMessages, lastName: '' });
     } else {
@@ -1000,21 +1033,15 @@ export const HomeScreen = ({ route }) => {
       </Modal>
           </View> */}
           <View style={{marginLeft: 20}}>
-            {/* <CardImage
-              title="Applicant"
-              imageContent={kf_applicantimage}
-              setImageContent={setkf_applicantimage}
-            // onViewImage={onViewImage}
-            /> */}
-         <CardImage
-            title="Applicant Image"
-            imageContent={kf_applicantimage}
-            setImageContent={setkf_applicantimage}
-          />
-          {errorMessages.applicantImage !== '' && (
-            <Text style={styles.errorText}>{errorMessages.applicantImage}</Text>
-          )}
-          </View>
+                <CardImage
+                  title="Applicant"
+                  imageContent={kf_applicantimage}
+                  setImageContent={setkf_applicantimage}
+                />
+                {!kf_applicantimage.fileContent && errorMessages.applicantImage !== '' && (
+                  <Text style={styles.errorText}>{errorMessages.applicantImage}</Text>
+                )}
+              </View>
           <ButtonComponent
             title="SUBMIT"
             onPress={handleSaveRecord}

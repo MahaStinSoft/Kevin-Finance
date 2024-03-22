@@ -973,6 +973,12 @@ const EditHomeLoan = ({ route, navigation }) => {
       Alert.alert('Error', 'Failed to pick or process the image.');
     }
   };
+
+  const isValidInput = (text) => {
+    // Regular expression to allow only alphabets and spaces
+    const onlyAlphabets = /^[a-zA-Z\s]*$/;
+    return onlyAlphabets.test(text);
+  };
   
   return (
     <View style={styles.container}>
@@ -1071,21 +1077,23 @@ const EditHomeLoan = ({ route, navigation }) => {
             />
 
             <TextInput
-             style={[
-              styles.textInputContainer,
-              getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
-            ]}
+              style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={firstname}
               placeholder="First Name"
               onChangeText={(text) => {
-                setfirstname(text);
-                setIsfirstnameValid(text.trim() !== '');
-                setErrorMessages({
-                  ...errorMessages,
-                  firstNameEdit: text.trim() !== '' ? '' : 'Enter First Name',
-                });
+                if (isValidInput(text) || text === '') { // Call isValidInput function
+                  setfirstname(text);
+                  setIsfirstnameValid(text.trim() !== '');
+                  setErrorMessages({
+                    ...errorMessages,
+                    firstNameEdit: text.trim() !== '' ? '' : 'Enter First Name',
+                  });
+                }
               }}
-              editable={getStatusStringFromNumericValue(status) !== 'Approved'} 
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             {errorMessages.firstNameEdit !== '' && <Text style={styles.errorText}>{errorMessages.firstNameEdit}</Text>}
 
@@ -1097,13 +1105,16 @@ const EditHomeLoan = ({ route, navigation }) => {
               value={lastname}
               placeholder="Last Name"
               onChangeText={(text) => {
+                if (isValidInput(text) || text === '') { // Call isValidInput function
                 setLastname(text);
                 setIsLastNameValid(text.trim() !== '')
                 setErrorMessages({
                   ...errorMessages,
                   lastNameEdit: text.trim() !== '' ? '' : 'Enter Last Name',
                 });
+              }
               }}
+              
               editable={getStatusStringFromNumericValue(status) !== 'Approved'} 
             />
             {errorMessages.lastNameEdit !== '' && <Text style={styles.errorText}>{errorMessages.lastNameEdit}</Text>}

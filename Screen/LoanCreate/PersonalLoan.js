@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Alert, Image, Text, TouchableOpacity, StatusBar, TextInput } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, Image, Text, TouchableOpacity, StatusBar, TextInput, BackHandler } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -236,6 +236,34 @@ const handleInterestRateChange = (text) => {
   };
 
   useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (navigation.isFocused()) {
+        // If the user is on the login screen, show the exit confirmation alert
+        Alert.alert(
+          'Discard Changes',
+          'Are you sure want to discard the changes?',
+          [
+            {
+              text: 'cancel',
+              onPress: () => null,
+              style: 'cancel',
+            },
+            {
+              text: 'Discard',
+              onPress: () => BackHandler.exitApp(),
+            },
+          ],
+          { cancelable: false }
+        );
+        return true; // Prevent default back button behavior
+      }
+    });
+
+    return () => backHandler.remove();
+  }, [navigation]);
+
+
+  useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       resetForm();
     });
@@ -263,7 +291,9 @@ const handleInterestRateChange = (text) => {
   };
 
   const handleFirstNameChange = (text) => {
-    if (text.trim() !== '') {
+    const onlyAlphabets = /^[^!-\/:-@\[-`{-~]+$/;
+
+    if (onlyAlphabets.test(text) || text.trim() !== '') {
       setkf_firstname(text);
       setErrorMessages({ ...errorMessages, firstName: '' });
     } else {
@@ -273,7 +303,9 @@ const handleInterestRateChange = (text) => {
   };
 
   const handleLastNameChange = (text) => {
-    if (text.trim() !== '') {
+    const onlyAlphabets = /^[^!-\/:-@\[-`{-~]+$/;
+
+    if (onlyAlphabets.test(text) || text.trim() !== '') {
       setkf_lastname(text);
       setErrorMessages({ ...errorMessages, lastName: '' });
     } else {
@@ -884,17 +916,15 @@ const handleInterestRateChange = (text) => {
             onChangeText={(text) => setKf_othercharges(parseFloat(text))}
           /> */}
 
-<View style={{marginLeft: 20}}>
+          <View style={{ marginLeft: 20 }}>
             <CardImage
-              title="Applicant Image"
+              title="Applicant"
               imageContent={kf_applicantimage}
               setImageContent={setkf_applicantimage}
-            // onViewImage={onViewImage}
             />
-             {errorMessages.applicantImage !== '' && (
-            <Text style={styles.errorText}>{errorMessages.applicantImage}</Text>
-          )} 
-            
+            {!kf_applicantimage.fileContent && errorMessages.applicantImage !== '' && (
+              <Text style={styles.errorText}>{errorMessages.applicantImage}</Text>
+            )}
           </View>
 
           <ButtonComponent

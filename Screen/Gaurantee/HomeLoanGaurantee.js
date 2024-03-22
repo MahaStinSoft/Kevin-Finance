@@ -125,20 +125,7 @@ const HomeLoanGurantee = ({ route, navigation }) => {
       return;
     }
 
-    const newErrorMessages = {
-      guarantorFirstNameEdit: !guarantorfirstname ? 'Enter First Name' : '',
-      guarantorLastNameEdit: !guarantorlastname ? 'Enter Last Name' : '',
-      guarantorDateOfBirthEdit: !guarantordateofbirth ? 'Enter Date of Birth' : '',
-      guarantorMobileNumberEdit: /^\d{10}$/.test(guarantormobilenumber) ? '' : 'Please Enter a Valid 10-digit mobile number.',
-      guarantorEmailEdit: !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guarantoremail) ? 'Enter Email Address' : '',
-      guarantorAadharCardNumberEdit: /^\d{12}$/.test(guarantoraadharnumber) ? '' : 'Please Enter Valid Aadharcard Number',
-      guarantorPanCardNumberEdit: !guarantorpannumber ? 'Enter PAN Card Number' : '',
-    };
-    setErrorMessages(newErrorMessages);
-
-    if (Object.values(newErrorMessages).some(message => message !== '')) {
-      return;
-    }
+   
     try {
       const tokenResponse = await axios.post(
         'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
@@ -234,6 +221,11 @@ const HomeLoanGurantee = ({ route, navigation }) => {
   }, []);
 
   const sendAnnotation = async () => {
+    const newErrorMessages = {
+      aadharCardImage: !aadharcard.fileContent ? 'Aadharcard image is required.' : '',
+      
+    };
+    setErrorMessages(newErrorMessages);
     try {
       const tokenResponse = await axios.post(
         'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
@@ -285,6 +277,11 @@ const HomeLoanGurantee = ({ route, navigation }) => {
   };
 
   const sendAnnotation1 = async () => {
+    const newErrorMessages = {
+      panCardImage: !pancard.fileContent ? 'Pancard image is required.' : '', 
+    };
+    setErrorMessages(newErrorMessages);
+    
     try {
       const tokenResponse = await axios.post(
         'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
@@ -372,6 +369,10 @@ const HomeLoanGurantee = ({ route, navigation }) => {
   };
 
   const sendAnnotation2 = async () => {
+    const newErrorMessages = {
+      applicantImage: !applicantImage.fileContent ? 'Applicant Image is required.' : '', 
+    };
+    setErrorMessages(newErrorMessages);
     try {
       const tokenResponse = await axios.post(
         'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
@@ -425,6 +426,10 @@ const HomeLoanGurantee = ({ route, navigation }) => {
   };
 
   const sendAnnotation3 = async () => {
+    const newErrorMessages = {
+      signatureImage: !signatureImage ? 'Applicant Image is required.' : '', 
+    };
+    setErrorMessages(newErrorMessages);
     try {
       const tokenResponse = await axios.post(
         'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
@@ -480,6 +485,26 @@ const HomeLoanGurantee = ({ route, navigation }) => {
   };
 
   const handleUpdateRecordAndSendAnnotation = () => {
+    const newErrorMessages = {
+      aadharCardImage: !aadharcard.fileContent ? 'Aadharcard image is required.' : '',
+      panCardImage:!pancard.fileContent ? 'Pancard image is required.' : '',
+      applicantCardImage: !applicantImage.fileContent ? 'Applicant Image is required.' : '', 
+      signatureCardImage:!signatureImage ? 'Signature image is required.' : '',
+
+      guarantorFirstNameEdit: !guarantorfirstname ? 'Enter First Name' : '',
+      guarantorLastNameEdit: !guarantorlastname ? 'Enter Last Name' : '',
+      guarantorDateOfBirthEdit: !guarantordateofbirth ? 'Enter Date of Birth' : '',
+      guarantorMobileNumberEdit: /^\d{10}$/.test(guarantormobilenumber) ? '' : 'Please Enter a Valid 10-digit mobile number.',
+      guarantorEmailEdit: !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guarantoremail) ? 'Enter Email Address' : '',
+      guarantorAadharCardNumberEdit: /^\d{12}$/.test(guarantoraadharnumber) ? '' : 'Please Enter Valid Aadharcard Number',
+      guarantorPanCardNumberEdit: !guarantorpannumber ? 'Enter PAN Card Number' : '',
+      
+    };
+    setErrorMessages(newErrorMessages);
+
+    if (Object.values(newErrorMessages).some(message => message !== '')) {
+      return;
+    }
     sendAnnotation();
     sendAnnotation1();
     sendAnnotation2();
@@ -647,6 +672,12 @@ const HomeLoanGurantee = ({ route, navigation }) => {
   const handleNavigateToSignatureScreen = () => {
     navigation.navigate('Gurantee1SignatureHome', { loanApplication });
   };
+  
+  const isValidInput = (text) => {
+    // Regular expression to allow only alphabets and spaces
+    const onlyAlphabets = /^[a-zA-Z\s]*$/;
+    return onlyAlphabets.test(text);
+  };
 
   const isEditable = loanStatus !== 'Approved';
 
@@ -684,12 +715,14 @@ const HomeLoanGurantee = ({ route, navigation }) => {
               value={guarantorfirstname}
               placeholder="First Name"
               onChangeText={(text) => {
+                if (isValidInput(text) || text === '') { // Call isValidInput function
                 setfirstname(text);
                 setIsfirstnameValid(text.trim() !== '');
                 setErrorMessages({
                   ...errorMessages,
                   guarantorFirstNameEdit: text.trim() !== '' ? '' : 'Enter First Name',
                 });
+              }
               }}
               editable={isEditable}
             />
@@ -699,12 +732,14 @@ const HomeLoanGurantee = ({ route, navigation }) => {
               value={guarantorlastname}
               placeholder="Last Name"
               onChangeText={(text) => {
+                if (isValidInput(text) || text === '') { // Call isValidInput function
                 setLastname(text);
                 setIsLastNameValid(text.trim() !== '')
                 setErrorMessages({
                   ...errorMessages,
                   guarantorLastNameEdit: text.trim() !== '' ? '' : 'Enter Last Name',
                 });
+              }
               }}
               editable={isEditable}
             />
@@ -714,12 +749,12 @@ const HomeLoanGurantee = ({ route, navigation }) => {
                 onOptionChange={handleGenderOptionset}
                 title="Gender"
                 options={['Male', 'Female']}
-                initialOption={guarantorgender ? getGenderOptionsetStringFromNumericValue(guarantorgender) : ''}
+                initialOption={guarantorgender ? getGenderOptionsetStringFromNumericValue(guarantorgender) : 'Gender'}
                 style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
               />
             ) : (
               <Text style={[styles.textInputContainer, { color: isEditable ? "black" : "gray", height: 45 }]}>
-                {guarantorgender ? getGenderOptionsetStringFromNumericValue(guarantorgender) : ''}
+                {guarantorgender ? getGenderOptionsetStringFromNumericValue(guarantorgender) : 'Gender'}
               </Text>
             )}
             {/* <ComponentDatePicker
@@ -825,36 +860,52 @@ const HomeLoanGurantee = ({ route, navigation }) => {
             )}
             {isEditable && (
             <View style={{ backgroundColor: "white", marginTop: 15 }}>
-              <View style={{ marginVertical: 3 }}>
-                <CardImage
-                  title=" AadharCard"
-                  imageContent={aadharcard}
-                  setImageContent={setAadharcard}
-                />
-              </View>
-              <View style={{ marginVertical: 3 }}>
-                <CardImage
-                  title=" PanCard"
-                  imageContent={pancard}
-                  setImageContent={setPancard}
-                />
-              </View>
+             <View style={{ marginBottom: aadharcard.fileContent ? 15 : -10, marginTop: 10 }}>
+                    <CardImage
+                      title="AadharCard"
+                      imageContent={aadharcard}
+                      setImageContent={setAadharcard}
+                      // disabled={isEditable} // Set disabled based on isEditable
+                    />
+                    {!aadharcard.fileContent && errorMessages.aadharCardImage !== '' && (
+                      <Text style={[styles.errorText1, {}]}>{errorMessages.aadharCardImage}</Text>
+                    )}
+                  </View>
+                  <View style={{ marginBottom: aadharcard.fileContent ? 15 : -10, marginTop: 5  }} >
+                    <CardImage
+                      title="PanCard"
+                      imageContent={pancard}
+                      setImageContent={setPancard}
+                      disabled={isEditable} // Set disabled based on isEditable
+                    />
+                    {!pancard.fileContent && errorMessages.panCardImage !== '' && (
+                      <Text style={styles.errorText1}>{errorMessages.panCardImage}</Text>
+                    )}
+                  </View>
+                  <View style={{ marginBottom: aadharcard.fileContent ? 15 : -10, marginTop: 5  }}>
+                    <CardImage
+                      title="Applicant"
+                      imageContent={applicantImage}
+                      setImageContent={setapplicantImage}
+                      disabled={isEditable} // Set disabled based on isEditable
+                    />
+                    {!applicantImage.fileContent && errorMessages.applicantCardImage !== '' && (
+                      <Text style={styles.errorText1}>{errorMessages.applicantCardImage}</Text>
+                    )}
+                  </View>
+                  <View style={{ marginBottom: aadharcard.fileContent ? 15 : 15, marginTop: 5  }} >
+                    <CardImageSignature
+                      title="Signature"
+                      imageContent={signatureImage}
+                      pickImage={handleNavigateToSignatureScreen}
+                      sendAnnotation={sendAnnotation3}
+                      disabled={isEditable} // Set disabled based on isEditable
+                    />
+                    {!signatureImage && errorMessages.signatureCardImage !== '' && (
+                      <Text style={styles.errorText1}>{errorMessages.signatureCardImage}</Text>
+                    )}
+                  </View>
 
-              <View style={{ marginVertical: 3 }}>
-                <CardImage
-                  title=" Applicant"
-                  imageContent={applicantImage}
-                  setImageContent={setapplicantImage}
-                />
-              </View>
-              <View style={{ marginBottom: 15 }}>
-              <CardImageSignature
-                  title="Signature"
-                  imageContent={signatureImage}
-                  pickImage={handleNavigateToSignatureScreen}
-                  sendAnnotation={sendAnnotation3}
-                />
-                </View>
             </View>
             )}
             <Gurantee1AnnotationHome
@@ -884,6 +935,13 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: 15,
     marginBottom: 8,
+    marginHorizontal:10
+  },
+  errorText1: {
+    color: 'red',
+    fontSize: 15,
+    marginHorizontal:15
+
   },
   textInputContainer: {
     marginVertical: 5,
@@ -910,4 +968,3 @@ const styles = StyleSheet.create({
 });
 
 export default HomeLoanGurantee;
-
