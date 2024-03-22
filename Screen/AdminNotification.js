@@ -507,9 +507,11 @@ const handlePendingApprovals = async (personalLoanId) => {
     }
   };
   
-  const handleSettings = () => {
-    navigation.navigate( "Setting");
+  const handleGoBack = () => {
+    // navigation.navigate("Dashboard");
+    navigation.goBack();
   };
+  
   const handleNavigation = () => {
     navigation.navigate("AdminNotification", { authenticatedUser });
   };
@@ -517,10 +519,10 @@ const handlePendingApprovals = async (personalLoanId) => {
   return (
     <View>
 <View style={styles.navBar}>
-  <TouchableOpacity style={styles.iconButton} onPress={handleSettings}>
-    <Ionicons name="list-sharp" size={25} color="#fff" />
-  </TouchableOpacity>
-  <Text style={styles.text}>Kevin Small Finance</Text>
+<TouchableOpacity style={styles.iconButton} onPress={handleGoBack}>
+          <Ionicons name="chevron-back" size={30} color="#fff" />
+        </TouchableOpacity>
+        <Text style={styles.text}>Notification</Text>
   <TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
     <Ionicons name="notifications" size={25} color="#fff" />
     {(

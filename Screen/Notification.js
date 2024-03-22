@@ -742,7 +742,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: 'rgba(243,242,241,255)'
   },
-
 });
 
 export default Notification;
