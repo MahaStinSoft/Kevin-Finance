@@ -110,7 +110,7 @@ const Gurantee2SignatureHome = ({ route }) => {
       await AsyncStorage.setItem('signaturefile', base64Data);
       
       // Navigate to the next screen with the signature image
-      navigation.navigate('HomeLoanGurantee', { signatureImage: base64Data, loanApplication: loanApplication });
+      navigation.navigate('HomeLoanGurantee2', { signatureImage: base64Data, loanApplication: loanApplication });
     } catch (error) {
       console.error('Error capturing signature:', error);
     }

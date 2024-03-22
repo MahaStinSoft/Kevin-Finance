@@ -693,7 +693,6 @@ const HomeLoanGurantee = ({ route, navigation }) => {
       <ScrollView>
         <View style={styles.container}>
           <View style={styles.wrapper}>
-          {/* <Text>Loan Status: {loanStatus}</Text> */}
             <TextInput
               style={[styles.textInputContainer, { color: "gray" }]}
               value={applicationnumber}

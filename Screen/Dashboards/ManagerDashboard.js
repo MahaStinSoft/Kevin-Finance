@@ -52,8 +52,9 @@ const ManagerDashboard = ({ navigation, route }) => {
   const [loanApplications, setLoanApplications] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const totalRecords = loanApplications.length + notifications.length;
+  const unreadMessagesCount = loanApplications.filter(application => !application.kf_markasread).length + notifications.filter(notification => !notification.kf_markasread).length;
 
-  // const [refresh, setRefresh] = useState(false);
+  const [refresh, setRefresh] = useState(false);
 
   const [displayedHomeLoans, setDisplayedHomeLoans] = useState([]);
   const [displayedPersonalLoans, setDisplayedPersonalLoans] = useState([]);
@@ -402,7 +403,7 @@ const ManagerDashboard = ({ navigation, route }) => {
   };
   const handleRefresh = () => {
     // This function will be called when you want to refresh the page
-    // setRefresh(!refresh);
+    setRefresh(!refresh);
   };
 
   const handleDynamicDashboard = () => {
@@ -531,15 +532,15 @@ const fetchNotifications = async () => {
             </TouchableOpacity>
             <Text style={styles.text}>Kevin Small Finance</Text>
             <TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
-  <View> 
-    <Ionicons name="notifications" size={25} color="#fff" />
-    {totalRecords > 0 && ( 
-      <View style={styles.badgeContainer}>
-        <Text style={styles.badgeText}>{totalRecords}</Text>
-      </View>
-    )}
-  </View>
-</TouchableOpacity>
+          <View> 
+            <Ionicons name="notifications" size={25} color="#fff" />
+            {unreadMessagesCount > 0 && ( 
+              <View style={styles.badgeContainer}>
+                <Text style={styles.badgeText}>{unreadMessagesCount}</Text>
+              </View>
+            )}
+          </View>
+        </TouchableOpacity>
 
 
           </View>
@@ -686,7 +687,7 @@ const fetchNotifications = async () => {
             )}
           </View> */}
 
-            <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 8 }}>
+            <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 0 }}>
               {initialLoading ? (
                 <ActivityIndicator size="large" color="#0000ff" />
               ) : (
@@ -927,9 +928,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginTop: 10,
-    marginBottom: 10
-  }
-  
+    marginBottom: 10,
+    color: "red"
+  },
+
 });
 
 export default ManagerDashboard;

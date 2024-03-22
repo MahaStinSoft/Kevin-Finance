@@ -12,6 +12,7 @@ const AdminNotification = ({loanApplication, navigation, personalLoan, route }) 
   const [loanApplications, setLoanApplications] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [approverName, setApproverName] = useState('');
+  const [unreadCount, setUnreadCount] = useState(0);
   const [sendApproval, setSendApproval] = useState(null);
   const [loanApplicationsCount, setLoanApplicationsCount] = useState(0);
   const [notificationsCount, setNotificationsCount] = useState(0);
@@ -22,12 +23,11 @@ const AdminNotification = ({loanApplication, navigation, personalLoan, route }) 
     // Fetch loan applications and notifications whenever refresh state changes
     fetchLoanApplications();
     fetchNotifications();
+    fetchUnreadCount();
     
     // Reset refresh state after re-render
-    // setRefresh(false);
-  }, 
-  // [refresh]
-  );
+    setRefresh(false);
+  }, [refresh]);
   
 
   const fetchLoanApplications = async () => {
@@ -424,6 +424,50 @@ const handlePendingApprovals = async (personalLoanId) => {
     }
   };
   
+  const fetchUnreadCount = async () => {
+    try {
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        querystring.stringify({
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        }),
+        {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        }
+      );
+
+      const accessToken = tokenResponse.data.access_token;
+
+      const responseHome = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const responsePersonalLoans = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const unreadHomeCount = responseHome.data.value.filter(
+        notification => !notification.kf_markasread && notification.kf_createdby === authenticatedUser.kf_adminname
+      ).length;
+
+      const unreadPersonalLoansCount = responsePersonalLoans.data.value.filter(
+        notification => !notification.kf_markasread && notification.kf_createdby === authenticatedUser.kf_adminname
+      ).length;
+
+      setUnreadCount(unreadHomeCount + unreadPersonalLoansCount);
+    } catch (error) {
+      console.error('Error fetching unread count:', error);
+    }
+  };
+
   // Function to update kf_markasread field in CRM
   const updateKfMarkAsRead = async (recordId) => {
     try {
@@ -472,60 +516,68 @@ const handlePendingApprovals = async (personalLoanId) => {
 
   return (
     <View>
-   <View style={styles.navBar}>
-    <TouchableOpacity style={styles.iconButton} onPress={handleSettings}>
-        <Ionicons name="list-sharp" size={25} color="#fff" />
-    </TouchableOpacity>
-    <Text style={styles.text}>Kevin Small Finance</Text>
-    <TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
-  <Ionicons name="notifications" size={25} color="#fff" />
-  {(
-    loanApplications
-      .filter(
-        application =>
-          (sendApproval === null || application.kf_sendapproval === (sendApproval ? 1 : 0)) &&
-          authenticatedUser &&
-          application.kf_createdby === authenticatedUser.kf_adminname
-      )
-      .length +
-    notifications
-      .filter(
-        notification =>
-          authenticatedUser && notification.kf_createdby === authenticatedUser.kf_adminname
-      )
-      .length
-  ) > 0 && (
-    <View style={styles.badge}>
-      <Text style={styles.badgeText}>
-        {
-          loanApplications
-            .filter(
-              application =>
-                (sendApproval === null || application.kf_sendapproval === (sendApproval ? 1 : 0)) &&
-                authenticatedUser &&
-                application.kf_createdby === authenticatedUser.kf_adminname
-            )
-            .length +
-          notifications
-            .filter(
-              notification =>
-                authenticatedUser && notification.kf_createdby === authenticatedUser.kf_adminname
-            )
-            .length
-        }
-      </Text>
-    </View>
-  )}
-</TouchableOpacity>
+<View style={styles.navBar}>
+  <TouchableOpacity style={styles.iconButton} onPress={handleSettings}>
+    <Ionicons name="list-sharp" size={25} color="#fff" />
+  </TouchableOpacity>
+  <Text style={styles.text}>Kevin Small Finance</Text>
+  <TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
+    <Ionicons name="notifications" size={25} color="#fff" />
+    {(
+      loanApplications
+        .filter(
+          application =>
+            (sendApproval === null || application.kf_sendapproval === (sendApproval ? 1 : 0)) &&
+            authenticatedUser &&
+            application.kf_createdby === authenticatedUser.kf_adminname &&
+            !application.kf_markasread // Filter only unread home loan applications
+        )
+        .length +
+      notifications
+        .filter(
+          notification =>
+            authenticatedUser &&
+            notification.kf_createdby === authenticatedUser.kf_adminname &&
+            !notification.kf_markasread // Filter only unread personal loan notifications
+        )
+        .length
+    ) > 0 && (
+      <View style={styles.badge}>
+        <Text style={styles.badgeText}>
+          {
+            loanApplications
+              .filter(
+                application =>
+                  (sendApproval === null || application.kf_sendapproval === (sendApproval ? 1 : 0)) &&
+                  authenticatedUser &&
+                  application.kf_createdby === authenticatedUser.kf_adminname &&
+                  !application.kf_markasread // Filter only unread home loan applications
+              )
+              .length +
+            notifications
+              .filter(
+                notification =>
+                  authenticatedUser &&
+                  notification.kf_createdby === authenticatedUser.kf_adminname &&
+                  !notification.kf_markasread // Filter only unread personal loan notifications
+              )
+              .length
+          }
+        </Text>
+      </View>
+    )}
+  </TouchableOpacity>
 </View>
+
 
       
  {/* </View> */}
     <ScrollView>
       <View style={styles.container}>
-        {loanApplication.length > 0 && (
-          <>
         <Text style={styles.header}>Home Loan</Text>
+        {loanApplications.length === 0 && (
+          <Text>Norecords found in home loan</Text>
+        )}
         {loanApplications
         .filter(application => sendApproval === null || application.kf_sendapproval === (sendApproval ? 1 : 0))
         .filter(application => authenticatedUser && application.kf_createdby === authenticatedUser.kf_adminname) // Filter based on the authenticated user
@@ -539,6 +591,8 @@ const handlePendingApprovals = async (personalLoanId) => {
         >
     <View key={index}>
       <Text>Application Number: {application.kf_applicationnumber}</Text>
+      
+      <Text>Name: {application.kf_name} {application.kf_lastname}</Text>
       <View style={styles.readIndicatorContainer}>
   {application.kf_markasread ? (
     <Image
@@ -552,7 +606,6 @@ const handlePendingApprovals = async (personalLoanId) => {
     />
   )}
 </View>
-      <Text>Name: {application.kf_name} {application.kf_lastname}</Text>
       <Text>Created By: {application.kf_createdby}</Text>
       <Text>Status: {statusNames[application.kf_status]}</Text>
       <View style={styles.buttonContainer}>
@@ -563,11 +616,11 @@ const handlePendingApprovals = async (personalLoanId) => {
     </View>
     </View>
   ))}
-  </>
-)}
-    {loanApplications.length === 0 && <Text>No Home Loan record found</Text>}
 
         <Text style={styles.header}>Personal Loan</Text>
+        {notifications.length === 0 && (
+          <Text>No records found in personal loan</Text>
+        )}
         {notifications
   .filter(notification => authenticatedUser && notification.kf_createdby === authenticatedUser.kf_adminname)
   .map((notification, index) => (
@@ -615,7 +668,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    marginTop: 40
+    marginTop: 40,
   },
   header: {
     fontSize: 24,
@@ -692,8 +745,8 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     position: 'absolute',
-    top: -5,
-    right: 5,
+    top: -22,
+    right: 0,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -701,8 +754,8 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     position: 'absolute',
-    top: 5,
-    right: 5,
+    top: -40,
+    right: 0,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -713,6 +766,13 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 5,
     backgroundColor:'rgba(243,242,241,255)'
+  },
+  noRecordsText: {
+    fontSize: 16,
+    fontStyle: 'italic',
+    color: 'gray',
+    textAlign: 'center',
+    marginTop: 10,
   },
 });
 
