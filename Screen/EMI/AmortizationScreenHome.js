@@ -985,7 +985,6 @@ const AmortizationScreenHome = ({ route }) => {
     <View style={styles.container}>
       <HeaderComponent titleText="HomeLoan EMI Summary" onPress={handleGoBackHomedetails} />
       <ScrollView>
-        <Text>HII{receivedDate}</Text>
         <Text style={[styles.amortizationTitle, { marginTop: 10 }]}>EMI Details</Text>
         <View style={{ paddingHorizontal: 15, marginBottom: 20 }}>
 

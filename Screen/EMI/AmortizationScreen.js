@@ -914,7 +914,19 @@ const AmortizationScreen = ({ route }) => {
         }
       }
       setCreatedRecords(createdRecordsArray);
-      Alert.alert('All records created successfully in CRM');
+      // Alert.alert('All records created successfully in CRM');
+      Alert.alert('Amortization Schedule', 'Created Schedule Successfully', [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: () => {
+            // navigation.navigate('Dashboard', { resetState: true });
+          },
+        },
+      ]);
       console.log('All records created successfully in CRM')
       // navigation.navigate('Dashboard');
     } catch (error) {

@@ -85,12 +85,12 @@ export const LoginForm = () => {
         } else {
           // Authentication failed, display an error message
           console.log("Failed to authenticate. Invalid credentials.", response.data);
-          Alert.alert("Error", "Invalid credentials. Please try again.");
+          Alert.alert("Invalid credentials", "Please Enter Correct Email & Password.");
         }
       } else {
         // Authentication failed, display an error message
         console.log("Failed to authenticate. Response status:", response.status);
-        Alert.alert("Error", "Invalid credentials. Please try again.");
+        Alert.alert("Invalid credentials", "Please Enter Correct Email & Password.");
       }
     } catch (error) {
       console.error("Error during login:", error);

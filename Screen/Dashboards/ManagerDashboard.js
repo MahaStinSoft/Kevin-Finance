@@ -548,7 +548,7 @@ const fetchNotifications = async () => {
           <View style={styles.searchSection}>
             <Ionicons style={styles.searchIcon} name="search" size={25} color="rgba(255, 28, 53, 255)" />
             <TextInput
-              style={styles.input} placeholder="Search"
+              style={styles.input} placeholder="Search- Mobile no, Aadhar no, Pancard no"
               value={searchQuery}
               onChangeText={handleSearch}
             />
@@ -909,7 +909,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -7, // Adjust the position of the badge vertically
     right: -7, // Adjust the position of the badge horizontally
-    backgroundColor: 'red',
+    backgroundColor: '#697d71',
     borderRadius: 50,
     width: 20,
     height: 20,
@@ -922,7 +922,7 @@ const styles = StyleSheet.create({
   badgeText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 12, // Adjust font size for better visibility
+    fontSize: 10, // Adjust font size for better visibility
   },
   heading: {
     fontSize: 18,

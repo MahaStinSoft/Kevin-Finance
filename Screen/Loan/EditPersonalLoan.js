@@ -295,7 +295,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
         }
         // console.log(age);
 
-        Alert.alert('Updated the record Successfully.', '', [
+        Alert.alert('Personal Loan', 'Updated the record Successfully.', [
           {
             text: 'cancel'
           },
@@ -355,7 +355,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
 
           });
         }
-        Alert.alert('Applicant Image Updated Successfully.', '', [
+        Alert.alert('Personal Loan', 'Applicant Image Updated Successfully.', [
           {
             text: 'OK',
           },

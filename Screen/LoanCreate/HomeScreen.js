@@ -730,7 +730,7 @@ export const HomeScreen = ({ route }) => {
       if (createRecordResponse.status === 204) {
         setFormDisabled(true);
         console.log("Record created successfully in CRM"); //createRecordResponse
-        Alert.alert('Created record Successfully.', '', [
+        Alert.alert('Home Loan', 'Created record Successfully.', [
           {
             text: 'Cancel',
             style: 'cancel',

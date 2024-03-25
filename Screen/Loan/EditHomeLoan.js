@@ -292,7 +292,7 @@ const EditHomeLoan = ({ route, navigation }) => {
           });
         }
         // console.log(loanAmountRequested)
-        Alert.alert('Updated the record Successfully.', '', [
+        Alert.alert('Home Loan', 'Updated the record Successfully.', [
           {
             text: 'cancel'
           },
@@ -353,7 +353,7 @@ const EditHomeLoan = ({ route, navigation }) => {
 
           });
         }
-        Alert.alert('Applicant Image Updated Successfully.', '', [
+        Alert.alert('Home Loan', 'Applicant Image Updated Successfully.', [
           {
             text: 'OK',
           },

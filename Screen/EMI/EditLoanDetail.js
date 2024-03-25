@@ -474,7 +474,7 @@ const EditLoanDetail = ({ route, navigation }) => {
         console.log('Record updated successfully in CRM');
         setIsPaid(true);
         await AsyncStorage.setItem(`paid_${record.kf_loanid}`, 'true');
-        Alert.alert('EMI Amount Is Paided Successfully.', '', [
+        Alert.alert('EMI', 'EMI Amount is Paided Successfully.', [
           {
             text: 'OK',
             onPress: () => {

@@ -12,6 +12,8 @@ import CardImageSignature from '../../common/CardImageSignature';
 const HomeLoanGurantee = ({ route, navigation }) => {
   const { loanApplication, onUpdateSuccess } = route.params || {};
   const [applicationnumber, setapplicationnumber] = useState(loanApplication?.kf_applicationnumber || '');
+  const [applicantFirstName, setapplicantFirstName] = useState(loanApplication?.kf_name || '');
+  const [applicantLastName, setapplicantLastName] = useState(loanApplication?.kf_lastname || '');
   const [guarantoraadharnumber, setAadharcardNumber] = useState(loanApplication?.kf_guarantoraadharnumber || '');
   const [guarantorpannumber, setPancardNumber] = useState(loanApplication?.kf_guarantorpannumber || '');
   const [createdby, setcreatedby] = useState(loanApplication?.kf_createdby || '');
@@ -65,6 +67,8 @@ const HomeLoanGurantee = ({ route, navigation }) => {
 
   useEffect(() => {
     setapplicationnumber(loanApplication.kf_applicationnumber);
+    setapplicantFirstName(loanApplication.kf_name);
+    setapplicantLastName(loanApplication.kf_lastname);
     setcreatedby(loanApplication.kf_createdby);
     setfirstname(loanApplication.kf_guarantorfirstname);
     setLastname(loanApplication.kf_guarantorlastname);
@@ -146,6 +150,8 @@ const HomeLoanGurantee = ({ route, navigation }) => {
         `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications(${recordId})`,
         {
           kf_applicationnumber: applicationnumber,
+          kf_name: applicantFirstName,
+          kf_lastname: applicantLastName,
           kf_createdby: createdby,
           kf_guarantorfirstname: guarantorfirstname,
           kf_guarantorlastname: guarantorlastname,
@@ -178,6 +184,8 @@ const HomeLoanGurantee = ({ route, navigation }) => {
           onUpdateSuccess({
             ...loanApplication,
             kf_applicationnumber: applicationnumber,
+            kf_name: applicantFirstName,
+            kf_lastname: applicantLastName,
             kf_createdby: createdby,
             kf_guarantorfirstname: guarantorfirstname,
             kf_guarantorlastname: guarantorlastname,
@@ -709,6 +717,7 @@ const HomeLoanGurantee = ({ route, navigation }) => {
               onChangeText={(text) => {setcreatedby(text)}}
               editable={false}
             />
+            <Text  style={[styles.textInputContainer, { color: "gray" , height: 45}]}>{applicantFirstName} {applicantLastName}</Text>
             <TextInput
               style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
               value={guarantorfirstname}

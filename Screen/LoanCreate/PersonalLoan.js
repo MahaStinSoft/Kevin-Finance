@@ -680,7 +680,7 @@ const handleInterestRateChange = (text) => {
       if (createRecordResponse.status === 204) {
         setFormDisabled(true);
         console.log("Record created successfully in CRM");
-        Alert.alert('Created record Successfully.', '', [
+        Alert.alert('Personal Loan', 'Created record Successfully.', [
           {
             text: 'Cancel',
             style: 'cancel',

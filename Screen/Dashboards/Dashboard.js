@@ -53,7 +53,7 @@ const DashboardScreen = ({ navigation, route }) => {
   const [notifications, setNotifications] = useState([]);
   const [loanApplicationsCount, setLoanApplicationsCount] = useState(0);
   const [notificationsCount, setNotificationsCount] = useState(0);
-    // const [refresh, setRefresh] = useState(false);
+    const [refresh, setRefresh] = useState(false);
     const [sendApproval, setSendApproval] = useState(null);
 
   const [displayedHomeLoans, setDisplayedHomeLoans] = useState([]);
@@ -556,7 +556,7 @@ const handleNavigation = () => {
           <View style={styles.searchSection}>
             <Ionicons style={styles.searchIcon} name="search" size={25} color="rgba(255, 28, 53, 255)" />
             <TextInput
-              style={styles.input} placeholder="Search"
+              style={styles.input} placeholder="Search -Mobile No, Aadhar No, Pancard No"
               value={searchQuery}
               onChangeText={handleSearch}
             />
