@@ -659,9 +659,9 @@ const fetchNotifications = async () => {
                 ) : (
                   <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
                     {displayedHomeLoans.length === 0 && displayedPersonalLoans.length === 0 && (
-                      <Text style={{ fontSize: 18, fontWeight: "bold", textAlign: "center", marginTop: 20 }}>
-                        No records found
-                      </Text>
+                     <View style={styles.noRecordsContainer}>
+                     <Text style={styles.noRecordsText}>No Records Found</Text>
+                   </View>
                     )}
 
                     {displayedHomeLoans.length > 0 && (
@@ -710,22 +710,22 @@ const fetchNotifications = async () => {
                       </>
                     )}
 
-                    {displayedHomeLoans.length === 0 && displayedPersonalLoans.length === 0 && (
+                    {/* {displayedHomeLoans.length === 0 && displayedPersonalLoans.length === 0 && (
                       <Text style={{ fontSize: 18, fontWeight: "bold", textAlign: "center", marginTop: 20 }}>
                         No records found for both Home Loans and Personal Loans
                       </Text>
-                    )}
+                    )} */}
 
                     {displayedHomeLoans.length === 0 && displayedPersonalLoans.length > 0 && (
-                      <Text style={{ fontSize: 18, fontWeight: "bold", textAlign: "center", marginTop: 20 }}>
-                        No records found for Home Loans
-                      </Text>
+                     <View style={styles.noRecordsContainer}>
+                     <Text style={styles.noRecordsText}>No Records Found</Text>
+                   </View>
                     )}
 
                     {displayedHomeLoans.length > 0 && displayedPersonalLoans.length === 0 && (
-                      <Text style={{ fontSize: 18, fontWeight: "bold", textAlign: "center", marginTop: 20 }}>
-                        No records found for Personal Loans
-                      </Text>
+                     <View style={styles.noRecordsContainer}>
+                     <Text style={styles.noRecordsText}>No Records Found</Text>
+                   </View>
                     )}
                   </ScrollView>
                 )}
@@ -885,6 +885,28 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 10,
     color: "red"
+  },
+  noRecordsContainer: {
+    backgroundColor: '#FFF', // Background color of the container
+    borderRadius: 8, // Border radius to make it look like a card
+    padding: 16, // Padding around the text
+    marginTop: 16, // Margin around the container
+    shadowColor: '#000', // Shadow color
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25, // Shadow opacity
+    shadowRadius: 3.84,
+    // elevation: 5, // Elevation for Android shadow
+    justifyContent: 'center', // Center the text vertically
+    alignItems: 'center', // Center the text horizontally
+  },
+  noRecordsText: {
+    color: '#0000cc', // Text color
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center', // Center align the text
   },
 
 });
