@@ -12,14 +12,14 @@ import {
   ActivityIndicator,
   StatusBar,
   Platform,
-  RefreshControl, 
+  RefreshControl,
   Alert,
   BackHandler
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import NetInfo from '@react-native-community/netinfo'; 
+import NetInfo from '@react-native-community/netinfo';
 import axios from 'axios';
 import { BarChart } from 'react-native-chart-kit';
 import LogoutButton from '../../common/CustomDrawer';
@@ -53,12 +53,14 @@ const DashboardScreen = ({ navigation, route }) => {
   const [notifications, setNotifications] = useState([]);
   const [loanApplicationsCount, setLoanApplicationsCount] = useState(0);
   const [notificationsCount, setNotificationsCount] = useState(0);
-    const [refresh, setRefresh] = useState(false);
-    const [sendApproval, setSendApproval] = useState(null);
+  const [refresh, setRefresh] = useState(false);
+  const [sendApproval, setSendApproval] = useState(null);
 
   const [displayedHomeLoans, setDisplayedHomeLoans] = useState([]);
   const [displayedPersonalLoans, setDisplayedPersonalLoans] = useState([]);
-  const [showAllLoans, setShowAllLoans] = useState(false);
+  // const [showAllLoans, setShowAllLoans] = useState(false);
+  const [showAllHomeLoans, setShowAllHomeLoans] = useState(false);
+  const [showAllPersonalLoans, setShowAllPersonalLoans] = useState(false);
 
   const isFocused = useIsFocused();
 
@@ -69,13 +71,13 @@ const DashboardScreen = ({ navigation, route }) => {
         console.log('No Internet Connection');
         Alert.alert('No Internet Connection', 'Please check your internet connection and try again.');
       }
-      
+
     });
-  
+
     return () => {
       unsubscribe();
     };
-  }, []);  
+  }, []);
 
   useEffect(() => {
     getAuthenticatedUser();
@@ -109,9 +111,9 @@ const DashboardScreen = ({ navigation, route }) => {
   }, [navigation]);
 
   useEffect(() => {
-    setDisplayedHomeLoans(showAllLoans ? HomeLoanRecords : HomeLoanRecords.slice(0, 3));
-    setDisplayedPersonalLoans(showAllLoans ? PersonalLoanRecords : PersonalLoanRecords.slice(0, 3));
-  }, [showAllLoans, HomeLoanRecords, PersonalLoanRecords]);
+    setDisplayedHomeLoans(showAllHomeLoans ? HomeLoanRecords : HomeLoanRecords.slice(0, 3));
+    setDisplayedPersonalLoans(showAllPersonalLoans ? PersonalLoanRecords : PersonalLoanRecords.slice(0, 3));
+  }, [showAllHomeLoans, showAllPersonalLoans,  HomeLoanRecords, PersonalLoanRecords]);
 
 
   useEffect(() => {
@@ -141,6 +143,15 @@ const DashboardScreen = ({ navigation, route }) => {
 
   const deviceWidth = Dimensions.get('window').width;
   const textColor = deviceWidth < 390 ? 'red' : 'blue';
+
+  const toggleShowAllHomeLoans = () => {
+    setShowAllHomeLoans(!showAllHomeLoans);
+  };
+  
+  // Function to toggle showing all personal loans
+  const toggleShowAllPersonalLoans = () => {
+    setShowAllPersonalLoans(!showAllPersonalLoans);
+  };
 
   const handleHomeLoan = () => {
     navigation.navigate('HomeLoan');
@@ -198,14 +209,14 @@ const DashboardScreen = ({ navigation, route }) => {
 
         const sortedHomeLoans = homeLoans.sort((a, b) => new Date(b.createdon) - new Date(a.createdon));
         const sortedPersonalLoans = personalLoans.sort((a, b) => new Date(b.createdon) - new Date(a.createdon));
-  
+
         const latestHomeLoans = sortedHomeLoans.slice(0, 3);
         const latestPersonalLoans = sortedPersonalLoans.slice(0, 3);
-      
+
         const userAdmin = authenticatedUser ? authenticatedUser.kf_adminname : '';
 
         const homeLoanRecords = homeLoans.filter(
-          (homeLoan) => 
+          (homeLoan) =>
             homeLoan.kf_createdby === userAdmin &&
             (
               homeLoan.kf_name && homeLoan.kf_name.toUpperCase().includes(searchQuery.toUpperCase()) ||
@@ -213,10 +224,10 @@ const DashboardScreen = ({ navigation, route }) => {
               (homeLoan.kf_mobilenumber && homeLoan.kf_mobilenumber.toLowerCase().includes(searchQuery.toLowerCase())) ||
               (homeLoan.kf_aadharnumber && homeLoan.kf_aadharnumber.toLowerCase().includes(searchQuery.toLowerCase()))
             )
-        );        
-        
+        );
+
         const personalLoanRecords = personalLoans.filter(
-          (personalLoan) => 
+          (personalLoan) =>
             personalLoan.kf_createdby === userAdmin &&
             (
               personalLoan.kf_firstname && personalLoan.kf_firstname.toUpperCase().includes(searchQuery.toUpperCase()) ||
@@ -225,13 +236,13 @@ const DashboardScreen = ({ navigation, route }) => {
               (personalLoan.kf_aadharnumber && personalLoan.kf_aadharnumber.toLowerCase().includes(searchQuery.toLowerCase()))
             )
         );
-        
+
         setDisplayedHomeLoans(latestHomeLoans);
         setDisplayedPersonalLoans(latestPersonalLoans);
 
         setHomeLoanRecords(homeLoanRecords);
         setPersonalLoanRecords(personalLoanRecords);
-    
+
         setHomeLoanContacts(homeLoanRecords);
         setPersonalLoanContacts(personalLoanRecords);
 
@@ -255,7 +266,7 @@ const DashboardScreen = ({ navigation, route }) => {
       const fetchLoanData = async () => {
         try {
           setLoading(true);
-  
+
           const data = {
             grant_type: "client_credentials",
             client_id: "d9dcdf05-37f4-4bab-b428-323957ad2f86",
@@ -263,15 +274,15 @@ const DashboardScreen = ({ navigation, route }) => {
             scope: "https://org0f7e6203.crm5.dynamics.com/.default",
             client_secret: "JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2",
           };
-  
+
           const tokenResponse = await axios.post(
             "https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token",
             new URLSearchParams(data).toString(),
             { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
           );
-  
+
           const accessToken = tokenResponse.data.access_token;
-  
+
           const responseLoanApplications = await axios.get(
             "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications",
             {
@@ -284,7 +295,7 @@ const DashboardScreen = ({ navigation, route }) => {
               }
             }
           );
-  
+
           const responsePersonalLoans = await axios.get(
             "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans",
             {
@@ -297,33 +308,33 @@ const DashboardScreen = ({ navigation, route }) => {
               }
             }
           );
-  
+
           const homeLoans = responseLoanApplications.data.value;
           const personalLoans = responsePersonalLoans.data.value;
-  
+
           const filteredHomeLoans = homeLoans.filter(
             (homeLoan) => homeLoan.kf_status !== null
           );
-  
+
           const filteredPersonalLoans = personalLoans.filter(
             (personalLoan) => personalLoan.kf_status !== null
           );
-  
+
           const combinedData = [...filteredHomeLoans, ...filteredPersonalLoans];
-  
+
           setLoanData(combinedData);
-  
+
           const today = new Date();
           const lastMonth = new Date(today);
           lastMonth.setMonth(today.getMonth() - 1);
-  
+
           const lastMonthRecords = combinedData.filter((item) => {
             const createdDate = new Date(item.createdon);
             return createdDate >= lastMonth && createdDate <= today;
           });
-  
+
           setLastMonthData(lastMonthRecords);
-    
+
         } catch (error) {
           console.error("Error fetching loan data:", error);
           console.log("API Response:", error.response?.data);
@@ -331,7 +342,7 @@ const DashboardScreen = ({ navigation, route }) => {
           setLoading(false);
         }
       };
-  
+
       if (authenticatedUser) {
         fetchLoanData();
       } else {
@@ -339,7 +350,7 @@ const DashboardScreen = ({ navigation, route }) => {
       }
     }, [authenticatedUser])
   );
-  
+
   const filteredData = loanData.filter(
     (item) =>
       item.kf_status !== null &&
@@ -389,102 +400,102 @@ const DashboardScreen = ({ navigation, route }) => {
     setRefresh(!refresh);
   };
 
-const handleDynamicDashboard = () => {
- try {
-  navigation.navigate('DynamicDashboardScreen');
-} catch (error) {
-  console.error('Error navigating to DynamicDashboardScreen:', error);
-}
-}
-
-// notificaiton badge
-useEffect(() => {
-      fetchLoanApplications();
-      fetchNotifications();
-    }, []);
-
-const fetchLoanApplications = async () => {
-  try {
-    const tokenResponse = await axios.post(
-      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
-      querystring.stringify({
-        grant_type: 'client_credentials',
-        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
-        resource: 'https://org0f7e6203.crm5.dynamics.com',
-        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
-        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
-      }),
-      {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      }
-    );
-
-    const accessToken = tokenResponse.data.access_token;
-
-    const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    if (response.data && response.data.value && Array.isArray(response.data.value)) {
-      // Filter loan applications where kf_sendapproval is equal to 1
-      const filteredApplications = response.data.value.filter(application => application.kf_sendapproval == 1);
-      setLoanApplications(filteredApplications);
-      setLoanApplicationsCount(filteredApplications.length);
-      // setRefresh(!refresh);
-    } else {
-      console.error('Invalid loan applications response format:', response.data);
+  const handleDynamicDashboard = () => {
+    try {
+      navigation.navigate('DynamicDashboardScreen');
+    } catch (error) {
+      console.error('Error navigating to DynamicDashboardScreen:', error);
     }
-  } catch (error) {
-    console.error('Error fetching loan applications:', error);
   }
-};
 
-const fetchNotifications = async () => {
-  try {
-    const tokenResponse = await axios.post(
-      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
-      querystring.stringify({
-        grant_type: 'client_credentials',
-        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
-        resource: 'https://org0f7e6203.crm5.dynamics.com',
-        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
-        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
-      }),
-      {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  // notificaiton badge
+  useEffect(() => {
+    fetchLoanApplications();
+    fetchNotifications();
+  }, []);
+
+  const fetchLoanApplications = async () => {
+    try {
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        querystring.stringify({
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        }),
+        {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        }
+      );
+
+      const accessToken = tokenResponse.data.access_token;
+
+      const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.data && response.data.value && Array.isArray(response.data.value)) {
+        // Filter loan applications where kf_sendapproval is equal to 1
+        const filteredApplications = response.data.value.filter(application => application.kf_sendapproval == 1);
+        setLoanApplications(filteredApplications);
+        setLoanApplicationsCount(filteredApplications.length);
+        // setRefresh(!refresh);
+      } else {
+        console.error('Invalid loan applications response format:', response.data);
       }
-    );
-
-    const accessToken = tokenResponse.data.access_token;
-
-    const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    if (response.data && response.data.value && Array.isArray(response.data.value)) {
-      // Filter personal loan notifications where kf_sendapproval is equal to 1
-      const filteredNotifications = response.data.value.filter(notification => notification.kf_sendapproval == 1);
-      setNotifications(filteredNotifications);
-      setNotificationsCount(filteredNotifications.length); // Update count based on the fetched data
-      // setRefresh(!refresh);
-    } else {
-      console.error('Invalid notifications response format:', response.data);
+    } catch (error) {
+      console.error('Error fetching loan applications:', error);
     }
-  } catch (error) {
-    console.error('Error fetching notifications:', error);
-  }
-}; 
+  };
 
-const handleSettings = () => {
-  navigation.navigate( "Setting");
-};
-const handleNavigation = () => {
-  navigation.navigate("AdminNotification", { authenticatedUser });
-};
+  const fetchNotifications = async () => {
+    try {
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        querystring.stringify({
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        }),
+        {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        }
+      );
+
+      const accessToken = tokenResponse.data.access_token;
+
+      const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.data && response.data.value && Array.isArray(response.data.value)) {
+        // Filter personal loan notifications where kf_sendapproval is equal to 1
+        const filteredNotifications = response.data.value.filter(notification => notification.kf_sendapproval == 1);
+        setNotifications(filteredNotifications);
+        setNotificationsCount(filteredNotifications.length); // Update count based on the fetched data
+        // setRefresh(!refresh);
+      } else {
+        console.error('Invalid notifications response format:', response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
+  };
+
+  const handleSettings = () => {
+    navigation.navigate("Setting");
+  };
+  const handleNavigation = () => {
+    navigation.navigate("AdminNotification", { authenticatedUser });
+  };
 
   return (
     <>
@@ -504,53 +515,53 @@ const handleNavigation = () => {
               <Ionicons name="list-sharp" size={25} color="#fff" />
             </TouchableOpacity>
             <Text style={styles.text}>Kevin Small Finance</Text>
-          
+
             <TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
-    <Ionicons name="notifications" size={25} color="#fff" />
-    {(
-      loanApplications
-        .filter(
-          application =>
-            (sendApproval === null || application.kf_sendapproval === (sendApproval ? 1 : 0)) &&
-            authenticatedUser &&
-            application.kf_createdby === authenticatedUser.kf_adminname &&
-            !application.kf_markasread // Filter only unread home loan applications
-        )
-        .length +
-      notifications
-        .filter(
-          notification =>
-            authenticatedUser &&
-            notification.kf_createdby === authenticatedUser.kf_adminname &&
-            !notification.kf_markasread // Filter only unread personal loan notifications
-        )
-        .length
-    ) > 0 && (
-      <View style={styles.badge}>
-        <Text style={styles.badgeText}>
-          {
-            loanApplications
-              .filter(
-                application =>
-                  (sendApproval === null || application.kf_sendapproval === (sendApproval ? 1 : 0)) &&
-                  authenticatedUser &&
-                  application.kf_createdby === authenticatedUser.kf_adminname &&
-                  !application.kf_markasread // Filter only unread home loan applications
-              )
-              .length +
-            notifications
-              .filter(
-                notification =>
-                  authenticatedUser &&
-                  notification.kf_createdby === authenticatedUser.kf_adminname &&
-                  !notification.kf_markasread // Filter only unread personal loan notifications
-              )
-              .length
-          }
-        </Text>
-      </View>
-    )}
-  </TouchableOpacity>
+              <Ionicons name="notifications" size={25} color="#fff" />
+              {(
+                loanApplications
+                  .filter(
+                    application =>
+                      (sendApproval === null || application.kf_sendapproval === (sendApproval ? 1 : 0)) &&
+                      authenticatedUser &&
+                      application.kf_createdby === authenticatedUser.kf_adminname &&
+                      !application.kf_markasread // Filter only unread home loan applications
+                  )
+                  .length +
+                notifications
+                  .filter(
+                    notification =>
+                      authenticatedUser &&
+                      notification.kf_createdby === authenticatedUser.kf_adminname &&
+                      !notification.kf_markasread // Filter only unread personal loan notifications
+                  )
+                  .length
+              ) > 0 && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>
+                      {
+                        loanApplications
+                          .filter(
+                            application =>
+                              (sendApproval === null || application.kf_sendapproval === (sendApproval ? 1 : 0)) &&
+                              authenticatedUser &&
+                              application.kf_createdby === authenticatedUser.kf_adminname &&
+                              !application.kf_markasread // Filter only unread home loan applications
+                          )
+                          .length +
+                        notifications
+                          .filter(
+                            notification =>
+                              authenticatedUser &&
+                              notification.kf_createdby === authenticatedUser.kf_adminname &&
+                              !notification.kf_markasread // Filter only unread personal loan notifications
+                          )
+                          .length
+                      }
+                    </Text>
+                  </View>
+                )}
+            </TouchableOpacity>
           </View>
 
           <View style={styles.searchSection}>
@@ -582,7 +593,7 @@ const handleNavigation = () => {
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
           >
-          {/* <Text style={{textAlign: "center", marginBottom: 10, fontSize: 18, fontWeight: "bold",color: "red"}}>ADMIN DASHBOARD</Text> */}
+            {/* <Text style={{textAlign: "center", marginBottom: 10, fontSize: 18, fontWeight: "bold",color: "red"}}>ADMIN DASHBOARD</Text> */}
 
             {/* <View>
               {authenticatedUser && (
@@ -649,64 +660,48 @@ const handleNavigation = () => {
               />
             </View>
 
-              {/* Dynamic Dashboard Button */}
-              {/* <TouchableOpacity style={styles.dynamicDashboardButton} onPress={handleDynamicDashboard}>
+            {/* Dynamic Dashboard Button */}
+            {/* <TouchableOpacity style={styles.dynamicDashboardButton} onPress={handleDynamicDashboard}>
                 <Text style={styles.dynamicDashboardButtonText}>Dynamic Dashboard</Text>
               </TouchableOpacity> */}
 
-              <View style={{ marginRight: 10 }}>
-                <TouchableOpacity
-                  onPress={() => setShowAllLoans(!showAllLoans)}
-                  style={styles.viewButton}
-                >
-                  <Text style={styles.dynamicDashboardButtonText}>
-                    {showAllLoans ? 'View Less' : 'View More'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
+            {/* <View style={{ marginRight: 10 }}>
+              <TouchableOpacity
+                onPress={() => setShowAllLoans(!showAllLoans)}
+                style={styles.viewButton}
+              >
+                <Text style={styles.dynamicDashboardButtonText}>
+                  {showAllLoans ? 'View Less' : 'View More'}
+                </Text>
+              </TouchableOpacity>
+            </View> */}
 
-
-            {/* <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10 }}>
-            {loading ? (
-              <ActivityIndicator size="large" color="#0000ff" />
-            ) : (
-              <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Home Loans</Text>
-            {displayedHomeLoans.map((homeLoan, index) => (
-              <HomeLoanCard
-                key={index}
-                loanApplication={homeLoan}
-                onPress={() => navigateToHomeDetails(homeLoan)}
-              />
-            ))}
-
-            <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 20, marginBottom: 10 }}>Personal Loans</Text>
-            {displayedPersonalLoans.map((personalLoan, index) => (
-              <PersonalLoanCard
-                key={index}
-                personalLoan={personalLoan}
-                onPress={() => navigateToPersonalDetails(personalLoan)}
-              />
-            ))}
-
-              </ScrollView>
-            )}
-          </View> */}
-
-            <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10,  paddingHorizontal: 8 }}>
-            {initialLoading ? (
+            <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 8 }}>
+              {initialLoading ? (
                 <ActivityIndicator size="large" color="#0000ff" />
               ) : (
                 <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
                   {displayedHomeLoans.length === 0 && displayedPersonalLoans.length === 0 && (
-                    <Text style={{ fontSize: 18, fontWeight: "bold", textAlign: "center", marginTop: 20 }}>
-                      No records found
-                    </Text>
+                    <View style={[styles.noRecordsContainer, { marginTop: 80 }]}>
+                      <Text style={styles.noRecordsText}>No Records Found</Text>
+                    </View>
                   )}
 
                   {displayedHomeLoans.length > 0 && (
                     <>
-                      <Text style={styles.heading}>Home Loans</Text>
+                    <View style={{ marginRight: 10 }}>
+            {displayedHomeLoans.length > 0 && (
+              <TouchableOpacity
+                onPress={toggleShowAllHomeLoans}
+                style={styles.viewButton}
+              >
+                <Text style={styles.dynamicDashboardButtonText}>
+                  {showAllHomeLoans ? 'View Less' : 'View More'}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+                      <Text style={[styles.heading, {marginBottom: 20}]}>Home Loans</Text>
                       {displayedHomeLoans.map((homeLoan, index) => (
                         <HomeLoanCard
                           key={index}
@@ -719,7 +714,19 @@ const handleNavigation = () => {
 
                   {displayedPersonalLoans.length > 0 && (
                     <>
-                      <Text style={[styles.heading, { paddingHorizontal: 5}]}>Personal Loans</Text>
+                     <View style={{ marginRight: 10 }}>
+            {displayedPersonalLoans.length > 0 && (
+              <TouchableOpacity
+                onPress={toggleShowAllPersonalLoans}
+                style={[styles.viewButton, {top: 30}]}
+              >
+                <Text style={styles.dynamicDashboardButtonText}>
+                  {showAllPersonalLoans ? 'View Less' : 'View More'}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+                      <Text style={[styles.heading, { paddingHorizontal: 5, top: -10 }]}>Personal Loans</Text>
                       {displayedPersonalLoans.map((personalLoan, index) => (
                         <PersonalLoanCard
                           key={index}
@@ -730,22 +737,24 @@ const handleNavigation = () => {
                     </>
                   )}
 
-                  {displayedHomeLoans.length === 0 && displayedPersonalLoans.length === 0 && (
+                  {/* {displayedHomeLoans.length === 0 && displayedPersonalLoans.length === 0 && (
                     <Text style={{ fontSize: 18, fontWeight: "bold", textAlign: "center", marginTop: 20 }}>
                       No records found for both Home Loans and Personal Loans
                     </Text>
-                  )}
+                  )} */}
 
+                  {/* Home Records */}
                   {displayedHomeLoans.length === 0 && displayedPersonalLoans.length > 0 && (
-                    <Text style={{ fontSize: 18, fontWeight: "bold", textAlign: "center", marginTop: 20 }}>
-                      No records found for Home Loans
-                    </Text>
+                    <View style={styles.noRecordsContainer}>
+                      <Text style={styles.noRecordsText}>No Records Found</Text>
+                    </View>
                   )}
 
+                  {/* personal loan records */}
                   {displayedHomeLoans.length > 0 && displayedPersonalLoans.length === 0 && (
-                    <Text style={{ fontSize: 18, fontWeight: "bold", textAlign: "center", marginTop: 20 }}>
-                      No records found for Personal Loans
-                    </Text>
+                    <View style={styles.noRecordsContainer}>
+                      <Text style={styles.noRecordsText}>No Records Found</Text>
+                    </View>
                   )}
                 </ScrollView>
               )}
@@ -898,23 +907,23 @@ const styles = StyleSheet.create({
     marginRight: 30
   },
   dynamicDashboardButtonText: {
-    backgroundColor:'rgba(255, 28, 53, 255)',
+    backgroundColor: 'rgba(255, 28, 53, 255)',
     color: '#fff',
     fontSize: 15,
     fontWeight: 'bold',
-    textAlign:"center"
+    textAlign: "center"
   },
   viewButton: {
-    backgroundColor:'rgba(255, 28, 53, 255)',
+    backgroundColor: 'rgba(255, 28, 53, 255)',
     borderRadius: 25,
     padding: 10,
-    marginTop: 10,
-    width: 100,
-    alignSelf: "flex-end"
-},
-chart: {
-  marginLeft: 10
-},
+    top: 40,
+    width: "28%",
+    alignSelf: "flex-end",
+  },
+  chart: {
+    marginLeft: 10
+  },
   heading: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -922,11 +931,11 @@ chart: {
     marginBottom: 10,
     color: "red"
   },
-badge: {
+  badge: {
     position: 'absolute',
     top: -7, // Adjust the position of the badge vertically
     right: -7, // Adjust the position of the badge horizontally
-    backgroundColor: 'red',
+    backgroundColor: '#697d71',
     borderRadius: 50,
     width: 20,
     height: 20,
@@ -940,6 +949,28 @@ badge: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 12, // Adjust font size for better visibility
+  },
+  noRecordsContainer: {
+    backgroundColor: '#FFF', // Background color of the container
+    borderRadius: 8, // Border radius to make it look like a card
+    padding: 16, // Padding around the text
+    marginTop: 16, // Margin around the container
+    shadowColor: '#000', // Shadow color
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25, // Shadow opacity
+    shadowRadius: 3.84,
+    // elevation: 5, // Elevation for Android shadow
+    justifyContent: 'center', // Center the text vertically
+    alignItems: 'center', // Center the text horizontally
+  },
+  noRecordsText: {
+    color: '#0000cc', // Text color
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center', // Center align the text
   },
 });
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, Modal, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, Button, Modal, TouchableOpacity, TextInput, Alert } from 'react-native';
 import axios from 'axios';
 import { ScrollView } from 'react-native-gesture-handler';
 import querystring from 'querystring';
@@ -8,6 +8,7 @@ import moment from 'moment'; // Import moment.js for date formatting
 import PushNotification from 'react-native-push-notification';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'react-native';
+import ButtonComponent from '../common/ButtonComponent';
 
 const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
   const [loanApplications, setLoanApplications] = useState([]);
@@ -62,6 +63,9 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
       if (response.data && response.data.value && Array.isArray(response.data.value)) {
         // Filter loan applications where kf_sendapproval is equal to 1
         const filteredApplications = response.data.value.filter(application => application.kf_sendapproval == 1);
+
+        // Sort the filtered applications based on a timestamp or any other relevant field indicating when the approval was sent
+      filteredApplications.sort((a, b) => new Date(b.approvalSentTimestamp) - new Date(a.approvalSentTimestamp));
         setLoanApplications(filteredApplications);
 
         if (loanApplications.length < filteredApplications.length) {
@@ -103,6 +107,7 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
       if (response.data && response.data.value && Array.isArray(response.data.value)) {
         // Filter personal loan notifications where kf_sendapproval is equal to 1
         const filteredNotifications = response.data.value.filter(notification => notification.kf_sendapproval == 1);
+        filteredNotifications.sort((a, b) => new Date(b.approvalSentTimestamp) - new Date(a.approvalSentTimestamp));
         setNotifications(filteredNotifications);
 
         // Schedule push notification if new notifications are fetched
@@ -118,47 +123,96 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
     }
   };
 
+  // const handleApproveLoan = async (applicationId) => {
+  //   try {
+  //     const tokenResponse = await axios.post(
+  //       'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+  //       querystring.stringify({
+  //         grant_type: 'client_credentials',
+  //         client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+  //         resource: 'https://org0f7e6203.crm5.dynamics.com',
+  //         scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+  //         client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+  //       }),
+  //       {
+  //         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  //       }
+  //     );
+
+  //     const accessToken = tokenResponse.data.access_token;
+
+  //     await axios.patch(`https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications(${applicationId})`, {
+  //       kf_status: 123950000, // Approved status
+  //       kf_approvedby: kf_adminname, // Set the admin name
+  //     }, {
+  //       headers: {
+  //         Authorization: `Bearer ${accessToken}`,
+  //       },
+  //     });
+
+  //     // Refresh loan applications after approval
+  //     fetchLoanApplications();
+  //   } catch (error) {
+  //     console.error('Error approving loan application:', error);
+  //   }
+  // };
+
   const handleApproveLoan = async (applicationId) => {
-    try {
-      const tokenResponse = await axios.post(
-        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
-        querystring.stringify({
-          grant_type: 'client_credentials',
-          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
-          resource: 'https://org0f7e6203.crm5.dynamics.com',
-          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
-          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
-        }),
+    // Display an alert confirming the approval action
+    Alert.alert(
+      'Approve Loan',
+      'Are you sure you want to approve?',
+      [
         {
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        }
-      );
-
-      const accessToken = tokenResponse.data.access_token;
-
-      await axios.patch(`https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications(${applicationId})`, {
-        kf_status: 123950000, // Approved status
-        kf_approvedby: kf_adminname, // Set the admin name
-      }, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
         },
-      });
+        {
+          text: 'Yes',
+          onPress: async () => {
+            try {
+              const tokenResponse = await axios.post(
+                'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+                querystring.stringify({
+                  grant_type: 'client_credentials',
+                  client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+                  resource: 'https://org0f7e6203.crm5.dynamics.com',
+                  scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+                  client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+                }),
+                {
+                  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                }
+              );
 
-      // Refresh loan applications after approval
-      fetchLoanApplications();
-    } catch (error) {
-      console.error('Error approving loan application:', error);
-    }
+              const accessToken = tokenResponse.data.access_token;
+
+              await axios.patch(`https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications(${applicationId})`, {
+                kf_status: 123950000, // Approved status
+                kf_approvedby: kf_adminname, // Set the admin name
+              }, {
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
+                },
+              });
+
+              // Refresh loan applications after approval
+              fetchLoanApplications();
+            } catch (error) {
+              console.error('Error approving loan application:', error);
+            }
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
-
-
 
   const handleRejectLoan = async (applicationId) => {
     setSelectedApplicationId(applicationId);
     setShowRejectCommentBox(true);
   };
-
 
   const handleRejectNotification = async (personalLoanId) => {
     setSelectedPersonalLoanId(personalLoanId); // Set the selected personal loan ID
@@ -168,38 +222,90 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
   // For Personal Loan 
 
   // Add functions to handle personal loan approvals, drafts, pending approvals, and rejections
+  // const handleApproveNotification = async (personalLoanId) => {
+  //   try {
+  //     const tokenResponse = await axios.post(
+  //       'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+  //       querystring.stringify({
+  //         grant_type: 'client_credentials',
+  //         client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+  //         resource: 'https://org0f7e6203.crm5.dynamics.com',
+  //         scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+  //         client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+  //       }),
+  //       {
+  //         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  //       }
+  //     );
+
+  //     const accessToken = tokenResponse.data.access_token;
+
+  //     await axios.patch(`https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans(${personalLoanId})`, {
+  //       kf_status: 123950000, // Approved status
+  //       kf_approvedby: kf_adminname, // Assuming 123950000 represents the status for approval
+  //     }, {
+  //       headers: {
+  //         Authorization: `Bearer ${accessToken}`,
+  //       },
+  //     });
+
+  //     // Refresh notifications after approval
+  //     fetchNotifications();
+  //   } catch (error) {
+  //     console.error('Error approving personal loan:', error);
+  //   }
+  // };
+
   const handleApproveNotification = async (personalLoanId) => {
-    try {
-      const tokenResponse = await axios.post(
-        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
-        querystring.stringify({
-          grant_type: 'client_credentials',
-          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
-          resource: 'https://org0f7e6203.crm5.dynamics.com',
-          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
-          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
-        }),
+    // Display an alert confirming the approval action
+    Alert.alert(
+      'Approve Personal Loan',
+      'Are you sure you want to approve?',
+      [
         {
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        }
-      );
-
-      const accessToken = tokenResponse.data.access_token;
-
-      await axios.patch(`https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans(${personalLoanId})`, {
-        kf_status: 123950000, // Approved status
-        kf_approvedby: kf_adminname, // Assuming 123950000 represents the status for approval
-      }, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
         },
-      });
+        {
+          text: 'Yes',
+          onPress: async () => {
+            try {
+              const tokenResponse = await axios.post(
+                'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+                querystring.stringify({
+                  grant_type: 'client_credentials',
+                  client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+                  resource: 'https://org0f7e6203.crm5.dynamics.com',
+                  scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+                  client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+                }),
+                {
+                  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                }
+              );
 
-      // Refresh notifications after approval
-      fetchNotifications();
-    } catch (error) {
-      console.error('Error approving personal loan:', error);
-    }
+              const accessToken = tokenResponse.data.access_token;
+
+              await axios.patch(`https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans(${personalLoanId})`, {
+                kf_status: 123950000, // Approved status
+                kf_approvedby: kf_adminname, // Assuming 123950000 represents the status for approval
+              }, {
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
+                },
+              });
+
+              // Refresh notifications after approval
+              fetchNotifications();
+            } catch (error) {
+              console.error('Error approving personal loan:', error);
+            }
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
 
   const handlePendingApprovals = async (personalLoanId) => {
@@ -464,6 +570,8 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
     navigation.navigate("Notification", { kf_adminname });
   };
 
+  const approvedApplications = loanApplications.filter(application => application.kf_status === 123950000);
+
   return (
     <View>
       <View style={styles.navBar}>
@@ -490,11 +598,16 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
 
       <ScrollView>
         <View style={styles.container}>
+        <View style={{borderWidth: 1, borderColor: "#b0b0b0", paddingHorizontal: 10, marginTop: 10, borderRadius: 10}}>
           <Text style={styles.header}>Home Loan</Text>
           {loanApplications.length === 0 && (
-            <Text>No records found in home loan</Text>
+            <View style={styles.noRecordsContainer}>
+            <Text style={styles.noRecordsText}>No Records Found</Text>
+            </View>
           )}
-          {loanApplications.map((application, index) => (
+          {loanApplications
+          .sort((a, b) => (a.kf_markasread === b.kf_markasread ? 0 : a.kf_markasread ? 1 : -1)) 
+          .map((application, index) => (
             <View
               key={index}
               style={[
@@ -506,7 +619,6 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
               <Text>Created By: {application.kf_createdby}</Text>
               <Text>Admin Name: {kf_adminname}</Text>
               <Text>Name: {application.kf_name} {application.kf_lastname}</Text>
-              {/* Display the status name */}
               <View style={styles.readIndicatorContainer}>
                 {application.kf_markasread ? (
                   <Image
@@ -514,20 +626,13 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
                     style={styles.twitterImage1}
                   />
                 ) : (
-                  <Image
-                    source={require('../assets/unread_message.png')}
-                    style={styles.twitterImage}
-                  />
+                  <Text style={styles.twitterImage}>Unread</Text>
                 )}
               </View>
               <Text>Status: {statusNames[application.kf_status]}</Text>
-              {/* Buttons for actions */}
               <Text>Created At: {formatDateTime(application.created_at)}</Text>
               <View style={styles.buttonContainer}>
-                <Button title={`✓ Approve`} onPress={() => handleApproveLoan(application.kf_loanapplicationid)} color="green" disabled={application.kf_status === 123950000} />
-                <Button title={`✗ Reject`} onPress={() => handleRejectLoan(application.kf_loanapplicationid)} color="red" disabled={application.kf_status === 123950000} />
                 <Button title="View Record" onPress={() => handleViewHomeLoan(application)} />
-                {/* Display date and time */}
                 {showRejectCommentBox && selectedApplicationId === application.kf_loanapplicationid && (
                   <Modal
                     transparent
@@ -537,29 +642,39 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
                   >
                     <View style={styles.modalContainer}>
                       <View style={styles.commentBoxContainer}>
-                        <Text>Enter Reject Reason:</Text>
+                        <Text style={{ fontSize: 16, fontWeight: "bold", }}>Enter Reject Reason:</Text>
                         <TextInput
                           style={styles.commentInput}
                           multiline
                           value={rejectComment}
                           onChangeText={(text) => setRejectComment(text)}
                         />
-                        <Button title="Submit Reject Reason" onPress={handleRejectWithComment} />
-                        <Button title="Cancel" onPress={() => setShowRejectCommentBox(false)} />
+                        <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
+                          <ButtonComponent title="Submit" onPress={handleRejectWithComment} style={{ width: "40%", height: "45%", backgroundColor: "green" }} />
+                          <ButtonComponent title="Cancel" onPress={() => setShowRejectCommentBox(false)} style={{ width: "40%", height: "45%" }} />
+                        </View>
                       </View>
                     </View>
                   </Modal>
                 )}
+                <Button title={`✓ Approve`} onPress={() => handleApproveLoan(application.kf_loanapplicationid)} color="green" disabled={application.kf_status === 123950000} />
+                <Button title={`✗ Reject`} onPress={() => handleRejectLoan(application.kf_loanapplicationid)} color="red" disabled={application.kf_status === 123950000} />
+
               </View>
             </View>
           ))}
+          </View>
 
-
-          <Text style={styles.header}>Personal Loan Notifications</Text>
+          <View style={{borderWidth: 1, borderColor: "#b0b0b0", paddingHorizontal: 10, marginTop: 10, borderRadius: 10}}>
+          <Text style={styles.header}>Personal Loan </Text>
           {notifications.length === 0 && (
-            <Text>No records found in personal loan</Text>
+             <View style={styles.noRecordsContainer}>
+             <Text style={styles.noRecordsText}>No Records Found</Text>
+             </View>
           )}
-          {notifications.map((notification, index) => (
+          {notifications
+          .sort((a, b) => (a.kf_markasread === b.kf_markasread ? 0 : a.kf_markasread ? 1 : -1)) 
+          .map((notification, index) => (
             <View
               key={index}
               style={[
@@ -579,18 +694,18 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
                     style={styles.twitterImage1}
                   />
                 ) : (
-                  <Image
-                    source={require('../assets/unread_message.png')}
-                    style={styles.twitterImage}
-                  />
+                  // <Image
+                  //   source={require('../assets/unread_message.png')}
+                  //   style={styles.twitterImage}
+                  // />
+                  <Text style={styles.twitterImage}>Unread</Text>
+
                 )}
               </View>
               <Text>Status: {statusNames[notification.kf_status]}</Text>
               {/* Buttons for actions */}
               <Text>Created At: {formatDateTime(notification.created_at)}</Text>
               <View style={styles.buttonContainer}>
-                <Button title={`✓ Approve`} onPress={() => handleApproveNotification(notification.kf_personalloanid)} color="green" disabled={notification.kf_status === 123950000} />
-                <Button title={`✗ Reject`} onPress={() => handleRejectNotification(notification.kf_personalloanid)} color="red" disabled={notification.kf_status === 123950000} />
                 <Button title="View Record" onPress={() => handleViewPersonalLoan(notification)} />
                 {showRejectCommentBox && selectedPersonalLoanId === notification.kf_personalloanid && (
                   <Modal
@@ -601,23 +716,28 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
                   >
                     <View style={styles.modalContainer}>
                       <View style={styles.commentBoxContainer}>
-                        <Text>Enter Reject Reason:</Text>
+                        <Text style={{ fontSize: 16, fontWeight: "bold" }}>Enter Reject Reason:</Text>
                         <TextInput
                           style={styles.commentInput}
                           multiline
                           value={rejectComment}
                           onChangeText={(text) => setRejectComment(text)}
                         />
-                        <Button title="Submit Reject Reason" onPress={handleRejectPersonalLoanWithComment} />
-                        <Button title="Cancel" onPress={() => setShowRejectCommentBox(false)} />
+
+                        <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
+                          <ButtonComponent title="Submit" onPress={handleRejectPersonalLoanWithComment} style={{ width: "40%", height: "45%", backgroundColor: "green" }} />
+                          <ButtonComponent title="Cancel" onPress={() => setShowRejectCommentBox(false)} style={{ width: "40%", height: "45%" }} />
+                        </View>
                       </View>
                     </View>
                   </Modal>
                 )}
-
+                <Button title={`✓ Approve`} onPress={() => handleApproveNotification(notification.kf_personalloanid)} color="green" disabled={notification.kf_status === 123950000} />
+                <Button title={`✗ Reject`} onPress={() => handleRejectNotification(notification.kf_personalloanid)} color="red" disabled={notification.kf_status === 123950000} />
               </View>
             </View>
           ))}
+          </View>
         </View>
       </ScrollView>
     </View>
@@ -653,12 +773,12 @@ const styles = StyleSheet.create({
     color: 'black', // Black text color for the comment input
   },
   header: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginVertical: 10,
   },
   itemContainer: {
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: '#ccc',
     padding: 10,
     marginBottom: 10,
@@ -693,7 +813,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -7, // Adjust the position of the badge vertically
     right: -7, // Adjust the position of the badge horizontally
-    backgroundColor: 'red',
+    backgroundColor: '#697d71',
     borderRadius: 50,
     width: 20,
     height: 20,
@@ -706,24 +826,28 @@ const styles = StyleSheet.create({
   badgeText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 12, // Adjust font size for better visibility
+    fontSize: 10, // Adjust font size for better visibility
   },
   unreadItemContainer: {
-    borderWidth: 1,
+    borderWidth: 2,
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,
-    opacity: 0.7,
-    backgroundColor: '#c2e7ff',
+    borderWidth: 2,
+    borderColor: '#ff8080',
+    // opacity: 0.7,
+    // backgroundColor: '#c2e7ff',
   },
   twitterImage: {
-    width: 28,
+    width: "30%",
     height: 28,
     position: 'absolute',
     top: -75,
-    right: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
+    right: -40,
+    // justifyContent: 'center',
+    // alignItems: 'center',
+    color: "red",
+    fontWeight: "bold",
   },
   twitterImage1: {
     width: 30,
@@ -735,13 +859,52 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   readItemContainer: {
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: '#ccc',
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,
     backgroundColor: 'rgba(243,242,241,255)'
   },
+  noRecordsContainer: {
+    backgroundColor: '#FFF', // Background color of the container
+    borderRadius: 8, // Border radius to make it look like a card
+    padding: 16, // Padding around the text
+    margin: 16, // Margin around the container
+    shadowColor: '#000', // Shadow color
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25, // Shadow opacity
+    shadowRadius: 3.84,
+    elevation: 5, // Elevation for Android shadow
+    justifyContent: 'center', // Center the text vertically
+    alignItems: 'center', // Center the text horizontally
+  },
+  noRecordsText: {
+    color: '#0000cc', // Text color
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center', // Center align the text
+  },
+  // noRecordsContainer: {
+  //   borderColor: '#ff6347', // Red color
+  //   borderWidth: 2,
+  //   borderRadius: 10, // Rounded corners
+  //   padding: 15,
+  //   marginHorizontal: 20,
+  //   marginVertical: 20,
+  //   backgroundColor: '#ffe4e1', // Light red background color
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  // },
+  // noRecordsText: {
+  //   color: '#ff6347', // Red color
+  //   fontSize: 18,
+  //   fontWeight: 'bold',
+  //   textAlign: 'center',
+  // },
 });
 
 export default Notification;

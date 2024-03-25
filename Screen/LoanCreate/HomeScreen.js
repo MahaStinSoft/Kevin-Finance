@@ -939,11 +939,25 @@ export const HomeScreen = ({ route }) => {
             <Text style={styles.errorText}>{errorMessages.loanAmountRequested}</Text>
           )}
 
-          <TextInput
+          {/* <TextInput
             style={[styles.textInputContainer, { marginVertical: 10 }]}
             placeholder="Interest Rate"
             value={kf_interestrate}
             onChangeText={handleInterestRate}
+            onBlur={handleLoanChange}
+            keyboardType="numeric"
+          /> */}
+
+          <TextInput
+            style={[styles.textInputContainer, { marginVertical: 10 }]}
+            placeholder="Interest Rate"
+            value={kf_interestrate ? `${kf_interestrate}${kf_interestrate.endsWith('%') ? '' : '%'}` : ''}
+            onChangeText={(text) => {
+              const formattedText = text.replace(/[^\d]/g, '');
+              if (/^\d{0,2}%?$/.test(formattedText)) {
+                handleInterestRate(formattedText);
+              }
+            }}
             onBlur={handleLoanChange}
             keyboardType="numeric"
           />

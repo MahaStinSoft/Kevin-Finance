@@ -470,35 +470,32 @@ const EditLoanDetail = ({ route, navigation }) => {
         }
       );
 
-      if (updateRecordResponse.status === 204) {
-        console.log('Record updated successfully in CRM');
-        setIsPaid(true);
-        await AsyncStorage.setItem(`paid_${record.kf_loanid}`, 'true');
-        Alert.alert('EMI', 'EMI Amount is Paided Successfully.', [
-          {
-            text: 'OK',
-            onPress: () => {
-              // setIsPaid(true);
-              setIsLoading(false);
-              setEmiStatusUpdated(true);
-
-              navigation.goBack({ isPaid: true });
-            },
-          },
-        ]);
-        setUpdatePerformed(true);
-      } else {
-        console.log('Error updating record in CRM:', updateRecordResponse);
-        Alert.alert('Error', 'Failed to update the record in CRM.');
-      }
-      setkf_paidstatus(kf_paidstatus);
-    } catch (error) {
-      console.error('Error during update:', error.response?.data || error.message);
-      Alert.alert('Error', 'An unexpected error occurred. Please try again later.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  if (updateRecordResponse.status === 204) {
+    console.log('Record updated successfully in CRM');
+    await AsyncStorage.setItem(`paid_${record.kf_loanid}`, 'true');
+    Alert.alert('EMI', 'EMI Amount is Paided Successfully.', [
+      {
+        text: 'OK',
+        onPress: () => {
+          setIsPaid(true);
+          setEmiStatusUpdated(true);
+          setUpdatePerformed(true);
+          setkf_paidstatus(kf_paidstatus);
+          navigation.goBack({ isPaid: true });
+        },
+      },
+    ]);
+  } else {
+    console.log('Error updating record in CRM:', updateRecordResponse);
+    Alert.alert('Error', 'Failed to update the record in CRM.');
+  }
+} catch (error) {
+  console.error('Error during update:', error.response?.data || error.message);
+  Alert.alert('Error', 'An unexpected error occurred. Please try again later.');
+} finally {
+  setIsLoading(false);
+}
+};
 
   const handleGoBackPersonaldetails = () => {
     navigation.goBack();
@@ -589,20 +586,6 @@ const EditLoanDetail = ({ route, navigation }) => {
           />
         </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>EMI Status:</Text>
-          <Picker
-            style={[styles.valueInput, { color: kf_paidstatus ? "gray" : "black" }]}
-            selectedValue={kf_paidstatus ? 'Paid' : 'Unpaid'}
-            onValueChange={(itemValue, itemIndex) => setkf_paidstatus(itemValue === 'Paid')}
-            enabled={!kf_paidstatus && !isLoading} // Disable the Picker if isLoading is true
-          >
-            {emiStatusOptions.map((option, index) => (
-              <Picker.Item key={index} label={option} value={option} />
-            ))}
-          </Picker>
-        </View>
-
         {kf_paidstatus ? (
           <View style={styles.row}>
             <Text style={styles.label}>Payment Received Date:</Text>
@@ -621,13 +604,27 @@ const EditLoanDetail = ({ route, navigation }) => {
           </View>
         )}
 
-        <ButtonComponent title="Update"
-          onPress={handleUpdate}
-          disabled={isLoading || kf_paidstatus === 'Paid' || statusUpdated}
-          style={{ width: "35%", backgroundColor: kf_paidstatus ? 'green' : 'red' }}
-        />
+        <View style={styles.row}>
+          <Text style={styles.label}>EMI Status:</Text>
+          <Picker
+            style={[styles.valueInput, { color: kf_paidstatus ? "gray" : "black" }]}
+            selectedValue={kf_paidstatus ? 'Paid' : 'Unpaid'}
+            onValueChange={(itemValue, itemIndex) => setkf_paidstatus(itemValue === 'Paid')}
+            enabled={!kf_paidstatus && !isLoading} // Disable the Picker if isLoading is true
+          >
+            {emiStatusOptions.map((option, index) => (
+              <Picker.Item key={index} label={option} value={option} />
+            ))}
+          </Picker>
+        </View>
 
-      </View>
+<ButtonComponent 
+        title= {isPaid ? "Closed" : "Update"}
+        onPress={handleUpdate}
+        disabled={isPaid || isLoading || emiStatusUpdated || updatePerformed}
+        style={isPaid ? styles.disabledButton : styles.button}
+      />
+    </View>
     </View>
   );
 };
@@ -636,6 +633,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     // backgroundColor: '#f0f0f0',
+  },
+  disabledButton: {
+    backgroundColor: 'gray', 
+    marginTop: 20,
+    padding: 0,
+    borderRadius: 50,
+    alignItems: 'center',
+    width: "50%"
   },
   title: {
     fontSize: 24,
@@ -671,10 +676,10 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 20,
-    padding: 10,
-    // backgroundColor: 'blue',
-    borderRadius: 5,
+    padding: 0,
+    borderRadius: 50,
     alignItems: 'center',
+    width: "50%"
   },
   buttonText: {
     color: 'white',

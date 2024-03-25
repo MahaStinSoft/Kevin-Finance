@@ -475,6 +475,7 @@ import ButtonComponent from '../../common/ButtonComponent';
 import TextInputComponent from '../../common/TextInput';
 import HeaderComponent from '../../common/Header';
 import axios from 'axios';
+import moment from 'moment';
 
 const AmortizationScreen = ({ route }) => {
   const [recordId, setRecordId] = useState(route.params.recordId);
@@ -1079,9 +1080,9 @@ const AmortizationScreen = ({ route }) => {
         <View style={styles.createdRecordsList}>
           <Text style={styles.amortizationTitle}>EMI Unpaid Records:</Text>
           {fetchedRecords.filter(record => record.kf_applicationnumber === loanDetails.applicationNumber && record.kf_paidstatus === false).length === 0 ? (
-            <View style={{ alignItems: "center", justifyContent: "center", flex: 1 }}>
-              <Text>No unpaid records found.</Text>
-            </View>
+          <View style={styles.noRecordsContainer}>
+          <Text style={styles.noRecordsText}>No Records Found</Text>
+          </View>
           ) : (
             <View style={[styles.scrollViewContent, { marginBottom: 20 }]}>
               {/* <ScrollView contentContainerStyle={styles.scrollViewContent} ref={scrollViewRef}> */}
@@ -1101,7 +1102,7 @@ const AmortizationScreen = ({ route }) => {
                             <Text>{item.kf_emiamount}</Text>
                           </View>
                           <View style={styles.column3}>
-                            <Text>Payment Date</Text>
+                            <Text>Due Date</Text>
                             <Text>{(item.kf_receiveddate)}</Text>
                           </View>
                           <View style={[styles.column4, { backgroundColor: item.kf_paidstatus ? 'green' : 'red' }]}>
@@ -1122,9 +1123,9 @@ const AmortizationScreen = ({ route }) => {
         <View style={styles.createdRecordsContainer}>
           <Text style={styles.amortizationTitle}>EMI Paid Records:</Text>
           {fetchedSavedRecords.filter(record => record.kf_applicationnumber === loanDetails.applicationNumber).length === 0 ? (
-            <View style={{ alignItems: "center", justifyContent: "center", flex: 1 }}>
-              <Text>No paid records found.</Text>
-            </View>
+             <View style={styles.noRecordsContainer}>
+             <Text style={styles.noRecordsText}>No Records Found</Text>
+             </View>
           ) : (
             <View style={styles.scrollViewContent}>
               {/* <ScrollView contentContainerStyle={styles.scrollViewContent} ref={scrollViewRef}> */}
@@ -1144,8 +1145,12 @@ const AmortizationScreen = ({ route }) => {
                             <Text>{item.kf_emiamount}</Text>
                           </View>
                           <View style={styles.column3}>
-                            <Text>Payment Date</Text>
-                            <Text>{(item.kf_receiveddate)}</Text>
+                          <Text>Received Date</Text>
+                            {item.kf_datepicker ? (
+                              <Text>{moment(item.kf_datepicker).format('DD-MM-YYYY')}</Text>
+                            ) : (
+                              <Text></Text>
+                            )}
                           </View>
                           <View style={[styles.column4, { backgroundColor: item.kf_paidstatus ? 'green' : 'red' }]}>
                             <Text style={{ color: "white", fontWeight: "bold", textAlign: "center", marginVertical: -5 }}>
@@ -1216,15 +1221,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     // justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 5,
+    padding: 12,
     borderBottomWidth: 1,
     borderBottomColor: 'gray',
-    marginHorizontal: 5,
     maxHeight: 100
   },
   column: {
     flexDirection: 'row',
-    alignSelf: "center",
+    alignSelf: "center"
   },
   column1: {
     marginLeft: 5
@@ -1236,14 +1240,14 @@ const styles = StyleSheet.create({
     marginLeft: 20
   },
   column4: {
-    marginLeft: 30,
+    marginLeft: 35,
     backgroundColor: 'red',
     padding: 8,
     borderRadius: 10,
     color: 'white',
     width: "20%",
     height: 28,
-    alignSelf:"center"
+    alignSelf: "center"
   },
   paidButton: {
     backgroundColor: 'green',
@@ -1294,6 +1298,28 @@ const styles = StyleSheet.create({
   },
   label: {
     marginLeft: 30
+  },
+  noRecordsContainer: {
+    backgroundColor: '#FFF', // Background color of the container
+    borderRadius: 8, // Border radius to make it look like a card
+    padding: 16, // Padding around the text
+    margin: 16, // Margin around the container
+    shadowColor: '#000', // Shadow color
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25, // Shadow opacity
+    shadowRadius: 3.84,
+    elevation: 5, // Elevation for Android shadow
+    justifyContent: 'center', // Center the text vertically
+    alignItems: 'center', // Center the text horizontally
+  },
+  noRecordsText: {
+    color: '#0000cc', // Text color
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center', // Center align the text
   },
 });
 

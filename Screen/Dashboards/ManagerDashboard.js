@@ -59,7 +59,8 @@ const ManagerDashboard = ({ navigation, route }) => {
   const [displayedHomeLoans, setDisplayedHomeLoans] = useState([]);
   const [displayedPersonalLoans, setDisplayedPersonalLoans] = useState([]);
   const [showAllLoans, setShowAllLoans] = useState(false);
-
+  const [showAllHomeLoans, setShowAllHomeLoans] = useState(false);
+  const [showAllPersonalLoans, setShowAllPersonalLoans] = useState(false);
   const isFocused = useIsFocused();
 
   useEffect(() => {
@@ -125,10 +126,19 @@ const ManagerDashboard = ({ navigation, route }) => {
 
   // Update displayed loans based on showAllLoans state
   useEffect(() => {
-    setDisplayedHomeLoans(showAllLoans ? HomeLoanRecords : HomeLoanRecords.slice(0, 3));
-    setDisplayedPersonalLoans(showAllLoans ? PersonalLoanRecords : PersonalLoanRecords.slice(0, 3));
-  }, [showAllLoans, HomeLoanRecords, PersonalLoanRecords]);
+    setDisplayedHomeLoans(showAllHomeLoans ? HomeLoanRecords : HomeLoanRecords.slice(0, 3));
+    setDisplayedPersonalLoans(showAllPersonalLoans ? PersonalLoanRecords : PersonalLoanRecords.slice(0, 3));
+  }, [showAllHomeLoans, showAllPersonalLoans, HomeLoanRecords, PersonalLoanRecords]);
 
+ // Function to toggle showing all home loans
+ const toggleShowAllHomeLoans = () => {
+  setShowAllHomeLoans(!showAllHomeLoans);
+};
+
+// Function to toggle showing all personal loans
+const toggleShowAllPersonalLoans = () => {
+  setShowAllPersonalLoans(!showAllPersonalLoans);
+};
 
   useEffect(() => {
     if (route.params?.kf_adminname) {
@@ -513,274 +523,219 @@ const fetchNotifications = async () => {
     navigation.navigate("Notification", { kf_adminname });
   };
 
-  return (
-    <>
-      <StatusBar />
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
+    return (
+      <>
+        <StatusBar />
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
 
-        <View style={styles.container}>
+          <View style={styles.container}>
 
-          <View style={styles.navBar}>
-            {/* <TouchableOpacity style={styles.iconButton} onPress={() => navigation.openDrawer()}>
-              <Ionicons name="list-sharp" size={25} color="#fff" />
-            </TouchableOpacity> */}
-            <TouchableOpacity style={styles.iconButton} onPress={handlelogout}>
-              <Ionicons name="list-sharp" size={25} color="#fff" />
-            </TouchableOpacity>
-            <Text style={styles.text}>Kevin Small Finance</Text>
-            <TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
-          <View> 
-            <Ionicons name="notifications" size={25} color="#fff" />
-            {unreadMessagesCount > 0 && ( 
-              <View style={styles.badgeContainer}>
-                <Text style={styles.badgeText}>{unreadMessagesCount}</Text>
-              </View>
-            )}
-          </View>
-        </TouchableOpacity>
-
-
-          </View>
-
-          <View style={styles.searchSection}>
-            <Ionicons style={styles.searchIcon} name="search" size={25} color="rgba(255, 28, 53, 255)" />
-            <TextInput
-              style={styles.input} placeholder="Search- Mobile no, Aadhar no, Pancard no"
-              value={searchQuery}
-              onChangeText={handleSearch}
-            />
-            {showClearIcon && (
-              <Ionicons
-                style={styles.searchIcon}
-                name="close"
-                size={25}
-                color="rgba(255, 28, 53, 255)"
-                onPress={handleClearSearch}
-              />
-            )}
-          </View>
-
-          <ScrollView
-            contentContainerStyle={{ width: '100%' }}
-            refreshControl={
-              <RefreshControl
-                refreshing={loading}
-                onRefresh={handleRefresh}
-              />
-            }
-            showsVerticalScrollIndicator={false}
-            showsHorizontalScrollIndicator={false}
-          >
-
-            <View>
-              {/* {authenticatedUser && ( */}
-              {/* <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 2, textAlign: "center" }}>Created By: {kf_adminname}</Text> */}
-              {/* // )} */}
-            </View>
-            {/* <LogoutButton navigation={navigation}/> */}
-
-            {/* <Text style={{ textAlign: "center", marginVertical: 10, fontSize: 18, fontWeight: "bold", color: "red" }}>MANAGER DASHBOARD</Text> */}
-
-
-            <View style={styles.chart}>
-              <Text style={styles.heading}>Loan Status Chart</Text>
-              {/* <Text style={styles.totalLoans}>Total Loans: {filteredData.length}</Text> */}
-
-              <View style={styles.statusContainer}>
-                <TouchableOpacity onPress={() => handleStatusClick(123950000)}>
-                  <Text style={styles.statusText}>Approved: {statusCounts.approved}</Text>
-                </TouchableOpacity>
-                {/* <TouchableOpacity onPress={() => handleStatusClick(123950002)}>
-                  <Text style={styles.statusText}>Draft: {statusCounts.draft}</Text>
-                </TouchableOpacity> */}
-                <TouchableOpacity onPress={() => handleStatusClick(123950001)}>
-                  <Text style={styles.statusText}>Pending: {statusCounts.pending}</Text>
-                </TouchableOpacity>
-                {/* <TouchableOpacity onPress={() => handleStatusClick(123950003)}>
-                  <Text style={styles.statusText}>Canceled: {statusCounts.canceled}</Text>
-                </TouchableOpacity> */}
-                <TouchableOpacity onPress={() => handleStatusClick(123950004)}>
-                  <Text style={styles.statusText}>Rejected: {statusCounts.expired}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleStatusClick(null)}>
-                  <Text style={[styles.statusText, {right: 10,}]}>All: {filteredData.length}</Text>
-                </TouchableOpacity>
-              </View>
-
-              <BarChart
-                data={{
-                  labels: ['Approved', 'Pending', 'Rejected'],
-                  datasets: [
-                    {
-                      data: [
-                        statusCounts.approved,
-                        statusCounts.pending,
-                        // statusCounts.draft,
-                        // statusCounts.canceled,
-                        statusCounts.expired,
-                      ],
-                    },
-                  ],
-                }}
-                width={deviceWidth - 20}
-                height={220}
-                yAxisLabel=""
-                chartConfig={{
-                  backgroundGradientFrom: '#fff',
-                  backgroundGradientTo: '#fff',
-                  color: (opacity = 1) => `rgba(255, 28, 53, ${opacity})`,
-                  labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                  barPercentage: 1.5,
-                }}
-                bezier
-                style={{
-                  marginVertical: 8,
-                  borderRadius: 16,
-                }}
-              />
-            </View>
-
-            {/* Dynamic Dashboard Button */}
-            {/* <TouchableOpacity style={styles.dynamicDashboardButton} onPress={handleDynamicDashboard}>
-                <Text style={styles.dynamicDashboardButtonText}>Dynamic Dashboard</Text>
+            <View style={styles.navBar}>
+              {/* <TouchableOpacity style={styles.iconButton} onPress={() => navigation.openDrawer()}>
+                <Ionicons name="list-sharp" size={25} color="#fff" />
               </TouchableOpacity> */}
-
-            <View style={{ marginRight: 10 }}>
-              <TouchableOpacity
-                onPress={() => setShowAllLoans(!showAllLoans)}
-                style={styles.viewButton}
-              >
-                <Text style={styles.dynamicDashboardButtonText}>
-                  {showAllLoans ? 'View Less' : 'View More'}
-                </Text>
+              <TouchableOpacity style={styles.iconButton} onPress={handlelogout}>
+                <Ionicons name="list-sharp" size={25} color="#fff" />
               </TouchableOpacity>
+              <Text style={styles.text}>Kevin Small Finance</Text>
+              <TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
+            <View> 
+              <Ionicons name="notifications" size={25} color="#fff" />
+              {unreadMessagesCount > 0 && ( 
+                <View style={styles.badgeContainer}>
+                  <Text style={styles.badgeText}>{unreadMessagesCount}</Text>
+                </View>
+              )}
+            </View>
+          </TouchableOpacity>
             </View>
 
-
-            {/* <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10 }}>
-            {loading ? (
-              <ActivityIndicator size="large" color="#0000ff" />
-            ) : (
-              <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Home Loans</Text>
-            {displayedHomeLoans.map((homeLoan, index) => (
-              <HomeLoanCard
-                key={index}
-                loanApplication={homeLoan}
-                onPress={() => navigateToHomeDetails(homeLoan)}
+            <View style={styles.searchSection}>
+              <Ionicons style={styles.searchIcon} name="search" size={25} color="rgba(255, 28, 53, 255)" />
+              <TextInput
+                style={styles.input} placeholder="Search- Mobile no, Aadhar no, Pancard no"
+                value={searchQuery}
+                onChangeText={handleSearch}
               />
-            ))}
-
-            <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 20, marginBottom: 10 }}>Personal Loans</Text>
-            {displayedPersonalLoans.map((personalLoan, index) => (
-              <PersonalLoanCard
-                key={index}
-                personalLoan={personalLoan}
-                onPress={() => navigateToPersonalDetails(personalLoan)}
-              />
-            ))}
-
-              </ScrollView>
-            )}
-          </View> */}
-
-            <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 0 }}>
-              {initialLoading ? (
-                <ActivityIndicator size="large" color="#0000ff" />
-              ) : (
-                <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
-                  {displayedHomeLoans.length === 0 && displayedPersonalLoans.length === 0 && (
-                    <Text style={{ fontSize: 18, fontWeight: "bold", textAlign: "center", marginTop: 20 }}>
-                      No records found
-                    </Text>
-                  )}
-
-                  {displayedHomeLoans.length > 0 && (
-                    <>
-                      <Text style={[styles.heading, { paddingHorizontal: 5, }]}>Home Loans</Text>
-                      {displayedHomeLoans.map((homeLoan, index) => (
-                        <HomeLoanCard
-                          key={index}
-                          loanApplication={homeLoan}
-                          onPress={() => navigateToHomeDetails(homeLoan)}
-                        />
-                      ))}
-                    </>
-                  )}
-
-                  {displayedPersonalLoans.length > 0 && (
-                    <>
-                      <Text style={[styles.heading, { paddingHorizontal: 5}]}>Personal Loans</Text>
-                      {displayedPersonalLoans.map((personalLoan, index) => (
-                        <PersonalLoanCard
-                          key={index}
-                          personalLoan={personalLoan}
-                          onPress={() => navigateToPersonalDetails(personalLoan)}
-                        />
-                      ))}
-                    </>
-                  )}
-
-                  {displayedHomeLoans.length === 0 && displayedPersonalLoans.length === 0 && (
-                    <Text style={{ fontSize: 18, fontWeight: "bold", textAlign: "center", marginTop: 20 }}>
-                      No records found for both Home Loans and Personal Loans
-                    </Text>
-                  )}
-
-                  {displayedHomeLoans.length === 0 && displayedPersonalLoans.length > 0 && (
-                    <Text style={{ fontSize: 18, fontWeight: "bold", textAlign: "center", marginTop: 20 }}>
-                      No records found for Home Loans
-                    </Text>
-                  )}
-
-                  {displayedHomeLoans.length > 0 && displayedPersonalLoans.length === 0 && (
-                    <Text style={{ fontSize: 18, fontWeight: "bold", textAlign: "center", marginTop: 20 }}>
-                      No records found for Personal Loans
-                    </Text>
-                  )}
-                </ScrollView>
+              {showClearIcon && (
+                <Ionicons
+                  style={styles.searchIcon}
+                  name="close"
+                  size={25}
+                  color="rgba(255, 28, 53, 255)"
+                  onPress={handleClearSearch}
+                />
               )}
             </View>
 
-          </ScrollView>
-        </View>
-        {/* <Modal
-          animationType="slide"
-          transparent={true}
-          visible={showLoanModal}
-          onRequestClose={() => setShowLoanModal(false)}
-        >
-          <View style={styles.modalBackground}>
-            <View style={styles.modalContainer}>
-              <View style={{ flexDirection: "column" }}>
-                <Text style={styles.modalHeading}>LOAN TYPES</Text>
+            <ScrollView
+              contentContainerStyle={{ width: '100%' }}
+              refreshControl={
+                <RefreshControl
+                  refreshing={loading}
+                  onRefresh={handleRefresh}
+                />
+              }
+              showsVerticalScrollIndicator={false}
+              showsHorizontalScrollIndicator={false}
+            >
 
-                <TouchableOpacity style={styles.closeButton} onPress={() => setShowLoanModal(false)}>
-                  <Ionicons name="close" size={20} color="#000" />
-                </TouchableOpacity>
+
+              <View style={styles.chart}>
+                <Text style={styles.heading}>Loan Status Chart</Text>
+                {/* <Text style={styles.totalLoans}>Total Loans: {filteredData.length}</Text> */}
+
+                <View style={styles.statusContainer}>
+                  <TouchableOpacity onPress={() => handleStatusClick(123950000)}>
+                    <Text style={styles.statusText}>Approved: {statusCounts.approved}</Text>
+                  </TouchableOpacity>
+                  {/* <TouchableOpacity onPress={() => handleStatusClick(123950002)}>
+                    <Text style={styles.statusText}>Draft: {statusCounts.draft}</Text>
+                  </TouchableOpacity> */}
+                  <TouchableOpacity onPress={() => handleStatusClick(123950001)}>
+                    <Text style={styles.statusText}>Pending: {statusCounts.pending}</Text>
+                  </TouchableOpacity>
+                  {/* <TouchableOpacity onPress={() => handleStatusClick(123950003)}>
+                    <Text style={styles.statusText}>Canceled: {statusCounts.canceled}</Text>
+                  </TouchableOpacity> */}
+                  <TouchableOpacity onPress={() => handleStatusClick(123950004)}>
+                    <Text style={styles.statusText}>Rejected: {statusCounts.expired}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleStatusClick(null)}>
+                    <Text style={[styles.statusText, {right: 10,}]}>All: {filteredData.length}</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <BarChart
+                  data={{
+                    labels: ['Approved', 'Pending', 'Rejected'],
+                    datasets: [
+                      {
+                        data: [
+                          statusCounts.approved,
+                          statusCounts.pending,
+                          // statusCounts.draft,
+                          // statusCounts.canceled,
+                          statusCounts.expired,
+                        ],
+                      },
+                    ],
+                  }}
+                  width={deviceWidth - 20}
+                  height={220}
+                  yAxisLabel=""
+                  chartConfig={{
+                    backgroundGradientFrom: '#fff',
+                    backgroundGradientTo: '#fff',
+                    color: (opacity = 1) => `rgba(255, 28, 53, ${opacity})`,
+                    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                    barPercentage: 1.5,
+                  }}
+                  bezier
+                  style={{
+                    marginVertical: 8,
+                    borderRadius: 16,
+                  }}
+                />
               </View>
-              <View style={{ marginTop: -20 }}>
-                <TouchableOpacity style={[styles.loanOption, { borderBottomWidth: 1, borderBottomColor: '#ccc', marginTop: 40 }]} onPress={handleHomeLoan}>
-                  <Text style={styles.loanOptionText}>Home Loan</Text>
+
+              {/* <View style={{ marginRight: 10 }}>
+                <TouchableOpacity
+                  onPress={() => setShowAllLoans(!showAllLoans)}
+                  style={styles.viewButton}
+                >
+                  <Text style={styles.dynamicDashboardButtonText}>
+                    {showAllLoans ? 'View Less' : 'View More'}
+                  </Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.loanOption} onPress={handlePersonalLoan}>
-                  <Text style={styles.loanOptionText}>Personal Loan</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
+              </View> */}
+
+              <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 0 }}>
+                {initialLoading ? (
+                  <ActivityIndicator size="large" color="#0000ff" />
+                ) : (
+                  <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
+                    {displayedHomeLoans.length === 0 && displayedPersonalLoans.length === 0 && (
+                      <Text style={{ fontSize: 18, fontWeight: "bold", textAlign: "center", marginTop: 20 }}>
+                        No records found
+                      </Text>
+                    )}
+
+                    {displayedHomeLoans.length > 0 && (
+                      <>
+                       <View style={{ marginRight: 10 }}>
+            <TouchableOpacity
+              onPress={toggleShowAllHomeLoans}
+              style={[styles.viewButton, {top: 30}]}
+            >
+              <Text style={styles.dynamicDashboardButtonText}>
+                {showAllHomeLoans ? 'View Less' : 'View More'}
+              </Text>
+            </TouchableOpacity>
           </View>
-        </Modal> */}
-        {/* <View style={styles.plusIconScetion}>
-          <TouchableOpacity style={styles.plusIcon} onPress={() => setShowLoanModal(!showLoanModal)}>
-            <Text style={styles.plusIconText}>+</Text>
-          </TouchableOpacity>
-        </View> */}
-      </KeyboardAvoidingView>
-    </>
-  );
+                        <Text style={[styles.heading, { paddingHorizontal: 5, top: -10 }]}>Home Loans</Text>
+                        {displayedHomeLoans.map((homeLoan, index) => (
+                          <HomeLoanCard
+                            key={index}
+                            loanApplication={homeLoan}
+                            onPress={() => navigateToHomeDetails(homeLoan)}
+                          />
+                        ))}
+                      </>
+                    )}
+
+                    {displayedPersonalLoans.length > 0 && (
+                      <>
+                       <View style={{ marginRight: 10 }}>
+            <TouchableOpacity
+              onPress={toggleShowAllPersonalLoans}
+              style={[styles.viewButton, {top: 30}]}
+            >
+              <Text style={styles.dynamicDashboardButtonText}>
+                {showAllPersonalLoans ? 'View Less' : 'View More'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+                        <Text style={[styles.heading, { paddingHorizontal: 5, top: -10}]}>Personal Loans</Text>
+                        {displayedPersonalLoans.map((personalLoan, index) => (
+                          <PersonalLoanCard
+                            key={index}
+                            personalLoan={personalLoan}
+                            onPress={() => navigateToPersonalDetails(personalLoan)}
+                          />
+                        ))}
+                      </>
+                    )}
+
+                    {displayedHomeLoans.length === 0 && displayedPersonalLoans.length === 0 && (
+                      <Text style={{ fontSize: 18, fontWeight: "bold", textAlign: "center", marginTop: 20 }}>
+                        No records found for both Home Loans and Personal Loans
+                      </Text>
+                    )}
+
+                    {displayedHomeLoans.length === 0 && displayedPersonalLoans.length > 0 && (
+                      <Text style={{ fontSize: 18, fontWeight: "bold", textAlign: "center", marginTop: 20 }}>
+                        No records found for Home Loans
+                      </Text>
+                    )}
+
+                    {displayedHomeLoans.length > 0 && displayedPersonalLoans.length === 0 && (
+                      <Text style={{ fontSize: 18, fontWeight: "bold", textAlign: "center", marginTop: 20 }}>
+                        No records found for Personal Loans
+                      </Text>
+                    )}
+                  </ScrollView>
+                )}
+              </View>
+
+            </ScrollView>
+          </View>
+        </KeyboardAvoidingView>
+      </>
+    );
 };
 
 const styles = StyleSheet.create({
@@ -901,8 +856,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 28, 53, 255)',
     borderRadius: 25,
     padding: 10,
-    marginTop: 10,
-    width: 100,
+    top: 40,
+    width: "28%",
     alignSelf: "flex-end"
   },
   badgeContainer: {

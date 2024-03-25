@@ -471,15 +471,37 @@ const handleInterestRateChange = (text) => {
     }
   };
 
-  const handleInterestRate = (text) => {
-    setKf_interestrate(text);
+  // const handleInterestRate = (text) => {
+  //   setKf_interestrate(text);
 
+  //   if (text.trim() === '') {
+  //     setErrorMessages({
+  //       ...errorMessages,
+  //       interestRate: 'Enter a Interest Amount',
+  //     });
+  //   } else if (/^\d+$/.test(text)) {
+  //     setErrorMessages({
+  //       ...errorMessages,
+  //       interestRate: '',
+  //     });
+  //   } else {
+  //     setErrorMessages({
+  //       ...errorMessages,
+  //       interestRate: `Enter a Valid Interest Rate`,
+  //     });
+  //   }
+  // };
+
+  const handleInterestRate = (text) => {
+    // Update the state with the input text
+    setKf_interestrate(text);
     if (text.trim() === '') {
       setErrorMessages({
         ...errorMessages,
-        interestRate: 'Enter a Interest Amount',
+        interestRate: 'Enter an Interest Amount',
       });
-    } else if (/^\d+$/.test(text)) {
+    } else if (/^\d+$/.test(text) || /^\d+%$/.test(text)) {
+      // Validate if the input contains only digits or digits followed by a '%' sign
       setErrorMessages({
         ...errorMessages,
         interestRate: '',
@@ -487,7 +509,7 @@ const handleInterestRateChange = (text) => {
     } else {
       setErrorMessages({
         ...errorMessages,
-        interestRate: `Enter a Valid Interest Rate`,
+        interestRate: 'Enter a valid Interest Rate ',
       });
     }
   };
@@ -864,13 +886,28 @@ const handleInterestRateChange = (text) => {
             <Text style={styles.errorText}>{errorMessages.loanAmountRequested}</Text>
           )}
 
-<TextInput
+          {/* <TextInput
             style={[styles.textInputContainer, { marginVertical: 10 }]}
             placeholder="Interest Rate"
-            value={kf_interestrate}
+            // value={kf_interestrate}
+            value={kf_interestrate ? `${kf_interestrate}${kf_interestrate.endsWith('%') ? '' : '%'}` : ''}
             onChangeText={handleInterestRate}
             onBlur={handleLoanChange}
-          keyboardType="numeric" 
+            keyboardType="numeric"
+          /> */}
+
+          <TextInput
+            style={[styles.textInputContainer, { marginVertical: 10 }]}
+            placeholder="Interest Rate"
+            value={kf_interestrate ? `${kf_interestrate}${kf_interestrate.endsWith('%') ? '' : '%'}` : ''}
+            onChangeText={(text) => {
+              const formattedText = text.replace(/[^\d]/g, '');
+              if (/^\d{0,2}%?$/.test(formattedText)) {
+                handleInterestRate(formattedText);
+              }
+            }}
+            onBlur={handleLoanChange}
+            keyboardType="numeric"
           />
           {errorMessages.interestRate !== '' && (
             <Text style={styles.errorText}>{errorMessages.interestRate}</Text>
