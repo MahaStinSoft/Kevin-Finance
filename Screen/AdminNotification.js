@@ -730,7 +730,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -7, // Adjust the position of the badge vertically
     right: -7, // Adjust the position of the badge horizontally
-    backgroundColor: 'red',
+    backgroundColor: '#697d71',
     borderRadius: 50,
     width: 20,
     height: 20,
