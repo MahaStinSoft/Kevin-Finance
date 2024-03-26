@@ -28,6 +28,7 @@ import querystring from 'querystring';
 import HomeLoanCard from '../card/HomeLoanCard';
 import PersonalLoanCard from '../card/PersonalLoanCard';
 import DynamicDashboardScreen from '../DynamicDashboardScreen';
+import ButtonComponent from '../../common/ButtonComponent';
 
 const DashboardScreen = ({ navigation, route }) => {
   // const { authenticatedUser } = route.params;
@@ -762,7 +763,7 @@ const DashboardScreen = ({ navigation, route }) => {
 
           </ScrollView>
         </View>
-        <Modal
+        {/* <Modal
           animationType="slide"
           transparent={true}
           visible={showLoanModal}
@@ -787,7 +788,35 @@ const DashboardScreen = ({ navigation, route }) => {
               </View>
             </View>
           </View>
-        </Modal>
+        </Modal> */}
+
+<Modal
+  animationType="slide"
+  transparent={true}
+  visible={showLoanModal}
+  onRequestClose={() => setShowLoanModal(false)}
+>
+  <View style={styles.modalBackground}>
+    <View style={styles.modalContainer}>
+      <View style={styles.modalHeader}>
+        <Text style={[styles.modalHeading, {textAlign: "center"}]}>Choose Loan Type</Text>
+        <TouchableOpacity style={styles.closeButton} onPress={() => setShowLoanModal(false)}>
+          <Ionicons name="close" size={26} color="red" />
+        </TouchableOpacity>
+      </View>
+      <View style={[styles.optionContainer, {height: "50%"}]}>
+        <TouchableOpacity style={[styles.optionButton,{ marginTop: 0 }]} onPress={handleHomeLoan}>
+          <Text style={styles.optionText}>Home Loan</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={[styles.optionButton, {marginTop: 10}]} onPress={handlePersonalLoan}>
+          <Text style={styles.optionText}>Personal Loan</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+</Modal>
+
         <View style={styles.plusIconScetion}>
           <TouchableOpacity style={styles.plusIcon} onPress={() => setShowLoanModal(!showLoanModal)}>
             <Text style={styles.plusIconText}>+</Text>
@@ -850,17 +879,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  modalContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 20,
-    width: '80%',
-    height: "25%"
-  },
+  // modalContainer: {
+  //   backgroundColor: '',
+  //   borderRadius: 10,
+  //   padding: 20,
+  //   width: '70%',
+  //   height: "25%"
+  // },
   closeButton: {
     position: 'absolute',
-    top: 5,
-    right: 15,
+    top: 0,
+    right: 5,
   },
   loanOption: {
     paddingVertical: 10,
@@ -901,10 +930,10 @@ const styles = StyleSheet.create({
   modalHeading: {
     fontSize: 16,
     fontWeight: 'bold',
-    marginTop: 10,
+    marginTop: 50,
     color: '#333',
     textAlign: 'center',
-    marginRight: 30
+    marginHorizontal: 40
   },
   dynamicDashboardButtonText: {
     backgroundColor: 'rgba(255, 28, 53, 255)',
@@ -971,6 +1000,48 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center', // Center align the text
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContainer: {
+    backgroundColor: '#fff',
+    width: '70%',
+    borderRadius: 10,
+    padding: 20,
+    height: "35%"
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  // closeButton: {
+  //   padding: 5,
+  // },
+  optionContainer: {
+    alignItems: 'center',
+    // backgroundColor:"green",
+  },
+  optionButton: {
+    backgroundColor: '#ffb3b3',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginBottom: 10,
+    width: "70%", 
+    borderColor: "red",
+    borderWidth: 1
+  },
+  optionText: {
+    fontSize: 16,
+    color: 'red',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 

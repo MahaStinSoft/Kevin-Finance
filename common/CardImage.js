@@ -129,7 +129,10 @@ const CardImage = ({ title, imageContent, setImageContent }) => {
   return (
     <View style={{ flexDirection: 'row', marginTop: 15, alignContent: 'space-around' }}>
       <View style={{ marginHorizontal: 15, width: 140 }}>
-        <Text>{title}</Text>
+        {/* <Text style={styles.titleText}>{title}</Text> */}
+        <View style={styles.noRecordsContainer}>
+          <Text style={styles.noRecordsText}>{title}</Text>
+        </View>
       </View>
       <View style={{}}>
         {imageContent.fileContent && (
@@ -158,10 +161,10 @@ const CardImage = ({ title, imageContent, setImageContent }) => {
         )}
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-        <TouchableOpacity onPress={pickImage} style={{ backgroundColor: 'red', padding: 10, borderRadius: 25, width: 85, marginLeft: -25, height: 30, marginTop: -5 }}>
+        <TouchableOpacity onPress={pickImage} style={{ backgroundColor: 'red', padding: 10, borderRadius: 25, width: 85, marginLeft: -25, height: 30, marginTop: 5 }}>
           <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold', marginVertical: -7 }}>Gallery</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={takePictureWithCamera} style={{ backgroundColor: 'red', padding: 10, borderRadius: 25, width: 85, marginLeft: 15, height: 30, marginTop: -5 }}>
+        <TouchableOpacity onPress={takePictureWithCamera} style={{ backgroundColor: 'red', padding: 10, borderRadius: 25, width: 85, marginLeft: 15, height: 30, marginTop: 5 }}>
           <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold', marginVertical: -7 }}>Camera</Text>
         </TouchableOpacity>
       </View>
@@ -190,6 +193,28 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     right: 10,
+  },
+  noRecordsContainer: {
+    backgroundColor: '#FBFCFC', 
+    borderRadius: 8,
+    paddingVertical: 10,
+    marginRight: 35, 
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    justifyContent: 'center', 
+    alignItems: 'center', 
+  },
+  noRecordsText: {
+    color: '#0000cc', 
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center', 
   },
 });
 

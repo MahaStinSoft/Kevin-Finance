@@ -55,7 +55,7 @@ const PersonalLoanDetailsScreen = ({ route }) => {
   };
 
   const getGenderLabelG1 = () => {
-    switch (loanApplication.kf_guarantorgender) {
+    switch (personalLoan.kf_guarantorgender) {
       case 123950000:
         return 'Male';
       case 123950001:
@@ -429,7 +429,7 @@ const PersonalLoanDetailsScreen = ({ route }) => {
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}>City:</Text>
+            <Text style={styles.label}> City:</Text>
             <Text style={styles.value}>{personalLoan.kf_guarantorcity}</Text>
           </View>
 

@@ -394,7 +394,7 @@ const HomeLoanDetailsScreen = ({ route }) => {
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}>City:</Text>
+            <Text style={styles.label}> City:</Text>
             <Text style={styles.value}>{loanApplication.kf_guarantorcity}</Text>
           </View>
 

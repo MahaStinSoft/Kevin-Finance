@@ -78,8 +78,6 @@ export const HomeScreen = ({ route }) => {
     emiCollectionDate: ''
   });
 
-  
-
   useFocusEffect(
     React.useCallback(() => {
       getAuthenticatedUser();
@@ -114,7 +112,6 @@ export const HomeScreen = ({ route }) => {
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
       if (navigation.isFocused()) {
-        // If the user is on the login screen, show the exit confirmation alert
         Alert.alert(
           'Discard Changes',
           'Are you sure want to discard the changes?',
@@ -131,57 +128,12 @@ export const HomeScreen = ({ route }) => {
           ],
           { cancelable: false }
         );
-        return true; // Prevent default back button behavior
+        return true; 
       }
     });
 
     return () => backHandler.remove();
   }, [navigation]);
-
-  const pickImage = async () => {
-    try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-        base64: true,
-      });
-  
-      if (result.canceled) {
-        return;
-      }
-  
-      const byteArray = result.base64; // Use result.base64 directly
-  
-      setkf_applicantimage({
-        fileName: 'payslip.jpg', // You can set a default file name
-        fileContent: byteArray,
-      });
-    } catch (error) {
-      console.error('Error picking or processing the image:', error);
-      Alert.alert('Error', 'Failed to pick or process the image.');
-    }
-  };
-
-  const takePictureWithCamera = async () => {
-    try {
-      const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-        base64: true,
-      });
-
-      if (!result.cancelled) {
-        setImageContent({ fileName: result.uri.split('/').pop(), fileContent: result.base64 });
-        await AsyncStorage.setItem('selectedImage', JSON.stringify({ fileName: result.uri.split('/').pop(), fileContent: result.base64 }));
-      }
-    } catch (error) {
-      console.error('Error taking picture:', error);
-    }
-  };
 
   const handleViewImages = () => {
     setShowImage(!showImage); 
@@ -216,26 +168,6 @@ export const HomeScreen = ({ route }) => {
     });
     return unsubscribe;
   }, [navigation]);
-
-  // console.log("Request Payload to CRM:", {
-  //   kf_name: kf_name,
-  //   kf_lastname: kf_lastname,
-  //   kf_gender: kf_gender,
-  //   kf_dateofbirth:kf_dateofbirth,
-  //   kf_age: kf_age,
-  //   kf_mobilenumber: kf_mobilenumber,
-  //   kf_email: kf_email,
-  //   kf_address1: kf_address1,
-  //   kf_address2: kf_address2,
-  //   kf_address3: kf_address3,
-  //   kf_city: kf_city,
-  //   kf_state: kf_state,
-  //   kf_loanamountrequested: kf_loanamountrequested,
-  //   kf_aadharnumber:kf_aadharnumber,
-  //   kf_aadharcard:  'base64 content',
-  //   kf_adminname:kf_adminname,
-  //   kf_pannumber:kf_pannumber,
-  // });
 
   const handleGenderOptionset = (selectedOptionGender) => {
     let numericValue;
@@ -515,17 +447,14 @@ export const HomeScreen = ({ route }) => {
         n = 12; // Default to monthly
     }
 
-    // Total number of payments over the loan tenure
     N = parseInt(kf_numberofemi);
 
     // Loan tenure in years
     t = N / n;
 
-    // Calculate EMI
     const R = r / n; // Monthly interest rate
     const EMI = (P * R * Math.pow((1 + R), N)) / (Math.pow((1 + R), N) - 1);
 
-    // Update state with calculated EMI
     setKf_emi(EMI.toFixed(2));
   };
 
@@ -555,38 +484,28 @@ export const HomeScreen = ({ route }) => {
             n = 12; // Default to monthly
         }
   
-        // Total number of payments over the loan tenure
         N = parseInt(kf_numberofemi);
   
-        // Loan tenure in years
         t = N / n;
   
-        // Calculate EMI
         const R = r / n; // Monthly interest rate
         const EMI = (P * R * Math.pow((1 + R), N)) / (Math.pow((1 + R), N) - 1);
   
-        // Update state with calculated EMI
         setKf_emi(EMI.toFixed(2));
       }
     };
-  
-    // Call the calculateEMI function whenever any of the dependent values change
-    calculateEMI();
+      calculateEMI();
   }, [kf_loanamountrequested, kf_interestrate, kf_emischedule, kf_numberofemi]);
   
-  // Function to handle changes in loan amount requested or interest rate
   const handleLoanChange = () => {
-    // Check if loan amount and interest rate are provided
     if (kf_loanamountrequested && kf_interestrate) {
-      calculateEMI(); // Calculate EMI
+      calculateEMI(); 
     }
   };
 
-  // Function to handle changes in EMI schedule or number of EMIs
   const handleEMIScheduleChange = () => {
-    // Check if EMI schedule and number of EMIs are provided
     if (kf_emischedule && kf_numberofemi) {
-      calculateEMI(); // Calculate EMI
+      calculateEMI(); 
     }
   };
 
@@ -610,7 +529,7 @@ export const HomeScreen = ({ route }) => {
 
   const handleEmiSchedule = (emischedule) => {
     setKf_emischedule(emischedule);
-    handleEmiScheduleOptionset(emischedule); // Call handleEmiScheduleOptionset here
+    handleEmiScheduleOptionset(emischedule); 
 
     if (emischedule.trim() === '') {
       setErrorMessages({
@@ -634,17 +553,6 @@ export const HomeScreen = ({ route }) => {
       });
       return;
     }
-
-    // const minLoanAmount = 25000;
-    // const maxLoanAmount = 1500000;
-
-    // if (kf_loanamountrequested < minLoanAmount || kf_loanamountrequested > maxLoanAmount) {
-    //   setErrorMessages({
-    //     ...errorMessages,
-    //     // loanAmountRequested: `Loan amount should be between ${minLoanAmount} and ${maxLoanAmount} INR.`,
-    //   });
-    //   return;
-    // }
 
     const newErrorMessages = {
       firstName: !kf_name ? ' Enter a First Name' : '',
@@ -759,10 +667,8 @@ export const HomeScreen = ({ route }) => {
     <>
       <StatusBar />
       <HeaderComponent titleText="Home Screen" onPress={handleGoBack} />
-
       <ScrollView key={resetFormKey} keyboardShouldPersistTaps="handled">
         <View style={styles.container}>
-
           {/* <View>
               {authenticatedUser && (
                 <Text style={{ color: 'rgba(255, 28, 53, 255)', fontSize: 15, fontWeight: 'bold', textAlign: 'center' }}>Created by: {authenticatedUser.kf_adminname}</Text>
@@ -824,6 +730,7 @@ export const HomeScreen = ({ route }) => {
             title="Gender"
             options={['Male', 'Female']}
           // initialOption="Option1"
+          Optiontitle= "Gender"
           />
 
           <TextInputComponent
@@ -903,31 +810,7 @@ export const HomeScreen = ({ route }) => {
             <Text style={styles.errorText}>{errorMessages.panCardNumber}</Text>
           )}
 
-          {/* <CardImage
-            title="AadharCard"
-            imageContent={kf_aadharcard}
-            onViewImage={onViewImage}
-            pickImage={() => pickImage('aadhar')}
-            setModalVisible={setModalVisible}
-          />
-
-          <CardImage
-            title="PANCard"
-            imageContent={kf_pancard}
-            onViewImage={onViewImage}
-            pickImage={() => pickImage('pan')}
-            setModalVisible={setModalVisible}
-          />
-
-          <CardImage
-            title="Applicant"
-            imageContent={kf_applicantimage}
-            onViewImage={onViewImage}
-            pickImage={() => pickImage('applicantimage')}
-            setModalVisible={setModalVisible}
-          />  */}
-
-<TextInputComponent
+          <TextInputComponent
             placeholder="Loan Amount Request"
             autoCapitalize="none"
             value={kf_loanamountrequested}
@@ -938,15 +821,6 @@ export const HomeScreen = ({ route }) => {
           {errorMessages.loanAmountRequested !== '' && (
             <Text style={styles.errorText}>{errorMessages.loanAmountRequested}</Text>
           )}
-
-          {/* <TextInput
-            style={[styles.textInputContainer, { marginVertical: 10 }]}
-            placeholder="Interest Rate"
-            value={kf_interestrate}
-            onChangeText={handleInterestRate}
-            onBlur={handleLoanChange}
-            keyboardType="numeric"
-          /> */}
 
           <TextInput
             style={[styles.textInputContainer, { marginVertical: 10 }]}
@@ -969,6 +843,7 @@ export const HomeScreen = ({ route }) => {
             onOptionChange={handleEmiSchedule}
             title="EMI Schedule"
             options={['Daily', 'Weekly', 'Monthly']}
+            Optiontitle= "EMI Schedule"
           />
           {errorMessages.emiSchedule !== '' && (
             <Text style={styles.errorText}>{errorMessages.emiSchedule}</Text>
@@ -988,67 +863,9 @@ export const HomeScreen = ({ route }) => {
 
           <Text style={[styles.textInputContainer, { marginVertical: 10, height: 48, color: "gray" }]}>EMI: {kf_emi}</Text>
 
-          {/* <ComponentDatePicker
-            style={{ height: 48, marginBottom: 15 }}
-            selectedDate={kf_emicollectiondate}
-            onDateChange={handleEmiCollectionDateChange}
-            placeholder="EMI Collection Date"  
-          />
-          {errorMessages.emiCollectionDate !== '' && (
-            <Text style={styles.errorText}>{errorMessages.emiCollectionDate}</Text>
-          )} */}
-
-          {/* <TextInputComponent
-            placeholder="Other Charges"
-            autoCapitalize="none"
-            value={kf_othercharges}
-            onChangeText={(text) => setKf_othercharges(parseFloat(text))}
-          /> */}
-          
-
-
-          {/* <View style={{flexDirection:"row", justifyContent:"space-evenly", width: "100%", marginTop: 20 }}>  
-<View>
-<Text>Applicant Image</Text>
-</View>
-
-       <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-      
-        <TouchableOpacity onPress={pickImage} style={{ backgroundColor: 'red', padding: 10, borderRadius: 25, width: 85, marginLeft: -10, height: 30, marginTop: -5 }}>
-          <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold', marginVertical: -7 }}>Gallery</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={takePictureWithCamera} style={{ backgroundColor: 'red', padding: 10, borderRadius: 25, width: 85, marginLeft: 15, height: 30, marginTop: -5 }}>
-          <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold', marginVertical: -7 }}>View</Text>
-        </TouchableOpacity>
-
-      </View>
-      
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={showImage}
-        onRequestClose={() => setShowImage(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <TouchableOpacity onPress={() => setShowImage(false)} style={styles.closeButton}>
-            <Ionicons name="close" size={20} color="white" />
-            </TouchableOpacity>
-            {kf_applicantimage.fileContent ? (
-              <Image
-                style={styles.fullscreenImage}
-                source={{ uri: `data:image/jpeg;base64,${kf_applicantimage.fileContent}` }}
-              />
-            ) : (
-              <Text style={styles.noImageText}>No image found</Text>
-            )}
-          </View>
-        </View>
-      </Modal>
-          </View> */}
-          <View style={{marginLeft: 20}}>
+          <View style={{marginLeft: 10}}>
                 <CardImage
-                  title="Applicant"
+                  title="Upload Image"
                   imageContent={kf_applicantimage}
                   setImageContent={setkf_applicantimage}
                 />
