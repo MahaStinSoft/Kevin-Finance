@@ -488,27 +488,39 @@ const HomeLoanDetailsScreen = ({ route }) => {
           </View>
         )}
 
-        <View style={{ flexDirection: "row" }}>
-          <View style={{ alignContent: "flex-start", width: "60%", left: -35 }}>
-            <ButtonComponent style={{ height: 50 }}
+        {/* <View style={{ flexDirection: "row" }}>
+          <View style={{ alignContent: "flex-start", width: "80%", right: 60 }}>
+            <ButtonComponent style={{ height: 45 }}
               title={showMore ? "View less" : "View more"}
               onPress={handleShowMoreToggle}
             />
           </View>
 
-          <View style={{ width: "60%" }}>
+          <View style={{ width: "80%", right: 100 }}>
 
             <ButtonComponent
               style={[
                 styles.calculateButton,
                 getLoanStatus() !== 'Approved' && styles.disabledButton,
               ]}
-              title="Calculate EMI"
+              title="Pay EMI"
               onPress={handleGoToAmortizationScreen}
               disabled={getLoanStatus() !== 'Approved'}
             />
 
           </View>
+        </View> */}
+        <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
+            <ButtonComponent style={{ width: "30%", }}
+              title={showMore ? "View less" : "View more"}
+              onPress={handleShowMoreToggle}
+            />
+            <ButtonComponent
+              style={[styles.calculateButton, { width: "30%"}, getLoanStatus() !== 'Approved' && styles.disabledButton,]}
+              title="Pay EMI"
+              onPress={handleGoToAmortizationScreen}
+              disabled={getLoanStatus() !== 'Approved'}
+            />
         </View>
       </ScrollView>
     </View>
@@ -613,7 +625,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderRadius: 15,
     marginLeft: 20,
-    width: "55%",
+    width: "100%",
     height: 30
   },
   buttonText: {
@@ -624,10 +636,10 @@ const styles = StyleSheet.create({
     marginVertical: -5
   },
   calculateButton: {
-    marginBottom: 60,
-    height: 50,
-    marginLeft: -120,
-    backgroundColor: 'red', 
+    // marginBottom: 60,
+    // height: 45,
+    // marginLeft: -120,
+    // backgroundColor: 'red', 
   },
   disabledButton: {
     backgroundColor: 'gray', 
