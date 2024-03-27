@@ -8,6 +8,7 @@ import ButtonComponent from '../../common/ButtonComponent';
 import ComponentDatePicker from '../../common/ComponentDatePicker';
 import LoanStatusPicker from '../../common/LoanStatusPicker ';
 import { Ionicons } from '@expo/vector-icons'; // Import the close icon from your icon library
+import CustomAlert from '../../common/CustomAlert';
 
 const EditLoanDetail = ({ route, navigation }) => {
   const { record, recordId } = route.params;
@@ -32,6 +33,9 @@ const EditLoanDetail = ({ route, navigation }) => {
   const [updateClicked, setUpdateClicked] = useState(false);
   const [updatePerformed, setUpdatePerformed] = useState(false);
   // const [kf_gender, setkf_gender] = useState(null);
+  const [showAlert, setShowAlert] = useState(false); // New state for showing custom alert
+  const [showAlertEMIUnpaid, setShowAlertEMIUnpaid] = useState(false); // New state for showing custom alert
+
 
   useEffect(() => {
     console.log('Penalty updated:', penalty);
@@ -89,13 +93,13 @@ const EditLoanDetail = ({ route, navigation }) => {
   const handleUpdate = async () => {
 
     if (!kf_datepicker) {
-      Alert.alert('Cannot Update', 'Select Payment Received Date');
+      handleShowAlert(); 
       setIsLoading(false);
       return;
     };
 
     if (!kf_paidstatus) {
-      Alert.alert('Cannot Update', 'EMI status is unpaid. Cannot update.');
+      handleShowAlertEMIUnPaid();
       setIsLoading(false);
       return;
     };
@@ -171,21 +175,6 @@ const EditLoanDetail = ({ route, navigation }) => {
 }
 };
 
-// const handleEMIStatusOptionset = (selectedOptionGender) => {
-//   let numericValue;
-//   switch (selectedOptionGender) {
-//     case 'Unpaid':
-//       numericValue = 0;
-//       break;
-//     case 'Paid':
-//       numericValue = 1;
-//       break;
-//     default:
-//       numericValue = Unpaid;
-//   }
-//   setkf_paidstatus(numericValue);
-// };
-
   const handleEMIStatusOptionset = (selectedOptionGender) => {
 
     if (!kf_datepicker ) {
@@ -234,6 +223,23 @@ const EditLoanDetail = ({ route, navigation }) => {
   };
 
   const date = kf_datepicker ? new Date(kf_datepicker) : null;
+
+  const handleShowAlert = () => {
+    setShowAlert(true);
+  };
+
+  const handleShowAlertEMIUnPaid = () => {
+    setShowAlertEMIUnpaid(true);
+  };
+
+  // Function to close the custom alert
+  const handleCloseAlert = () => {
+    setShowAlert(false);
+  };
+
+  const handleCloseAlertEMIUnPaid = () => {
+    setShowAlertEMIUnpaid(false);
+  };
 
   return (
     <View style={styles.container}>
@@ -339,22 +345,12 @@ const EditLoanDetail = ({ route, navigation }) => {
 
         <View style={styles.row}>
           <Text style={[styles.label,{top: -10}]}>EMI Status:</Text>
-          {/* <Picker
-            style={[styles.valueInput, { color: kf_paidstatus ? "gray" : "black" }]}
-            selectedValue={kf_paidstatus ? 'Paid' : 'Unpaid'}
-            onValueChange={(itemValue, itemIndex) => setkf_paidstatus(itemValue === 'Paid')}
-            enabled={!kf_paidstatus && !isLoading} // Disable the Picker if isLoading is true
-          >
-            {emiStatusOptions.map((option, index) => (
-              <Picker.Item key={index} label={option} value={option} />
-            ))}
-          </Picker> */}
           <View style={{width: "80%", left: 18, top: -10, height: "100%"}}>
           <LoanStatusPicker style={{height: 40, color: kf_paidstatus ? "gray" : "black" }}
             onOptionChange={handleEMIStatusOptionset}
             title="EMI Status"
             options={['Paid', 'Unpaid']}
-            initialOption= 'Unpaid'
+            initialOption={kf_paidstatus ? 'Paid' : 'Unpaid'}
             Optiontitle= "EMI Status"
           disabled={kf_paidstatus}
           />
@@ -362,10 +358,30 @@ const EditLoanDetail = ({ route, navigation }) => {
         </View>
 
         <ButtonComponent
-          title={isPaid ? "Closed" : "Update"}
+          title={isPaid ? "Paid" : "Update"}
           onPress={handleUpdate}
           disabled={isPaid || isLoading || emiStatusUpdated || updatePerformed}
           style={isPaid ? styles.disabledButton : styles.button}
+        />
+        <CustomAlert
+        visible={showAlert}
+        onClose={handleCloseAlert}
+        title="Cannot Update"
+        headerMessage= "Alert"
+        message="Select Payment Received Date"
+        buttonText="OK"
+      />
+
+        <CustomAlert
+          visible={showAlertEMIUnpaid}
+          onClose={handleCloseAlertEMIUnPaid}
+          title="Cannot Update"
+          headerMessage="Cannot Update"
+          message="EMI status is unpaid. Cannot update."
+          buttonText="OK"
+          style={styles.alertStyle}
+          modalHeaderStyle={styles.modalheaderStyle}
+          textStyle={styles.textStyle}
         />
     </View>
     </View>
@@ -383,7 +399,7 @@ const styles = StyleSheet.create({
     padding: 0,
     borderRadius: 50,
     alignItems: 'center',
-    width: "50%"
+    width: "30%"
   },
   title: {
     fontSize: 24,
@@ -435,7 +451,7 @@ const styles = StyleSheet.create({
     padding: 0,
     borderRadius: 50,
     alignItems: 'center',
-    width: "50%"
+    width: "30%"
   },
   buttonText: {
     color: 'white',
@@ -446,6 +462,17 @@ const styles = StyleSheet.create({
     // marginRight: -20,
     marginTop: -10,
   },
+  alertStyle:{
+// backgroundColor: "blue",
+width: "80%",
+  },
+  modalheaderStyle:{
+    // backgroundColor: "green",
+    marginLeft: 40
+  },
+  textStyle:{
+    // backgroundColor: "yellow"
+  }
 });
 
 export default EditLoanDetail;
