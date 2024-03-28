@@ -6,7 +6,10 @@ import HeaderComponent from '../../common/Header';
 import ButtonComponent from '../../common/ButtonComponent';
 import ComponentDatePicker from '../../common/ComponentDatePicker';
 import LoanStatusPicker from '../../common/LoanStatusPicker ';
-
+import CardImage from '../../common/CardImage';
+import Gurantee2Annotation from '../Annotations/Gurantee2Annotation';
+import CardImageSignature from '../../common/CardImageSignature';
+import CustomAlert from '../../common/CustomAlert';
 
 const HomeLoanGurantee2 = ({ route, navigation }) => {
   const { loanApplication, onUpdateSuccess } = route.params || {};
@@ -26,6 +29,9 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
   const [guarantoraddress3, setAddress3] = useState(loanApplication?.kf_guarantor2address3 || '');
   const [guarantorcity, setCity] = useState(loanApplication?.kf_guarantor2city || '');
   const [guarantorstate, setState] = useState(loanApplication?.kf_guarantor2state || '');
+  const [aadharcard, setAadharcard] = useState({ fileName: null, fileContent: null });
+  const [pancard, setPancard] = useState({ fileName: null, fileContent: null });
+  const [applicantImage, setapplicantImage] = useState({ fileName: null, fileContent: null });
 
   const [isfirstnameValid, setIsfirstnameValid] = useState(true);
   const [isLastNameValid, setIsLastNameValid] = useState(true);
@@ -33,8 +39,17 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [isaadharNumberValid, setIsaadharcardNumberValid] = useState(true);
   const [isPancardNumberValid, setIsPancardNumberValid] = useState(true);
+  const [annotations, setAnnotations] = useState([]);
+  const [aadharImageContent, setAadharImageContent] = useState(null);
+  const [showImage, setShowImage] = useState(true);
+  const [showAlert, setShowAlert] = useState(false); 
+  const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
 
   const [recordId, setRecordId] = useState(loanApplication.kf_loanapplicationid);
+  
+  const { signatureImage } = route.params;
+  const { loanStatus } = route.params;
+  console.log('signature',signatureImage);
 
   const [errorMessages, setErrorMessages] = useState({
     guarantorFirstNameEdit: '',
@@ -49,8 +64,6 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
   const handleGoBack = () => {
     navigation.navigate("HomeLoanDetailsScreen", { loanApplication });
   };
-
-
 
   useEffect(() => {
     setapplicationnumber(loanApplication.kf_applicationnumber);
@@ -69,6 +82,9 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
     setState(loanApplication.kf_guarantor2state);
     setAadharcardNumber(loanApplication.kf_guarantor2aadharnumber);
     setPancardNumber(loanApplication.kf_guarantor2pannumber);
+    setAadharcard({ fileName: null, fileContent: null });
+    setPancard({ fileName: null, fileContent: null });
+    setapplicantImage({ fileName: null, fileContent: null });
     setRecordId(loanApplication.kf_loanapplicationid);
     console.log('State updated:', {
       applicationnumber,
@@ -78,7 +94,7 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
       guarantorgender,
       guarantorpannumber,
       guarantoraadharnumber,
-    //   status,
+      //   status,
       guarantormobilenumber
     });
   }, [loanApplication]);
@@ -144,22 +160,22 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
       const updateRecordResponse = await axios.patch(
         `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications(${recordId})`,
         {
-            kf_applicationnumber: applicationnumber,
-            kf_createdby: createdby,
-            kf_guarantor2firstname: guarantorfirstname,
-            kf_guarantor2lastname: guarantorlastname,
-            kf_guarantor2dateofbirth: formattedDateOfBirth,
-            kf_guarantor2age: guarantorage,
-            kf_guarantor2gender: guarantorgender,
-            kf_guarantor2mobilenumber: guarantormobilenumber,
-            kf_guarantor2email: guarantoremail,
-            kf_guarantor2address1: guarantoraddress1,
-            kf_guarantor2address2: guarantoraddress2,
-            kf_guarantor2address3: guarantoraddress3,
-            kf_guarantor2city: guarantorcity,
-            kf_guarantor2state: guarantorstate,
-            kf_guarantor2aadharnumber:guarantoraadharnumber,
-            kf_guarantor2pannumber:guarantorpannumber
+          kf_applicationnumber: applicationnumber,
+          kf_createdby: createdby,
+          kf_guarantor2firstname: guarantorfirstname,
+          kf_guarantor2lastname: guarantorlastname,
+          kf_guarantor2dateofbirth: formattedDateOfBirth,
+          kf_guarantor2age: guarantorage,
+          kf_guarantor2gender: guarantorgender,
+          kf_guarantor2mobilenumber: guarantormobilenumber,
+          kf_guarantor2email: guarantoremail,
+          kf_guarantor2address1: guarantoraddress1,
+          kf_guarantor2address2: guarantoraddress2,
+          kf_guarantor2address3: guarantoraddress3,
+          kf_guarantor2city: guarantorcity,
+          kf_guarantor2state: guarantorstate,
+          kf_guarantor2aadharnumber: guarantoraadharnumber,
+          kf_guarantor2pannumber: guarantorpannumber
         },
         {
           headers: {
@@ -174,50 +190,320 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
 
         // Notify the parent screen about the successful update
         if (onUpdateSuccess) {
-            onUpdateSuccess({
-              ...loanApplication,
-              kf_applicationnumber: applicationnumber,
-              kf_createdby: createdby,
-              kf_guarantor2firstname: guarantorfirstname,
-              kf_guarantor2lastname: guarantorlastname,
-              kf_guarantor2dateofbirth: formattedDateOfBirth,
-              kf_guarantor2age: parseInt(guarantorage),
-              kf_guarantor2gender: guarantorgender,
-              kf_guarantor2mobilenumber: guarantormobilenumber,
-              kf_guarantor2email: guarantoremail,
-              kf_guarantor2address1: guarantoraddress1,
-              kf_guarantor2address2: guarantoraddress2,
-              kf_guarantor2address3: guarantoraddress3,
-              kf_guarantor2city: guarantorcity,
-              kf_guarantor2state: guarantorstate,
-              kf_guarantor2aadharnumber: guarantoraadharnumber,
-              kf_guarantor2pannumber: guarantorpannumber,
-            });
-          }
-          Alert.alert('Updated the record Successfully.', '', [
-            {
-              text: 'cancel'
-            },
-            {
-              text: 'OK',
-              onPress: () => {
-                navigation.navigate('HomeLoanDetailsScreen', { loanApplication: loanApplication });
-              },
-            },
-          ]);
-        } else {
-          console.log('Error updating record in CRM:', updateRecordResponse);
-          Alert.alert('Error', 'Failed to update the record in CRM.');
+          onUpdateSuccess({
+            ...loanApplication,
+            kf_applicationnumber: applicationnumber,
+            kf_createdby: createdby,
+            kf_guarantor2firstname: guarantorfirstname,
+            kf_guarantor2lastname: guarantorlastname,
+            kf_guarantor2dateofbirth: formattedDateOfBirth,
+            kf_guarantor2age: guarantorage,
+            kf_guarantor2gender: guarantorgender,
+            kf_guarantor2mobilenumber: guarantormobilenumber,
+            kf_guarantor2email: guarantoremail,
+            kf_guarantor2address1: guarantoraddress1,
+            kf_guarantor2ddress2: guarantoraddress2,
+            kf_guarantor2address3: guarantoraddress3,
+            kf_guarantor2city: guarantorcity,
+            kf_guarantor2state: guarantorstate,
+            kf_guarantor2aadharnumber: guarantoraadharnumber,
+            kf_guarantor2pannumber: guarantorpannumber,
+          });
         }
-      } catch (error) {
-        console.error('Error during update:', error.response?.data || error.message);
-        Alert.alert('Error', 'An unexpected error occurred. Please try again later.');
+        // Alert.alert('Updated the record Successfully.', '', [
+        //   // {
+        //   //   text: 'cancel'
+        //   // },
+        //   {
+        //     text: 'OK',
+        //     onPress: () => {
+        //       navigation.goBack();
+        //     },
+        //   },
+        // ]);
+        handleShowAlert();
+      } else {
+        console.log('Error updating record in CRM:', updateRecordResponse);
+        Alert.alert('Error', 'Failed to update the record in CRM.');
       }
-    };
+    } catch (error) {
+      console.error('Error during update:', error.response?.data || error.message);
+      Alert.alert('Error', 'An unexpected error occurred. Please try again later.');
+    }
+  };
 
 
   // Define onUpdateSuccess function in your component
-  
+  // const onUpdateSuccess = (updatedData) => {
+  //     // Handle the updated data here, such as updating the state or performing any other action
+  //     console.log('Record updated successfully:', updatedData);
+  //   };
+
+
+  useEffect(() => {
+    fetchAnnotations1();
+  }, []);
+
+  const sendAnnotation = async () => {
+    try {
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        {
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        },
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      );
+
+      const accessToken = tokenResponse.data.access_token;
+
+      // Create a new annotation
+      const annotations = [
+        {
+          subject: 'Guarantee2 AadharCard Image',
+          filename: aadharcard.fileName || 'Guarantee2AadharCard.jpg',
+          isdocument: true,
+          'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
+          documentbody: aadharcard.fileContent,
+        },
+      ];
+
+      const createAnnotationResponse = await axios.post(
+        'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
+        annotations,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (createAnnotationResponse.status === 204) {
+        console.log('Aadhar image annotation created successfully.');
+      } else {
+        console.error('Failed to create Aadhar image annotation. Response:', createAnnotationResponse.data);
+        // Alert.alert('Error', 'Failed to create Aadhar image annotation.');
+      }
+
+    } catch (error) {
+      console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
+      // Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+    }
+  };
+
+  const sendAnnotation1 = async () => {
+    try {
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        {
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        },
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      );
+
+      const accessToken = tokenResponse.data.access_token;
+
+      // Create a new annotation
+      const annotations = [
+        {
+          subject: 'Guarantee2 PanCard Image',
+          filename: pancard.fileName || 'Guarantee2PanCard.jpg',
+          isdocument: true,
+          'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
+          documentbody: pancard.fileContent,
+        },
+      ];
+
+      const createAnnotationResponse = await axios.post(
+        'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
+        annotations,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (createAnnotationResponse.status === 204) {
+        console.log('PanCard image annotation created successfully.');
+      } else {
+        console.error('Failed to create Aadhar image annotation. Response:', createAnnotationResponse.data);
+        // Alert.alert('Error', 'Failed to create Aadhar image annotation.');
+      }
+
+    } catch (error) {
+      console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
+      // Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+    }
+  };
+
+  const fetchAnnotations1 = async () => {
+    try {
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        {
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        },
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      );
+
+      const accessToken = tokenResponse.data.access_token;
+
+      const fetchAnnotationsResponse = await axios.get(
+        'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations?$filter=_objectid_value eq ' + recordId,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      const fetchedAnnotations = fetchAnnotationsResponse.data.value;
+      // console.log('Annotations:', fetchedAnnotations);
+      setAnnotations(fetchedAnnotations);
+
+    } catch (error) {
+      console.error('Error fetching annotations:', error.response?.data || error.message);
+      // Alert.alert('Error', 'An error occurred while fetching annotations.');
+    }
+  };
+
+  const sendAnnotation2 = async () => {
+    try {
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        {
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        },
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      );
+
+      const accessToken = tokenResponse.data.access_token;
+
+      // Create a new annotation
+      const annotations = [
+        {
+          subject: 'Guarantee2 Applicant Image',
+          filename: applicantImage.fileName || 'Guarantee2Applicant.jpg',
+          isdocument: true,
+          'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
+          documentbody: applicantImage.fileContent,
+        },
+      ];
+
+      const createAnnotationResponse = await axios.post(
+        'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
+        annotations,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (createAnnotationResponse.status === 204) {
+        console.log('ApplicantImage image annotation created successfully.');
+        // Alert.alert('Sucess', '');
+
+      } else {
+        console.error('Failed to create Applicant image annotation. Response:', createAnnotationResponse.data);
+        // Alert.alert('Error', 'Failed to create Aadhar image annotation.');
+      }
+
+    } catch (error) {
+      console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
+      // Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+    }
+  };
+
+  const sendAnnotation3 = async () => {
+    try {
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        {
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        },
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      );
+
+      const accessToken = tokenResponse.data.access_token;
+
+      // Create a new annotation
+      const annotations = [
+        {
+          subject: 'Gurantee2 Signature Image',
+          filename: signatureImage.fileName || 'Gurantee2SignatureHome.jpg',
+          isdocument: true,
+          'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
+          documentbody: signatureImage,
+        },
+      ];
+
+   console.log('documentbody',signatureImage);
+
+      const createAnnotationResponse = await axios.post(
+        'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
+        annotations,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (createAnnotationResponse.status === 204) {
+        console.log('Signature image annotation created successfully.');
+        // Alert.alert('Sucess', '');
+
+      } else {
+        console.error('Failed to create Signature image annotation. Response:', createAnnotationResponse.data);
+        // Alert.alert('Error', 'Failed to create Aadhar image annotation.');
+      }
+
+      // Fetch and display the updated annotations
+    } catch (error) {
+      // console.error('Error sending Signature image annotation:', error.response?.data || error.message);
+      // Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+    }
+  };
+
+  const handleUpdateRecordAndSendAnnotation = () => {
+    sendAnnotation();
+    sendAnnotation1();
+    sendAnnotation2();
+    sendAnnotation3();
+    handleUpdateRecord();
+  };
+
+  const handleViewImages = () => {
+    setShowImage(!showImage);
+  };
+
+  const filteredAnnotations = annotations.filter(item => item.documentbody);
 
   const handleEmailChange = (text) => {
     setEmail(text);
@@ -239,7 +525,6 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
       });
     }
   };
-
 
   const calculateAge = (birthDate) => {
     const today = new Date();
@@ -333,8 +618,6 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
     }
   };
 
- 
-
   const handleLoanStatusChange = (selectedOptionLoan) => {
     let numericValue;
     switch (selectedOptionLoan) {
@@ -350,7 +633,7 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
       case 'Cancelled':
         numericValue = 123950003;
         break;
-      case 'Expired':
+      case 'Rejected':
         numericValue = 123950004;
         break;
       default:
@@ -370,7 +653,7 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
       case 123950003:
         return 'Cancelled';
       case 123950004:
-        return 'Expired';
+        return 'Rejected';
       default:
         return 'Pending Approval';
     }
@@ -441,18 +724,44 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
     }
   };
 
+  const handleNavigateToSignatureScreen = () => {
+    navigation.navigate('Gurantee2SignatureHome', { loanApplication });
+  };
+
+  const isValidInput = (text) => {
+    // Regular expression to allow only alphabets and spaces
+    const onlyAlphabets = /^[a-zA-Z\s]*$/;
+    return onlyAlphabets.test(text);
+  };
+
+  const handleShowAlert = () => {
+    setShowAlert(true);
+  };
+
+  const handleCloseAlert = () => {
+    setShowAlert(false);
+  };
+
+  const handleCloseAlertConfirmation = () => {
+    setShowAlertConfirmation(false);
+    navigation.navigate('HomeLoanDetailsScreen', { loanApplication: loanApplication });
+  };
+
+  const isEditable = loanStatus !== 'Approved';
 
   return (
     <>
-      <HeaderComponent titleText="HomeLoan Gurantee"
+      <HeaderComponent titleText="HomeLoan Gurantee2"
         onPress={handleGoBack}
-        onIconPress={handleUpdateRecord}
+        // onIconPress={handleUpdateRecord}
+        onIconPress={handleUpdateRecordAndSendAnnotation}
         screenIcon="md-save"
         screenIconStyle={{ marginTop: 5 }}
       />
       <ScrollView>
         <View style={styles.container}>
           <View style={styles.wrapper}>
+          {/* <Text>Loan Status: {loanStatus}</Text> */}
             <TextInput
               style={[styles.textInputContainer, { color: "gray" }]}
               value={applicationnumber}
@@ -474,27 +783,29 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
             />
 
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
               value={guarantorfirstname}
               placeholder="First Name"
               onChangeText={(text) => {
+                if (isValidInput(text) || text === '') { // Call isValidInput function
                 setfirstname(text);
                 setIsfirstnameValid(text.trim() !== '');
-
-                // Update error message
                 setErrorMessages({
                   ...errorMessages,
                   guarantorFirstNameEdit: text.trim() !== '' ? '' : 'Enter First Name',
                 });
               }}
+            }
+              editable={isEditable}
             />
             {errorMessages.guarantorFirstNameEdit !== '' && <Text style={styles.errorText}>{errorMessages.guarantorFirstNameEdit}</Text>}
 
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
               value={guarantorlastname}
               placeholder="Last Name"
               onChangeText={(text) => {
+                if (isValidInput(text) || text === '') { // Call isValidInput function
                 setLastname(text);
                 setIsLastNameValid(text.trim() !== '')
 
@@ -502,29 +813,44 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
                   ...errorMessages,
                   guarantorLastNameEdit: text.trim() !== '' ? '' : 'Enter Last Name',
                 });
+              }
               }}
+              editable={isEditable}
             />
             {errorMessages.guarantorLastNameEdit !== '' && <Text style={styles.errorText}>{errorMessages.guarantorLastNameEdit}</Text>}
 
-            <LoanStatusPicker
-              onOptionChange={handleGenderOptionset}
-              title="Gender"
-              options={['Male', 'Female']}
-              initialOption={guarantorgender ? getGenderOptionsetStringFromNumericValue(guarantorgender) : ''}
-              style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
-            />
 
-            <ComponentDatePicker
-              selectedDate={guarantordateofbirth}
-              onDateChange={handleDateOfBirth}
-              placeholder="Date of Birth"
-              style={{ width: "100%", height: 45, marginTop: 5, marginLeft: 0 }}
-            />
+            {isEditable ? (
+              <LoanStatusPicker
+                onOptionChange={handleGenderOptionset}
+                title="Gender"
+                options={['Male', 'Female']}
+                initialOption={guarantorgender ? getGenderOptionsetStringFromNumericValue(guarantorgender) : 'Gender'}
+                style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
+              />
+            ) : (
+              <Text style={[styles.textInputContainer, { color: isEditable ? "black" : "gray", height: 45 }]}>
+                {guarantorgender ? getGenderOptionsetStringFromNumericValue(guarantorgender) : 'Gender'}
+              </Text>
+            )}
+
+            {isEditable ? (
+              <ComponentDatePicker
+                selectedDate={guarantordateofbirth}
+                onDateChange={handleDateOfBirth}
+                placeholder="Date of Birth"
+                style={{ width: "100%", height: 45, marginTop: 5, marginLeft: 0 }}
+              />
+            ) : (
+              <Text style={[styles.textInputContainer, { color: isEditable ? "black" : "gray", height: 45 }]}>
+                {guarantordateofbirth ? guarantordateofbirth : "Date of Birth"}
+              </Text>
+            )}
             {errorMessages.guarantorDateOfBirthEdit !== '' && <Text style={styles.errorText}>{errorMessages.guarantorDateOfBirthEdit}</Text>}
 
 
             <TextInput
-              style={[styles.textInputContainer, { color: "gray" }]}
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
               value={guarantorage.toString()}
               placeholder="Age"
               onChangeText={(text) => setage(text)}
@@ -532,83 +858,173 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
             />
 
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
               value={guarantormobilenumber}
               placeholder="Mobile Number"
               onChangeText={handleMobileNumberChange}
+              editable={isEditable}
             />
             {errorMessages.guarantorMobileNumberEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.guarantorMobileNumberEdit}</Text>
             )}
 
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
               value={guarantoremail}
               placeholder="Email"
               onChangeText={handleEmailChange}
+              editable={isEditable}
             />
             {errorMessages.guarantorEmailEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.guarantorEmailEdit}</Text>
             )}
 
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
               value={guarantoraddress1}
               placeholder="Address Line 1"
               onChangeText={(text) => setAddress1(text)}
+              editable={isEditable}
             />
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
               value={guarantoraddress2}
               placeholder="Address Line 2"
               onChangeText={(text) => setAddress2(text)}
+              editable={isEditable}
             />
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
               value={guarantoraddress3}
               placeholder="Address Line 3"
               onChangeText={(text) => setAddress3(text)}
+              editable={isEditable}
             />
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
               value={guarantorcity}
               placeholder="City"
               onChangeText={(text) => setCity(text)}
+              editable={isEditable}
             />
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
               value={guarantorstate}
               placeholder="State"
               onChangeText={(text) => setState(text)}
+              editable={isEditable}
             />
 
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
               value={guarantoraadharnumber}
               placeholder="Aadharcard Number"
               onChangeText={handleAadharCardNumberChange}
+              editable={isEditable}
             />
             {errorMessages.guarantorAadharCardNumberEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.guarantorAadharCardNumberEdit}</Text>
             )}
 
-
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
               value={guarantorpannumber}
               placeholder="PAN Card Number"
               onChangeText={handlePancardNumberValid}
+              editable={isEditable}
             />
             {errorMessages.guarantorPanCardNumberEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.guarantorPanCardNumberEdit}</Text>
             )}
-
-
-
-            {/* <ButtonComponent title="Update" onPress={handleUpdateRecord} /> */}
+ {isEditable && (
+            <View style={{ backgroundColor: "white", marginTop: 15 }}>
+             <View style={{marginVertical:3}} >
+                    <CardImage
+                      title="AadharCard"
+                      imageContent={aadharcard}
+                      setImageContent={setAadharcard}
+                      // disabled={isEditable} // Set disabled based on isEditable
+                    />
+                   
+                  </View>
+                  <View style={{marginVertical:3}} >
+                    <CardImage
+                      title="PanCard"
+                      imageContent={pancard}
+                      setImageContent={setPancard}
+                      disabled={isEditable} // Set disabled based on isEditable
+                    />
+                    {/* {errorMessages.panCardImage !== '' && !showImage &&(
+                      <Text style={styles.errorText1}>{errorMessages.panCardImage}</Text>
+                    )} */}
+                  </View>
+                  <View style={{marginVertical:3}}>
+                    <CardImage
+                      title="Applicant"
+                      imageContent={applicantImage}
+                      setImageContent={setapplicantImage}
+                      disabled={isEditable} // Set disabled based on isEditable
+                    />
+                    {/* {errorMessages.applicantCardImage !== '' && !showImage &&(
+                      <Text style={styles.errorText1}>{errorMessages.applicantCardImage}</Text>
+                    )} */}
+                  </View>
+                  <View style={{marginBottom:15}} >
+                    <CardImageSignature
+                      title="Signature"
+                      imageContent={signatureImage}
+                      pickImage={handleNavigateToSignatureScreen}
+                      sendAnnotation={sendAnnotation3}
+                      disabled={isEditable} // Set disabled based on isEditable
+                    />
+                  </View>
+                  <View style={{ width: '25%',top: -200,left: 200,marginBottom: -190}}>
+                  <Gurantee2Annotation
+                    annotations={annotations}
+                    filteredAnnotations={filteredAnnotations}
+                    showImage={showImage}
+                    handleViewImages={handleViewImages}
+                  />
+             </View>
+            </View>
+            
+            )} 
+            {!isEditable && (
+              <View style={{ backgroundColor: "white", marginTop: 15 }}>
+               <View style={{marginVertical:3}} >
+                 <View style={{marginLeft: 40,top: 10}}>
+                  <View style={styles.textImage}><Text>Aadhar Image</Text></View>                   
+                  <View style={styles.textImage}><Text>PAN Image</Text></View>
+                  <View style={styles.textImage}><Text>Applicant Image</Text></View>
+                  <View style={styles.textImage}><Text>Signature Image</Text></View>
+                    </View>
+                  </View>
+                  <View style={{ width:'25%',top: -180,left: 200,marginBottom: -150}}>
+                  <Gurantee2Annotation
+                    annotations={annotations}
+                    filteredAnnotations={filteredAnnotations}
+                    showImage={showImage}
+                    handleViewImages={handleViewImages}
+                  />
+             </View>
+              </View>
+              )}
+     
           </View>
         </View>
       </ScrollView>
+      <CustomAlert
+          visible={showAlert}
+          onClose={handleCloseAlert}
+          onConfirm={handleCloseAlertConfirmation}
+          headerMessage="Home Loan"
+          message="Record updated Successfully."
+          Button1="Cancel"
+          Button2="OK"
+          style={styles.alertStyle}
+          modalHeaderStyle={[styles.modalheaderStyle, {right: 90}]}
+          textStyle={styles.textStyle}
+        />
     </>
   );
 };
@@ -642,6 +1058,28 @@ const styles = StyleSheet.create({
     backgroundColor: '#FBFCFC',
     padding: 10,
   },
+
+  annotation: {
+    marginBottom: 15,
+    padding: 10,
+    // borderWidth: 1,
+    // borderColor: '#ccc',
+    borderRadius: 5,
+  },
+  textImage:{
+    marginVertical:15
+  },
+  alertStyle:{
+    // backgroundColor: "blue",
+    width: "80%",
+      },
+      modalheaderStyle:{
+        // backgroundColor: "green",
+        right: 85
+      },
+      textStyle:{
+        // backgroundColor: "yellow"
+      }
 });
 
 export default HomeLoanGurantee2;

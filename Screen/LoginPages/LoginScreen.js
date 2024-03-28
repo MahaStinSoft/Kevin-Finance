@@ -6,10 +6,13 @@ const LoginScreen = () => {
   const navigation = useNavigation();
 
   const handleAdminLogin = () => {
-    navigation.navigate('ToggleFormScreen');
+    navigation.navigate('LoginForm');
+  };
+  const handleManagerLogin = () => {
+    navigation.navigate('LoginManagerScreen');
   };
   const handleUserLogin = () => {
-    navigation.navigate('LoginManagerScreen');
+    navigation.navigate('LoginUserForm');
   };
 
   return (
@@ -18,9 +21,12 @@ const LoginScreen = () => {
       <TouchableOpacity style={styles.button} onPress={handleAdminLogin}>
         <Text style={styles.buttonText}>Login as Administrator</Text>
       </TouchableOpacity>
-      {/* <TouchableOpacity style={styles.button} onPress={handleUserLogin}>
+      <TouchableOpacity style={styles.button} onPress={handleManagerLogin}>
         <Text style={styles.buttonText}>Login as Manager</Text>
-      </TouchableOpacity> */}
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={handleUserLogin}>
+        <Text style={styles.buttonText}>Login as User</Text>
+      </TouchableOpacity>
     </View>
     
   );
@@ -49,6 +55,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     textAlign: 'center',
+    fontWeight:"bold"
   },
 });
 

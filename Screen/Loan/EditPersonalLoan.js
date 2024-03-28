@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, Alert, StyleSheet, ScrollView, Text } from 'react-native';
+import { View, TextInput, Button, Alert, StyleSheet, ScrollView, Text,Image,TouchableOpacity} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
+import { Ionicons } from '@expo/vector-icons';
 
 import HeaderComponent from '../../common/Header';
 import ButtonComponent from '../../common/ButtonComponent';
@@ -11,6 +12,10 @@ import ComponentDatePicker from '../../common/ComponentDatePicker';
 import TextInputComponent from '../../common/TextInput';
 import LoanStatusPicker from '../../common/LoanStatusPicker ';
 import CardImage from '../../common/CardImage';
+import CardImageSignature from '../../common/CardImageSignature';
+import RenderAnnotation from '../Annotations/renderAnnotationItem';
+import SendNotification from '../../common/SendNotification';
+import CustomAlert from '../../common/CustomAlert';
 
 const EditPersonalLoan = ({ route, navigation }) => {
   const { personalLoan, onUpdateSuccess } = route.params || {};
@@ -37,7 +42,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
   const [aadharcardNumber, setAadharcardNumber] = useState(personalLoan?.kf_aadharnumber || '');
   const [pancardNumber, setPancardNumber] = useState(personalLoan?.kf_pannumber || '');
   const [otherCharges, setOtherCharges] = useState(personalLoan?.kf_othercharges || '');
-  const [emiCollectionDate, setEmiCollectionDate] = useState(personalLoan?.kf_emicollectiondate || '');
+  const [emiCollectionDate, setEmiCollectionDate] = useState(new Date()); // Initialize with today's date
   const [interestRate, setInterestRate] = useState(personalLoan?.kf_interestrate || '');
   const [emiSchedule, setEmiSchedule] = useState(personalLoan?.kf_emischedule || '');
   const [numberOfEMI, setNumberOfEMI] = useState(personalLoan?.kf_numberofemi || '');
@@ -45,7 +50,10 @@ const EditPersonalLoan = ({ route, navigation }) => {
   const [aadharcard, setAadharcard] = useState({ fileName: null, fileContent: null });
   const [pancard, setPancard] = useState({ fileName: null, fileContent: null });
   const [applicantImage, setapplicantImage] = useState({ fileName: null, fileContent: null });
-  const [signature, setSignature] = useState({ fileName: null, fileContent: null });
+  const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fileContent: null });
+  const [signature, setSignature] = useState({ fileName: null });
+  const [sendApproval, setSendApproval] = useState(personalLoan?.kf_sendapproval || '');
+  const [reason, setReason] = useState(personalLoan?.kf_reason || '');
 
   const [isfirstnameValid, setIsfirstnameValid] = useState(true);
   const [isLastNameValid, setIsLastNameValid] = useState(true);
@@ -54,9 +62,20 @@ const EditPersonalLoan = ({ route, navigation }) => {
   const [isPancardNumberValid, setIsPancardNumberValid] = useState(true);
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [isLoanAmountRequested, setIsLoanAmountRequested] = useState(true);
-  const [ModalVisible, setModalVisible] = useState(true);  
+  const [ModalVisible, setModalVisible] = useState(true);
+  const [annotations, setAnnotations] = useState([]);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [showImage, setShowImage] = useState(true);
+  const [item, setItem] = useState(null); // Assuming you have some state to store the current item
+  const [imageContent, setImageContent] = useState(null);
+  const [aadharImageContent, setAadharImageContent] = useState(null);
+  const [showAlert, setShowAlert] = useState(false); 
+  const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
 
+  const { signatureFile } = route.params;
+  console.log('signature', signatureFile);
   const [recordId, setRecordId] = useState(personalLoan.kf_personalloanid);
+  const [imageSource, setImageSource] = useState(null);
 
   const [errorMessages, setErrorMessages] = useState({
     firstNameEdit: '',
@@ -103,10 +122,13 @@ const EditPersonalLoan = ({ route, navigation }) => {
     setEmiAmount(personalLoan.kf_emi);
     setInterestRate(personalLoan.kf_interestrate);
     setNumberOfEMI(personalLoan.kf_numberofemi);
+    setReason(personalLoan.kf_reason);
     setRecordId(personalLoan.kf_personalloanid);
+    setSendApproval(personalLoan.kf_sendapproval);
     setAadharcard({ fileName: null, fileContent: null });
     setPancard({ fileName: null, fileContent: null });
-    setapplicantImage({ fileName: null, fileContent: null });
+    setkf_applicantimage({ fileName: null, fileContent: null });
+    setSignature({ fileName: null })
     console.log('State updated:', {
       applicationnumber,
       createdby,
@@ -116,6 +138,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
       status
     });
   }, [personalLoan]);
+
+  console.log("send personal approval ", sendApproval);
 
   const handleUpdateRecord = async () => {
 
@@ -135,16 +159,16 @@ const EditPersonalLoan = ({ route, navigation }) => {
       return; // Stop the update process if email is invalid
     }
 
-    const minLoanAmount = 25000;
-    const maxLoanAmount = 1500000;
+    // const minLoanAmount = 25000;
+    // const maxLoanAmount = 1500000;
 
-    if (loanAmountRequested < minLoanAmount || loanAmountRequested > maxLoanAmount) {
-      setErrorMessages({
-        ...errorMessages,
-        loanAmountRequestedEdit: `Loan amount should be between ${minLoanAmount} and ${maxLoanAmount} INR.`,
-      });
-      return;
-    }
+    // if (loanAmountRequested < minLoanAmount || loanAmountRequested > maxLoanAmount) {
+    //   setErrorMessages({
+    //     ...errorMessages,
+    //     // loanAmountRequestedEdit: `Loan amount should be between ${minLoanAmount} and ${maxLoanAmount} INR.`,
+    //   });
+    //   return;
+    // }
 
     if (!isPancardNumberValid) {
       setErrorMessages({
@@ -220,6 +244,9 @@ const EditPersonalLoan = ({ route, navigation }) => {
           kf_emischedule: emiSchedule,
           kf_othercharges: otherCharges,
           kf_numberofemi: numberOfEMI,
+          kf_sendapproval: sendApproval,
+          kf_reason: reason,
+          // kf_applicantimage: applicantImage.fileContent,
         },
         {
           headers: {
@@ -263,21 +290,25 @@ const EditPersonalLoan = ({ route, navigation }) => {
             kf_emischedule: emiSchedule,
             kf_othercharges: otherCharges,
             kf_numberofemi: numberOfEMI,
+            kf_sendapproval: sendApproval,
+            kf_reason: reason,
+            // kf_applicantimage: applicantImage.fileContent,
           });
         }
-        console.log(age);
+        // console.log(age);
 
-        Alert.alert('Updated the record Successfully.', '', [
-          // {
-          //   text: 'cancel'
-          // },
-          {
-            text: 'OK',
-            onPress: () => {
-              navigation.navigate('PersonalLoanDetailsScreen', { personalLoan: personalLoan });
-            },
-          },
-        ]);
+        // Alert.alert('Personal Loan', 'Updated the record Successfully.', [
+        //   {
+        //     text: 'cancel'
+        //   },
+        //   {
+        //     text: 'OK',
+        //     onPress: () => {
+        //       navigation.navigate('PersonalLoanDetailsScreen', { personalLoan: personalLoan });
+        //     },
+        //   },
+        // ]);
+        handleShowAlert();
       } else {
         console.log('Error updating record in CRM:', updateRecordResponse);
         Alert.alert('Error', 'Failed to update the record in CRM.');
@@ -287,6 +318,85 @@ const EditPersonalLoan = ({ route, navigation }) => {
     }
   };
 
+  const handleUpdateField = async () => {
+
+    try {
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        {
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        },
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      );
+
+      const accessToken = tokenResponse.data.access_token;
+
+      const updateFieldResponse = await axios.patch(
+        `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans(${recordId})`,
+        {
+          kf_applicantimage: kf_applicantimage.fileContent,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (updateFieldResponse.status === 204) {
+        console.log('Field updated successfully in CRM');
+
+        if (onUpdateSuccess) {
+          onUpdateSuccess({
+            ...personalLoan,
+            kf_applicantimage: kf_applicantimage.fileContent,
+
+          });
+        }
+        Alert.alert('Personal Loan', 'Applicant Image Updated Successfully.', [
+          {
+            text: 'OK',
+          },
+        ]);
+      } else {
+        console.log('Error updating field in CRM:', updateFieldResponse);
+        Alert.alert('Error', 'Failed to update the field in CRM.');
+      }
+    } catch (error) {
+      console.error('Error during field update:', error);
+    }
+  };
+
+  const handleSendApproval = (selectedOptionGender) => {
+    let booleanValue;
+    switch (selectedOptionGender) {
+      case 'No':
+        booleanValue = false;
+        break;
+      case 'Yes':
+        booleanValue = true;
+        break;
+      default:
+        booleanValue = null;
+    }
+    setSendApproval(booleanValue);
+  };
+
+  const getSendApproval = (booleanValue) => {
+    switch (booleanValue) {
+      case false:
+        return 'No';
+      case true:
+        return 'Yes';
+      default:
+        return '';
+    }
+  };
   const handleGenderOptionset = (selectedOptionGender) => {
     let numericValue;
     switch (selectedOptionGender) {
@@ -347,7 +457,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
       case 'Cancelled':
         numericValue = 123950003;
         break;
-      case 'Expired':
+      case 'Rejected':
         numericValue = 123950004;
         break;
       default:
@@ -367,7 +477,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
       case 123950003:
         return 'Cancelled';
       case 123950004:
-        return 'Expired';
+        return 'Rejected';
       default:
         return '';
     }
@@ -550,7 +660,421 @@ const EditPersonalLoan = ({ route, navigation }) => {
     }
   };
 
-  const pickImage = async (imageType) => {
+  // const sendAnnotation = async () => {
+  //   try {
+  //     const tokenResponse = await axios.post(
+  //       'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+  //       {
+  //         grant_type: 'client_credentials',
+  //         client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+  //         resource: 'https://org0f7e6203.crm5.dynamics.com',
+  //         scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+  //         client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+  //       },
+  //       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+  //     );
+
+  //     const accessToken = tokenResponse.data.access_token;
+
+  //     // Check if there is an existing Aadhar image annotation
+  //     const existingAnnotationResponse = await axios.get(
+  //       `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations?$filter=_objectid_value eq ${recordId} and subject eq 'AadharCard Image'`,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${accessToken}`,
+  //           'Content-Type': 'application/json',
+  //         },
+  //       }
+  //     );
+
+  //     if (existingAnnotationResponse.data.value.length > 0) {
+  //       // If an existing annotation is found, delete it
+  //       const existingAnnotationId = existingAnnotationResponse.data.value[0].annotationid;
+  //       await deleteAnnotation(existingAnnotationId, accessToken);
+  //     }
+
+  //     // Create a new annotation
+  //     const annotations = [
+  //       {
+  //         subject: 'AadharCard Image',
+  //         filename: aadharcard.fileName || 'AadharCard.jpg',
+  //         isdocument: true,
+  //         'objectid_kf_personalloan@odata.bind': `/kf_personalloans(${recordId})`,
+  //         documentbody: aadharcard.fileContent,
+  //       },
+  //     ];
+
+  //     const createAnnotationResponse = await axios.post(
+  //       'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
+  //       annotations,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${accessToken}`,
+  //           'Content-Type': 'application/json',
+  //         },
+  //       }
+  //     );
+
+  //     if (createAnnotationResponse.status === 204) {
+  //       console.log('Aadhar image annotation created successfully.');
+  //       // Alert.alert('Sucess', '');
+
+  //     } else {
+  //       console.error('Failed to create Aadhar image annotation. Response:', createAnnotationResponse.data);
+  //       Alert.alert('Error', 'Failed to create Aadhar image annotation.');
+  //     }
+
+  //     // Fetch and display the updated annotations
+  //   } catch (error) {
+  //     console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
+  //     Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+  //   }
+  // };
+  
+
+  useEffect(() => {
+    fetchAnnotations1();
+  }, []);
+
+  const sendAnnotation = async () => {
+    try {
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        {
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        },
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      );
+
+      const accessToken = tokenResponse.data.access_token;
+
+      // Create a new annotation
+      const annotations = [
+        {
+          subject: 'AadharCard Image',
+          filename: aadharcard.fileName || 'AadharCard.jpg',
+          isdocument: true,
+          'objectid_kf_personalloan@odata.bind': `/kf_personalloans(${recordId})`,
+          documentbody: aadharcard.fileContent,
+        },
+      ];
+
+      const createAnnotationResponse = await axios.post(
+        'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
+        annotations,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (createAnnotationResponse.status === 204) {
+        console.log('Aadhar image annotation created successfully.');
+      } else {
+        console.error('Failed to create Aadhar image annotation. Response:', createAnnotationResponse.data);
+        Alert.alert('Error', 'Failed to create Aadhar image annotation.');
+      }
+
+    } catch (error) {
+      console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
+      Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+    }
+  };
+
+  const sendAnnotation1 = async () => {
+    try {
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        {
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        },
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      );
+
+      const accessToken = tokenResponse.data.access_token;
+
+      // Create a new annotation
+      const annotations = [
+        {
+          subject: 'PanCard Image',
+          filename: pancard.fileName || 'PanCard.jpg',
+          isdocument: true,
+          'objectid_kf_personalloan@odata.bind': `/kf_personalloans(${recordId})`,
+          documentbody: pancard.fileContent,
+        },
+      ];
+
+      const createAnnotationResponse = await axios.post(
+        'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
+        annotations,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (createAnnotationResponse.status === 204) {
+        console.log('PanCard image annotation created successfully.');
+      } else {
+        console.error('Failed to create Aadhar image annotation. Response:', createAnnotationResponse.data);
+        Alert.alert('Error', 'Failed to create Aadhar image annotation.');
+      }
+
+    } catch (error) {
+      console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
+      Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+    }
+  };
+
+  const fetchAnnotations1 = async () => {
+    try {
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        {
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        },
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      );
+
+      const accessToken = tokenResponse.data.access_token;
+
+      const fetchAnnotationsResponse = await axios.get(
+        'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations?$filter=_objectid_value eq ' + recordId,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      const fetchedAnnotations = fetchAnnotationsResponse.data.value;
+      // console.log('Annotations:', fetchedAnnotations);
+      setAnnotations(fetchedAnnotations);
+
+    } catch (error) {
+      console.error('Error fetching annotations:', error.response?.data || error.message);
+      Alert.alert('Error', 'An error occurred while fetching annotations.');
+    }
+  };
+
+  // const sendAnnotation2 = async () => {
+  //   try {
+  //     const tokenResponse = await axios.post(
+  //       'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+  //       {
+  //         grant_type: 'client_credentials',
+  //         client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+  //         resource: 'https://org0f7e6203.crm5.dynamics.com',
+  //         scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+  //         client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+  //       },
+  //       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+  //     );
+
+  //     const accessToken = tokenResponse.data.access_token;
+
+  //     // Create a new annotation
+  //     const annotations = [
+  //       {
+  //         subject: 'Applicant Image',
+  //         filename: applicantImage.fileName || 'Applicant.jpg',
+  //         isdocument: true,
+  //         'objectid_kf_personalloan@odata.bind': `/kf_personalloans(${recordId})`,
+  //         documentbody: applicantImage.fileContent,
+  //       },
+  //     ];
+
+  //     const createAnnotationResponse = await axios.post(
+  //       'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
+  //       annotations,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${accessToken}`,
+  //           'Content-Type': 'application/json',
+  //         },
+  //       }
+  //     );
+
+  //     if (createAnnotationResponse.status === 204) {
+  //       console.log('ApplicantImage image annotation created successfully.');
+  //       // Alert.alert('Sucess', '');
+
+  //     } else {
+  //       console.error('Failed to create Applicant image annotation. Response:', createAnnotationResponse.data);
+  //       Alert.alert('Error', 'Failed to create Aadhar image annotation.');
+  //     }
+
+  //   } catch (error) {
+  //     console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
+  //     Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+  //   }
+  // };
+
+
+  const sendAnnotation3 = async () => {
+    try {
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        {
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        },
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      );
+
+      const accessToken = tokenResponse.data.access_token;
+
+      // Create a new annotation
+      const annotations = [
+        {
+          subject: 'Signature Image',
+          filename: signatureFile.fileName || 'Signature.jpg',
+          isdocument: true,
+          'objectid_kf_personalloan@odata.bind': `/kf_personalloans(${recordId})`,
+          documentbody: signatureFile,
+        },
+      ];
+
+      console.log('documentbody', signatureFile);
+
+      const createAnnotationResponse = await axios.post(
+        'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
+        annotations,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (createAnnotationResponse.status === 204) {
+        console.log('Signature image annotation created successfully.');
+        // Alert.alert('Sucess', '');
+
+      } else {
+        console.error('Failed to create Signature image annotation. Response:', createAnnotationResponse.data);
+        Alert.alert('Error', 'Failed to create Aadhar image annotation.');
+      }
+
+      // Fetch and display the updated annotations
+    } catch (error) {
+      // console.error('Error sending Signature image annotation:', error.response?.data || error.message);
+      // Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
+    }
+  };
+
+  const handleEmiCollectionDateChange = (date) => {
+    setEmiCollectionDate(date);
+    // Additional handling if needed
+  };
+
+  const handleUpdateRecordAndSendAnnotation = () => {
+    sendAnnotation();
+    sendAnnotation1();
+    // sendAnnotation2();
+    sendAnnotation3();
+    handleUpdateRecord();
+
+  };
+
+  const handleViewImages = () => {
+    setShowImage(!showImage);
+  };
+
+  const filteredAnnotations = annotations.filter(item => item.documentbody);
+
+  const handleNavigateToSignatureScreen = async () => {
+    navigation.navigate('PersonalSignatureScreen', { personalLoan: personalLoan });
+  }
+
+  const date = emiCollectionDate ? new Date(emiCollectionDate) : null;
+  const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+
+
+  // const renderImage = () => {
+  //   if (personalLoan.kf_applicantimage) {
+  //     return (
+  //       <Image
+  //         source={{ uri: `data:image/png;base64,${personalLoan.kf_applicantimage}` }}
+  //         style={{width:100, height: 100, borderRadius: 50, objectFit:"fill", marginTop: 15, marginLeft: 15 }}
+  //       />
+  //     );
+  //   } else {
+  //     const initials = personalLoan ? `${personalLoan.kf_firstname[0]}${personalLoan.kf_lastname[0]}` : '';
+  //     return (
+  //       <View style={[styles.cardImage,{ backgroundColor:"gray",width: "100%", height: "100%" } ]}>
+  //         <Text style={styles.placeholderText}>{initials}</Text>
+  //       </View>
+  //     );
+  //   }
+  // };
+
+  const renderImage = () => {
+    if (personalLoan.kf_applicantimage) {
+      return (
+        <Image
+          source={{ uri: `data:image/png;base64,${personalLoan.kf_applicantimage}` }}
+          style={{width:100, height: 100, borderRadius: 50, objectFit:"fill", marginTop: 15, marginLeft: 15 }}
+        />
+      );
+    } else {
+      const initials = personalLoan ? `${personalLoan.kf_firstname[0]}${personalLoan.kf_lastname[0]}` : '';
+      return (
+        <View style={[styles.cardImage,{ backgroundColor:"gray",width: "100%", height: "100%" } ]}>
+          <Text style={styles.placeholderText}>{initials}</Text>
+        </View>
+      );
+    }
+  };
+  
+
+  const takePictureWithCamera = async () => {
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+        base64: true,
+      });
+
+      if (result.canceled) {
+        return;
+      }
+  
+      const byteArray = result.base64; // Use result.base64 directly
+  
+      setkf_applicantimage({
+        fileName: 'payslip.jpg', // You can set a default file name
+        fileContent: byteArray,
+      });
+    } catch (error) {
+      console.error('Error taking picture:', error);
+    }
+  };
+
+  const pickImage = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -560,214 +1084,43 @@ const EditPersonalLoan = ({ route, navigation }) => {
         base64: true,
       });
   
-      if (result.cancelled) {
+      if (result.canceled) {
         return;
       }
   
       const byteArray = result.base64; // Use result.base64 directly
-      const fileName = result.uri.split('/').pop(); // Extracting filename from URI
   
-      switch (imageType) {
-        case 'aadhar':
-          setAadharcard({
-            fileName: fileName,
-            fileContent: byteArray,
-          });
-          break;
-        case 'pan':
-          setPancard({
-            fileName: fileName,
-            fileContent: byteArray,
-          });
-          break;
-        case 'applicant':
-          setapplicantImage({
-            fileName: fileName,
-            fileContent: byteArray,
-          });
-          break;
-        default:
-          break;
-      }
+      setkf_applicantimage({
+        fileName: 'payslip.jpg', // You can set a default file name
+        fileContent: byteArray,
+      });
     } catch (error) {
       console.error('Error picking or processing the image:', error);
       Alert.alert('Error', 'Failed to pick or process the image.');
     }
   };
 
-const sendAnnotation = async () => {
-  try {
-    const tokenResponse = await axios.post(
-      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
-      {
-        grant_type: 'client_credentials',
-        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
-        resource: 'https://org0f7e6203.crm5.dynamics.com',
-        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
-        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
-      },
-      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
-    );
+  const isValidInput = (text) => {
+    // Regular expression to allow only alphabets and spaces
+    const onlyAlphabets = /^[a-zA-Z\s]*$/;
+    return onlyAlphabets.test(text);
+  };
 
-    const accessToken = tokenResponse.data.access_token;
+  const handleShowAlert = () => {
+    setShowAlert(true);
+  };
 
-    const annotations = [
-      {
-        subject: `Image: ${aadharcard.fileName || 'example.jpg'}`,
-        filename: aadharcard.fileName || 'example.jpg',
-        isdocument: true,
-        'objectid_kf_personalloan@odata.bind': `/kf_personalloans(${recordId})`,
-        documentbody: aadharcard.fileContent,
-      },
-    ];
+  const handleCloseAlert = () => {
+    setShowAlert(false);
+  };
 
-    const createAnnotationResponse = await axios.post(
-      'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
-      annotations,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    if (createAnnotationResponse.status === 204) {
-      console.log('Annotations (Notes) with file attachments created successfully.');
-      // Alert.alert('Success', 'Notes with file attachments created successfully.');
-    } else {
-      console.error('Failed to create annotations (notes) with file attachments. Response:', createAnnotationResponse.data);
-      Alert.alert('Error', 'Failed to create notes with file attachments.');
-    }
-  } catch (error) {
-    console.error('Error creating annotations (notes) with file attachments:', error.response?.data || error.message);
-    Alert.alert('Error', 'An error occurred while creating notes with file attachments.');
-  }
-};
-
-const sendAnnotation1 = async () => {
-  try {
-    const tokenResponse = await axios.post(
-      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
-      {
-        grant_type: 'client_credentials',
-        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
-        resource: 'https://org0f7e6203.crm5.dynamics.com',
-        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
-        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
-      },
-      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
-    );
-
-    const accessToken = tokenResponse.data.access_token;
-
-    const annotations1 = [
-      {
-        subject: `Image: ${pancard.fileName || 'pancard.jpg'}`,
-        filename: pancard.fileName || 'pancard.jpg',
-        isdocument: true,
-        'objectid_kf_personalloan@odata.bind': `/kf_personalloans(${recordId})`,
-        documentbody: pancard.fileContent,
-      },
-    ];
-
-    const createAnnotationResponse = await axios.post(
-      'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
-      annotations1,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    if (createAnnotationResponse.status === 204) {
-      console.log('Annotations (Notes) with file attachments created successfully.');
-      // Alert.alert('Success', 'Notes with file attachments created successfully.');
-    } else {
-      console.error('Failed to create annotations (notes) with file attachments. Response:', createAnnotationResponse.data);
-      Alert.alert('Error', 'Failed to create notes with file attachments.');
-    }
-  } catch (error) {
-    console.error('Error creating annotations (notes) with file attachments:', error.response?.data || error.message);
-    Alert.alert('Error', 'An error occurred while creating notes with file attachments.');
-  }
-};
-
-const sendAnnotation2 = async () => {
-  try {
-    const tokenResponse = await axios.post(
-      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
-      {
-        grant_type: 'client_credentials',
-        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
-        resource: 'https://org0f7e6203.crm5.dynamics.com',
-        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
-        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
-      },
-      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
-    );
-
-    const accessToken = tokenResponse.data.access_token;
-
-    const annotations2 = [
-      {
-        subject: `Image: ${applicantImage.fileName || 'applicantImage.jpg'}`,
-        filename: applicantImage.fileName || 'applicantImage.jpg',
-        isdocument: true,
-        'objectid_kf_personalloan@odata.bind': `/kf_personalloans(${recordId})`,
-        documentbody: applicantImage.fileContent,
-      }
-    ];
-
-    const createAnnotationResponse = await axios.post(
-      'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
-      annotations2,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    if (createAnnotationResponse.status === 204) {
-      console.log('Annotations (Notes) with file attachments created successfully.');
-      Alert.alert('Success', 'Notes with file attachments created successfully.');
-    } else {
-      console.error('Failed to create annotations (notes) with file attachments. Response:', createAnnotationResponse.data);
-      Alert.alert('Error', 'Failed to create notes with file attachments.');
-    }
-  } catch (error) {
-    console.error('Error creating annotations (notes) with file attachments:', error.response?.data || error.message);
-    Alert.alert('Error', 'An error occurred while creating notes with file attachments.');
-  }
-};
-
-const handleUpdateRecordAndSendAnnotation = () => {
-  // sendAnnotation();
-  // sendAnnotation1();
-  // sendAnnotation2();
-  handleUpdateRecord(); 
-  
-};
-
-const onViewImage = () => {
-  setModalVisible(true);
-};
-
-
-const handlesignature = async  () => {
-  navigation.navigate('SignatureScreen', { loanApplication: loanApplication });
-}
-
-
-  const date = emiCollectionDate ? new Date(emiCollectionDate) : null;
-  const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+  const handleCloseAlertConfirmation = () => {
+    setShowAlertConfirmation(false);
+    navigation.navigate('PersonalLoanDetailsScreen', { personalLoan: personalLoan });  
+  };
 
   return (
-    <>
+    <View style={styles.container}>
       <HeaderComponent
         titleText="Edit Personal Loan"
         onPress={handleGoBack}
@@ -775,9 +1128,53 @@ const handlesignature = async  () => {
         screenIcon="md-save"
         screenIconStyle={{ marginTop: 5 }}
       />
+
       <ScrollView>
-        <View style={styles.container}>
+     
+        <View style={styles.Imagepart}>
+          <View style={{ width: 100, height: 100, left: 0, bottom: 5 }}>{renderImage()}</View>
+          <View style={{ right: 25, top: 30 }}>
+            <View style={styles.touch}>
+              <TouchableOpacity
+                onPress={pickImage}
+                style={[styles.button, getStatusStringFromNumericValue(status) === 'Approved' && styles.disabledButton]} // Apply disabled style if status is 'Approved'
+                disabled={getStatusStringFromNumericValue(status) === 'Approved'} // Disable button if status is 'Approved'
+              >
+                <Text style={styles.buttonText}>Choose File</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={takePictureWithCamera}
+                style={[styles.button, getStatusStringFromNumericValue(status) === 'Approved' && styles.disabledButton]} // Apply disabled style if status is 'Approved'
+                disabled={getStatusStringFromNumericValue(status) === 'Approved'} // Disable button if status is 'Approved'
+              >
+                <Text style={styles.buttonText}>Camera</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={handleUpdateField}
+                style={[{ marginLeft: 10 },
+                getStatusStringFromNumericValue(status) === 'Approved' && styles.disabledButton1
+                ]}
+                disabled={getStatusStringFromNumericValue(status) === 'Approved'} // Disable button if status is 'Approved'
+              >
+                <Ionicons name="save" size={26} color={getStatusStringFromNumericValue(status) === 'Approved' ? 'gray' : 'red'} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+
+      <View style={styles.detailContainer}>
           <View style={styles.wrapper}>
+            <LoanStatusPicker
+              onOptionChange={handleSendApproval}
+              title="Send Approval"
+              options={['No', 'Yes']}
+              // initialOption={sendApproval ? getSendApproval(sendApproval) : ''}
+              initialOption={sendApproval ? 'Yes' : 'No'}
+              style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
+              disabled={sendApproval}
+            />
             <TextInput
               style={[styles.textInputContainer, { color: "gray" }]}
               value={applicationnumber}
@@ -799,10 +1196,15 @@ const handlesignature = async  () => {
             />
 
             <TextInput
-              style={styles.textInputContainer}
+               style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={firstname}
               placeholder="First Name"
               onChangeText={(text) => {
+                if (isValidInput(text) || text === '') { // Call isValidInput function
+
                 setfirstname(text);
                 setIsfirstnameValid(text.trim() !== '');
 
@@ -811,15 +1213,22 @@ const handlesignature = async  () => {
                   ...errorMessages,
                   firstNameEdit: text.trim() !== '' ? '' : 'Enter First Name',
                 });
+              }
               }}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'} 
             />
             {errorMessages.firstNameEdit !== '' && <Text style={styles.errorText}>{errorMessages.firstNameEdit}</Text>}
 
             <TextInput
-              style={styles.textInputContainer}
+               style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={lastname}
               placeholder="Last Name"
               onChangeText={(text) => {
+                if (isValidInput(text) || text === '') { // Call isValidInput function
+
                 setLastname(text);
                 setIsLastNameValid(text.trim() !== '')
 
@@ -827,110 +1236,205 @@ const handlesignature = async  () => {
                   ...errorMessages,
                   lastNameEdit: text.trim() !== '' ? '' : 'Enter Last Name',
                 });
+              }
               }}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             {errorMessages.lastNameEdit !== '' && <Text style={styles.errorText}>{errorMessages.lastNameEdit}</Text>}
 
 
-            <LoanStatusPicker
+            {/* <LoanStatusPicker
               onOptionChange={handleGenderOptionset}
               title="Gender"
               options={['Male', 'Female']}
               initialOption={gender === 123950000 ? 'Male' : 'Female'}
               style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
-            />
+            /> */}
 
-            <ComponentDatePicker
+<View style={{ position: 'relative' }}>
+  <LoanStatusPicker
+    onOptionChange={handleGenderOptionset}
+    title="Gender"
+    options={['Male', 'Female']}
+    initialOption={gender === 123950000 ? 'Male' : 'Female'}
+    style={[
+      { width: "100%", marginLeft: 0, marginTop: 5 },
+      getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' } // Change text color to gray based on loan status
+    ]}
+    disabled={getStatusStringFromNumericValue(status) === 'Approved'} // Disable the picker based on loan status
+  />
+  {getStatusStringFromNumericValue(status) === 'Approved' && (
+    <View
+      style={{
+        position: 'absolute',
+        backgroundColor: 'transparent',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+      }}
+    />
+  )}
+</View>
+
+
+            {/* <ComponentDatePicker
               selectedDate={dateofbirth}
               onDateChange={handleDateOfBirth}
               placeholder="Date of Birth"
               style={{ width: "100%", height: 45, marginTop: 5, marginLeft: 0 }}
             />
+            {errorMessages.dateOfBirthEdit !== '' && <Text style={styles.errorText}>{errorMessages.dateOfBirthEdit}</Text>} */}
+
+<View style={{ position: 'relative' }}>
+              <ComponentDatePicker
+                selectedDate={dateofbirth}
+                onDateChange={handleDateOfBirth}
+                placeholder="Date of Birth"
+                style={[
+                  { width: "100%", height: 45, marginTop: 5, marginLeft: 0 },
+                  getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' } // Change text color to gray based on loan status
+                ]}
+                onPress={() => getStatusStringFromNumericValue(status) === 'Approved' && handleDateOfBirth()} // Prevent opening date picker when disabled
+              />
+              {getStatusStringFromNumericValue(status) === 'Approved' && (
+                <View
+                  style={{
+                    position: 'absolute',
+                    backgroundColor: 'transparent',
+                    top: 0,
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                  }}
+                />
+              )}
+            </View>
             {errorMessages.dateOfBirthEdit !== '' && <Text style={styles.errorText}>{errorMessages.dateOfBirthEdit}</Text>}
 
             <TextInput
-              style={styles.textInputContainer}
+              style={[styles.textInputContainer, {color:"gray"}]}
               value={age.toString()}
               placeholder="Age"
               onChangeText={(text) => setage(text)}
+              editable={false}
             />
 
             <TextInput
-              style={styles.textInputContainer}
+               style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={mobileNumber}
               placeholder="Mobile Number"
               onChangeText={handleMobileNumberChange}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             {errorMessages.mobileNumberEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.mobileNumberEdit}</Text>
             )}
 
             <TextInput
-              style={styles.textInputContainer}
+               style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={email}
               placeholder="Email"
               onChangeText={handleEmailChange}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             {errorMessages.emailEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.emailEdit}</Text>
             )}
 
             <TextInput
-              style={styles.textInputContainer}
+               style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={address1}
               placeholder="Address Line 1"
               onChangeText={(text) => setAddress1(text)}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             <TextInput
-              style={styles.textInputContainer}
+               style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={address2}
               placeholder="Address Line 2"
               onChangeText={(text) => setAddress2(text)}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             <TextInput
-              style={styles.textInputContainer}
+              style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={address3}
               placeholder="Address Line 3"
               onChangeText={(text) => setAddress3(text)}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             <TextInput
-              style={styles.textInputContainer}
+              style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={city}
               placeholder="City"
               onChangeText={(text) => setCity(text)}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             <TextInput
-              style={styles.textInputContainer}
+               style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={state}
               placeholder="State"
               onChangeText={(text) => setState(text)}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             <TextInput
-              style={styles.textInputContainer}
+               style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={aadharcardNumber}
               placeholder="Aadharcard Number"
               onChangeText={handleAadharCardNumberChange}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             {errorMessages.aadharCardNumberEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.aadharCardNumberEdit}</Text>
             )}
 
-
             <TextInput
-              style={styles.textInputContainer}
+               style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={pancardNumber}
               placeholder="PAN Card Number"
               onChangeText={handlePancardNumberValid}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             {errorMessages.panCardNumberEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.panCardNumberEdit}</Text>
             )}
 
             <TextInput
-              style={styles.textInputContainer}
+              style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               placeholder="Loan Amount Request"
               value={loanAmountRequested ? loanAmountRequested.toString() : ''}
               onChangeText={handleLoanAmountRequestedChange}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             {errorMessages.loanAmountRequestedEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.loanAmountRequestedEdit}</Text>
@@ -950,14 +1454,14 @@ const handlesignature = async  () => {
               placeholder="Interest Rate%"
               value={interestRate}
               editable={false}
-            />
-            <TextInput
+            /> 
+            {/* <TextInput
               style={[styles.textInputContainer, { color: "gray" }]}
               placeholder="EMI Collection Date"
               // value={emiCollectionDate}
               value={formattedDate}
               editable={false}
-            />
+            /> */}
             <TextInput
               style={[styles.textInputContainer, { color: "gray" }]}
               placeholder="EMI Amount "
@@ -965,45 +1469,49 @@ const handlesignature = async  () => {
               editable={false}
             />
             <TextInput
-              style={styles.textInputContainer}
+              style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               placeholder="Other Charges"
-              value={otherCharges? otherCharges.toString(): ""}
+              value={otherCharges ? otherCharges.toString() : ""}
               onChangeText={(text) => setOtherCharges(text)}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
 
-            <LoanStatusPicker
+            {/* <LoanStatusPicker
               onOptionChange={handleLoanStatusChange}
               title="Select Loan Status"
               options={['Approved', 'PendingApproval', 'Draft', 'Cancelled']}
               initialOption={getStatusStringFromNumericValue(status)}
-              style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
+              style={{ width: "100%", marginLeft: 0, marginTop: 5 , color: "gray"}}
+              disabled={true}
+            /> */}
+
+            <TextInput
+              style={[styles.textInputContainer, { color: "gray" }]}
+              placeholder="Loan Status"
+              value={getStatusStringFromNumericValue(status)}
+              editable={false}
             />
 
-{/* <CardImage
-  title="AadharCard"
-  imageContent={aadharcard}
-  onViewImage={onViewImage}
-  pickImage={() => pickImage('aadhar')}
-  setModalVisible={setModalVisible}
-/>
+            {status === 123950004 && ( // Display reason column only when status is 'Rejected'
+              <TextInput
+                style={[styles.textInputContainer, { color: "red" }]}
+                placeholder="Reason"
+                value={reason}
+                editable={false}
+              />
+            )}
 
-<CardImage
-  title="Pancard"
-  imageContent={pancard}
-  onViewImage={onViewImage}
-  pickImage={() => pickImage('pan')}
-  setModalVisible={setModalVisible}
-/>
+            <ComponentDatePicker
+              selectedDate={date} // Pass the Date object directly
+              onDateChange={handleEmiCollectionDateChange}
+              placeholder="Select EMI Collection Date"
+              style={{ width: "100%", height: 45, marginTop: 5, marginLeft: 0 }}
+            />
 
-<CardImage
-  title="Applicant Image"
-  imageContent={applicantImage}
-  onViewImage={onViewImage}
-  pickImage={() => pickImage('applicant')}
-  setModalVisible={setModalVisible}
-/> */}
-
-            {statusReason && (
+            {/* {statusReason && (
               <LoanStatusPicker
                 onOptionChange={handleAnotherOptionChange}
                 title="Status Reason"
@@ -1011,68 +1519,110 @@ const handlesignature = async  () => {
                 initialOption={statusReason ? getAnotherOptionStringFromNumericValue(statusReason) : ''}
                 style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
               />
-            )}
+            )} */}
+           <View style={styles.indentityImage}>
+              <View style={{ marginVertical: 3 }}>
+                <CardImage
+                  title="AadharCard"
+                  imageContent={aadharcard}
+                  setImageContent={setAadharcard}
+                // onViewImage={onViewImage}
+                />
+              </View>
+              <View style={{ marginVertical: 3 }}>
+                <CardImage
+                  title="PanCard"
+                  imageContent={pancard}
+                  setImageContent={setPancard}
+                />
+              </View>
+              <View style={{ marginVertical: 3 }}>
+                {/* <CardImage
+                  title="Applicant"
+                  imageContent={applicantImage}
+                  setImageContent={setapplicantImage}
+                /> */}
+              </View>
+              <View style={{ marginBottom: 15 }}>
+                {/* <CardImageSignature
+                  title="Draw Signature"
+                  imageContent={signatureFile}
+                  pickImage={handleNavigateToSignatureScreen}
+                /> */}
 
-            {approver && (
-              <TextInput
-                style={[styles.textInputContainer, { color: "gray" }]}
-                value={approver}
-                placeholder="Approver"
-                onChangeText={(text) => {
-                  setApprover(text);
-                }}
-                editable={false}
-              />
-            )}
+                <CardImageSignature
+                  title="Signature"
+                  imageContent={signatureFile}
+                  pickImage={handleNavigateToSignatureScreen}
+                  sendAnnotation={sendAnnotation3}
+                  setImageContent={setSignature}
+                />
+              </View>           
 
-            {approvalDate && (
-              <TextInput
-                style={[styles.textInputContainer, { color: "gray" }]}
-                value={approvalDate}
-                placeholder="Approval Date"
-                onChangeText={(text) => {
-                  setApprovalDate(text);
-                }}
-                editable={false}
-              />
-            )}
-
-            {firstEMIDate && (
-              <TextInput
-                style={[styles.textInputContainer, { color: "gray" }]}
-                value={firstEMIDate}
-                placeholder="First EMI Date"
-                onChangeText={(text) => {
-                  setfirstEMIDate(text);
-                }}
-                editable={false}
-              />
-            )}
-
-            {/* <ButtonComponent title="Update" onPress={handleUpdateRecord} /> */}
+              <View style={styles.imageView}>
+                  <RenderAnnotation
+                    annotations={annotations}
+                    filteredAnnotations={filteredAnnotations}
+                    showImage={showImage}
+                    handleViewImages={handleViewImages}
+                  />
+             </View>
+            </View>
           </View>
+         
         </View>
       </ScrollView>
-    </>
+      <CustomAlert
+          visible={showAlert}
+          onClose={handleCloseAlert}
+          onConfirm={handleCloseAlertConfirmation}
+          headerMessage="Personal Loan"
+          message="Record updated Successfully."
+          Button1="Cancel"
+          Button2="OK"
+          style={styles.alertStyle}
+          modalHeaderStyle={[styles.modalheaderStyle, {right: 70}]}
+          textStyle={styles.textStyle}
+        />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  container:{
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 20
+    width: "100%",
+    marginBottom: 20
+  },
+  imageContent: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    backgroundColor: "white",
+     elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  indentityImage:{
+    backgroundColor:"white",
+    marginTop:5,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   wrapper: {
-    width: '90%',
-  },
-  textInputContainer: {
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#bbb',
-    borderRadius: 5,
-    paddingHorizontal: 14,
+    width: '100%',
+    paddingHorizontal: 20,
+    marginTop:5
   },
   errorText: {
     color: 'red',
@@ -1093,6 +1643,105 @@ const styles = StyleSheet.create({
     backgroundColor: '#FBFCFC',
     padding: 10,
   },
+  heading: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  annotation: {
+    backgroundColor:"white",
+    marginTop:5,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  cardImage: {
+    // borderRadius: 40,
+    width: 200,
+    height: 200,
+    marginTop: 20,
+    marginLeft: 15,
+    borderRadius: 50
+  },
+  profileContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    marginTop: 0,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    minWidth: "100%",
+    marginBottom: 20,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  placeholderText:{
+    fontSize: 25,
+    color: "white",
+    textAlign: "center",
+    margin: 32,
+    fontWeight:"bold"
+  },
+  Imagepart:{
+    flexDirection:'row',
+    marginRight:10,
+    marginBottom: 20
+  },
+  touch:{
+    flexDirection:'row',
+    marginLeft:40,
+    marginTop:15,
+  },
+  button:{
+    marginLeft: 10, 
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    backgroundColor: 'red',
+    borderRadius: 50,
+    width: "33%"
+  },
+  buttonText:{
+    fontSize: 14,
+    color: 'white',
+    padding: 5,
+    fontWeight: "bold"
+  },
+  disabledButton: {
+    marginLeft: 10, 
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    backgroundColor: 'red',
+    borderRadius: 50,
+    width: "33%",
+    opacity: 0.5, 
+  },
+  disabledButton1: {
+    marginLeft: 10, 
+    // flexDirection: 'row',
+    // justifyContent: 'space-evenly',
+    // backgroundColor: 'red',
+    borderRadius: 50,
+    width: "10%",
+    opacity: 0.5, 
+  },
+  imageView:{
+    marginBottom:-150,
+    width: 85,
+    top: -150,
+    left:200
+  }
 });
+
 
 export default EditPersonalLoan;

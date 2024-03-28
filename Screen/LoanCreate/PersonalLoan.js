@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Alert, Image, Text, TouchableOpacity, StatusBar, TextInput } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, Image, Text, TouchableOpacity, StatusBar, TextInput, BackHandler } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -9,6 +9,8 @@ import TextInputComponent from '../../common/TextInput';
 import ButtonComponent from '../../common/ButtonComponent';
 import LoanStatusPicker from '../../common/LoanStatusPicker ';
 import ComponentDatePicker from '../../common/ComponentDatePicker';
+import CardImage from '../../common/CardImage';
+import CustomAlert from '../../common/CustomAlert';
 
 export const PersonalLoan = () => {
   const [kf_firstname, setkf_firstname] = useState('');
@@ -31,6 +33,7 @@ export const PersonalLoan = () => {
   const [authenticatedUser, setAuthenticatedUser] = useState(null);
   const [resetFormKey, setResetFormKey] = useState(0);
   const [image, setImage] = useState(null);
+  const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fileContent: null });
   const [kf_interestamount, setkf_interestamount] = useState(null);
   const [kf_totalamount, setkf_totalamount] = useState(null);
   const [kf_othercharges, setKf_othercharges] = useState(null);
@@ -42,7 +45,7 @@ export const PersonalLoan = () => {
   const [kf_emi, setKf_emi] = useState('');
   const [formDisabled, setFormDisabled] = useState(false);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
-
+  const [showImage, setShowImage] = useState(false);
   const [isfirstnameValid, setIsfirstnameValid] = useState(true);
   const [isLastNameValid, setIsLastNameValid] = useState(true);
   const [isMobileNumberValid, setIsMobileNumberValid] = useState(true);
@@ -51,6 +54,8 @@ export const PersonalLoan = () => {
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [isLoanAmountRequested, setIsLoanAmountRequested] = useState(true);
   const [isEmiCollectionDateTouched, setIsEmiCollectionDateTouched] = useState(false);
+  const [showAlert, setShowAlert] = useState(false); 
+  const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
 
   const calculateEMI = () => {
     const P = parseFloat(kf_loanamountrequested); // Principal loan amount
@@ -87,6 +92,51 @@ export const PersonalLoan = () => {
     // Update state with calculated EMI
     setKf_emi(EMI.toFixed(2));
 };
+
+useEffect(() => {
+  // Function to calculate EMI
+  const calculateEMI = () => {
+    // Check if all required values are available
+    if (kf_loanamountrequested && kf_interestrate && kf_emischedule && kf_numberofemi) {
+      const P = parseFloat(kf_loanamountrequested); // Principal loan amount
+      const r = parseFloat(kf_interestrate) / 100; // Annual interest rate (expressed as a decimal)
+      let n = null; // Number of payments per year
+      let N = null; // Total number of payments over the loan tenure
+      let t = null; // Loan tenure in years
+
+      // Determine the number of payments per year based on the selected EMI schedule
+      switch (kf_emischedule) {
+        case 1: // Daily
+          n = 365;
+          break;
+        case 2: // Weekly
+          n = 52;
+          break;
+        case 3: // Monthly
+          n = 12;
+          break;
+        default:
+          n = 12; // Default to monthly
+      }
+
+      // Total number of payments over the loan tenure
+      N = parseInt(kf_numberofemi);
+
+      // Loan tenure in years
+      t = N / n;
+
+      // Calculate EMI
+      const R = r / n; // Monthly interest rate
+      const EMI = (P * R * Math.pow((1 + R), N)) / (Math.pow((1 + R), N) - 1);
+
+      // Update state with calculated EMI
+      setKf_emi(EMI.toFixed(2));
+    }
+  };
+
+  // Call the calculateEMI function whenever any of the dependent values change
+  calculateEMI();
+}, [kf_loanamountrequested, kf_interestrate, kf_emischedule, kf_numberofemi]);
 
 // Function to handle changes in loan amount requested or interest rate
 const handleLoanChange = () => {
@@ -162,7 +212,8 @@ const handleInterestRateChange = (text) => {
     setKf_emi(null);
     setKf_numberofemi(null);
     setKf_emischedule(null);
-    setKf_interestrate(null);
+    setKf_interestrate(null);    
+    setkf_applicantimage({ fileName: null, fileContent: null });
     setResetFormKey((prevKey) => prevKey + 1);
   };
 
@@ -179,7 +230,7 @@ const handleInterestRateChange = (text) => {
           text: 'Discard',
           onPress: () => {
             key = { resetFormKey }
-            navigation.navigate('Dashboard', { resetState: true }); 
+            navigation.goBack({ resetState: true }); 
           },
         },
       ],
@@ -188,16 +239,44 @@ const handleInterestRateChange = (text) => {
   };
 
   useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (navigation.isFocused()) {
+        // If the user is on the login screen, show the exit confirmation alert
+        Alert.alert(
+          'Discard Changes',
+          'Are you sure want to discard the changes?',
+          [
+            {
+              text: 'cancel',
+              onPress: () => null,
+              style: 'cancel',
+            },
+            {
+              text: 'Discard',
+              onPress: () => BackHandler.exitApp(),
+            },
+          ],
+          { cancelable: false }
+        );
+        return true; // Prevent default back button behavior
+      }
+    });
+
+    return () => backHandler.remove();
+  }, [navigation]);
+
+
+  useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       resetForm();
     });
     return unsubscribe;
   }, [navigation]);
 
-  console.log("Request Payload to CRM:", {
-    kf_mobile: kf_mobile,
-    kf_name: kf_name
-  });
+  // console.log("Request Payload to CRM:", {
+  //   kf_mobile: kf_mobile,
+  //   kf_name: kf_name
+  // });
 
   const handleGenderOptionset = (selectedOptionGender) => {
     let numericValue;
@@ -215,7 +294,9 @@ const handleInterestRateChange = (text) => {
   };
 
   const handleFirstNameChange = (text) => {
-    if (text.trim() !== '') {
+    const onlyAlphabets = /^[^!-\/:-@\[-`{-~]+$/;
+
+    if (onlyAlphabets.test(text) || text.trim() !== '') {
       setkf_firstname(text);
       setErrorMessages({ ...errorMessages, firstName: '' });
     } else {
@@ -225,7 +306,9 @@ const handleInterestRateChange = (text) => {
   };
 
   const handleLastNameChange = (text) => {
-    if (text.trim() !== '') {
+    const onlyAlphabets = /^[^!-\/:-@\[-`{-~]+$/;
+
+    if (onlyAlphabets.test(text) || text.trim() !== '') {
       setkf_lastname(text);
       setErrorMessages({ ...errorMessages, lastName: '' });
     } else {
@@ -376,28 +459,52 @@ const handleInterestRateChange = (text) => {
         ...errorMessages,
         loanAmountRequested: 'Enter Loan Amount',
       });
-    } else if (/^\d{5,7}$/.test(text) && amountRequested !== null && amountRequested >= minLoanAmount && amountRequested <= maxLoanAmount) {
+    } 
+    // else if (/^\d{5,7}$/.test(text) && amountRequested !== null && amountRequested >= minLoanAmount && amountRequested <= maxLoanAmount) {
+    //   setErrorMessages({
+    //     ...errorMessages,
+    //     loanAmountRequested: '',
+    //   });
+    // } 
+    else {
       setErrorMessages({
         ...errorMessages,
         loanAmountRequested: '',
       });
-    } else {
-      setErrorMessages({
-        ...errorMessages,
-        loanAmountRequested: `Loan amount should be between ${minLoanAmount} and ${maxLoanAmount} INR.`,
-      });
     }
   };
 
-  const handleInterestRate = (text) => {
-    setKf_interestrate(text);
+  // const handleInterestRate = (text) => {
+  //   setKf_interestrate(text);
 
+  //   if (text.trim() === '') {
+  //     setErrorMessages({
+  //       ...errorMessages,
+  //       interestRate: 'Enter a Interest Amount',
+  //     });
+  //   } else if (/^\d+$/.test(text)) {
+  //     setErrorMessages({
+  //       ...errorMessages,
+  //       interestRate: '',
+  //     });
+  //   } else {
+  //     setErrorMessages({
+  //       ...errorMessages,
+  //       interestRate: `Enter a Valid Interest Rate`,
+  //     });
+  //   }
+  // };
+
+  const handleInterestRate = (text) => {
+    // Update the state with the input text
+    setKf_interestrate(text);
     if (text.trim() === '') {
       setErrorMessages({
         ...errorMessages,
-        interestRate: 'Enter a Interest Amount',
+        interestRate: 'Enter an Interest Amount',
       });
-    } else if (/^\d+$/.test(text)) {
+    } else if (/^\d+(\.\d+)?%?$/.test(text)) {
+      // Validate if the input contains digits, optionally followed by a decimal point and more digits, and optionally followed by a '%' sign
       setErrorMessages({
         ...errorMessages,
         interestRate: '',
@@ -405,7 +512,7 @@ const handleInterestRateChange = (text) => {
     } else {
       setErrorMessages({
         ...errorMessages,
-        interestRate: `Enter a Valid Interest Rate`,
+        interestRate: 'Enter a valid Interest Rate',
       });
     }
   };
@@ -426,7 +533,7 @@ const handleInterestRateChange = (text) => {
     } else {
       setErrorMessages({
         ...errorMessages,
-        NoOfEMIs: `Enter a Valid No of EMI payment`,
+        NoOfEMIs: `Enter a No of EMI payment`,
       });
     }
   };
@@ -486,14 +593,14 @@ const handleInterestRateChange = (text) => {
   const getAuthenticatedUser = async () => {
     try {
       const userString = await AsyncStorage.getItem('authenticatedUser');
-      console.log("getAuthenticatedUser:", userString);
+      // console.log("getAuthenticatedUser:", userString);
 
       if (userString) {
         const user = JSON.parse(userString);
         setAuthenticatedUser(user);
       }
     } catch (error) {
-      console.error('Error getting authenticated user:', error);
+      // console.error('Error getting authenticated user:', error);
     }
   };
 
@@ -507,16 +614,16 @@ const handleInterestRateChange = (text) => {
       return; 
     }
 
-    const minLoanAmount = 25000;
-    const maxLoanAmount = 1500000;
+    // const minLoanAmount = 25000;
+    // const maxLoanAmount = 1500000;
 
-    if (kf_loanamountrequested < minLoanAmount || kf_loanamountrequested > maxLoanAmount) {
-      setErrorMessages({
-        ...errorMessages,
-        loanAmountRequested: `Loan amount should be between ${minLoanAmount} and ${maxLoanAmount} INR.`,
-      });
-      return;
-    }
+    // if (kf_loanamountrequested < minLoanAmount || kf_loanamountrequested > maxLoanAmount) {
+    //   setErrorMessages({
+    //     ...errorMessages,
+    //     // loanAmountRequested: `Loan amount should be between ${minLoanAmount} and ${maxLoanAmount} INR.`,
+    //   });
+    //   return;
+    // }
 
     const newErrorMessages = {
       firstName: !kf_firstname ? ' Enter First Name' : '',
@@ -527,10 +634,12 @@ const handleInterestRateChange = (text) => {
       loanAmountRequested: !kf_loanamountrequested ? ' Enter Loan Amount Requested' : '',
       aadharCardNumber: !/^\d{12}$/.test(kf_aadharnumber) ? 'Enter Valid Aadharcard Number' : '',
       panCardNumber: !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(kf_pannumber) ? 'Enter Valid PAN Card Number' : '',
-      interestRate: !/^\d+$/.test(kf_interestrate) ? 'Enter a Valid Interest Rate' : '',
+      interestRate: !/^\d+(\.\d+)?%?$/.test(kf_interestrate) ? 'Enter a Interest Rate' : '',
       emiSchedule: !kf_emischedule ? 'select a EMISchedule' : '',
-      NoOfEMIs: !/^\d+$/.test(kf_numberofemi) ? 'Enter a Valid No of EMI payment' : '',
-      emiCollectionDate: !kf_emicollectiondate ? 'select a EMI Collection Date' : ''
+      NoOfEMIs: !/^\d+$/.test(kf_numberofemi) ? 'Enter a No of EMI payment' : '',
+      // emiCollectionDate: !kf_emicollectiondate ? 'select a EMI Collection Date' : ''
+      applicantImage: !kf_applicantimage.fileContent ? 'Applicant image is required.' : '',  
+
     };
     setErrorMessages(newErrorMessages);
     if (Object.values(newErrorMessages).some(message => message !== '')) {
@@ -556,7 +665,7 @@ const handleInterestRateChange = (text) => {
       const formattedDateOfBirth = kf_dateofbirth ? kf_dateofbirth.toISOString() : null;
       const loanAmount = parseFloat(kf_loanamountrequested);
       const userAdminname = authenticatedUser ? authenticatedUser.kf_adminname : '';
-      console.log("created by", userAdminname);
+      // console.log("created by", userAdminname);
 
       const createRecordResponse = await axios.post(
         "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans",  // Updated entity name
@@ -584,6 +693,7 @@ const handleInterestRateChange = (text) => {
           kf_numberofemi: kf_numberofemi,
           kf_emicollectiondate: kf_emicollectiondate,
           kf_othercharges: kf_othercharges,
+          kf_applicantimage:kf_applicantimage.fileContent,
         },
         {
           headers: {
@@ -595,27 +705,42 @@ const handleInterestRateChange = (text) => {
       if (createRecordResponse.status === 204) {
         setFormDisabled(true);
         console.log("Record created successfully in CRM");
-        Alert.alert('Created record Successfully.', '', [
-          {
-            text: 'Cancel',
-            style: 'cancel',
-          },
-          {
-            text: 'OK',
-            onPress: () => {
-              navigation.navigate('Dashboard');
-            },
-          },
-        ]);
+        // Alert.alert('Personal Loan', 'Created record Successfully.', [
+        //   {
+        //     text: 'Cancel',
+        //     style: 'cancel',
+        //   },
+        //   {
+        //     text: 'OK',
+        //     onPress: () => {
+        //       navigation.navigate('Dashboard');
+        //     },
+        //   },
+        // ]);
+        handleShowAlert();
       } else {
         console.log("Failed to create a record in CRM.");
         Alert.alert("Error", "Failed to create a record in CRM.");
       }
     } catch (error) {
       console.error("Error during record creation:", error);
-      console.log("Detailed Error Response:", error.response);
+      // console.log("Detailed Error Response:", error.response);
       Alert.alert("Error", "An unexpected error occurred.  try again later.");
     }
+  };
+
+  const handleShowAlert = () => {
+    setShowAlert(true);
+  };
+
+  const handleCloseAlert = () => {
+    setShowAlert(false);
+    // navigation.navigate('Dashboard');
+  };
+
+  const handleConfirmAlert = () => {
+    setShowAlertConfirmation(false);
+    navigation.navigate('Dashboard');
   };
 
   return (
@@ -772,19 +897,30 @@ const handleInterestRateChange = (text) => {
             value={kf_loanamountrequested}
             onChangeText={handleLoanAmountRequestedChange}
             onBlur={handleLoanChange}
+            keyboardType="numeric"
           />
 
           {errorMessages.loanAmountRequested !== '' && (
             <Text style={styles.errorText}>{errorMessages.loanAmountRequested}</Text>
           )}
 
-<TextInput
+          {/* <TextInput
             style={[styles.textInputContainer, { marginVertical: 10 }]}
             placeholder="Interest Rate"
+            // value={kf_interestrate}
+            value={kf_interestrate ? `${kf_interestrate}${kf_interestrate.endsWith('%') ? '' : '%'}` : ''}
+            onChangeText={handleInterestRate}
+            onBlur={handleLoanChange}
+            keyboardType="numeric"
+          /> */}
+
+          <TextInput
+            style={[styles.textInputContainer, { marginVertical: 10 }]}
+            placeholder="Interest Rate %"
             value={kf_interestrate}
             onChangeText={handleInterestRate}
             onBlur={handleLoanChange}
-          // keyboardType="numeric" 
+            keyboardType="numeric"
           />
           {errorMessages.interestRate !== '' && (
             <Text style={styles.errorText}>{errorMessages.interestRate}</Text>
@@ -805,7 +941,7 @@ const handleInterestRateChange = (text) => {
             value={kf_numberofemi}
             onChangeText={handleNoOfEMIs}
             onBlur={handleEMIScheduleChange}
-          // keyboardType="numeric"
+          keyboardType="numeric"
           />
           {errorMessages.NoOfEMIs !== '' && (
             <Text style={styles.errorText}>{errorMessages.NoOfEMIs}</Text>
@@ -813,7 +949,7 @@ const handleInterestRateChange = (text) => {
 
           <Text style={[styles.textInputContainer, { marginVertical: 10, height: 48, color: "gray" }]}>EMI: {kf_emi}</Text>
 
-          <ComponentDatePicker
+          {/* <ComponentDatePicker
             style={{ height: 48, marginBottom: 15 }}
             selectedDate={kf_emicollectiondate}
             onDateChange={handleEmiCollectionDateChange}
@@ -821,7 +957,7 @@ const handleInterestRateChange = (text) => {
           />
           {errorMessages.emiCollectionDate !== '' && (
             <Text style={styles.errorText}>{errorMessages.emiCollectionDate}</Text>
-          )}
+          )} */}
 
           {/* <TextInputComponent
             placeholder="Other Charges"
@@ -830,11 +966,35 @@ const handleInterestRateChange = (text) => {
             onChangeText={(text) => setKf_othercharges(parseFloat(text))}
           /> */}
 
+          <View style={{ marginLeft: 20 }}>
+            <CardImage
+              title="Applicant"
+              imageContent={kf_applicantimage}
+              setImageContent={setkf_applicantimage}
+            />
+            {!kf_applicantimage.fileContent && errorMessages.applicantImage !== '' && (
+              <Text style={styles.errorText}>{errorMessages.applicantImage}</Text>
+            )}
+          </View>
+
           <ButtonComponent
             title="SUBMIT"
             onPress={handleSaveRecord}
           disabled={formDisabled}
           />
+
+<CustomAlert
+          visible={showAlert}
+          onClose={handleCloseAlert}
+          onConfirm={handleConfirmAlert}
+          headerMessage="Personal Loan"
+          message="Record Created Successfully."
+          Button1="Cancel"
+          Button2="OK"
+          style={styles.alertStyle}
+          modalHeaderStyle={[styles.modalheaderStyle, {right: 80}]}
+          textStyle={styles.textStyle}
+        />
 
         </View>
       </ScrollView>
@@ -865,6 +1025,17 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     color: "black",
   },
+  alertStyle:{
+    // backgroundColor: "blue",
+    width: "80%",
+      },
+      modalheaderStyle:{
+        // backgroundColor: "green",
+        right: 85
+      },
+      textStyle:{
+        // backgroundColor: "yellow"
+      }
 });
 
 export default PersonalLoan;

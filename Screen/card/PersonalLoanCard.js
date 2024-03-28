@@ -15,23 +15,25 @@ const PersonalLoanCard = ({ personalLoan, onPress, onDelete }) => {
       case 123950003:
         return 'Cancelled';
       case 123950004:
-        return 'Expired';
+        return 'Rejected';
       default:
         return 'Pending Approval';
     }
   };
 
   const renderImage = () => {
-    if (personalLoan.entityimage) {
+    if (personalLoan.kf_applicantimage) {
       return (
         <Image
-          source={{ uri: `data:image/png;base64,${personalLoan.entityimage}` }}
+          source={{ uri: `data:image/png;base64,${personalLoan.kf_applicantimage}` }}
           style={styles.cardImage}
           onError={(error) => console.error('Image load error:', error.nativeEvent.error)}
         />
       );
     } else {
-      const initials = `${personalLoan.kf_firstname[0]}${personalLoan.kf_lastname[0]}`;
+      const initials = personalLoan.kf_firstname && personalLoan.kf_lastname
+        ? `${personalLoan.kf_firstname[0]}${personalLoan.kf_lastname[0]}`
+        : '';
       return (
         <View style={[styles.cardImage, styles.placeholderImage]}>
           <Text style={styles.placeholderText}>{initials}</Text>

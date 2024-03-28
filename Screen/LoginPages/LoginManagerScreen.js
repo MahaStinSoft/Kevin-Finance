@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, TouchableOpacity, Text, TextInput, StyleSheet, ScrollView, Alert, Button, KeyboardAvoidingView, ImageBackground, Platform } from 'react-native';
+import { View, TouchableOpacity, Text, TextInput, StyleSheet, ScrollView, Alert, Button, KeyboardAvoidingView, ImageBackground, Platform, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -81,7 +81,7 @@ export const LoginManagerScreen = () => {
             }
 
             console.log("Authenticated user:", matchedUser);
-            console.log("response.data", response.data);
+            // console.log("response.data", response.data);
             navigation.navigate("ManagerDashboard", { authenticatedUser: matchedUser });
           } else {
             // User is not a Manager, display an error message
@@ -91,12 +91,12 @@ export const LoginManagerScreen = () => {
         } else {
           // Authentication failed, display an error message
           console.log("Failed to authenticate. Invalid credentials.", response.data);
-          Alert.alert("Error", "Invalid credentials. Please try again.");
+          Alert.alert("Invalid credentials", "Please Enter Correct Email & Password.");
         }
       } else {
         // Authentication failed, display an error message
         console.log("Failed to authenticate. Response status:", response.status);
-        Alert.alert("Error", "Invalid credentials. Please try again.");
+        Alert.alert("Invalid credentials", "Please Enter Correct Email & Password.");
       }
     } catch (error) {
       console.error("Error during login:", error);
@@ -129,7 +129,7 @@ export const LoginManagerScreen = () => {
               <View style={styles.passwordContainer}>
                 <Ionicons name="person" size={20} color="#888" style={styles.icon} />
                 <TextInput
-                  placeholder="Enter mobilenumber"
+                  placeholder="Enter Email Address"
                   autoCapitalize="none"
                   style={styles.input}
                   value={kf_name}
@@ -150,11 +150,11 @@ export const LoginManagerScreen = () => {
                   <Ionicons name={showkf_applicationnumber ? 'eye' : 'eye-off'} size={24} color="#888" style={styles.eyeIcon} />
                 </TouchableOpacity>
               </View>
-              <TouchableOpacity style={styles.Forgotpassword} onPress={() => console.log('Forgot password')}>
+              {/* <TouchableOpacity style={styles.Forgotpassword} onPress={() => console.log('Forgot password')}>
               <Text style={styles.ForgotText}>Forgot Password?</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               <ButtonComponent
-                title="Login IN"
+                title="SIGN IN"
                 onPress={handleLogin}
                 disabled={isSignInDisabled}
               />
@@ -237,10 +237,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 100,
   },
   backgroundImage: {
-    width: '100%',
-    height: '100%',
+    flex: 1,
     resizeMode: 'cover',
-    maxWidth: 900
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height
   },
   backgroundContainer: {
     backgroundColor: 'white',

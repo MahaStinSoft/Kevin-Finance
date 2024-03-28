@@ -15,17 +15,17 @@ const HomeLoanCard = ({ loanApplication, onPress, onDelete }) => {
       case 123950003:
         return 'Cancelled';
       case 123950004:
-        return 'Expired';
+        return 'Rejected';
       default:
         return 'Pending Approval';
     }
   };
 
   const renderImage = () => {
-    if (loanApplication.entityimage) {
+    if (loanApplication.kf_applicantimage) {
       return (
         <Image
-          source={{ uri: `data:image/png;base64,${loanApplication.entityimage}` }}
+          source={{ uri: `data:image/png;base64,${loanApplication.kf_applicantimage}` }}
           style={styles.cardImage}
           onError={(error) => console.error('Image load error:', error.nativeEvent.error)}
         />

@@ -1,6 +1,6 @@
 
 import React, { useState, } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import HeaderComponent from '../../common/Header';
 import ButtonComponent from '../../common/ButtonComponent';
@@ -97,7 +97,7 @@ const LoanCalculator = () => {
           keyboardType="numeric"
         />
 
-        <Text>Loan Term (Months):</Text>
+        <Text>Loan Term:</Text>
         <TextInput
           style={styles.input}
           value={loanDetails.loanTermMonths}

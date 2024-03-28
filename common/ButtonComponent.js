@@ -14,18 +14,18 @@ const ButtonComponent = (props) => {
 const styles = StyleSheet.create({
     SignButton: {
         backgroundColor: '#rgba(255,28,53,255)',
-        width: '60%',
+        width: '40%',
         alignSelf: 'center',
         borderRadius: 25,
         marginTop: 25,
-        padding: 5,
-        marginBottom: 30
+        padding: 8,
+        marginBottom: 30, 
       },
       SignText: {
         color: '#fff',
-        padding: 12,
+        padding: 5,
         textAlign: 'center',
-        fontWeight: "bold"
+        fontWeight: "bold",
       },
       disabledButton: {
         backgroundColor: '#d3d3d3', // Change the color for a disabled look
