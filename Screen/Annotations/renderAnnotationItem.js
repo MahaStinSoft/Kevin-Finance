@@ -497,25 +497,30 @@ const RenderAnnotation = ({ annotations, filteredAnnotations, showImage, handleV
   const latestSignatureAnnotation = getLatestAnnotation('Signature Image');
 
   return (
-    <View style={{backgroundColor:"white", flex: 1, width: "100%", marginTop: 10}}>
-      <Text style={styles.heading}>Images</Text>
+    <View style={{ flex: 1, width: "50%"}}>
+      {/* {/ <Text style={styles.heading}>Images</Text> /} */}
       {latestAadharAnnotation ? (
         <TouchableOpacity onPress={() => onViewImage(`data:image/png;base64,${latestAadharAnnotation.documentbody}`)}>
           <View style={styles.annotation}>
-            <Text>Subject: {latestAadharAnnotation.subject}</Text>
-          </View>
+            <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold'}}>View</Text>
+            </View> 
         </TouchableOpacity>
       ) : (
-        <Text style={{textAlign: "center", marginBottom: 15}}>No AadharCard Image to display</Text>
+        <View style={styles.annotation1}>
+        <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold'}}>View</Text>
+        </View>
+
       )}
       {latestPanAnnotation ? (
         <TouchableOpacity onPress={() => onViewImage(`data:image/png;base64,${latestPanAnnotation.documentbody}`)}>
           <View style={styles.annotation}>
-            <Text>Subject: {latestPanAnnotation.subject}</Text>
-          </View>
+            <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold'}}>View</Text>
+            </View>
         </TouchableOpacity>
       ) : (
-        <Text style={{textAlign: "center", marginBottom: 15}}>No PanCard Image to display</Text>
+        <View style={styles.annotation1}>
+        <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold' }}>View</Text>
+        </View>
       )}
       {/* {latestApplicantAnnotation ? (
         <TouchableOpacity onPress={() => onViewImage(`data:image/png;base64,${latestApplicantAnnotation.documentbody}`)}>
@@ -528,12 +533,16 @@ const RenderAnnotation = ({ annotations, filteredAnnotations, showImage, handleV
       )} */}
       {latestSignatureAnnotation ? (
         <TouchableOpacity onPress={() => onViewImage(`data:image/png;base64,${latestSignatureAnnotation.documentbody}`)}>
+
           <View style={styles.annotation}>
-            <Text>Subject: {latestSignatureAnnotation.subject}</Text>
+            <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold'}}>View</Text>
           </View>
+
         </TouchableOpacity>
       ) : (
-        <Text style={{textAlign: "center", marginBottom: 15}}>No Signature Image to display</Text>
+        <View style={styles.annotation1}>
+        <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold' }}>View</Text>
+        </View>
       )}
       <Modal
         animationType="slide"
@@ -560,16 +569,27 @@ const RenderAnnotation = ({ annotations, filteredAnnotations, showImage, handleV
 };
 
 const styles = StyleSheet.create({
-  heading: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: "center"
-  },
   annotation: {
-    padding: 10,
+    padding: 5,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+    backgroundColor: 'red',
+    borderRadius: 25,
+    width: 85, 
+    height: 28,
+    marginBottom:17,
+    top: 10
+  },
+  annotation1: {
+    padding: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    backgroundColor: 'gray',
+    borderRadius: 25,
+    width: 85, 
+    height: 28,
+    marginBottom:17,
+    top: 10
   },
   modalContainer: {
     flex: 1,
@@ -590,6 +610,7 @@ const styles = StyleSheet.create({
     color: 'blue',
     fontSize: 16,
   },
+
 });
 
 export default RenderAnnotation;

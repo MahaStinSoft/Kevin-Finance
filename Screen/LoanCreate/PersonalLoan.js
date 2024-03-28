@@ -500,8 +500,8 @@ const handleInterestRateChange = (text) => {
         ...errorMessages,
         interestRate: 'Enter an Interest Amount',
       });
-    } else if (/^\d+$/.test(text) || /^\d+%$/.test(text)) {
-      // Validate if the input contains only digits or digits followed by a '%' sign
+    } else if (/^\d+(\.\d+)?%?$/.test(text)) {
+      // Validate if the input contains digits, optionally followed by a decimal point and more digits, and optionally followed by a '%' sign
       setErrorMessages({
         ...errorMessages,
         interestRate: '',
@@ -509,7 +509,7 @@ const handleInterestRateChange = (text) => {
     } else {
       setErrorMessages({
         ...errorMessages,
-        interestRate: 'Enter a valid Interest Rate ',
+        interestRate: 'Enter a valid Interest Rate',
       });
     }
   };
@@ -631,7 +631,7 @@ const handleInterestRateChange = (text) => {
       loanAmountRequested: !kf_loanamountrequested ? ' Enter Loan Amount Requested' : '',
       aadharCardNumber: !/^\d{12}$/.test(kf_aadharnumber) ? 'Enter Valid Aadharcard Number' : '',
       panCardNumber: !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(kf_pannumber) ? 'Enter Valid PAN Card Number' : '',
-      interestRate: !/^\d+$/.test(kf_interestrate) ? 'Enter a Interest Rate' : '',
+      interestRate: !/^\d+(\.\d+)?%?$/.test(kf_interestrate) ? 'Enter a Interest Rate' : '',
       emiSchedule: !kf_emischedule ? 'select a EMISchedule' : '',
       NoOfEMIs: !/^\d+$/.test(kf_numberofemi) ? 'Enter a No of EMI payment' : '',
       // emiCollectionDate: !kf_emicollectiondate ? 'select a EMI Collection Date' : ''
@@ -898,14 +898,9 @@ const handleInterestRateChange = (text) => {
 
           <TextInput
             style={[styles.textInputContainer, { marginVertical: 10 }]}
-            placeholder="Interest Rate"
-            value={kf_interestrate ? `${kf_interestrate}${kf_interestrate.endsWith('%') ? '' : '%'}` : ''}
-            onChangeText={(text) => {
-              const formattedText = text.replace(/[^\d]/g, '');
-              if (/^\d{0,2}%?$/.test(formattedText)) {
-                handleInterestRate(formattedText);
-              }
-            }}
+            placeholder="Interest Rate %"
+            value={kf_interestrate}
+            onChangeText={handleInterestRate}
             onBlur={handleLoanChange}
             keyboardType="numeric"
           />

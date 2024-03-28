@@ -474,6 +474,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ButtonComponent from '../../common/ButtonComponent';
 import TextInputComponent from '../../common/TextInput';
 import HeaderComponent from '../../common/Header';
+import CustomAlert from '../../common/CustomAlert';
 import axios from 'axios';
 import moment from 'moment';
 
@@ -507,6 +508,7 @@ const AmortizationScreen = ({ route }) => {
   const scrollViewRef = useRef(null);
   const [recordsFetched, setRecordsFetched] = useState(false);
   const [saveButtonDisabled, setSaveButtonDisabled] = useState(false);
+  const [showAlert, setShowAlert] = useState(false); 
 
   useEffect(() => {
     if (fetchedRecords.length >= 0) {
@@ -916,18 +918,7 @@ const AmortizationScreen = ({ route }) => {
       }
       setCreatedRecords(createdRecordsArray);
       // Alert.alert('All records created successfully in CRM');
-      Alert.alert('Amortization Schedule', 'Created Schedule Successfully', [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'OK',
-          onPress: () => {
-            // navigation.navigate('Dashboard', { resetState: true });
-          },
-        },
-      ]);
+      handleShowAlert();
       console.log('All records created successfully in CRM')
       // navigation.navigate('Dashboard');
     } catch (error) {
@@ -966,14 +957,12 @@ const AmortizationScreen = ({ route }) => {
     });
   };
 
-
   const formatDate = (date) => {
     const day = date.getDate().toString().padStart(2, '0');
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear().toString();
     return `${day}/${month}/${year}`;
   };
-
 
   const handleGoBackPersonaldetails = () => {
     navigation.goBack();
@@ -990,6 +979,14 @@ const AmortizationScreen = ({ route }) => {
       default:
         return '';
     }
+  };
+
+  const handleShowAlert = () => {
+    setShowAlert(true);
+  };
+
+  const handleCloseAlert = () => {
+    setShowAlert(false);
   };
 
   return (
@@ -1080,9 +1077,9 @@ const AmortizationScreen = ({ route }) => {
         <View style={styles.createdRecordsList}>
           <Text style={styles.amortizationTitle}>EMI Unpaid Records:</Text>
           {fetchedRecords.filter(record => record.kf_applicationnumber === loanDetails.applicationNumber && record.kf_paidstatus === false).length === 0 ? (
-          <View style={styles.noRecordsContainer}>
-          <Text style={styles.noRecordsText}>No Records Found</Text>
-          </View>
+            <View style={styles.noRecordsContainer}>
+              <Text style={styles.noRecordsText}>No Records Found</Text>
+            </View>
           ) : (
             <View style={[styles.scrollViewContent, { marginBottom: 20 }]}>
               {/* <ScrollView contentContainerStyle={styles.scrollViewContent} ref={scrollViewRef}> */}
@@ -1094,7 +1091,7 @@ const AmortizationScreen = ({ route }) => {
                       <TouchableOpacity onPress={() => handlePress(item)}>
                         <View style={styles.column}>
                           <View style={styles.column1}>
-                          <Text>Term</Text>
+                            <Text>Term</Text>
                             <Text>{parseInt(item.kf_totalmonths)}</Text>
                           </View>
                           <View style={styles.column2}>
@@ -1123,14 +1120,15 @@ const AmortizationScreen = ({ route }) => {
         <View style={styles.createdRecordsContainer}>
           <Text style={styles.amortizationTitle}>EMI Paid Records:</Text>
           {fetchedSavedRecords.filter(record => record.kf_applicationnumber === loanDetails.applicationNumber).length === 0 ? (
-             <View style={styles.noRecordsContainer}>
-             <Text style={styles.noRecordsText}>No Records Found</Text>
-             </View>
+            <View style={styles.noRecordsContainer}>
+              <Text style={styles.noRecordsText}>No Records Found</Text>
+            </View>
           ) : (
             <View style={styles.scrollViewContent}>
-              {/* <ScrollView contentContainerStyle={styles.scrollViewContent} ref={scrollViewRef}> */}
               {fetchedSavedRecords
                 .filter(record => record.kf_applicationnumber === loanDetails.applicationNumber)
+                .sort((a, b) => new Date(b.kf_receiveddate) - new Date(a.kf_receiveddate)) // Sort in descending order based on payment date
+                .reverse() // Reverse the array to display latest updated record first
                 .map((item) => (
                   <View key={item.kf_loanId}>
                     <View style={styles.amortizationTile}>
@@ -1144,15 +1142,15 @@ const AmortizationScreen = ({ route }) => {
                             <Text>EMI Amount</Text>
                             <Text>{item.kf_emiamount}</Text>
                           </View>
-                          <View style={styles.column3}>
-                          <Text>Received Date</Text>
+                          <View style={[styles.column3, {marginRight: -10}]}>
+                            <Text>Received Date</Text>
                             {item.kf_datepicker ? (
                               <Text>{moment(item.kf_datepicker).format('DD-MM-YYYY')}</Text>
                             ) : (
                               <Text></Text>
                             )}
                           </View>
-                          <View style={[styles.column4, { backgroundColor: item.kf_paidstatus ? 'green' : 'red' }]}>
+                          <View style={[styles.column4, { backgroundColor: item.kf_paidstatus ? 'green' : 'red', marginRight: 5 }]}>
                             <Text style={{ color: "white", fontWeight: "bold", textAlign: "center", marginVertical: -5 }}>
                               {item.kf_paidstatus ? 'Paid' : 'Unpaid'}
                             </Text>
@@ -1162,7 +1160,6 @@ const AmortizationScreen = ({ route }) => {
                     </View>
                   </View>
                 ))}
-              {/* </ScrollView> */}
             </View>
           )}
         </View>
@@ -1174,14 +1171,26 @@ const AmortizationScreen = ({ route }) => {
                 title="Create EMI Schedule"
                 onPress={() => {
                   handleSave();
-                  setRecordsFetched(true); // Set recordsFetched to true when saving is initiated
+                  setRecordsFetched(true); 
                 }}
                 disabled={isSaving}
+                style={{width: "50%"}}
               />
-            )}
+             )} 
           </View>
-        )}
-
+        )} 
+        <CustomAlert
+          visible={showAlert}
+          onClose={handleCloseAlert}
+          onConfirm={handleCloseAlert}
+          headerMessage="EMI Record"
+          message="All records created successfully"
+          Button1="Cancel"
+          Button2="OK"
+          style={styles.alertStyle}
+          modalHeaderStyle={[styles.modalheaderStyle, { right: 90 }]}
+          textStyle={styles.textStyle}
+        />
       </ScrollView>
     </View>
   );
@@ -1321,6 +1330,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center', // Center align the text
   },
+alertStyle: {
+  // backgroundColor: "blue",
+  width: "80%",
+},
+modalheaderStyle: {
+  // backgroundColor: "green",
+  right: 85
+},
+textStyle: {
+  // backgroundColor: "yellow"
+}
 });
 
 export default AmortizationScreen;

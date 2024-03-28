@@ -751,7 +751,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 5,
     borderWidth: 2,
-    borderColor: '#ff8080',
+    borderColor: '#ccc',
     // opacity: 0.7,
     // backgroundColor:'#c2e7ff',
   },

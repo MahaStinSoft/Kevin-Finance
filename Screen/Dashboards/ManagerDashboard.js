@@ -819,8 +819,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#E5E4E2',
-    marginTop: 45
-  },
+    marginTop: 45,
+    borderColor: "#AAB7B8",
+    borderWidth: 1,
+    shadowColor: '#000', 
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25, 
+    shadowRadius: 3.84,
+    elevation: 5
+    },
   searchIcon: {
     padding: 10,
     marginHorizontal: 10

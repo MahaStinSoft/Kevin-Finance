@@ -1,6 +1,8 @@
 import React from 'react';
 import { Modal, Text, TouchableHighlight, View, StyleSheet } from 'react-native';
-const CustomAlert = ({ visible, onClose, message, headerMessage ,style, modalHeaderStyle, textStyle  }) => {
+const CustomAlert = ({ visible, onClose, message, headerMessage ,style, modalHeaderStyle, textStyle, onConfirm, Button1, Button2  }) => {
+  if (!visible) return null;
+
     return (
         <Modal
             animationType="fade"
@@ -15,12 +17,12 @@ const CustomAlert = ({ visible, onClose, message, headerMessage ,style, modalHea
                         <TouchableHighlight
                             style={{ ...styles.openButton, backgroundColor: 'red', left: 20 }}
                             onPress={onClose}>
-                            <Text style={styles.textStyle}>Cancel</Text>
+                            <Text style={styles.textStyle}>{Button1}</Text>
                         </TouchableHighlight>
                         <TouchableHighlight
                             style={{ ...styles.openButton, backgroundColor: 'red', left: 60 }}
-                            onPress={onClose}>
-                            <Text style={styles.textStyle}>OK</Text>
+                            onPress={onConfirm}>
+                            <Text style={styles.textStyle}>{Button2}</Text>
                         </TouchableHighlight>
                     </View>
                 </View>
@@ -53,7 +55,7 @@ const styles = StyleSheet.create({
     },
     modalText: {
         marginBottom: 15,
-        textAlign: 'center',
+        // textAlign: 'center',
         fontSize: 16
     },
     openButton: {
@@ -61,9 +63,10 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         padding: 10,
         elevation: 2,
-        width: "25%",
+        width: "30%",
         height: 30,
-        marginTop: 10
+        marginTop: 10,
+        borderRadius: 50
     },
     textStyle: {
         color: 'white',

@@ -901,7 +901,7 @@ const EditHomeLoan = ({ route, navigation }) => {
   const date = emiCollectionDate ? new Date(emiCollectionDate) : null;
   const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
 
-    const handleSendNotification = () => {
+  const handleSendNotification = () => {
     schedulePushNotification(applicationnumber, firstname, lastname, loanAmountRequested, createdby); // Trigger push notification
   };
 
@@ -910,13 +910,13 @@ const EditHomeLoan = ({ route, navigation }) => {
       return (
         <Image
           source={{ uri: `data:image/png;base64,${loanApplication.kf_applicantimage}` }}
-          style={{width:100, height: 100, borderRadius: 50, objectFit:"fill", marginTop: 15, marginLeft: 15 }}
+          style={{ width: 100, height: 100, borderRadius: 50, objectFit: "fill", marginTop: 15, marginLeft: 15 }}
         />
       );
     } else {
       const initials = loanApplication ? `${loanApplication.kf_name[0]}${loanApplication.kf_lastname[0]}` : '';
       return (
-        <View style={[styles.cardImage,{ backgroundColor:"gray",width: "100%", height: "100%" } ]}>
+        <View style={[styles.cardImage, { backgroundColor: "gray", width: "100%", height: "100%" }]}>
           <Text style={styles.placeholderText}>{initials}</Text>
         </View>
       );
@@ -936,9 +936,9 @@ const EditHomeLoan = ({ route, navigation }) => {
       if (result.canceled) {
         return;
       }
-  
+
       const byteArray = result.base64; // Use result.base64 directly
-  
+
       setkf_applicantimage({
         fileName: 'payslip.jpg', // You can set a default file name
         fileContent: byteArray,
@@ -957,13 +957,13 @@ const EditHomeLoan = ({ route, navigation }) => {
         quality: 1,
         base64: true,
       });
-  
+
       if (result.canceled) {
         return;
       }
-  
+
       const byteArray = result.base64; // Use result.base64 directly
-  
+
       setkf_applicantimage({
         fileName: 'payslip.jpg', // You can set a default file name
         fileContent: byteArray,
@@ -979,7 +979,7 @@ const EditHomeLoan = ({ route, navigation }) => {
     const onlyAlphabets = /^[a-zA-Z\s]*$/;
     return onlyAlphabets.test(text);
   };
-  
+
   return (
     <View style={styles.container}>
       <HeaderComponent titleText="Edit Home Screen"
@@ -988,9 +988,9 @@ const EditHomeLoan = ({ route, navigation }) => {
         screenIcon="md-save"
         screenIconStyle={{ marginTop: 5 }}
       />
-     
+
       <ScrollView>
-      
+
         {/* <View style={styles.Imagepart}>
           <View style={{ width: 100, height:100, left: 0, bottom: 5 }}>{renderImage()}</View>
           <View style={{ right: 25, top: 30 }}>
@@ -1011,7 +1011,7 @@ const EditHomeLoan = ({ route, navigation }) => {
           </View>
         </View> */}
 
-<View style={styles.Imagepart}>
+        <View style={styles.Imagepart}>
           <View style={{ width: 100, height: 100, left: 0, bottom: 5 }}>{renderImage()}</View>
           <View style={{ right: 25, top: 30 }}>
             <View style={styles.touch}>
@@ -1106,16 +1106,16 @@ const EditHomeLoan = ({ route, navigation }) => {
               placeholder="Last Name"
               onChangeText={(text) => {
                 if (isValidInput(text) || text === '') { // Call isValidInput function
-                setLastname(text);
-                setIsLastNameValid(text.trim() !== '')
-                setErrorMessages({
-                  ...errorMessages,
-                  lastNameEdit: text.trim() !== '' ? '' : 'Enter Last Name',
-                });
-              }
+                  setLastname(text);
+                  setIsLastNameValid(text.trim() !== '')
+                  setErrorMessages({
+                    ...errorMessages,
+                    lastNameEdit: text.trim() !== '' ? '' : 'Enter Last Name',
+                  });
+                }
               }}
-              
-              editable={getStatusStringFromNumericValue(status) !== 'Approved'} 
+
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             {errorMessages.lastNameEdit !== '' && <Text style={styles.errorText}>{errorMessages.lastNameEdit}</Text>}
 
@@ -1127,7 +1127,7 @@ const EditHomeLoan = ({ route, navigation }) => {
               style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
             /> */}
 
-            
+
             <LoanStatusPicker
               onOptionChange={handleGenderOptionset}
               title="Gender"
@@ -1184,14 +1184,14 @@ const EditHomeLoan = ({ route, navigation }) => {
             />
 
             <TextInput
-             style={[
-              styles.textInputContainer,
-              getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
-            ]}
+              style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={mobileNumber}
               placeholder="Mobile Number"
               onChangeText={handleMobileNumberChange}
-              editable={getStatusStringFromNumericValue(status) !== 'Approved'} 
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             {errorMessages.mobileNumberEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.mobileNumberEdit}</Text>
@@ -1205,7 +1205,7 @@ const EditHomeLoan = ({ route, navigation }) => {
               value={email}
               placeholder="Email"
               onChangeText={handleEmailChange}
-              editable={getStatusStringFromNumericValue(status) !== 'Approved'} 
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             {errorMessages.emailEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.emailEdit}</Text>
@@ -1219,7 +1219,7 @@ const EditHomeLoan = ({ route, navigation }) => {
               value={address1}
               placeholder="Address Line 1"
               onChangeText={(text) => setAddress1(text)}
-              editable={getStatusStringFromNumericValue(status) !== 'Approved'} 
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             <TextInput
               style={[
@@ -1232,10 +1232,10 @@ const EditHomeLoan = ({ route, navigation }) => {
               editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             <TextInput
-             style={[
-              styles.textInputContainer,
-              getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
-            ]}
+              style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={address3}
               placeholder="Address Line 3"
               onChangeText={(text) => setAddress3(text)}
@@ -1263,10 +1263,10 @@ const EditHomeLoan = ({ route, navigation }) => {
             />
 
             <TextInput
-             style={[
-              styles.textInputContainer,
-              getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
-            ]}
+              style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={aadharcardNumber}
               placeholder="Aadharcard Number"
               onChangeText={handleAadharCardNumberChange}
@@ -1278,10 +1278,10 @@ const EditHomeLoan = ({ route, navigation }) => {
 
 
             <TextInput
-             style={[
-              styles.textInputContainer,
-              getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
-            ]}
+              style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
               value={pancardNumber}
               placeholder="PAN Card Number"
               onChangeText={handlePancardNumberValid}
@@ -1381,14 +1381,14 @@ const EditHomeLoan = ({ route, navigation }) => {
               />
             )}
 
-              <ComponentDatePicker
-                selectedDate={date} // Pass the Date object directly
-                onDateChange={handleEmiCollectionDateChange}
-                placeholder="Select EMI Collection Date"
-                style={{ width: "100%", height: 45, marginTop: 5, marginLeft: 0 }}
-              />        
+            <ComponentDatePicker
+              selectedDate={date} // Pass the Date object directly
+              onDateChange={handleEmiCollectionDateChange}
+              placeholder="Select EMI Collection Date"
+              style={{ width: "100%", height: 45, marginTop: 5, marginLeft: 0 }}
+            />
 
-    {/* <View style={{ position: 'relative' }}>
+            {/* <View style={{ position: 'relative' }}>
               <ComponentDatePicker
                 selectedDate={emiCollectionDate}
                 onDateChange={handleEmiCollectionDateChange}
@@ -1412,61 +1412,59 @@ const EditHomeLoan = ({ route, navigation }) => {
                 />
               )}
             </View> */}
-            
-            {getStatusStringFromNumericValue(status) !== 'Approved' && (
-              <View style={styles.indentityImage}>
-                <View style={{ marginVertical: 3 }}>
-                  <CardImage
-                    title="AadharCard"
-                    imageContent={aadharcard}
-                    setImageContent={setAadharcard}
-                  // onViewImage={onViewImage}
-                  />
-                </View>
-                <View style={{ marginVertical: 3 }}>
-                  <CardImage
-                    title="PanCard"
-                    imageContent={pancard}
-                    setImageContent={setPancard}
-                  />
-                </View>
-                <View style={{ marginVertical: 3 }}>
-                  {/* <CardImage
-                  title="Applicant"
-                  imageContent={applicantImage}
-                  setImageContent={setapplicantImage}
-                /> */}
-                </View>
-                <View style={{ marginBottom: 15 }}>
-                  <CardImageSignature
-                    title="Signature"
-                    imageContent={signatureImage}
-                    pickImage={handleNavigateToSignatureScreen}
-                    sendAnnotation={sendAnnotation3}
-                  />
 
-                </View>
+            <View style={styles.indentityImage}>
+
+              <View style={{ marginVertical: 3 }}>
+                <CardImage
+                  title="AadharCard"
+                  imageContent={aadharcard}
+                  setImageContent={setAadharcard}
+
+                />
               </View>
-            )}
-          </View>
+              <View style={{ marginVertical: 3 }}>
+                <CardImage
+                  title="PanCard"
+                  imageContent={pancard}
+                  setImageContent={setPancard}
+                />
+              </View>
+              <View style={{ marginVertical: 3 }}>
+                {/* <CardImage
+            title="Applicant"
+            imageContent={applicantImage}
+            setImageContent={setapplicantImage}
+          /> */}
+              </View>
+              <View style={{ marginBottom: 15 }}>
+                <CardImageSignature
+                  title="Signature"
+                  imageContent={signatureImage}
+                  pickImage={handleNavigateToSignatureScreen}
+                  sendAnnotation={sendAnnotation3}
+                  setImageContent={setImageContent}
+                />
+              </View>
 
-          <View style={{ width: "100%", paddingHorizontal: 20 }}>
-            <RenderAnnotation
-              annotations={annotations}
-              filteredAnnotations={filteredAnnotations}
-              showImage={showImage}
-              handleViewImages={handleViewImages}
-            />
+              <View style={styles.imageView} >
+                <RenderAnnotation
+                  annotations={annotations}
+                  filteredAnnotations={filteredAnnotations}
+                  showImage={showImage}
+                  handleViewImages={handleViewImages}
+                />
+              </View>
+            </View>
           </View>
         </View>
       </ScrollView>
-
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container:{
+  container: {
     flex: 1,
     width: "100%",
     marginBottom: 20
@@ -1475,18 +1473,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-evenly",
     backgroundColor: "white",
-     elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-  },
-  indentityImage:{
-    backgroundColor:"white",
-    marginTop:5,
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: {
@@ -1496,10 +1482,23 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
   },
+  indentityImage: {
+    backgroundColor: "white",
+    marginTop: 5,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    marginBottom: 30
+  },
   wrapper: {
     width: '100%',
     paddingHorizontal: 20,
-    marginTop:5
+    marginTop: 5
   },
   errorText: {
     color: 'red',
@@ -1526,8 +1525,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   annotation: {
-    backgroundColor:"white",
-    marginTop:5,
+    backgroundColor: "white",
+    marginTop: 5,
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: {
@@ -1563,55 +1562,61 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
   },
-  placeholderText:{
+  placeholderText: {
     fontSize: 25,
     color: "white",
     textAlign: "center",
     margin: 32,
-    fontWeight:"bold"
+    fontWeight: "bold"
   },
-  Imagepart:{
-    flexDirection:'row',
-    marginRight:10,
+  Imagepart: {
+    flexDirection: 'row',
+    marginRight: 10,
     marginBottom: 20
   },
-  touch:{
-    flexDirection:'row',
-    marginLeft:40,
-    marginTop:15,
+  touch: {
+    flexDirection: 'row',
+    marginLeft: 40,
+    marginTop: 15,
   },
-  button:{
-    marginLeft: 10, 
+  button: {
+    marginLeft: 10,
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     backgroundColor: 'red',
     borderRadius: 50,
     width: "33%"
   },
-  buttonText:{
+  buttonText: {
     fontSize: 14,
     color: 'white',
     padding: 5,
     fontWeight: "bold"
   },
   disabledButton: {
-    marginLeft: 10, 
+    marginLeft: 10,
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     backgroundColor: 'red',
     borderRadius: 50,
     width: "33%",
-    opacity: 0.5, 
+    opacity: 0.5,
   },
   disabledButton1: {
-    marginLeft: 10, 
+    marginLeft: 10,
     // flexDirection: 'row',
     // justifyContent: 'space-evenly',
     // backgroundColor: 'red',
     borderRadius: 50,
     width: "10%",
-    opacity: 0.5, 
+    opacity: 0.5,
   },
+  imageView: {
+    marginBottom: -150,
+    width: 85,
+    top: -150,
+    left: 200
+  }
 });
 
 export default EditHomeLoan;

@@ -475,6 +475,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ButtonComponent from '../../common/ButtonComponent';
 import TextInputComponent from '../../common/TextInput';
 import HeaderComponent from '../../common/Header';
+import CustomAlert from '../../common/CustomAlert';
 import axios from 'axios';
 import moment from 'moment';
 
@@ -496,7 +497,7 @@ const AmortizationScreenHome = ({ route }) => {
   });
 
   // const { isPaid, NoOfEMIsPaid } = route.params;
-  const { receivedDate } = route.params; 
+  const { receivedDate } = route.params;
   const [isAmortizationLoaded, setIsAmortizationLoaded] = useState(false);
 
   const [kf_emicollectiondate, setkf_emicollectiondate] = useState(route.params.kf_emicollectiondate);
@@ -509,6 +510,7 @@ const AmortizationScreenHome = ({ route }) => {
   const scrollViewRef = useRef(null);
   const [recordsFetched, setRecordsFetched] = useState(false);
   const [saveButtonDisabled, setSaveButtonDisabled] = useState(false);
+  const [showAlert, setShowAlert] = useState(false); 
 
   useEffect(() => {
     if (fetchedRecords.length >= 0) {
@@ -918,7 +920,8 @@ const AmortizationScreenHome = ({ route }) => {
       }
 
       setCreatedRecords(createdRecordsArray);
-      Alert.alert('All records created successfully in CRM');
+      // Alert.alert('All records created successfully in CRM');
+      handleShowAlert();
       console.log('All records created successfully in CRM')
       // navigation.navigate('Dashboard');
     } catch (error) {
@@ -980,6 +983,14 @@ const AmortizationScreenHome = ({ route }) => {
       default:
         return '';
     }
+  };
+
+  const handleShowAlert = () => {
+    setShowAlert(true);
+  };
+
+  const handleCloseAlert = () => {
+    setShowAlert(false);
   };
 
   return (
@@ -1070,9 +1081,9 @@ const AmortizationScreenHome = ({ route }) => {
         <View style={styles.createdRecordsList}>
           <Text style={styles.amortizationTitle}>EMI Unpaid Records:</Text>
           {fetchedRecords.filter(record => record.kf_applicationnumber === loanDetails.applicationNumber && record.kf_paidstatus === false).length === 0 ? (
-             <View style={styles.noRecordsContainer}>
-             <Text style={styles.noRecordsText}>No Records Found</Text>
-             </View>
+            <View style={styles.noRecordsContainer}>
+              <Text style={styles.noRecordsText}>No Records Found</Text>
+            </View>
           ) : (
             <View style={[styles.scrollViewContent, { marginBottom: 20 }]}>
               {/* <ScrollView contentContainerStyle={styles.scrollViewContent} ref={scrollViewRef}> */}
@@ -1113,14 +1124,15 @@ const AmortizationScreenHome = ({ route }) => {
         <View style={styles.createdRecordsContainer}>
           <Text style={styles.amortizationTitle}>EMI Paid Records:</Text>
           {fetchedSavedRecords.filter(record => record.kf_applicationnumber === loanDetails.applicationNumber).length === 0 ? (
-             <View style={styles.noRecordsContainer}>
-             <Text style={styles.noRecordsText}>No Records Found</Text>
-             </View>
+            <View style={styles.noRecordsContainer}>
+              <Text style={styles.noRecordsText}>No Records Found</Text>
+            </View>
           ) : (
             <View style={styles.scrollViewContent}>
-              {/* <ScrollView contentContainerStyle={styles.scrollViewContent} ref={scrollViewRef}> */}
               {fetchedSavedRecords
                 .filter(record => record.kf_applicationnumber === loanDetails.applicationNumber)
+                .sort((a, b) => new Date(b.kf_receiveddate) - new Date(a.kf_receiveddate)) // Sort in descending order based on payment date
+                .reverse() // Reverse the array to display latest updated record first
                 .map((item) => (
                   <View key={item.kf_loanId}>
                     <View style={styles.amortizationTile}>
@@ -1134,8 +1146,7 @@ const AmortizationScreenHome = ({ route }) => {
                             <Text>EMI Amount</Text>
                             <Text>{item.kf_emiamount}</Text>
                           </View>
-
-                          <View style={styles.column3}>
+                          <View style={[styles.column3, {marginRight: -10}]}>
                             <Text>Received Date</Text>
                             {item.kf_datepicker ? (
                               <Text>{moment(item.kf_datepicker).format('DD-MM-YYYY')}</Text>
@@ -1143,7 +1154,6 @@ const AmortizationScreenHome = ({ route }) => {
                               <Text></Text>
                             )}
                           </View>
-
                           <View style={[styles.column4, { backgroundColor: item.kf_paidstatus ? 'green' : 'red', marginRight: 5 }]}>
                             <Text style={{ color: "white", fontWeight: "bold", textAlign: "center", marginVertical: -5 }}>
                               {item.kf_paidstatus ? 'Paid' : 'Unpaid'}
@@ -1154,32 +1164,10 @@ const AmortizationScreenHome = ({ route }) => {
                     </View>
                   </View>
                 ))}
-              {/* </ScrollView> */}
             </View>
           )}
         </View>
 
-        {/* {!recordsFetched && !saveButtonDisabled && (
-  <Button
-    title="Save Records to CRM"
-    onPress={() => {
-      handleSave();
-      setRecordsFetched(true); // Set recordsFetched to true when saving is initiated
-    }}
-    disabled={isSaving}
-  />
-)} */}
-
-        {/* {fetchedRecords.filter(record => record.kf_applicationnumber === loanDetails.applicationNumber && record.kf_paidstatus === false).length === 0 && (
-        <ButtonComponent
-          title="Create EMI Schedule"
-          onPress={() => {
-            handleSave();
-            setRecordsFetched(true); // Set recordsFetched to true when saving is initiated
-          }}
-          disabled={isSaving}
-        />
-      )} */}
         {fetchedRecords.filter(record => record.kf_applicationnumber === loanDetails.applicationNumber && record.kf_paidstatus === false).length === 0 && (
           <View>
             {fetchedSavedRecords.filter(record => record.kf_applicationnumber === loanDetails.applicationNumber).length === 0 && (
@@ -1190,10 +1178,23 @@ const AmortizationScreenHome = ({ route }) => {
                   setRecordsFetched(true); // Set recordsFetched to true when saving is initiated
                 }}
                 disabled={isSaving}
+                style={{width: "50%"}}
               />
-            )}
+             )}
           </View>
-        )}
+         )} 
+        <CustomAlert
+        visible={showAlert}
+        onClose={handleCloseAlert}
+        onConfirm={handleCloseAlert}
+        headerMessage= "EMI Record"
+        message="All records created successfully"
+        Button1="Cancel"
+        Button2="OK"
+        style={styles.alertStyle}
+        modalHeaderStyle={[styles.modalheaderStyle, {right: 90}]}
+        textStyle={styles.textStyle}
+      />
 
       </ScrollView>
     </View>
@@ -1334,6 +1335,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center', // Center align the text
   },
+  alertStyle: {
+    // backgroundColor: "blue",
+    width: "80%",
+  },
+  modalheaderStyle: {
+    // backgroundColor: "green",
+    right: 85
+  },
+  textStyle: {
+    // backgroundColor: "yellow"
+  }
 });
 
 

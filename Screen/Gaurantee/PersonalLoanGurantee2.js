@@ -935,52 +935,82 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
               <Text style={styles.errorText}>{errorMessages.guarantorPanCardNumberEdit}</Text>
             )}
 
-            {isEditable && (
-              <View style={{ backgroundColor: "white", flex: 1, width: "100%", marginTop: 10 }}>
-                <View style={{ marginVertical: 3 }}>
-                  <CardImage
-                    title=" AadharCard"
-                    imageContent={aadharcard}
-                    setImageContent={setAadharcard}
-                  // onViewImage={onViewImage}
+{isEditable && (
+            <View style={{ backgroundColor: "white", marginTop: 15 }}>
+             <View style={{marginVertical:3}} >
+                    <CardImage
+                      title="AadharCard"
+                      imageContent={aadharcard}
+                      setImageContent={setAadharcard}
+                      // disabled={isEditable} // Set disabled based on isEditable
+                    />
+                    {errorMessages.aadharCardImage !== ''  && Gurantee2Annotation.filteredAnnotations && !selectedImage.includes(latestHG1AadharAnnotation.documentbody) &&(
+                      <Text style={styles.errorText1}>{errorMessages.aadharCardImage}</Text>
+                    )}
+                  </View>
+                  <View style={{marginVertical:3}} >
+                    <CardImage
+                      title="PanCard"
+                      imageContent={pancard}
+                      setImageContent={setPancard}
+                      disabled={isEditable} // Set disabled based on isEditable
+                    />
+                    {/* {errorMessages.panCardImage !== '' && !showImage &&(
+                      <Text style={styles.errorText1}>{errorMessages.panCardImage}</Text>
+                    )} */}
+                  </View>
+                  <View style={{marginVertical:3}}>
+                    <CardImage
+                      title="Applicant"
+                      imageContent={applicantImage}
+                      setImageContent={setapplicantImage}
+                      disabled={isEditable} // Set disabled based on isEditable
+                    />
+                    {/* {errorMessages.applicantCardImage !== '' && !showImage &&(
+                      <Text style={styles.errorText1}>{errorMessages.applicantCardImage}</Text>
+                    )} */}
+                  </View>
+                  <View style={{marginBottom:15}} >
+                    <CardImageSignature
+                      title="Signature"
+                      imageContent={signatureFile}
+                      pickImage={handleNavigateToSignatureScreen}
+                      sendAnnotation={sendAnnotation3}
+                      disabled={isEditable} // Set disabled based on isEditable
+                    />
+                  </View>
+                  <View style={{ width: '25%',top: -200,left: 200,marginBottom: -190}}>
+                  <Gurantee2Annotation
+                    annotations={annotations}
+                    filteredAnnotations={filteredAnnotations}
+                    showImage={showImage}
+                    handleViewImages={handleViewImages}
                   />
-                </View>
-
-
-                <View style={{ marginVertical: 3 }}>
-                  <CardImage
-                    title=" PanCard"
-                    imageContent={pancard}
-                    setImageContent={setPancard}
+             </View>
+            </View>
+            
+            )} 
+            {!isEditable && (
+              <View style={{ backgroundColor: "white", marginTop: 15 }}>
+               <View style={{marginVertical:3}} >
+                 <View style={{marginLeft: 40,top: 10}}>
+                  <View style={styles.textImage}><Text>Aadhar Image</Text></View>                   
+                  <View style={styles.textImage}><Text>PAN Image</Text></View>
+                  <View style={styles.textImage}><Text>Applicant Image</Text></View>
+                  <View style={styles.textImage}><Text>Signature Image</Text></View>
+                    </View>
+                  </View>
+                  <View style={{ width:'25%',top: -180,left: 200,marginBottom: -150}}>
+                  <Gurantee2Annotation
+                    annotations={annotations}
+                    filteredAnnotations={filteredAnnotations}
+                    showImage={showImage}
+                    handleViewImages={handleViewImages}
                   />
-                </View>
-
-                <View style={{ marginVertical: 3 }}>
-                  <CardImage
-                    title=" Applicant"
-                    imageContent={applicantImage}
-                    setImageContent={setapplicantImage}
-                  />
-                </View>
-                <View style={{ marginBottom: 15 }}>
-                  <CardImageSignature
-                    title="Signature"
-                    imageContent={signatureFile}
-                    pickImage={handleNavigateToSignatureScreen}
-                    sendAnnotation={sendAnnotation3}
-                  />
-                </View>
+             </View>
               </View>
-            )}
-            <Gurantee2Annotation
-              annotations={annotations}
-              filteredAnnotations={filteredAnnotations}
-              showImage={showImage}
-              handleViewImages={handleViewImages}
-            />
-
-
-            {/* <ButtonComponent title="Update" onPress={handleUpdateRecord} /> */}
+              )}
+     
           </View>
         </View>
       </ScrollView>
@@ -1031,6 +1061,9 @@ const styles = StyleSheet.create({
     // borderColor: '#ccc',
     borderRadius: 5,
   },
+  textImage:{
+    marginVertical:15
+  }
 });
 
 export default PersonalLoanGurantee2;

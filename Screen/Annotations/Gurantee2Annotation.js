@@ -39,42 +39,49 @@ const Gurantee2Annotation = ({ annotations, filteredAnnotations, showImage, hand
 
     return (
         <View style={{ backgroundColor: "white", flex: 1, width: "100%", marginTop: 10 }}>
-            <Text style={styles.heading}>Images</Text>
             {latestHG2AadharAnnotation ? (
                 <TouchableOpacity onPress={() => onViewImage(`data:image/png;base64,${latestHG2AadharAnnotation.documentbody}`)}>
                     <View style={styles.annotation}>
-                        <Text>Subject: {latestHG2AadharAnnotation.subject}</Text>
+                       <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold'}}>View</Text>
                     </View>
                 </TouchableOpacity>
             ) : (
-                <Text style={{ textAlign: "center", marginBottom: 15 }}>No AadharCard Image to display</Text>
+                <View style={styles.annotation1}>
+                    <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold'}}>View</Text>
+                </View>
             )}
             {latestHG2PanAnnotation ? (
                 <TouchableOpacity onPress={() => onViewImage(`data:image/png;base64,${latestHG2PanAnnotation.documentbody}`)}>
                     <View style={styles.annotation}>
-                        <Text>Subject: {latestHG2PanAnnotation.subject}</Text>
+                      <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold'}}>View</Text>
                     </View>
                 </TouchableOpacity>
             ) : (
-                <Text style={{ textAlign: "center", marginBottom: 15 }}>No PanCard Image to display</Text>
+                <View style={styles.annotation1}>
+                   <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold'}}>View</Text>
+                </View>
             )}
             {latestHG2AppicantAnnotation ? (
                 <TouchableOpacity onPress={() => onViewImage(`data:image/png;base64,${latestHG2AppicantAnnotation.documentbody}`)}>
                     <View style={styles.annotation}>
-                        <Text>Subject: {latestHG2AppicantAnnotation.subject}</Text>
+                       <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold'}}>View</Text>
                     </View>
                 </TouchableOpacity>
             ) : (
-                <Text style={{ textAlign: "center", marginBottom: 15 }}>No Applicant Image to display</Text>
+                <View style={styles.annotation1}>
+                   <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold'}}>View</Text>
+                </View>
             )}
              {latestHG2SignatureAnnotation ? (
                 <TouchableOpacity onPress={() => onViewImage(`data:image/png;base64,${latestHG2SignatureAnnotation.documentbody}`)}>
                     <View style={styles.annotation}>
-                        <Text>Subject: {latestHG2SignatureAnnotation.subject}</Text>
+                        <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold'}}>View</Text>
                     </View>
                 </TouchableOpacity>
             ) : (
-                <Text style={{ textAlign: "center", marginBottom: 15 }}>No Signature Image to display</Text>
+                <View style={styles.annotation1}>
+                    <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold'}}>View</Text>
+                </View>
             )}
             <Modal
                 animationType="slide"
@@ -108,10 +115,27 @@ const styles = StyleSheet.create({
         textAlign: "center"
     },
     annotation: {
-        padding: 10,
+        padding: 5,
         borderBottomWidth: 1,
         borderBottomColor: '#ccc',
-    },
+        backgroundColor: 'red',
+        borderRadius: 25,
+        width: 85, 
+        height: 28,
+        marginBottom:17,
+        top: 8
+      },
+      annotation1: {
+        padding: 5,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ccc',
+        backgroundColor: 'gray',
+        borderRadius: 25,
+        width: 85, 
+        height: 28,
+        marginBottom:17,
+        top: 8
+      },
     modalContainer: {
         flex: 1,
         justifyContent: 'center',

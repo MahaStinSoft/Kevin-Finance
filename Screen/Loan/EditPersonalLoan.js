@@ -1504,58 +1504,56 @@ const EditPersonalLoan = ({ route, navigation }) => {
                 style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
               />
             )} */}
-            {getStatusStringFromNumericValue(status) !== 'Approved' && (
-              <View style={styles.indentityImage}>
-                <View style={{ marginVertical: 3 }}>
-                  <CardImage
-                    title="AadharCard"
-                    imageContent={aadharcard}
-                    setImageContent={setAadharcard}
-                  // onViewImage={onViewImage}
-                  />
-                </View>
-
-                <View style={{ marginVertical: 3 }}>
-                  <CardImage
-                    title="PanCard"
-                    imageContent={pancard}
-                    setImageContent={setPancard}
-                  />
-                </View>
-                <View style={{ marginVertical: 3 }}>
-                  {/* <CardImage
+           <View style={styles.indentityImage}>
+              <View style={{ marginVertical: 3 }}>
+                <CardImage
+                  title="AadharCard"
+                  imageContent={aadharcard}
+                  setImageContent={setAadharcard}
+                // onViewImage={onViewImage}
+                />
+              </View>
+              <View style={{ marginVertical: 3 }}>
+                <CardImage
+                  title="PanCard"
+                  imageContent={pancard}
+                  setImageContent={setPancard}
+                />
+              </View>
+              <View style={{ marginVertical: 3 }}>
+                {/* <CardImage
                   title="Applicant"
                   imageContent={applicantImage}
                   setImageContent={setapplicantImage}
                 /> */}
-                </View>
-                <View style={{ marginBottom: 15 }}>
-                  {/* <CardImageSignature
+              </View>
+              <View style={{ marginBottom: 15 }}>
+                {/* <CardImageSignature
                   title="Draw Signature"
                   imageContent={signatureFile}
                   pickImage={handleNavigateToSignatureScreen}
                 /> */}
 
-                  <CardImageSignature
-                    title="Signature"
-                    imageContent={signatureFile}
-                    pickImage={handleNavigateToSignatureScreen}
-                    sendAnnotation={sendAnnotation3}
-                  />
+                <CardImageSignature
+                  title="Signature"
+                  imageContent={signatureFile}
+                  pickImage={handleNavigateToSignatureScreen}
+                  sendAnnotation={sendAnnotation3}
+                  setImageContent={setSignature}
+                />
+              </View>           
 
-                </View>
-              </View>
-            )}
+              <View style={styles.imageView}>
+                  <RenderAnnotation
+                    annotations={annotations}
+                    filteredAnnotations={filteredAnnotations}
+                    showImage={showImage}
+                    handleViewImages={handleViewImages}
+                  />
+             </View>
+            </View>
           </View>
-          <View style={{ width: "100%", paddingHorizontal: 20 }}>
-            <RenderAnnotation
-              annotations={annotations}
-              filteredAnnotations={filteredAnnotations}
-              showImage={showImage}
-              handleViewImages={handleViewImages}
-            />
-          </View>
-          {/* <SendNotification sendApproval={sendApproval} /> */}
+         
         </View>
       </ScrollView>
     </View>
@@ -1709,6 +1707,12 @@ const styles = StyleSheet.create({
     width: "10%",
     opacity: 0.5, 
   },
+  imageView:{
+    marginBottom:-150,
+    width: 85,
+    top: -150,
+    left:200
+  }
 });
 
 

@@ -49,7 +49,7 @@ const HomeLoanGurantee = ({ route, navigation }) => {
 
   const { signatureImage  } = route.params;
   const { loanStatus } = route.params;
-  console.log('signature',loanStatus);
+  // console.log('signature',loanStatus);
 
   const [errorMessages, setErrorMessages] = useState({
     guarantorFirstNameEdit: '',
@@ -868,40 +868,40 @@ const HomeLoanGurantee = ({ route, navigation }) => {
             )}
             {isEditable && (
             <View style={{ backgroundColor: "white", marginTop: 15 }}>
-             <View style={{ marginBottom: aadharcard.fileContent ? 15 : -10, marginTop: 10 }}>
+             <View style={{marginVertical:3}} >
                     <CardImage
                       title="AadharCard"
                       imageContent={aadharcard}
                       setImageContent={setAadharcard}
                       // disabled={isEditable} // Set disabled based on isEditable
                     />
-                    {!aadharcard.fileContent && errorMessages.aadharCardImage !== '' && (
-                      <Text style={[styles.errorText1, {}]}>{errorMessages.aadharCardImage}</Text>
+                    {errorMessages.aadharCardImage !== ''  && Gurantee1AnnotationHome.filteredAnnotations && !selectedImage.includes(latestHG1AadharAnnotation.documentbody) &&(
+                      <Text style={styles.errorText1}>{errorMessages.aadharCardImage}</Text>
                     )}
                   </View>
-                  <View style={{ marginBottom: aadharcard.fileContent ? 15 : -10, marginTop: 5  }} >
+                  <View style={{marginVertical:3}} >
                     <CardImage
                       title="PanCard"
                       imageContent={pancard}
                       setImageContent={setPancard}
                       disabled={isEditable} // Set disabled based on isEditable
                     />
-                    {!pancard.fileContent && errorMessages.panCardImage !== '' && (
+                    {/* {errorMessages.panCardImage !== '' && !showImage &&(
                       <Text style={styles.errorText1}>{errorMessages.panCardImage}</Text>
-                    )}
+                    )} */}
                   </View>
-                  <View style={{ marginBottom: aadharcard.fileContent ? 15 : -10, marginTop: 5  }}>
+                  <View style={{marginVertical:3}}>
                     <CardImage
                       title="Applicant"
                       imageContent={applicantImage}
                       setImageContent={setapplicantImage}
                       disabled={isEditable} // Set disabled based on isEditable
                     />
-                    {!applicantImage.fileContent && errorMessages.applicantCardImage !== '' && (
+                    {/* {errorMessages.applicantCardImage !== '' && !showImage &&(
                       <Text style={styles.errorText1}>{errorMessages.applicantCardImage}</Text>
-                    )}
+                    )} */}
                   </View>
-                  <View style={{ marginBottom: aadharcard.fileContent ? 15 : 15, marginTop: 5  }} >
+                  <View style={{marginBottom:15}} >
                     <CardImageSignature
                       title="Signature"
                       imageContent={signatureImage}
@@ -909,19 +909,39 @@ const HomeLoanGurantee = ({ route, navigation }) => {
                       sendAnnotation={sendAnnotation3}
                       disabled={isEditable} // Set disabled based on isEditable
                     />
-                    {!signatureImage && errorMessages.signatureCardImage !== '' && (
-                      <Text style={styles.errorText1}>{errorMessages.signatureCardImage}</Text>
-                    )}
                   </View>
-
+                  <View style={{ width: '25%',top: -200,left: 200,marginBottom: -190}}>
+                  <Gurantee1AnnotationHome
+                    annotations={annotations}
+                    filteredAnnotations={filteredAnnotations}
+                    showImage={showImage}
+                    handleViewImages={handleViewImages}
+                  />
+             </View>
             </View>
-            )}
-            <Gurantee1AnnotationHome
-              annotations={annotations}
-              filteredAnnotations={filteredAnnotations}
-              showImage={showImage}
-              handleViewImages={handleViewImages}
-            />
+            
+            )} 
+            {!isEditable && (
+              <View style={{ backgroundColor: "white", marginTop: 15 }}>
+               <View style={{marginVertical:3}} >
+                 <View style={{marginLeft: 40,top: 10}}>
+                  <View style={styles.textImage}><Text>Aadhar Image</Text></View>                   
+                  <View style={styles.textImage}><Text>PAN Image</Text></View>
+                  <View style={styles.textImage}><Text>Applicant Image</Text></View>
+                  <View style={styles.textImage}><Text>Signature Image</Text></View>
+                    </View>
+                  </View>
+                  <View style={{ width:'25%',top: -180,left: 200,marginBottom: -150}}>
+                  <Gurantee1AnnotationHome
+                    annotations={annotations}
+                    filteredAnnotations={filteredAnnotations}
+                    showImage={showImage}
+                    handleViewImages={handleViewImages}
+                  />
+             </View>
+              </View>
+              )}
+     
           </View>
         </View>
       </ScrollView>
@@ -973,6 +993,9 @@ const styles = StyleSheet.create({
     // borderColor: '#ccc',
     borderRadius: 5,
   },
+  textImage:{
+    marginVertical:15
+  }
 });
 
 export default HomeLoanGurantee;

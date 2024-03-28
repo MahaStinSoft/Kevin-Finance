@@ -25,17 +25,19 @@ const EditLoanDetail = ({ route, navigation }) => {
   const [penalty, setPenalty] = useState(record.kf_penalty);
   const [isLoading, setIsLoading] = useState(false);
   const emiStatusOptions = ['Paid', 'Unpaid'];
-  const [statusUpdated, setStatusUpdated] = useState(false); // New state variable
-  const [emiStatusUpdated, setEmiStatusUpdated] = useState(false); // New state variable
+  const [statusUpdated, setStatusUpdated] = useState(false); 
+  const [emiStatusUpdated, setEmiStatusUpdated] = useState(false); 
   // const [ReceivedDate, setReceivedDate] = useState('');
   const [kf_datepicker, setkf_datepicker] = useState(record.kf_datepicker);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [updateClicked, setUpdateClicked] = useState(false);
   const [updatePerformed, setUpdatePerformed] = useState(false);
   // const [kf_gender, setkf_gender] = useState(null);
-  const [showAlert, setShowAlert] = useState(false); // New state for showing custom alert
-  const [showAlertEMIUnpaid, setShowAlertEMIUnpaid] = useState(false); // New state for showing custom alert
-
+  const [showAlert, setShowAlert] = useState(false); 
+  const [showAlertEMIUnpaid, setShowAlertEMIUnpaid] = useState(false); 
+  const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
+  const [showAlertEMISuccess, setShowAlertEMISuccess] = useState(false); 
+  const [showAlertReceivedDate, setShowAlertReceivedDate] = useState(false); 
 
   useEffect(() => {
     console.log('Penalty updated:', penalty);
@@ -151,18 +153,19 @@ const EditLoanDetail = ({ route, navigation }) => {
   if (updateRecordResponse.status === 204) {
     console.log('Record updated successfully in CRM');
     await AsyncStorage.setItem(`paid_${record.kf_loanid}`, 'true');
-    Alert.alert('EMI', 'EMI Amount is Paided Successfully.', [
-      {
-        text: 'OK',
-        onPress: () => {
-          setIsPaid(true);
-          setEmiStatusUpdated(true);
-          setUpdatePerformed(true);
-          setkf_paidstatus(kf_paidstatus);
-          navigation.goBack({ isPaid: true });
-        },
-      },
-    ]);
+    // Alert.alert('EMI', 'EMI Amount is Paided Successfully.', [
+    //   {
+    //     text: 'OK',
+    //     onPress: () => {
+    //       setIsPaid(true);
+    //       setEmiStatusUpdated(true);
+    //       setUpdatePerformed(true);
+    //       setkf_paidstatus(kf_paidstatus);
+    //       navigation.goBack({ isPaid: true });
+    //     },
+    //   },
+    // ]);
+    handleShowAlertSuccess();
   } else {
     console.log('Error updating record in CRM:', updateRecordResponse);
     Alert.alert('Error', 'Failed to update the record in CRM.');
@@ -178,30 +181,15 @@ const EditLoanDetail = ({ route, navigation }) => {
   const handleEMIStatusOptionset = (selectedOptionGender) => {
 
     if (!kf_datepicker ) {
-      Alert.alert(
-        'Alert',
-        'Please select the payment received date before changing the EMI status.'
-      );
+      // Alert.alert(
+      //   'Alert',
+      //   'Please select the payment received date before changing the EMI status.'
+      // );
+      handleShowAlertReceivedDate();
       return; 
     }
     if (selectedOptionGender === 'Paid') {
-      Alert.alert(
-        'Confirmation',
-        'Are you sure you want to mark this as Paid?',
-        [
-          {
-            text: 'Cancel',
-            style: 'cancel',
-          },
-          {
-            text: 'Yes',
-            onPress: () => {
-              setkf_paidstatus(1); // Set as Paid
-            },
-          },
-        ],
-        { cancelable: false }
-      );
+      handleShowAlertConfirmation();
     } else {
       let numericValue;
       switch (selectedOptionGender) {
@@ -231,6 +219,18 @@ const EditLoanDetail = ({ route, navigation }) => {
   const handleShowAlertEMIUnPaid = () => {
     setShowAlertEMIUnpaid(true);
   };
+  
+  const handleShowAlertConfirmation = () => {
+    setShowAlertConfirmation(true);
+  };
+
+  const handleShowAlertSuccess = () => {
+    setShowAlertEMISuccess(true);
+  };
+
+  const handleShowAlertReceivedDate = () => {
+    setShowAlertReceivedDate(true);
+  };
 
   // Function to close the custom alert
   const handleCloseAlert = () => {
@@ -239,6 +239,32 @@ const EditLoanDetail = ({ route, navigation }) => {
 
   const handleCloseAlertEMIUnPaid = () => {
     setShowAlertEMIUnpaid(false);
+  };
+
+  const handleCloseAlertConfirmation = () => {
+    setShowAlertConfirmation(false);
+  };
+
+  const handleConfirmPaidStatus = () => {
+    setkf_paidstatus(1); // Set kf_paidstatus to 1 when confirmed
+    setShowAlertConfirmation(false); // Close the confirmation alert
+  };
+
+  const handleCloseAlertSuccess = () => {
+    setShowAlertEMISuccess(false);
+  };
+
+  const handleConfirmEMISucess = () => {
+    setShowAlertConfirmation(false);
+    setIsPaid(true);
+    setEmiStatusUpdated(true);
+    setUpdatePerformed(true);
+    setkf_paidstatus(kf_paidstatus);
+    navigation.goBack({ isPaid: true });
+  };
+
+  const handleCloseAlertReceivedDate = () => {
+    setShowAlertReceivedDate(false);
   };
 
   return (
@@ -363,24 +389,64 @@ const EditLoanDetail = ({ route, navigation }) => {
           disabled={isPaid || isLoading || emiStatusUpdated || updatePerformed}
           style={isPaid ? styles.disabledButton : styles.button}
         />
+
         <CustomAlert
         visible={showAlert}
         onClose={handleCloseAlert}
-        title="Cannot Update"
+        onConfirm={handleCloseAlert}
         headerMessage= "Alert"
         message="Select Payment Received Date"
-        buttonText="OK"
+        Button1="Cancel"
+        Button2="OK"
+        modalHeaderStyle={[styles.modalheaderStyle, {right: 108}]}
       />
 
         <CustomAlert
           visible={showAlertEMIUnpaid}
           onClose={handleCloseAlertEMIUnPaid}
-          title="Cannot Update"
+          onConfirm={handleCloseAlertEMIUnPaid}
           headerMessage="Cannot Update"
           message="EMI status is unpaid. Cannot update."
-          buttonText="OK"
+          Button1="Cancel"
+          Button2="OK"
+          style={styles.alertStyle}
+          modalHeaderStyle={[styles.modalheaderStyle, {right: 80}]}
+          textStyle={styles.textStyle}
+        />
+       <CustomAlert
+          visible={showAlertConfirmation}
+          onClose={handleCloseAlertConfirmation}
+          onConfirm={handleConfirmPaidStatus}
+          headerMessage="Confirmation"
+          message="Are you want to Confirm payment?"
+          Button1="Cancel"
+          Button2="OK"
           style={styles.alertStyle}
           modalHeaderStyle={styles.modalheaderStyle}
+          textStyle={styles.textStyle}
+        />
+        <CustomAlert
+          visible={showAlertEMISuccess}
+          onClose={handleCloseAlertSuccess}
+          onConfirm={handleConfirmEMISucess}
+          headerMessage="EMI Alert"
+          message="EMI Amount is Paided Successfully."
+          Button1="Cancel"
+          Button2="OK"
+          style={styles.alertStyle}
+          modalHeaderStyle={[styles.modalheaderStyle, {right: 100}]}
+          textStyle={styles.textStyle}
+        />
+        <CustomAlert
+          visible={showAlertReceivedDate}
+          onClose={handleCloseAlertReceivedDate}
+          onConfirm={handleCloseAlertReceivedDate}
+          headerMessage="Alert"
+          message="Please select the payment received date before changing the EMI status."
+          Button1="Cancel"
+          Button2="OK"
+          style={[styles.alertStyle, {height: "23%"}]}
+          modalHeaderStyle={[styles.modalheaderStyle, {right: 115}]}
           textStyle={styles.textStyle}
         />
     </View>
@@ -468,7 +534,7 @@ width: "80%",
   },
   modalheaderStyle:{
     // backgroundColor: "green",
-    marginLeft: 40
+    right: 85
   },
   textStyle:{
     // backgroundColor: "yellow"

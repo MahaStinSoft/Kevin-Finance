@@ -521,29 +521,17 @@ const PersonalLoanDetailsScreen = ({ route }) => {
         </View> 
           )}
 
-
-
-
-        <View style={{ flexDirection: "row" }}>
-          <View style={{ alignContent: "flex-start", width: "60%", left: -35 }}>
-            <ButtonComponent style={{ height: 50 }}
+        <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
+            <ButtonComponent style={{ width: "30%", }}
               title={showMore ? "View less" : "View more"}
               onPress={handleShowMoreToggle}
             />
-          </View>
-
-          <View style={{ width: "60%" }}>
-            
             <ButtonComponent
-              style={[
-                styles.calculateButton,
-                getLoanStatus() !== 'Approved' && styles.disabledButton,
-              ]}
-              title="Calculate EMI"
+              style={[styles.calculateButton, { width: "30%"}, getLoanStatus() !== 'Approved' && styles.disabledButton,]}
+              title="Pay EMI"
               onPress={handleGoToAmortizationScreen}
               disabled={getLoanStatus() !== 'Approved'}
             />
-          </View>
         </View>
 
       </ScrollView>
@@ -659,10 +647,7 @@ const styles = StyleSheet.create({
     fontSize: 12
   },
   calculateButton: {
-    marginBottom: 60,
-    height: 50,
-    marginLeft: -120,
-    backgroundColor: 'red',
+    // backgroundColor: 'red',
   },
   disabledButton: {
     backgroundColor: 'gray', 

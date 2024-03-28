@@ -4,12 +4,28 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import HeaderComponent from '../../common/Header';
 import { Ionicons } from '@expo/vector-icons';
+import NetInfo from '@react-native-community/netinfo';
 
 const UserDashboard = ({ navigation }) => {
     const [loading, setLoading] = useState(true);
     const [loanRecords, setLoanRecords] = useState([]);
     const [loanApplication, setLoanApplication] = useState(null);
     const [authenticatedUser, setAuthenticatedUser] = useState(null);
+
+    useEffect(() => {
+        const unsubscribe = NetInfo.addEventListener(state => {
+          console.log('Network state changed:', state.isConnected);
+          if (!state.isConnected) {
+            console.log('No Internet Connection');
+            Alert.alert('No Internet Connection', 'Please check your internet connection and try again.');
+          }
+    
+        });
+    
+        return () => {
+          unsubscribe();
+        };
+      }, []);
 
     useEffect(() => {
         const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -164,7 +180,7 @@ const UserDashboard = ({ navigation }) => {
     }, [authenticatedUser]);
 
     const handleLogout = async () => {
-        Alert.alert(
+        d(
             'Logout',
             'Are you sure you want to log out?',
             [

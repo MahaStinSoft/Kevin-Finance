@@ -617,7 +617,7 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
             >
               <Text>Application Number: {application.kf_applicationnumber}</Text>
               <Text>Created By: {application.kf_createdby}</Text>
-              <Text>Admin Name: {kf_adminname}</Text>
+              {/* <Text>Admin Name: {kf_adminname}</Text> */}
               <Text>Name: {application.kf_name} {application.kf_lastname}</Text>
               <View style={styles.readIndicatorContainer}>
                 {application.kf_markasread ? (
@@ -683,7 +683,7 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
               ]}
             >
               <Text>Application Number: {notification.kf_applicationnumber}</Text>
-              <Text>Admin Name: {kf_adminname}</Text>
+              {/* <Text>Admin Name: {kf_adminname}</Text> */}
               <Text>Created By: {notification.kf_createdby}</Text>
               <Text>Name: {notification.kf_firstname} {notification.kf_lastname}</Text>
               {/* Display the status name */}
@@ -763,7 +763,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: '80%',
   },
-
   commentInput: {
     height: 100,
     borderColor: 'gray',
@@ -834,7 +833,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 5,
     borderWidth: 2,
-    borderColor: '#ff8080',
+    borderColor: '#ccc',
     // opacity: 0.7,
     // backgroundColor: '#c2e7ff',
   },
@@ -842,7 +841,7 @@ const styles = StyleSheet.create({
     width: "30%",
     height: 28,
     position: 'absolute',
-    top: -75,
+    top: -60,
     right: -40,
     // justifyContent: 'center',
     // alignItems: 'center',
@@ -853,7 +852,7 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     position: 'absolute',
-    top: -75,
+    top: -60,
     right: 5,
     justifyContent: 'center',
     alignItems: 'center',
