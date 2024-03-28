@@ -15,7 +15,7 @@ import CardImage from '../../common/CardImage';
 import CardImageSignature from '../../common/CardImageSignature';
 import RenderAnnotation from '../Annotations/renderAnnotationItem';
 import SendNotification from '../../common/SendNotification';
-
+import CustomAlert from '../../common/CustomAlert';
 
 const EditPersonalLoan = ({ route, navigation }) => {
   const { personalLoan, onUpdateSuccess } = route.params || {};
@@ -69,6 +69,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
   const [item, setItem] = useState(null); // Assuming you have some state to store the current item
   const [imageContent, setImageContent] = useState(null);
   const [aadharImageContent, setAadharImageContent] = useState(null);
+  const [showAlert, setShowAlert] = useState(false); 
+  const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
 
   const { signatureFile } = route.params;
   console.log('signature', signatureFile);
@@ -295,17 +297,18 @@ const EditPersonalLoan = ({ route, navigation }) => {
         }
         // console.log(age);
 
-        Alert.alert('Personal Loan', 'Updated the record Successfully.', [
-          {
-            text: 'cancel'
-          },
-          {
-            text: 'OK',
-            onPress: () => {
-              navigation.navigate('PersonalLoanDetailsScreen', { personalLoan: personalLoan });
-            },
-          },
-        ]);
+        // Alert.alert('Personal Loan', 'Updated the record Successfully.', [
+        //   {
+        //     text: 'cancel'
+        //   },
+        //   {
+        //     text: 'OK',
+        //     onPress: () => {
+        //       navigation.navigate('PersonalLoanDetailsScreen', { personalLoan: personalLoan });
+        //     },
+        //   },
+        // ]);
+        handleShowAlert();
       } else {
         console.log('Error updating record in CRM:', updateRecordResponse);
         Alert.alert('Error', 'Failed to update the record in CRM.');
@@ -1103,6 +1106,19 @@ const EditPersonalLoan = ({ route, navigation }) => {
     return onlyAlphabets.test(text);
   };
 
+  const handleShowAlert = () => {
+    setShowAlert(true);
+  };
+
+  const handleCloseAlert = () => {
+    setShowAlert(false);
+  };
+
+  const handleCloseAlertConfirmation = () => {
+    setShowAlertConfirmation(false);
+    navigation.navigate('PersonalLoanDetailsScreen', { personalLoan: personalLoan });  
+  };
+
   return (
     <View style={styles.container}>
       <HeaderComponent
@@ -1556,6 +1572,18 @@ const EditPersonalLoan = ({ route, navigation }) => {
          
         </View>
       </ScrollView>
+      <CustomAlert
+          visible={showAlert}
+          onClose={handleCloseAlert}
+          onConfirm={handleCloseAlertConfirmation}
+          headerMessage="Personal Loan"
+          message="Record updated Successfully."
+          Button1="Cancel"
+          Button2="OK"
+          style={styles.alertStyle}
+          modalHeaderStyle={[styles.modalheaderStyle, {right: 70}]}
+          textStyle={styles.textStyle}
+        />
     </View>
   );
 };

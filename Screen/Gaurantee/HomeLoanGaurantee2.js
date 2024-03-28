@@ -9,6 +9,7 @@ import LoanStatusPicker from '../../common/LoanStatusPicker ';
 import CardImage from '../../common/CardImage';
 import Gurantee2Annotation from '../Annotations/Gurantee2Annotation';
 import CardImageSignature from '../../common/CardImageSignature';
+import CustomAlert from '../../common/CustomAlert';
 
 const HomeLoanGurantee2 = ({ route, navigation }) => {
   const { loanApplication, onUpdateSuccess } = route.params || {};
@@ -41,6 +42,8 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
   const [annotations, setAnnotations] = useState([]);
   const [aadharImageContent, setAadharImageContent] = useState(null);
   const [showImage, setShowImage] = useState(true);
+  const [showAlert, setShowAlert] = useState(false); 
+  const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
 
   const [recordId, setRecordId] = useState(loanApplication.kf_loanapplicationid);
   
@@ -207,17 +210,18 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
             kf_guarantor2pannumber: guarantorpannumber,
           });
         }
-        Alert.alert('Updated the record Successfully.', '', [
-          // {
-          //   text: 'cancel'
-          // },
-          {
-            text: 'OK',
-            onPress: () => {
-              navigation.goBack();
-            },
-          },
-        ]);
+        // Alert.alert('Updated the record Successfully.', '', [
+        //   // {
+        //   //   text: 'cancel'
+        //   // },
+        //   {
+        //     text: 'OK',
+        //     onPress: () => {
+        //       navigation.goBack();
+        //     },
+        //   },
+        // ]);
+        handleShowAlert();
       } else {
         console.log('Error updating record in CRM:', updateRecordResponse);
         Alert.alert('Error', 'Failed to update the record in CRM.');
@@ -730,6 +734,19 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
     return onlyAlphabets.test(text);
   };
 
+  const handleShowAlert = () => {
+    setShowAlert(true);
+  };
+
+  const handleCloseAlert = () => {
+    setShowAlert(false);
+  };
+
+  const handleCloseAlertConfirmation = () => {
+    setShowAlertConfirmation(false);
+    navigation.navigate('HomeLoanDetailsScreen', { loanApplication: loanApplication });
+  };
+
   const isEditable = loanStatus !== 'Approved';
 
   return (
@@ -928,9 +945,7 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
                       setImageContent={setAadharcard}
                       // disabled={isEditable} // Set disabled based on isEditable
                     />
-                    {errorMessages.aadharCardImage !== ''  && Gurantee1AnnotationHome.filteredAnnotations && !selectedImage.includes(latestHG1AadharAnnotation.documentbody) &&(
-                      <Text style={styles.errorText1}>{errorMessages.aadharCardImage}</Text>
-                    )}
+                   
                   </View>
                   <View style={{marginVertical:3}} >
                     <CardImage
@@ -998,6 +1013,18 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
           </View>
         </View>
       </ScrollView>
+      <CustomAlert
+          visible={showAlert}
+          onClose={handleCloseAlert}
+          onConfirm={handleCloseAlertConfirmation}
+          headerMessage="Home Loan"
+          message="Record updated Successfully."
+          Button1="Cancel"
+          Button2="OK"
+          style={styles.alertStyle}
+          modalHeaderStyle={[styles.modalheaderStyle, {right: 90}]}
+          textStyle={styles.textStyle}
+        />
     </>
   );
 };
@@ -1041,7 +1068,18 @@ const styles = StyleSheet.create({
   },
   textImage:{
     marginVertical:15
-  }
+  },
+  alertStyle:{
+    // backgroundColor: "blue",
+    width: "80%",
+      },
+      modalheaderStyle:{
+        // backgroundColor: "green",
+        right: 85
+      },
+      textStyle:{
+        // backgroundColor: "yellow"
+      }
 });
 
 export default HomeLoanGurantee2;

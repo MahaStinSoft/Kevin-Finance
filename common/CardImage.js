@@ -187,7 +187,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const CardImage = ({ title, imageContent, setImageContent }) => {
+const CardImage = ({ title, imageContent, setImageContent, style }) => {
   const [modalVisible, setModalVisible] = useState(false);
 
 
@@ -246,7 +246,6 @@ const CardImage = ({ title, imageContent, setImageContent }) => {
     }
   };
   
-
   const takePictureWithCamera = async () => {
         try {
           const result = await ImagePicker.launchCameraAsync({
@@ -269,8 +268,6 @@ const CardImage = ({ title, imageContent, setImageContent }) => {
               ]
             );
           }
-
-          
         } catch (error) {
           console.error('Error taking picture:', error);
         }
@@ -287,7 +284,7 @@ const CardImage = ({ title, imageContent, setImageContent }) => {
   return (
     <View style={{ flexDirection: 'row', marginTop: 15, alignContent: 'space-around',width: '26%'}}>
       <Text style={{ textAlign: 'center',width: 100}}>{title}</Text>
-      <TouchableOpacity onPress={onViewImage} style={{ backgroundColor: 'red', padding: 5, borderRadius: 25, width: 90,top: -4}}>
+      <TouchableOpacity onPress={onViewImage} style={{ backgroundColor: 'red', padding: 4, borderRadius: 25, width: 90, top: -4}}>
         <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold' }}>Upload</Text>
       </TouchableOpacity>
       <Modal

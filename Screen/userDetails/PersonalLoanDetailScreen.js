@@ -8,6 +8,7 @@ const PersonalLoanDetailsScreen = ({ route }) => {
   const navigation = useNavigation();
   const [personalLoan, setpersonalLoan] = useState(route.params.personalLoan);
   const [recordId, setRecordId] = useState(route.params.personalLoan.kf_personalloanid);
+  const [sendApproval, setSendApproval] = useState(personalLoan?.kf_sendapproval || '');
   const [showMore, setShowMore] = useState(false);
   const [showHomeLoanGuarantee1, setShowHomeLoanGuarantee1] = useState(false);
   const [showHomeLoanGuarantee2, setShowHomeLoanGuarantee2] = useState(false);
@@ -66,7 +67,7 @@ const PersonalLoanDetailsScreen = ({ route }) => {
   };
 
   const getGenderLabelG2 = () => {
-    switch (loanApplication.kf_guarantor2gender) {
+    switch (personalLoan.kf_guarantor2gender) {
       case 123950000:
         return 'Male';
       case 123950001:
@@ -226,6 +227,33 @@ const PersonalLoanDetailsScreen = ({ route }) => {
   };
 
 
+  const handleSendApproval = (selectedSendApproval) => {
+    let booleanValue;
+    switch (selectedSendApproval) {
+      case 'No':
+        booleanValue = false;
+        break;
+      case 'Yes':
+        booleanValue = true;
+        break;
+      default:
+        booleanValue = null;
+    }
+    setSendApproval(booleanValue);
+    // 
+  };
+
+  const getSendApproval = (booleanValue) => {
+    switch (booleanValue) {
+      case false:
+        return 'No';
+      case true:
+        return 'Yes';
+      default:
+        return '';
+    }
+  };
+
 
   return (
     <View style={styles.container}>
@@ -246,14 +274,11 @@ const PersonalLoanDetailsScreen = ({ route }) => {
           <View style={{ marginLeft: 20, marginTop: 0, width: 200, position: "relative" }}>
             <Text style={styles.cardTitle}>{personalLoan.kf_applicationnumber}</Text>
             <Text style={[styles.cardTitle]}>{`${personalLoan.kf_firstname} ${personalLoan.kf_lastname}`}</Text>
-            <View style={{ flexDirection: "row", marginTop: 30 }}>
-              <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={[styles.buttonContainer, { width: "42%", marginLeft: -5 }]}>
+            <View style={{ flexDirection: "row", marginTop: 10 ,width:350, height:60}}>
+              {/* <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={[styles.buttonContainer, { width: "42%", marginLeft: -5 }]}>
                 <Text style={styles.buttonText}>Guarantor1</Text>
               </TouchableOpacity>
-              {/* <TouchableOpacity onPress={handleNavigateToGuaranteeScreen2} style={[styles.buttonContainer, {width: "42%", marginLeft: 10}]}>
-            <Text style={styles.buttonText}>Guarantee2</Text>
-          </TouchableOpacity> */}
-
+      
               <TouchableOpacity
                 onPress={handleNavigateToGuaranteeScreen2}
                 style={[
@@ -264,6 +289,9 @@ const PersonalLoanDetailsScreen = ({ route }) => {
                 disabled={!personalLoan.kf_guarantorfirstname} // Disable button if HomeGuarantee 1 doesn't contain any values
               >
                 <Text style={styles.buttonText}>Guarantor2</Text>
+              </TouchableOpacity> */}
+               <TouchableOpacity onPress={handleEdit} style={[styles.buttonContainer, { width: "42%", marginLeft: -5 }]}>
+                <Text style={styles.buttonText}>Send For Approval </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -280,6 +308,11 @@ const PersonalLoanDetailsScreen = ({ route }) => {
             <Text style={styles.label}>DOB :</Text>
             <Text style={styles.value}>{formatDate(personalLoan.kf_dateofbirth)}</Text>
           </View>
+          <View style={styles.detailItem}>
+  <Text style={styles.label}>Send Approval:</Text>
+  <Text style={styles.value}>{getSendApproval(sendApproval)}</Text>
+</View>
+
 
           <View style={styles.detailItem}>
             <Text style={styles.label}>Age:</Text>

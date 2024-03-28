@@ -21,12 +21,14 @@ import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 import querystring from 'querystring';
+import CustomAlert from '../../common/CustomAlert';
 
 import axios from 'axios';
 import { BarChart } from 'react-native-chart-kit';
 
 import HomeLoanCard from '../card/HomeLoanCard';
 import PersonalLoanCard from '../card/PersonalLoanCard';
+import ButtonComponent from '../../common/ButtonComponent';
 
 const ManagerDashboard = ({ navigation, route }) => {
   // const { authenticatedUser } = route.params;
@@ -61,14 +63,21 @@ const ManagerDashboard = ({ navigation, route }) => {
   const [showAllLoans, setShowAllLoans] = useState(false);
   const [showAllHomeLoans, setShowAllHomeLoans] = useState(false);
   const [showAllPersonalLoans, setShowAllPersonalLoans] = useState(false);
+  const [showAlert, setShowAlert] = useState(false); 
+  const [isConnected, setIsConnected] = useState(true);
+
   const isFocused = useIsFocused();
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
       console.log('Network state changed:', state.isConnected);
+      setIsConnected(state.isConnected);
+
       if (!state.isConnected) {
         console.log('No Internet Connection');
-        Alert.alert('No Internet Connection', 'Please check your internet connection and try again.');
+        setShowAlert(true);
+      } else {
+        setShowAlert(false);
       }
     });
 
@@ -514,6 +523,9 @@ const fetchNotifications = async () => {
   }
 };
 
+const handleCloseAlert = () => {
+  setShowAlert(false);
+};
 
   const handlelogout = () => {
     navigation.navigate("Setting");
@@ -653,87 +665,95 @@ const fetchNotifications = async () => {
                 </TouchableOpacity>
               </View> */}
 
-              <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 0 }}>
-                {initialLoading ? (
-                  <ActivityIndicator size="large" color="#0000ff" />
-                ) : (
-                  <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
-                    {displayedHomeLoans.length === 0 && displayedPersonalLoans.length === 0 && (
-                     <View style={styles.noRecordsContainer}>
-                     <Text style={styles.noRecordsText}>No Records Found</Text>
-                   </View>
-                    )}
+              <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 8 }}>
+  {initialLoading ? (
+    <ActivityIndicator size="large" color="#0000ff" />
+  ) : (
+    <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
+      {(displayedHomeLoans.length === 0 && displayedPersonalLoans.length === 0) && (
+        <View style={[styles.noRecordsContainer, { marginTop: 80 }]}>
+          <Text style={styles.noRecordsText}>No Records Found</Text>
+        </View>
+      )}
 
-                    {displayedHomeLoans.length > 0 && (
-                      <>
-                       <View style={{ marginRight: 10 }}>
-            <TouchableOpacity
-              onPress={toggleShowAllHomeLoans}
-              style={[styles.viewButton, {top: 30}]}
-            >
-              <Text style={styles.dynamicDashboardButtonText}>
-                {showAllHomeLoans ? 'View Less' : 'View More'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-                        <Text style={[styles.heading, { paddingHorizontal: 5, top: -10 }]}>Home Loans</Text>
-                        {displayedHomeLoans.map((homeLoan, index) => (
-                          <HomeLoanCard
-                            key={index}
-                            loanApplication={homeLoan}
-                            onPress={() => navigateToHomeDetails(homeLoan)}
-                          />
-                        ))}
-                      </>
-                    )}
+<View style={{ marginTop: 10 }}>
+        {displayedHomeLoans.length > 0 && (
+        <>
+            <View style={{  flexDirection: "row", justifyContent: "space-between"}}>
+          <Text style={[styles.heading, { marginBottom: 20 }]}>Home Loans</Text>
+          
+          <TouchableOpacity
+                            onPress={toggleShowAllHomeLoans} style={{backgroundColor:'red', width: "30%", height: 30, marginTop: 10, borderRadius: 30}}>
+                              <Text style={{textAlign: "center", color: "white", marginTop: 4, fontWeight: "bold"}}>
+                                {showAllHomeLoans ? 'View Less' : 'View More'}
+                            </Text>
+                          </TouchableOpacity>
+                          </View>
+          {displayedHomeLoans.map((homeLoan, index) => (
+            <HomeLoanCard
+              key={index}
+              loanApplication={homeLoan}
+              onPress={() => navigateToHomeDetails(homeLoan)}
+            />
+          ))}
+        </>
+      )}
+</View>
+<View style={{ marginTop: 10, width: "100%" }}>
+      {displayedPersonalLoans.length > 0 && (
+        <>
+           <View style={{  flexDirection: "row", justifyContent: "space-between"}}>
+          <Text style={[styles.heading, { marginBottom: 20 }]}>Personal Loans</Text>
+          
+          <TouchableOpacity
+                            onPress={toggleShowAllPersonalLoans} style={{backgroundColor:'red', width: "30%", height: 30, marginTop: 10, borderRadius: 30}}>
+                              <Text style={{textAlign: "center", color: "white", marginTop: 4, fontWeight: "bold"}}>
+                                {showAllPersonalLoans ? 'View Less' : 'View More'}
+                            </Text>
+                          </TouchableOpacity>
+                          </View>
+          {displayedPersonalLoans.map((personalLoan, index) => (
+            <PersonalLoanCard
+              key={index}
+              personalLoan={personalLoan}
+              onPress={() => navigateToPersonalDetails(personalLoan)}
+            />
+          ))}
+        </>
+      )}
+</View>
+      {(displayedHomeLoans.length === 0 && displayedPersonalLoans.length > 0) && (
+        <View style={styles.noRecordsContainer}>
+          <Text style={styles.noRecordsText}>No Home Loan Records Found</Text>
+        </View>
+      )}
 
-                    {displayedPersonalLoans.length > 0 && (
-                      <>
-                       <View style={{ marginRight: 10 }}>
-            <TouchableOpacity
-              onPress={toggleShowAllPersonalLoans}
-              style={[styles.viewButton, {top: 30}]}
-            >
-              <Text style={styles.dynamicDashboardButtonText}>
-                {showAllPersonalLoans ? 'View Less' : 'View More'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-                        <Text style={[styles.heading, { paddingHorizontal: 5, top: -10}]}>Personal Loans</Text>
-                        {displayedPersonalLoans.map((personalLoan, index) => (
-                          <PersonalLoanCard
-                            key={index}
-                            personalLoan={personalLoan}
-                            onPress={() => navigateToPersonalDetails(personalLoan)}
-                          />
-                        ))}
-                      </>
-                    )}
+      {(displayedHomeLoans.length > 0 && displayedPersonalLoans.length === 0) && (
+        <View style={styles.noRecordsContainer}>
+          <Text style={styles.noRecordsText}>No Personal Loan Records Found</Text>
+        </View>
+      )}
+    </ScrollView>
+  )}
+</View>
 
-                    {/* {displayedHomeLoans.length === 0 && displayedPersonalLoans.length === 0 && (
-                      <Text style={{ fontSize: 18, fontWeight: "bold", textAlign: "center", marginTop: 20 }}>
-                        No records found for both Home Loans and Personal Loans
-                      </Text>
-                    )} */}
-
-                    {displayedHomeLoans.length === 0 && displayedPersonalLoans.length > 0 && (
-                     <View style={styles.noRecordsContainer}>
-                     <Text style={styles.noRecordsText}>No Records Found</Text>
-                   </View>
-                    )}
-
-                    {displayedHomeLoans.length > 0 && displayedPersonalLoans.length === 0 && (
-                     <View style={styles.noRecordsContainer}>
-                     <Text style={styles.noRecordsText}>No Records Found</Text>
-                   </View>
-                    )}
-                  </ScrollView>
-                )}
-              </View>
 
             </ScrollView>
           </View>
         </KeyboardAvoidingView>
+        <CustomAlert
+          // visible={handleShowAlert}
+          visible={showAlert && !isConnected}
+          onClose={handleCloseAlert}
+          onConfirm={handleCloseAlert}
+          headerMessage="No Internet Connection"
+          message="Please check your internet connection and try again."
+          Button1="Cancel"
+          Button2="OK"
+          style={[styles.alertStyle, {height: "23%"}]}
+          modalHeaderStyle={[styles.modalheaderStyle, {right: 40}]}
+          textStyle={styles.textStyle}
+        />
       </>
     );
 };

@@ -9,6 +9,7 @@ import PushNotification from 'react-native-push-notification';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'react-native';
 import ButtonComponent from '../common/ButtonComponent';
+import CustomAlert from '../common/CustomAlert';
 
 const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
   const [loanApplications, setLoanApplications] = useState([]);
@@ -23,7 +24,7 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
   const totalRecords = loanApplications.length + notifications.length;
   const [refresh, setRefresh] = useState(false);
   const { kf_adminname } = route.params;
-
+  const [showAlert, setShowAlert] = useState(false); 
 
   useEffect(() => {
     // Fetch loan applications and notifications whenever refresh state changes
@@ -159,6 +160,7 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
 
   const handleApproveLoan = async (applicationId) => {
     // Display an alert confirming the approval action
+    // handleShowAlert();
     Alert.alert(
       'Approve Loan',
       'Are you sure you want to approve?',
@@ -570,6 +572,13 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
     navigation.navigate("Notification", { kf_adminname });
   };
 
+  const handleShowAlert = () => {
+    setShowAlert(true);
+  };
+
+  const handleCloseAlert = () => {
+    setShowAlert(false);
+  };
   const approvedApplications = loanApplications.filter(application => application.kf_status === 123950000);
 
   return (
@@ -740,6 +749,18 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
           </View>
         </View>
       </ScrollView>
+      <CustomAlert
+          visible={showAlert}
+          onClose={handleCloseAlert}
+          onConfirm={handleCloseAlert}
+          headerMessage="Home Loan"
+          message="Record updated Successfully."
+          Button1="Cancel"
+          Button2="OK"
+          style={styles.alertStyle}
+          modalHeaderStyle={[styles.modalheaderStyle, {right: 90}]}
+          textStyle={styles.textStyle}
+        />
     </View>
   );
 };

@@ -14,6 +14,7 @@ import LoanStatusPicker from '../../common/LoanStatusPicker ';
 import ComponentDatePicker from '../../common/ComponentDatePicker';
 // import CardImage from '../common/CardImage';
 import { setLocale } from 'yup';
+import CustomAlert from '../../common/CustomAlert';
 
 export const HomeScreen = ({ route }) => {
   const [kf_name, setkf_name] = useState(null);
@@ -56,6 +57,8 @@ export const HomeScreen = ({ route }) => {
   const [isPancardNumberValid, setIsPancardNumberValid] = useState(true);
   const [isLoanAmountValid, setIsLoanAmountValid] = useState(true);
   const [isEmiCollectionDateTouched, setIsEmiCollectionDateTouched] = useState(false);
+  const [showAlert, setShowAlert] = useState(false); 
+  const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
 
   const navigation = useNavigation();
   const isFocused = useIsFocused();
@@ -639,18 +642,19 @@ export const HomeScreen = ({ route }) => {
       if (createRecordResponse.status === 204) {
         setFormDisabled(true);
         console.log("Record created successfully in CRM"); //createRecordResponse
-        Alert.alert('Home Loan', 'Created record Successfully.', [
-          {
-            text: 'Cancel',
-            style: 'cancel',
-          },
-          {
-            text: 'OK',
-            onPress: () => {
-              navigation.navigate('Dashboard', { resetState: true });
-            },
-          },
-        ]);
+        // Alert.alert('Home Loan', 'Created record Successfully.', [
+        //   {
+        //     text: 'Cancel',
+        //     style: 'cancel',
+        //   },
+        //   {
+        //     text: 'OK',
+        //     onPress: () => {
+        //       navigation.navigate('Dashboard', { resetState: true });
+        //     },
+        //   },
+        // ]);
+        handleShowAlert();
       } else {
         console.log("else part");
         Alert.alert("Error", "Failed to create a record in CRM.");
@@ -662,6 +666,20 @@ export const HomeScreen = ({ route }) => {
       }
       Alert.alert("Error", "An unexpected error occurred. Try again later.");
     }
+  };
+
+  const handleShowAlert = () => {
+    setShowAlert(true);
+  };
+
+  const handleCloseAlert = () => {
+    setShowAlert(false);
+    // navigation.navigate('Dashboard');
+  };
+
+  const handleConfirmAlert = () => {
+    setShowAlertConfirmation(false);
+    navigation.navigate('Dashboard');
   };
 
   return (
@@ -877,6 +895,18 @@ export const HomeScreen = ({ route }) => {
 
         </View>
       </ScrollView>
+      <CustomAlert
+          visible={showAlert}
+          onClose={handleCloseAlert}
+          onConfirm={handleConfirmAlert}
+          headerMessage="Home Loan"
+          message="Record Created Successfully."
+          Button1="Cancel"
+          Button2="OK"
+          style={styles.alertStyle}
+          modalHeaderStyle={[styles.modalheaderStyle, {right: 80}]}
+          textStyle={styles.textStyle}
+        />
     </>
   );
 };
@@ -966,7 +996,18 @@ const styles = StyleSheet.create({
   },
   topText:{
   // position:"absolute"
-  }
+  },
+  alertStyle:{
+    // backgroundColor: "blue",
+    width: "80%",
+      },
+      modalheaderStyle:{
+        // backgroundColor: "green",
+        right: 85
+      },
+      textStyle:{
+        // backgroundColor: "yellow"
+      }
 });
 
 export default HomeScreen;

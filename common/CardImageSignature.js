@@ -497,7 +497,7 @@ const CardImageSignature = ({ title, setImageContent, navigation, pickImage }) =
   return (
     <View style={{ flexDirection: 'row', marginTop: 15, alignContent: 'space-around', width: '26%' }}>
       <Text style={{ textAlign: 'center', width: 100 }}>{title}</Text>
-      <TouchableOpacity onPress={onViewImage} style={{ backgroundColor: 'red', padding: 5, borderRadius: 25, width: 90, top: -7 }}>
+      <TouchableOpacity onPress={onViewImage} style={{ backgroundColor: 'red', padding: 5, borderRadius: 25, width: 90, top: -12 }}>
         <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold' }}>Upload</Text>
       </TouchableOpacity>
       <Modal

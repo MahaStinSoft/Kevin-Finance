@@ -578,7 +578,7 @@ const styles = StyleSheet.create({
     width: 85, 
     height: 28,
     marginBottom:17,
-    top: 10
+    top: 12
   },
   annotation1: {
     padding: 5,
@@ -589,7 +589,7 @@ const styles = StyleSheet.create({
     width: 85, 
     height: 28,
     marginBottom:17,
-    top: 10
+    top: 12
   },
   modalContainer: {
     flex: 1,

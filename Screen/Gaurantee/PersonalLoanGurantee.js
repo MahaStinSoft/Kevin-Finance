@@ -10,6 +10,7 @@ import LoanStatusPicker from '../../common/LoanStatusPicker ';
 import CardImage from '../../common/CardImage';
 import Gurantee1AnnotationHome from '../Annotations/Gurantee1Annotation';
 import CardImageSignature from '../../common/CardImageSignature';
+import CustomAlert from '../../common/CustomAlert';
 
 const PersonalLoanGurantee = ({ route, navigation }) => {
   const { personalLoan, onUpdateSuccess } = route.params || {};
@@ -47,6 +48,8 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
   const [annotations, setAnnotations] = useState([]);
   const [aadharImageContent, setAadharImageContent] = useState(null);
   const [showImage, setShowImage] = useState(true);
+  const [showAlert, setShowAlert] = useState(false); 
+  const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
 
   const [recordId, setRecordId] = useState(personalLoan.kf_personalloanid);
 
@@ -212,17 +215,18 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
         }
         console.log(guarantorage);
 
-        Alert.alert('Updated the record Successfully.', '', [
-          // {
-          //   text: 'cancel'
-          // },
-          {
-            text: 'OK',
-            onPress: () => {
-              navigation.goBack();
-            },
-          },
-        ]);
+        // Alert.alert('Updated the record Successfully.', '', [
+        //   // {
+        //   //   text: 'cancel'
+        //   // },
+        //   {
+        //     text: 'OK',
+        //     onPress: () => {
+        //       navigation.goBack();
+        //     },
+        //   },
+        // ]);
+        handleShowAlert();
       } else {
         console.log('Error updating record in CRM:', updateRecordResponse);
         Alert.alert('Error', 'Failed to update the record in CRM.');
@@ -282,7 +286,7 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
       }
 
     } catch (error) {
-      console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
+      // console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
       // Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
     }
   };
@@ -741,6 +745,19 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
     return onlyAlphabets.test(text);
   };
 
+  const handleShowAlert = () => {
+    setShowAlert(true);
+  };
+
+  const handleCloseAlert = () => {
+    setShowAlert(false);
+  };
+
+  const handleCloseAlertConfirmation = () => {
+    setShowAlertConfirmation(false);
+    navigation.navigate('PersonalLoanDetailsScreen', { personalLoan: personalLoan });  
+  };
+
   const isEditable = loanStatus !== 'Approved';
 
   return (
@@ -1010,6 +1027,18 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
           </View>
         </View>
       </ScrollView>
+      <CustomAlert
+          visible={showAlert}
+          onClose={handleCloseAlert}
+          onConfirm={handleCloseAlertConfirmation}
+          headerMessage="Personal Loan"
+          message="Record updated Successfully."
+          Button1="Cancel"
+          Button2="OK"
+          style={styles.alertStyle}
+          modalHeaderStyle={[styles.modalheaderStyle, {right: 70}]}
+          textStyle={styles.textStyle}
+        />
     </>
   );
 };

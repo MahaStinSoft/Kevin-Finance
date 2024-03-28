@@ -10,6 +10,7 @@ import ButtonComponent from '../../common/ButtonComponent';
 import LoanStatusPicker from '../../common/LoanStatusPicker ';
 import ComponentDatePicker from '../../common/ComponentDatePicker';
 import CardImage from '../../common/CardImage';
+import CustomAlert from '../../common/CustomAlert';
 
 export const PersonalLoan = () => {
   const [kf_firstname, setkf_firstname] = useState('');
@@ -53,6 +54,8 @@ export const PersonalLoan = () => {
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [isLoanAmountRequested, setIsLoanAmountRequested] = useState(true);
   const [isEmiCollectionDateTouched, setIsEmiCollectionDateTouched] = useState(false);
+  const [showAlert, setShowAlert] = useState(false); 
+  const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
 
   const calculateEMI = () => {
     const P = parseFloat(kf_loanamountrequested); // Principal loan amount
@@ -702,18 +705,19 @@ const handleInterestRateChange = (text) => {
       if (createRecordResponse.status === 204) {
         setFormDisabled(true);
         console.log("Record created successfully in CRM");
-        Alert.alert('Personal Loan', 'Created record Successfully.', [
-          {
-            text: 'Cancel',
-            style: 'cancel',
-          },
-          {
-            text: 'OK',
-            onPress: () => {
-              navigation.navigate('Dashboard');
-            },
-          },
-        ]);
+        // Alert.alert('Personal Loan', 'Created record Successfully.', [
+        //   {
+        //     text: 'Cancel',
+        //     style: 'cancel',
+        //   },
+        //   {
+        //     text: 'OK',
+        //     onPress: () => {
+        //       navigation.navigate('Dashboard');
+        //     },
+        //   },
+        // ]);
+        handleShowAlert();
       } else {
         console.log("Failed to create a record in CRM.");
         Alert.alert("Error", "Failed to create a record in CRM.");
@@ -723,6 +727,20 @@ const handleInterestRateChange = (text) => {
       // console.log("Detailed Error Response:", error.response);
       Alert.alert("Error", "An unexpected error occurred.  try again later.");
     }
+  };
+
+  const handleShowAlert = () => {
+    setShowAlert(true);
+  };
+
+  const handleCloseAlert = () => {
+    setShowAlert(false);
+    // navigation.navigate('Dashboard');
+  };
+
+  const handleConfirmAlert = () => {
+    setShowAlertConfirmation(false);
+    navigation.navigate('Dashboard');
   };
 
   return (
@@ -965,6 +983,19 @@ const handleInterestRateChange = (text) => {
           disabled={formDisabled}
           />
 
+<CustomAlert
+          visible={showAlert}
+          onClose={handleCloseAlert}
+          onConfirm={handleConfirmAlert}
+          headerMessage="Personal Loan"
+          message="Record Created Successfully."
+          Button1="Cancel"
+          Button2="OK"
+          style={styles.alertStyle}
+          modalHeaderStyle={[styles.modalheaderStyle, {right: 80}]}
+          textStyle={styles.textStyle}
+        />
+
         </View>
       </ScrollView>
     </>
@@ -994,6 +1025,17 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     color: "black",
   },
+  alertStyle:{
+    // backgroundColor: "blue",
+    width: "80%",
+      },
+      modalheaderStyle:{
+        // backgroundColor: "green",
+        right: 85
+      },
+      textStyle:{
+        // backgroundColor: "yellow"
+      }
 });
 
 export default PersonalLoan;

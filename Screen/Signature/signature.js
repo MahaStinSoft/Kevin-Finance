@@ -281,13 +281,14 @@ const SignatureScreen = ({ route, navigation }) => {
   };
 
   const handleModalClose = () => {
-    setModalVisible(false);
+    // setModalVisible(false);
+    navigation.goBack();
   };
 
   return (
     <View style={{ flex: 1, marginTop: 150 }}>
       <View style={{ height: '50%', backgroundColor: 'white', margin: 30, padding: 20, position: 'relative' }}>
-        <TouchableOpacity onPress={() => setModalVisible(true)} style={{ position: 'absolute', top: 10, right: 10 }}>
+        <TouchableOpacity onPress={handleModalClose} style={{ position: 'absolute', top: 10, right: 10 }}>
           <Ionicons name="close" size={24} color="black" />
         </TouchableOpacity>
         <Svg

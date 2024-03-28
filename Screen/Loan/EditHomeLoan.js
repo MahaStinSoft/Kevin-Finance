@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Notification } from 'expo-notifications';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import CustomAlert from '../../common/CustomAlert';
 
 import HeaderComponent from '../../common/Header';
 import ButtonComponent from '../../common/ButtonComponent';
@@ -71,6 +72,8 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [imageContent, setImageContent] = useState(null);
   const [aadharImageContent, setAadharImageContent] = useState(null);
   const [sendApprovalDisabled, setSendApprovalDisabled] = useState(false);
+  const [showAlert, setShowAlert] = useState(false); 
+  const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
 
   const { signatureImage } = route.params;
   console.log('signature', signatureImage);
@@ -292,17 +295,18 @@ const EditHomeLoan = ({ route, navigation }) => {
           });
         }
         // console.log(loanAmountRequested)
-        Alert.alert('Home Loan', 'Updated the record Successfully.', [
-          {
-            text: 'cancel'
-          },
-          {
-            text: 'OK',
-            onPress: () => {
-              navigation.navigate('HomeLoanDetailsScreen', { loanApplication: loanApplication });
-            },
-          },
-        ]);
+        // Alert.alert('Home Loan', 'Updated the record Successfully.', [
+        //   {
+        //     text: 'cancel'
+        //   },
+        //   {
+        //     text: 'OK',
+        //     onPress: () => {
+        //       navigation.navigate('HomeLoanDetailsScreen', { loanApplication: loanApplication });
+        //     },
+        //   },
+        // ]);
+        handleShowAlert();
       } else {
         console.log('Error updating record in CRM:', updateRecordResponse);
         Alert.alert('Error', 'Failed to update the record in CRM.');
@@ -727,7 +731,7 @@ const EditHomeLoan = ({ route, navigation }) => {
       }
 
     } catch (error) {
-      console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
+      // console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
       Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
     }
   };
@@ -978,6 +982,19 @@ const EditHomeLoan = ({ route, navigation }) => {
     // Regular expression to allow only alphabets and spaces
     const onlyAlphabets = /^[a-zA-Z\s]*$/;
     return onlyAlphabets.test(text);
+  };
+
+  const handleShowAlert = () => {
+    setShowAlert(true);
+  };
+
+  const handleCloseAlert = () => {
+    setShowAlert(false);
+  };
+
+  const handleCloseAlertConfirmation = () => {
+    setShowAlertConfirmation(false);
+    navigation.navigate('HomeLoanDetailsScreen', { loanApplication: loanApplication });
   };
 
   return (
@@ -1415,8 +1432,8 @@ const EditHomeLoan = ({ route, navigation }) => {
 
             <View style={styles.indentityImage}>
 
-              <View style={{ marginVertical: 3 }}>
-                <CardImage
+              <View style={{ marginVertical: 3, marginHorizontal: 0  }}>
+                <CardImage 
                   title="AadharCard"
                   imageContent={aadharcard}
                   setImageContent={setAadharcard}
@@ -1459,6 +1476,18 @@ const EditHomeLoan = ({ route, navigation }) => {
           </View>
         </View>
       </ScrollView>
+      <CustomAlert
+          visible={showAlert}
+          onClose={handleCloseAlert}
+          onConfirm={handleCloseAlertConfirmation}
+          headerMessage="Home Loan"
+          message="Record updated Successfully."
+          Button1="Cancel"
+          Button2="OK"
+          style={styles.alertStyle}
+          modalHeaderStyle={[styles.modalheaderStyle, {right: 90}]}
+          textStyle={styles.textStyle}
+        />
     </View>
   );
 };
@@ -1614,9 +1643,20 @@ const styles = StyleSheet.create({
   imageView: {
     marginBottom: -150,
     width: 85,
-    top: -150,
+    top: -160,
     left: 200
-  }
+  },
+  alertStyle:{
+    // backgroundColor: "blue",
+    width: "80%",
+      },
+      modalheaderStyle:{
+        // backgroundColor: "green",
+        right: 85
+      },
+      textStyle:{
+        // backgroundColor: "yellow"
+      }
 });
 
 export default EditHomeLoan;

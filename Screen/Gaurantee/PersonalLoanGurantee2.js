@@ -10,6 +10,7 @@ import LoanStatusPicker from '../../common/LoanStatusPicker ';
 import CardImage from '../../common/CardImage';
 import Gurantee2Annotation from '../Annotations/Gurantee2Annotation';
 import CardImageSignature from '../../common/CardImageSignature';
+import CustomAlert from '../../common/CustomAlert';
 
 const PersonalLoanGurantee2 = ({ route, navigation }) => {
   const { personalLoan, onUpdateSuccess } = route.params || {};
@@ -32,6 +33,8 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
   const [applicantImage, setapplicantImage] = useState({ fileName: null, fileContent: null });
   const [showImageModal, setShowImageModal] = useState(false);
   const [signature, setSignature] = useState({ fileName: null });
+  const [showAlert, setShowAlert] = useState(false); 
+  const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
 
   const [firstEMIDate, setfirstEMIDate] = useState(personalLoan?.kf_firstemidate || '');
   const [guarantoraadharnumber, setAadharcardNumber] = useState(personalLoan?.kf_guarantor2aadharnumber || '');
@@ -215,17 +218,18 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
         }
         console.log(guarantorage);
 
-        Alert.alert('Updated the record Successfully.', '', [
-          // {
-          //   text: 'cancel'
-          // },
-          {
-            text: 'OK',
-            onPress: () => {
-              navigation.goBack();
-            },
-          },
-        ]);
+        // Alert.alert('Updated the record Successfully.', '', [
+        //   // {
+        //   //   text: 'cancel'
+        //   // },
+        //   {
+        //     text: 'OK',
+        //     onPress: () => {
+        //       navigation.goBack();
+        //     },
+        //   },
+        // ]);
+        handleShowAlert();
       } else {
         console.log('Error updating record in CRM:', updateRecordResponse);
         Alert.alert('Error', 'Failed to update the record in CRM.');
@@ -744,6 +748,19 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
     return onlyAlphabets.test(text);
   };
 
+  const handleShowAlert = () => {
+    setShowAlert(true);
+  };
+
+  const handleCloseAlert = () => {
+    setShowAlert(false);
+  };
+
+  const handleCloseAlertConfirmation = () => {
+    setShowAlertConfirmation(false);
+    navigation.navigate('PersonalLoanDetailsScreen', { personalLoan: personalLoan });  
+  };
+
   const isEditable = loanStatus !== 'Approved';
 
   return (
@@ -1014,6 +1031,18 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
           </View>
         </View>
       </ScrollView>
+      <CustomAlert
+          visible={showAlert}
+          onClose={handleCloseAlert}
+          onConfirm={handleCloseAlertConfirmation}
+          headerMessage="Personal Loan"
+          message="Record updated Successfully."
+          Button1="Cancel"
+          Button2="OK"
+          style={styles.alertStyle}
+          modalHeaderStyle={[styles.modalheaderStyle, {right: 70}]}
+          textStyle={styles.textStyle}
+        />
     </>
   );
 };

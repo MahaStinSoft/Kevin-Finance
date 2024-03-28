@@ -8,6 +8,7 @@ const HomeLoanDetailsScreen = ({ route }) => {
   const navigation = useNavigation();
   const [loanApplication, setLoanApplication] = useState(route.params.loanApplication);
   const [recordId, setRecordId] = useState(route.params.loanApplication.kf_loanApplicationid);
+  const [sendApproval, setSendApproval] = useState(loanApplication?.kf_sendapproval || '');
   const [showMore, setShowMore] = useState(false);
   const [showHomeLoanGuarantee1, setShowHomeLoanGuarantee1] = useState(false);
   const [showHomeLoanGuarantee2, setShowHomeLoanGuarantee2] = useState(false);
@@ -22,6 +23,7 @@ const HomeLoanDetailsScreen = ({ route }) => {
 
   useEffect(() => {
     // Update loanApplication and recordId when route params change
+    setSendApproval(loanApplication.kf_sendapproval);
     setLoanApplication(route.params.loanApplication);
     setRecordId(route.params.loanApplication.kf_loanApplicationid);
   }, [route.params.loanApplication]);
@@ -93,6 +95,34 @@ const HomeLoanDetailsScreen = ({ route }) => {
         return '';
     }
   };
+ 
+  
+  const handleSendApproval = (selectedSendApproval) => {
+    let booleanValue;
+    switch (selectedSendApproval) {
+      case 'No':
+        booleanValue = false;
+        break;
+      case 'Yes':
+        booleanValue = true;
+        break;
+      default:
+        booleanValue = null;
+    }
+    setSendApproval(booleanValue);
+    // 
+  };
+
+  const getSendApproval = (booleanValue) => {
+    switch (booleanValue) {
+      case false:
+        return 'No';
+      case true:
+        return 'Yes';
+      default:
+        return '';
+    }
+  };
 
   const getEmiSchedule = () => {
     switch (loanApplication.kf_emischedule) {
@@ -140,23 +170,23 @@ const HomeLoanDetailsScreen = ({ route }) => {
     }
   };
 
-  const handleNavigateToGuaranteeScreen = () => {
-    // Example navigation code from the previous screen
-    navigation.navigate('HomeLoanGurantee', {
-      loanApplication,
-      loanStatus: getLoanStatus(),
-      onUpdateSuccess: updatedLoanApplication => setLoanApplication(updatedLoanApplication),
-    });
-  };
+  // const handleNavigateToGuaranteeScreen = () => {
+  //   // Example navigation code from the previous screen
+  //   navigation.navigate('HomeLoanGurantee', {
+  //     loanApplication,
+  //     loanStatus: getLoanStatus(),
+  //     onUpdateSuccess: updatedLoanApplication => setLoanApplication(updatedLoanApplication),
+  //   });
+  // };
 
-  const handleNavigateToGuaranteeScreen2 = () => {
-    // Example navigation code from the previous screen
-    navigation.navigate('HomeLoanGurantee2', {
-      loanApplication,
-      loanStatus: getLoanStatus(),
-      onUpdateSuccess: updatedLoanApplication => setLoanApplication(updatedLoanApplication),
-    });
-  };
+  // const handleNavigateToGuaranteeScreen2 = () => {
+  //   // Example navigation code from the previous screen
+  //   navigation.navigate('HomeLoanGurantee2', {
+  //     loanApplication,
+  //     loanStatus: getLoanStatus(),
+  //     onUpdateSuccess: updatedLoanApplication => setLoanApplication(updatedLoanApplication),
+  //   });
+  // };
 
   const handleGoToAmortizationScreen = () => {
     navigation.navigate('AmortizationScreenHome', {
@@ -210,15 +240,16 @@ const HomeLoanDetailsScreen = ({ route }) => {
           <View style={{ marginLeft: 20, marginTop: 0, width: 200, position: "relative" }}>
             <Text style={styles.cardTitle}>{loanApplication.kf_applicationnumber}</Text>
             <Text style={[styles.cardTitle]}>{`${loanApplication.kf_name} ${loanApplication.kf_lastname}`}</Text>
-            <View style={{ flexDirection: "row", marginTop: 30 }}>
-              <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={[styles.buttonContainer, { width: "42%", marginLeft: -5 }]}>
-                <Text style={styles.buttonText}>Guarantor1</Text>
+            <View style={{ flexDirection: "row", marginTop: 10 ,width:350}}>
+              <TouchableOpacity onPress={handleEdit} style={[styles.buttonContainer, { width: "42%", marginLeft: -5 }]}>
+                <Text style={styles.buttonText}>Send For Approval </Text>
               </TouchableOpacity>
+              </View>
               {/* <TouchableOpacity onPress={handleNavigateToGuaranteeScreen2} style={[styles.buttonContainer, {width: "42%", marginLeft: 10}]}>
             <Text style={styles.buttonText}>Guarantee2</Text>
           </TouchableOpacity> */}
 
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 onPress={handleNavigateToGuaranteeScreen2}
                 style={[
                   styles.buttonContainer,
@@ -230,7 +261,7 @@ const HomeLoanDetailsScreen = ({ route }) => {
                 <Text style={styles.buttonText}>Guarantor2</Text>
               </TouchableOpacity>
 
-            </View>
+            </View> */}
           </View>
 
         </View>
@@ -246,6 +277,12 @@ const HomeLoanDetailsScreen = ({ route }) => {
             <Text style={styles.label}>DOB :</Text>
             <Text style={styles.value}>{formatDate(loanApplication.kf_dateofbirth)}</Text>
           </View>
+
+          <View style={styles.detailItem}>
+  <Text style={styles.label}>Send Approval:</Text>
+  <Text style={styles.value}>{getSendApproval(sendApproval)}</Text>
+</View>
+
 
           <View style={styles.detailItem}>
             <Text style={styles.label}>Age:</Text>

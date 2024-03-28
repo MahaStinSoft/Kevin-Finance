@@ -8,6 +8,7 @@ import LoanStatusPicker from '../../common/LoanStatusPicker ';
 import CardImage from '../../common/CardImage';
 import Gurantee1AnnotationHome from '../Annotations/Gurantee1Annotation';
 import CardImageSignature from '../../common/CardImageSignature';
+import CustomAlert from '../../common/CustomAlert';
 
 const HomeLoanGurantee = ({ route, navigation }) => {
   const { loanApplication, onUpdateSuccess } = route.params || {};
@@ -44,6 +45,8 @@ const HomeLoanGurantee = ({ route, navigation }) => {
   const [annotations, setAnnotations] = useState([]);
   const [aadharImageContent, setAadharImageContent] = useState(null);
   const [showImage, setShowImage] = useState(true);
+  const [showAlert, setShowAlert] = useState(false); 
+  const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
 
   const [recordId, setRecordId] = useState(loanApplication.kf_loanapplicationid);
 
@@ -66,9 +69,9 @@ const HomeLoanGurantee = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    setapplicationnumber(loanApplication.kf_applicationnumber);
-    setapplicantFirstName(loanApplication.kf_name);
-    setapplicantLastName(loanApplication.kf_lastname);
+    // setapplicationnumber(loanApplication.kf_applicationnumber);
+    // setapplicantFirstName(loanApplication.kf_name);
+    // setapplicantLastName(loanApplication.kf_lastname);
     setcreatedby(loanApplication.kf_createdby);
     setfirstname(loanApplication.kf_guarantorfirstname);
     setLastname(loanApplication.kf_guarantorlastname);
@@ -129,7 +132,27 @@ const HomeLoanGurantee = ({ route, navigation }) => {
       return;
     }
 
-   
+    const newErrorMessages = {
+      // aadharCardImage: !aadharcard.fileContent ? 'Aadharcard image is required.' : '',
+      // panCardImage:!pancard.fileContent ? 'Pancard image is required.' : '',
+      // applicantCardImage: !applicantImage.fileContent ? 'Applicant Image is required.' : '', 
+      // signatureCardImage:!signatureImage ? 'Signature image is required.' : '',
+
+      guarantorFirstNameEdit: !guarantorfirstname ? 'Enter First Name' : '',
+      guarantorLastNameEdit: !guarantorlastname ? 'Enter Last Name' : '',
+      guarantorDateOfBirthEdit: !guarantordateofbirth ? 'Enter Date of Birth' : '',
+      guarantorMobileNumberEdit: /^\d{10}$/.test(guarantormobilenumber) ? '' : 'Please Enter a Valid 10-digit mobile number.',
+      guarantorEmailEdit: !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guarantoremail) ? 'Enter Email Address' : '',
+      guarantorAadharCardNumberEdit: /^\d{12}$/.test(guarantoraadharnumber) ? '' : 'Please Enter Valid Aadharcard Number',
+      guarantorPanCardNumberEdit: !guarantorpannumber ? 'Enter PAN Card Number' : '',
+      
+    };
+    setErrorMessages(newErrorMessages);
+
+    if (Object.values(newErrorMessages).some(message => message !== '')) {
+      return;
+    }
+
     try {
       const tokenResponse = await axios.post(
         'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
@@ -203,17 +226,18 @@ const HomeLoanGurantee = ({ route, navigation }) => {
             kf_guarantorpannumber: guarantorpannumber,
           });
         }
-        Alert.alert('Updated the record Successfully.', '', [
-          // {
-          //   text: 'cancel'
-          // },
-          {
-            text: 'OK',
-            onPress: () => {
-              navigation.goBack();
-            },
-          },
-        ])
+        // Alert.alert('Updated the record Successfully.', '', [
+        //   // {
+        //   //   text: 'cancel'
+        //   // },
+        //   {
+        //     text: 'OK',
+        //     onPress: () => {
+        //       navigation.goBack();
+        //     },
+        //   },
+        // ])
+        handleShowAlert();
       } else {
         console.log('Error updating record in CRM:', updateRecordResponse);
         Alert.alert('Error', 'Failed to update the record in CRM.');
@@ -493,26 +517,6 @@ const HomeLoanGurantee = ({ route, navigation }) => {
   };
 
   const handleUpdateRecordAndSendAnnotation = () => {
-    const newErrorMessages = {
-      aadharCardImage: !aadharcard.fileContent ? 'Aadharcard image is required.' : '',
-      panCardImage:!pancard.fileContent ? 'Pancard image is required.' : '',
-      applicantCardImage: !applicantImage.fileContent ? 'Applicant Image is required.' : '', 
-      signatureCardImage:!signatureImage ? 'Signature image is required.' : '',
-
-      guarantorFirstNameEdit: !guarantorfirstname ? 'Enter First Name' : '',
-      guarantorLastNameEdit: !guarantorlastname ? 'Enter Last Name' : '',
-      guarantorDateOfBirthEdit: !guarantordateofbirth ? 'Enter Date of Birth' : '',
-      guarantorMobileNumberEdit: /^\d{10}$/.test(guarantormobilenumber) ? '' : 'Please Enter a Valid 10-digit mobile number.',
-      guarantorEmailEdit: !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guarantoremail) ? 'Enter Email Address' : '',
-      guarantorAadharCardNumberEdit: /^\d{12}$/.test(guarantoraadharnumber) ? '' : 'Please Enter Valid Aadharcard Number',
-      guarantorPanCardNumberEdit: !guarantorpannumber ? 'Enter PAN Card Number' : '',
-      
-    };
-    setErrorMessages(newErrorMessages);
-
-    if (Object.values(newErrorMessages).some(message => message !== '')) {
-      return;
-    }
     sendAnnotation();
     sendAnnotation1();
     sendAnnotation2();
@@ -686,6 +690,20 @@ const HomeLoanGurantee = ({ route, navigation }) => {
     const onlyAlphabets = /^[a-zA-Z\s]*$/;
     return onlyAlphabets.test(text);
   };
+
+  const handleShowAlert = () => {
+    setShowAlert(true);
+  };
+
+  const handleCloseAlert = () => {
+    setShowAlert(false);
+  };
+
+  const handleCloseAlertConfirmation = () => {
+    setShowAlertConfirmation(false);
+    navigation.navigate('HomeLoanDetailsScreen', { loanApplication: loanApplication });
+  };
+
 
   const isEditable = loanStatus !== 'Approved';
 
@@ -945,6 +963,18 @@ const HomeLoanGurantee = ({ route, navigation }) => {
           </View>
         </View>
       </ScrollView>
+      <CustomAlert
+          visible={showAlert}
+          onClose={handleCloseAlert}
+          onConfirm={handleCloseAlertConfirmation}
+          headerMessage="Home Loan"
+          message="Record updated Successfully."
+          Button1="Cancel"
+          Button2="OK"
+          style={styles.alertStyle}
+          modalHeaderStyle={[styles.modalheaderStyle, {right: 80}]}
+          textStyle={styles.textStyle}
+        />
     </>
   );
 };
@@ -995,7 +1025,18 @@ const styles = StyleSheet.create({
   },
   textImage:{
     marginVertical:15
-  }
+  },
+  alertStyle:{
+    // backgroundColor: "blue",
+    width: "80%",
+      },
+      modalheaderStyle:{
+        // backgroundColor: "green",
+        right: 85
+      },
+      textStyle:{
+        // backgroundColor: "yellow"
+      }
 });
 
 export default HomeLoanGurantee;
