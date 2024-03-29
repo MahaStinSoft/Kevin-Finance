@@ -49,12 +49,12 @@ const UserLoanDetails = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <HeaderComponent titleText="Loan Details(EMI)" onPress={handleGoBack} />
+      <HeaderComponent titleText="EMI Details" onPress={handleGoBack} />
       <View style={styles.detailsContainer}>
         <View style={styles.row}>
           <Text style={styles.label}>Application Number:</Text>
           <TextInput
-            style={styles.valueInput}
+             style={[styles.textInputContainer, { color: "gray" }]}
             value={applicationNumber}
             onChangeText={(text) => setApplicationNumber(text)}
             editable={false}
@@ -63,7 +63,7 @@ const UserLoanDetails = ({ route, navigation }) => {
         <View style={styles.row}>
           <Text style={styles.label}>Term No:</Text>
           <TextInput
-            style={styles.valueInput}
+             style={[styles.textInputContainer, { color: "gray" }]}
             value={totalMonths}
             onChangeText={(text) => setTotalMonths(text)}
             editable={false}
@@ -73,7 +73,7 @@ const UserLoanDetails = ({ route, navigation }) => {
         <View style={styles.row}>
           <Text style={styles.label}>Principal Loan Amount:</Text>
           <TextInput
-            style={styles.valueInput}
+             style={[styles.textInputContainer, { color: "gray" }]}
             value={principalLoanAmount}
             onChangeText={(text) => setPrincipalLoanAmount(text)}
             keyboardType="numeric"
@@ -83,7 +83,7 @@ const UserLoanDetails = ({ route, navigation }) => {
         <View style={styles.row}>
           <Text style={styles.label}>Interest Rate:</Text>
           <TextInput
-            style={styles.valueInput}
+             style={[styles.textInputContainer, { color: "gray" }]}
             value={interestRate}
             onChangeText={(text) => setInterestRate(text)}
             keyboardType="numeric"
@@ -93,7 +93,7 @@ const UserLoanDetails = ({ route, navigation }) => {
         <View style={styles.row}>
           <Text style={styles.label}>Received Date:</Text>
           <TextInput
-            style={styles.valueInput}
+             style={[styles.textInputContainer, { color: "gray" }]}
             value={receivedDate}
             onChangeText={(text) => setReceivedDate(text)}
             editable={false}
@@ -102,7 +102,7 @@ const UserLoanDetails = ({ route, navigation }) => {
         <View style={styles.row}>
           <Text style={styles.label}>Penalty:</Text>
           <TextInput
-            style={styles.valueInput}
+             style={[styles.textInputContainer, { color: "gray" }]}
             value={penalty}
             onChangeText={(text) => setPenalty(text)}
             keyboardType="numeric"
@@ -112,7 +112,7 @@ const UserLoanDetails = ({ route, navigation }) => {
         <View style={styles.row}>
           <Text style={styles.label}>EMI Amount:</Text>
           <TextInput
-            style={styles.valueInput}
+             style={[styles.textInputContainer, { color: "gray" }]}
             value={emiAmount}
             onChangeText={(text) => setEmiAmount(text)}
             keyboardType="numeric"
@@ -123,7 +123,7 @@ const UserLoanDetails = ({ route, navigation }) => {
         <View style={styles.row}>
           <Text style={styles.label}>Remaining Balance:</Text>
           <TextInput
-            style={styles.valueInput}
+            style={[styles.textInputContainer, { color: "gray" }]}
             value={remainingBalance}
             onChangeText={(text) => setRemainingBalance(text)}
             keyboardType="numeric"
@@ -132,9 +132,9 @@ const UserLoanDetails = ({ route, navigation }) => {
         </View>
 
         <View style={styles.row}>
-          <Text style={styles.label}>EMI Status</Text>
+          <Text style={styles.label}>EMI Status:</Text>
           <Picker
-            style={styles.valueInput}
+             style={[styles.textInputContainer, { color: "gray" }]}
             selectedValue={kf_paidstatus ? 'Paid' : 'Unpaid'}
             onValueChange={(itemValue, itemIndex) => setkf_paidstatus(itemValue === 'Paid')}
             enabled={false}
@@ -169,6 +169,7 @@ const styles = StyleSheet.create({
   label: {
     flex: 1,
     fontSize: 16,
+    fontWeight:'bold'
   },
   valueInput: {
     flex: 2,
@@ -177,6 +178,22 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     fontSize: 16,
+  },
+  textInputContainer: {
+    marginVertical: 5,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    borderRadius: 8,
+    backgroundColor: '#FBFCFC',
+    padding: 10,
+    width: '60%',
+    height: 40
   },
 });
 

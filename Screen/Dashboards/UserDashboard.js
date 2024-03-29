@@ -5,12 +5,14 @@ import axios from 'axios';
 import HeaderComponent from '../../common/Header';
 import { Ionicons } from '@expo/vector-icons';
 import NetInfo from '@react-native-community/netinfo';
+import CustomAlert from '../../common/CustomAlert';
 
 const UserDashboard = ({ navigation }) => {
     const [loading, setLoading] = useState(true);
     const [loanRecords, setLoanRecords] = useState([]);
     const [loanApplication, setLoanApplication] = useState(null);
     const [authenticatedUser, setAuthenticatedUser] = useState(null);
+    const [showAlertInvalidUser, setShowAlertInvalidUser] = useState(false);
 
     useEffect(() => {
         const unsubscribe = NetInfo.addEventListener(state => {
@@ -180,36 +182,59 @@ const UserDashboard = ({ navigation }) => {
     }, [authenticatedUser]);
 
     const handleLogout = async () => {
-        d(
-            'Logout',
-            'Are you sure you want to log out?',
-            [
-                {
-                    text: 'No',
-                    style: 'cancel',
-                },
-                {
-                    text: 'Yes',
-                    onPress: async () => {
-                        try {
-                            // Clear authentication state
-                            await AsyncStorage.setItem('isLoggedIn', 'false');
-                            // Reset the navigation stack and navigate to the login screen
-                            navigation.reset({
-                                index: 0,
-                                routes: [{ name: 'LoginScreen' }],
-                            });
-                        } catch (error) {
-                            console.error('Error clearing authentication state:', error);
-                        }
-                    },
-                },
-            ],
-            { cancelable: false }
-        );
-    };
+        // Display confirmation alert
+        // Alert.alert(
+        //   'Logout',
+        //   'Are you sure you want to log out?',
+        //   [
+        //     {
+        //       text: 'No',
+        //       style: 'cancel',
+        //     },
+        //     {
+        //       text: 'Yes',
+        //       onPress: async () => {
+        //         try {
+        //           // Clear authentication state
+        //           await AsyncStorage.setItem('isLoggedIn', 'false');
+        //           // Reset the navigation stack and navigate to the login screen
+        //           navigation.reset({
+        //             index: 0,
+        //             routes: [{ name: 'LoginScreen' }],
+        //           });
+        //         } catch (error) {
+        //           console.error('Error clearing authentication state:', error);
+        //         }
+        //       },
+        //     },
+        //   ],
+        //   { cancelable: false }
+        // );
+        handledShowInvalidAlert();
+      };
 
-
+      const handledShowInvalidAlert = () => {
+        setShowAlertInvalidUser(true);
+      }
+    
+      const handledCloseInvalidAlert = () => {
+        setShowAlertInvalidUser(false);
+      }
+    
+      const handleConfirmLogout = async () => {
+        try {
+          // Clear authentication state
+          await AsyncStorage.setItem('isLoggedIn', 'false');
+          // Reset the navigation stack and navigate to the login screen
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'LoginScreen' }],
+          });
+        } catch (error) {
+          console.error('Error clearing authentication state:', error);
+        }
+      };
+    
 
     const handleNavigation = () => {
         // navigation.navigate("Notification", { kf_adminname });
@@ -373,6 +398,18 @@ const UserDashboard = ({ navigation }) => {
                      
                     </ScrollView>
                 </View>
+                <CustomAlert
+        visible={showAlertInvalidUser} // Corrected the prop value
+        onClose={handledCloseInvalidAlert}
+        onConfirm={handleConfirmLogout}
+        headerMessage="Logout"
+        message="Are you sure you want to logout?"
+        Button1="Cancel"
+        Button2="OK"
+        // style={styles.alertStyle}
+        // modalHeaderStyle={[styles.modalheaderStyle, { right: 100 }]}
+        // textStyle={styles.textStyle}
+      />
             </KeyboardAvoidingView>
 
         </>

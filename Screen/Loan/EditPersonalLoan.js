@@ -1428,13 +1428,14 @@ const EditPersonalLoan = ({ route, navigation }) => {
 
             <TextInput
               style={[
-                styles.textInputContainer,
+                styles.textInputContainer, {color: "grey"},
                 getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
               ]}
               placeholder="Loan Amount Request"
               value={loanAmountRequested ? loanAmountRequested.toString() : ''}
               onChangeText={handleLoanAmountRequestedChange}
-              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
+              // editable={getStatusStringFromNumericValue(status) !== 'Approved'}
+              editable={false}
             />
             {errorMessages.loanAmountRequestedEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.loanAmountRequestedEdit}</Text>

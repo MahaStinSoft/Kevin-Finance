@@ -186,12 +186,12 @@ import { View, Text, TouchableOpacity, Image, Modal, StyleSheet, Alert, Linking 
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CustomAlert from './CustomAlert';
 
 const CardImage = ({ title, imageContent, setImageContent, style }) => {
   const [modalVisible, setModalVisible] = useState(false);
-
-
-
+  const [showAlert, setShowAlert] = useState(false); 
+  const [showAlertInvalidUser, setShowAlertInvalidUser] = useState(false); 
 
   const saveImageToStorage = async (image) => {
     try {
@@ -231,15 +231,13 @@ const CardImage = ({ title, imageContent, setImageContent, style }) => {
       if (!result.cancelled) {
         setImageContent({ fileName: result.uri.split('/').pop(), fileContent: result.base64 });
         await AsyncStorage.setItem('selectedImage', JSON.stringify({ fileName: result.uri.split('/').pop(), fileContent: result.base64 }));
-     
 
-        Alert.alert(
-          'Image Picked Successfully',
-          'The image has been successfully picked',
-          [
-            { text: 'OK', onPress :(closeModal) }
-          ]
-        );
+        // Alert.alert(
+        //   `${title}`, // Title message based on 'title' prop
+        //   'The image has been successfully picked',
+        //   [{ text: 'OK', onPress: closeModal }]
+        // );
+        handledShowInvalidAlert();
       }
     } catch (error) {
       console.error('Error picking image:', error);
@@ -261,17 +259,28 @@ const CardImage = ({ title, imageContent, setImageContent, style }) => {
             await AsyncStorage.setItem('selectedImage', JSON.stringify({ fileName: result.uri.split('/').pop(), fileContent: result.base64 }));
           
             Alert.alert(
-              'Image Picked Successfully',
+              `${title}`, // Title message based on 'title' prop
               'The image has been successfully picked',
-              [
-                { text: 'OK', onPress :(closeModal) }
-              ]
+              [{ text: 'OK', onPress: closeModal }]
             );
           }
         } catch (error) {
           console.error('Error taking picture:', error);
         }
       };
+
+      const handledShowInvalidAlert = () => {
+        setShowAlertInvalidUser(true);
+      }
+    
+      const handledCloseInvalidAlert = () => {
+        setShowAlertInvalidUser(false);
+      }
+
+      const handledCloseModal = () => {
+        setShowAlertInvalidUser(false); // Close the custom alert
+        closeModal(); // Close the modal
+      };      
 
   const onViewImage = () => {
     setModalVisible(true);
@@ -307,6 +316,18 @@ const CardImage = ({ title, imageContent, setImageContent, style }) => {
           </View>
         </View>
       </Modal>
+      <CustomAlert
+  visible={showAlertInvalidUser} // Corrected the prop value
+  onClose={handledCloseInvalidAlert}
+  onConfirm={handledCloseModal}
+  headerMessage={title}
+  message="Image Uploaded successfully"
+  Button1="Cancel"
+  Button2="OK"
+  style={styles.alertStyle}
+  modalHeaderStyle={[styles.modalheaderStyle, {right: 85}]}
+  textStyle={styles.textStyle}
+/>
     </View>
   );
 };
@@ -337,6 +358,17 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
   },
+  alertStyle:{
+    // backgroundColor: "blue",
+    width: "80%",
+      },
+      modalheaderStyle:{
+        // backgroundColor: "green",
+        right: 85
+      },
+      textStyle:{
+        // backgroundColor: "yellow"
+      }
 });
 
 export default CardImage;
