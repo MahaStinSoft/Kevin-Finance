@@ -20,7 +20,7 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
   const [rejectComment, setRejectComment] = useState('');
   const [selectedApplicationId, setSelectedApplicationId] = useState(null);
   const [selectedPersonalLoanId, setSelectedPersonalLoanId] = useState(null);
-  const unreadMessagesCount = loanApplications.filter(application => !application.kf_markasread).length + notifications.filter(notification => !notification.kf_markasread).length;
+  const unreadMessagesCount = loanApplications.filter(application => !application.kf_markasreadmanager).length + notifications.filter(notification => !notification.kf_markasreadmanager).length;
   const totalRecords = loanApplications.length + notifications.length;
   const [refresh, setRefresh] = useState(false);
   const { kf_adminname } = route.params;
@@ -481,13 +481,13 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
       );
 
       const accessToken = tokenResponse.data.access_token;
-      // Update kf_markasread field in CRM
+      // Update kf_markasreadmanager field in CRM
       await updateKfMarkAsRead(personalLoan.kf_personalloanid);
       // Navigate to PersonalLoanDetailsScreen
       navigation.navigate('PersonalLoanDetailsScreen', { personalLoan });
       setRefresh(true);
     } catch (error) {
-      console.error('Error updating kf_markasread:', error);
+      console.error('Error updating kf_markasreadmanager:', error);
     }
   };
 
@@ -509,20 +509,20 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
       );
 
       const accessToken = tokenResponse.data.access_token;
-      // Update kf_markasread field in CRM
+      // Update kf_markasreadmanager field in CRM
       await updateKfMarkAsRead(loanApplication.kf_loanapplicationid);
       // Navigate to HomeLoanDetailsScreen
       navigation.navigate('HomeLoanDetailsScreen', { loanApplication });
       setRefresh(true);
     } catch (error) {
-      console.error('Error updating kf_markasread:', error);
+      console.error('Error updating kf_markasreadmanager:', error);
     }
   };
 
-  // Function to update kf_markasread field in CRM
+  // Function to update kf_markasreadmanager field in CRM
   const updateKfMarkAsRead = async (recordId) => {
     try {
-      // Send a request to update kf_markasread field in CRM
+      // Send a request to update kf_markasreadmanager field in CRM
       const tokenResponse = await axios.post(
         'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
         querystring.stringify({
@@ -539,7 +539,7 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
 
       const accessToken = tokenResponse.data.access_token;
       await axios.patch(`https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans(${recordId})`, {
-        kf_markasread: true, // Assuming true represents read status
+        kf_markasreadmanager: true, // Assuming true represents read status
       }, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -547,14 +547,14 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
       });
 
       await axios.patch(`https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications(${recordId})`, {
-        kf_markasread: true, // Assuming true represents read status
+        kf_markasreadmanager: true, // Assuming true represents read status
       }, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
     } catch (error) {
-      console.error('Error updating kf_markasread:', error);
+      console.error('Error updating kf_markasreadmanager:', error);
     }
   };
 
@@ -615,13 +615,13 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
             </View>
           )}
           {loanApplications
-          .sort((a, b) => (a.kf_markasread === b.kf_markasread ? 0 : a.kf_markasread ? 1 : -1)) 
+          .sort((a, b) => (a.kf_markasreadmanager === b.kf_markasreadmanager ? 0 : a.kf_markasreadmanager ? 1 : -1)) 
           .map((application, index) => (
             <View
               key={index}
               style={[
                 styles.itemContainer,
-                application.kf_markasread ? styles.readItemContainer : styles.unreadItemContainer
+                application.kf_markasreadmanager ? styles.readItemContainer : styles.unreadItemContainer
               ]}
             >
               <Text>Application Number: {application.kf_applicationnumber}</Text>
@@ -629,7 +629,7 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
               {/* <Text>Admin Name: {kf_adminname}</Text> */}
               <Text>Name: {application.kf_name} {application.kf_lastname}</Text>
               <View style={styles.readIndicatorContainer}>
-                {application.kf_markasread ? (
+                {application.kf_markasreadmanager ? (
                   <Image
                     source={require('../assets/read_message.png')}
                     style={styles.twitterImage1}
@@ -639,7 +639,7 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
                 )}
               </View>
               <Text>Status: {statusNames[application.kf_status]}</Text>
-              <Text>Created At: {formatDateTime(application.created_at)}</Text>
+              {/* <Text>Created At: {formatDateTime(application.created_at)}</Text> */}
               <View style={styles.buttonContainer}>
                 <Button title="View Record" onPress={() => handleViewHomeLoan(application)} />
                 {showRejectCommentBox && selectedApplicationId === application.kf_loanapplicationid && (
@@ -682,13 +682,13 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
              </View>
           )}
           {notifications
-          .sort((a, b) => (a.kf_markasread === b.kf_markasread ? 0 : a.kf_markasread ? 1 : -1)) 
+          .sort((a, b) => (a.kf_markasreadmanager === b.kf_markasreadmanager ? 0 : a.kf_markasreadmanager ? 1 : -1)) 
           .map((notification, index) => (
             <View
               key={index}
               style={[
                 styles.itemContainer,
-                notification.kf_markasread ? styles.readItemContainer : styles.unreadItemContainer
+                notification.kf_markasreadmanager ? styles.readItemContainer : styles.unreadItemContainer
               ]}
             >
               <Text>Application Number: {notification.kf_applicationnumber}</Text>
@@ -697,7 +697,7 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
               <Text>Name: {notification.kf_firstname} {notification.kf_lastname}</Text>
               {/* Display the status name */}
               <View style={styles.readIndicatorContainer}>
-                {notification.kf_markasread ? (
+                {notification.kf_markasreadmanager ? (
                   <Image
                     source={require('../assets/read_message.png')}
                     style={styles.twitterImage1}
@@ -713,7 +713,7 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
               </View>
               <Text>Status: {statusNames[notification.kf_status]}</Text>
               {/* Buttons for actions */}
-              <Text>Created At: {formatDateTime(notification.created_at)}</Text>
+              {/* <Text>Created At: {formatDateTime(notification.created_at)}</Text> */}
               <View style={styles.buttonContainer}>
                 <Button title="View Record" onPress={() => handleViewPersonalLoan(notification)} />
                 {showRejectCommentBox && selectedPersonalLoanId === notification.kf_personalloanid && (

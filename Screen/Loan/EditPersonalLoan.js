@@ -372,31 +372,6 @@ const EditPersonalLoan = ({ route, navigation }) => {
     }
   };
 
-  const handleSendApproval = (selectedOptionGender) => {
-    let booleanValue;
-    switch (selectedOptionGender) {
-      case 'No':
-        booleanValue = false;
-        break;
-      case 'Yes':
-        booleanValue = true;
-        break;
-      default:
-        booleanValue = null;
-    }
-    setSendApproval(booleanValue);
-  };
-
-  const getSendApproval = (booleanValue) => {
-    switch (booleanValue) {
-      case false:
-        return 'No';
-      case true:
-        return 'Yes';
-      default:
-        return '';
-    }
-  };
   const handleGenderOptionset = (selectedOptionGender) => {
     let numericValue;
     switch (selectedOptionGender) {
@@ -1119,6 +1094,67 @@ const EditPersonalLoan = ({ route, navigation }) => {
     navigation.navigate('PersonalLoanDetailsScreen', { personalLoan: personalLoan });  
   };
 
+
+  const handleSendApproval = () => {
+    // If already approved, show alert to confirm sending approval
+    if (sendApproval) {
+      Alert.alert(
+        'Confirm Send Approval',
+        'Are you sure you want to send approval?',
+        [
+          {
+            text: 'No',
+            onPress: () => console.log('Approval not sent'),
+            style: 'cancel',
+          },
+          {
+            text: 'Yes',
+            onPress: () => {
+              // Handle sending approval
+              handleUpdateRecordAndSendAnnotation();
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    } else {
+      // Toggle sendApproval status if switch is not enabled
+      setSendApproval(previousValue => !previousValue);
+    }
+  };
+  
+
+  const getSendApproval = (booleanValue) => {
+    switch (booleanValue) {
+      case false:
+        return 'No';
+      case true:
+        return 'Yes';
+      default:
+        return '';
+    }
+  };
+
+  const handleNavigateToGuaranteeScreen = () => {
+    // Example navigation code from the previous screen
+    navigation.navigate('PersonalLoanGurantee', {
+      personalLoan,
+      loanStatus: getLoanStatus(),
+      onUpdateSuccess: updatedpersonalLoan => setpersonalLoan(updatedpersonalLoan),
+    });
+    // Pass any necessary parameters if needed
+  };
+
+  const handleNavigateToGuaranteeScreen2 = () => {
+    // Example navigation code from the previous screen
+    navigation.navigate('PersonalLoanGurantee2', {
+      personalLoan,
+      loanStatus: getLoanStatus(),
+      onUpdateSuccess: updatedpersonalLoan => setpersonalLoan(updatedpersonalLoan),
+    });
+    // Pass any necessary parameters if needed
+  };
+
   return (
     <View style={styles.container}>
       <HeaderComponent
@@ -1428,14 +1464,13 @@ const EditPersonalLoan = ({ route, navigation }) => {
 
             <TextInput
               style={[
-                styles.textInputContainer, {color: "grey"},
+                styles.textInputContainer,
                 getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
               ]}
               placeholder="Loan Amount Request"
               value={loanAmountRequested ? loanAmountRequested.toString() : ''}
               onChangeText={handleLoanAmountRequestedChange}
-              // editable={getStatusStringFromNumericValue(status) !== 'Approved'}
-              editable={false}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             {errorMessages.loanAmountRequestedEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.loanAmountRequestedEdit}</Text>
@@ -1569,6 +1604,44 @@ const EditPersonalLoan = ({ route, navigation }) => {
                   />
              </View>
             </View>
+            <View style={{ flexDirection: "row" ,marginTop: 10,marginLeft: 30}}>
+<TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={[styles.buttonContainer, { width: "42%", marginLeft: -15 }]}>
+                <Text style={styles.buttonText}>Guarantor1</Text>
+              </TouchableOpacity>
+      
+              <TouchableOpacity
+                onPress={handleNavigateToGuaranteeScreen2}
+                style={[
+                  styles.buttonContainer,
+                  { width: "42%", marginLeft: 10 },
+                  !personalLoan.kf_guarantorfirstname && { backgroundColor: 'gray' } // Disable button if HomeGuarantee 1 doesn't contain any values
+                ]}
+                disabled={!personalLoan.kf_guarantorfirstname} // Disable button if HomeGuarantee 1 doesn't contain any values
+              >
+                <Text style={styles.buttonText}>Guarantor2</Text>
+              </TouchableOpacity>
+            </View>
+
+           {/* Send Approval Section */}
+      <View style={styles.Approval}>
+        <Text style={{ fontWeight: 'bold', marginRight: 20 }}>Send Approval</Text>
+
+        <TouchableOpacity onPress={handleSendApproval} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: sendApproval ? 'green' : 'black', paddingVertical: 5,marginRight:10, paddingHorizontal: 10, borderRadius: 20 }}>
+  <Text style={{ color: 'white', marginRight: 5 }}>{sendApproval ? 'No' : 'Yes'}</Text>
+  <View style={{ backgroundColor: 'white', borderRadius: 10, width: 30, height: 20, justifyContent: 'center', alignItems: 'center', marginLeft: 'auto' }}>
+    <Text style={{ color: sendApproval ? 'green' : 'black' }}>{sendApproval ? 'Yes' : 'No'}</Text>
+  </View>
+</TouchableOpacity>
+
+
+
+        <TouchableOpacity
+          style={[styles.saveButton, { marginLeft: 0 }]}
+          onPress={handleSendApproval} // Call handleSendApproval function when button is pressed
+        >
+          <Text style={styles.saveButtonText}>Send Approval</Text>
+        </TouchableOpacity>
+      </View>
           </View>
          
         </View>
@@ -1741,7 +1814,53 @@ const styles = StyleSheet.create({
     width: 85,
     top: -160,
     left:200
-  }
+  },
+buttonContainer: {
+  backgroundColor: 'red',
+  padding: 10,
+  marginTop: 20,
+  borderRadius: 15,
+  marginRight: 40,
+  // width: "55%",
+  height: 35
+},
+buttonText: {
+  color: 'white',
+  fontWeight: 'bold',
+  textAlign: 'center',
+  fontSize: 12,
+}, disabledButton: {
+  backgroundColor: 'gray', 
+},
+saveButton: {
+  backgroundColor: 'red',
+  marginLeft: 10, // Adjust margin as needed
+  padding: 10,
+  borderRadius: 8,
+  justifyContent: 'center',
+  alignItems: 'center',
+  height: 40,
+},
+saveButtonText: {
+  color: 'white',
+  fontWeight: 'bold',
+},  
+Approval:{
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginTop: 20,
+  marginBottom: 20,
+  width: "100%",
+  elevation: 2,
+  shadowColor: '#000',
+  shadowOffset: {
+    width: 0,
+    height: 2,
+  },
+  shadowOpacity: 0.25,
+  shadowRadius: 3.84,
+}
 });
 
 
