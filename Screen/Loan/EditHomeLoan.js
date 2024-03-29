@@ -18,7 +18,8 @@ import SendNotification from '../../common/SendNotification';
 import { schedulePushNotification } from '../../common/notificationUtils';
 
 const EditHomeLoan = ({ route, navigation }) => {
-  const { loanApplication, onUpdateSuccess } = route.params || {};
+  // const { loanApplication, onUpdateSuccess } = route.params || {};
+  const [loanApplication, setLoanApplication] = useState(route.params.loanApplication);
   const [applicationnumber, setapplicationnumber] = useState(loanApplication?.kf_applicationnumber || '');
   const [createdby, setcreatedby] = useState(loanApplication?.kf_createdby || '');
   const [firstname, setfirstname] = useState(loanApplication?.kf_name || '');

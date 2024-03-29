@@ -62,7 +62,7 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
   });
 
   const handleGoBack = () => {
-    navigation.navigate("HomeLoanDetailsScreen", { loanApplication });
+    navigation.navigate("EditHomeLoan", { loanApplication });
   };
 
   useEffect(() => {
@@ -744,7 +744,7 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
 
   const handleCloseAlertConfirmation = () => {
     setShowAlertConfirmation(false);
-    navigation.navigate('HomeLoanDetailsScreen', { loanApplication: loanApplication });
+    navigation.navigate('EditHomeLoan', { loanApplication: loanApplication });
   };
 
   const isEditable = loanStatus !== 'Approved';

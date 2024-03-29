@@ -18,7 +18,8 @@ import SendNotification from '../../common/SendNotification';
 import CustomAlert from '../../common/CustomAlert';
 
 const EditPersonalLoan = ({ route, navigation }) => {
-  const { personalLoan, onUpdateSuccess } = route.params || {};
+  // const { personalLoan, onUpdateSuccess } = route.params || {};
+  const [personalLoan, setpersonalLoan] = useState(route.params.personalLoan);
   const [applicationnumber, setapplicationnumber] = useState(personalLoan?.kf_applicationnumber || '');
   const [createdby, setcreatedby] = useState(personalLoan?.kf_createdby || '');
   const [firstname, setfirstname] = useState(personalLoan?.kf_firstname || '');
@@ -1123,6 +1124,22 @@ const EditPersonalLoan = ({ route, navigation }) => {
     }
   };
   
+  const getLoanStatus = () => {
+    switch (personalLoan.kf_status) {
+      case 123950000:
+        return 'Approved';
+      case 123950001:
+        return 'PendingApproval';
+      case 123950002:
+        return 'Draft';
+      case 123950003:
+        return 'Cancelled';
+      case 123950004:
+        return 'Rejected';
+      default:
+        return 'PendingApproval';
+    }
+  };
 
   const getSendApproval = (booleanValue) => {
     switch (booleanValue) {

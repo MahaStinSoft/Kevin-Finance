@@ -71,7 +71,7 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
   });
 
   const handleGoBack = () => {
-    navigation.navigate("PersonalLoanDetailsScreen", { personalLoan });
+    navigation.navigate("EditPersonalLoan", { personalLoan });
   };
 
   useEffect(() => {
@@ -758,7 +758,7 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
 
   const handleCloseAlertConfirmation = () => {
     setShowAlertConfirmation(false);
-    navigation.navigate('PersonalLoanDetailsScreen', { personalLoan: personalLoan });  
+    navigation.navigate('EditPersonalLoan', { personalLoan: personalLoan });  
   };
 
   const isEditable = loanStatus !== 'Approved';

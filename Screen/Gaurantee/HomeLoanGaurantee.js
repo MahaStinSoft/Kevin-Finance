@@ -65,7 +65,7 @@ const HomeLoanGurantee = ({ route, navigation }) => {
   });
 
   const handleGoBack = () => {
-    navigation.navigate("HomeLoanDetailsScreen", { loanApplication });
+    navigation.navigate("EditHomeLoan", { loanApplication });
   };
 
   useEffect(() => {
@@ -701,7 +701,7 @@ const HomeLoanGurantee = ({ route, navigation }) => {
 
   const handleCloseAlertConfirmation = () => {
     setShowAlertConfirmation(false);
-    navigation.navigate('HomeLoanDetailsScreen', { loanApplication: loanApplication });
+    navigation.navigate('EditHomeLoan', { loanApplication: loanApplication });
   };
 
 
