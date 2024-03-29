@@ -1739,7 +1739,7 @@ const styles = StyleSheet.create({
   imageView:{
     marginBottom:-150,
     width: 85,
-    top: -150,
+    top: -160,
     left:200
   }
 });
