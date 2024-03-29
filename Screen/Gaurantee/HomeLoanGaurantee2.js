@@ -232,13 +232,11 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
     }
   };
 
-
   // Define onUpdateSuccess function in your component
   // const onUpdateSuccess = (updatedData) => {
   //     // Handle the updated data here, such as updating the state or performing any other action
   //     console.log('Record updated successfully:', updatedData);
   //   };
-
 
   useEffect(() => {
     fetchAnnotations1();
