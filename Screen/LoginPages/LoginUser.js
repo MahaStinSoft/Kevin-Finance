@@ -6,18 +6,29 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import NetInfo from "@react-native-community/netinfo";
 import ButtonComponent from '../../common/ButtonComponent';
+import CustomAlert from '../../common/CustomAlert';
 
 export const LoginUserForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [kf_email, setKf_email] = useState('');
   const [kf_mobilenumber, setKf_mobilenumber] = useState('');
   const [isConnected, setIsConnected] = useState(true);
+  const [showAlert, setShowAlert] = useState(false); 
+  const [showAlertInvalidUser, setShowAlertInvalidUser] = useState(false);
 
   const navigation = useNavigation();
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
+      console.log('Network state changed:', state.isConnected);
       setIsConnected(state.isConnected);
+
+      if (!state.isConnected) {
+        console.log('No Internet Connection');
+        setShowAlert(true);
+      } else {
+        setShowAlert(false);
+      }
     });
 
     return () => {
@@ -39,10 +50,10 @@ export const LoginUserForm = () => {
   }, []);
 
   const handleLogin = async () => {
-    if (!isConnected) {
-      Alert.alert("No Internet Connection", "Please check your internet connection and try again.");
-      return;
-    };
+    // if (!isConnected) {
+    //   Alert.alert("No Internet Connection", "Please check your internet connection and try again.");
+    //   return;
+    // };
 
     if (!kf_email || !kf_mobilenumber) {
       Alert.alert("Error", "Please enter both UserName and Password");
@@ -119,7 +130,8 @@ export const LoginUserForm = () => {
 } else {
   // Authentication failed, display an error message
   console.log("Failed to authenticate. Invalid credentials.");
-  Alert.alert("Error", "Invalid credentials. Please try again.");
+  // Alert.alert("Error", "Invalid credentials. Please try again.");
+  handledShowInvalidAlert();
 }
       } catch (error) {
         console.error("Error during login:", error);
@@ -147,7 +159,16 @@ export const LoginUserForm = () => {
     }
   };
 
+  const handledShowInvalidAlert = () => {
+    setShowAlertInvalidUser(true);
+  }
+
+  const handledCloseInvalidAlert = () => {
+    setShowAlertInvalidUser(false);
+  }
+
   const isSignInDisabled = !kf_email || !kf_mobilenumber;
+
   return (
     <ImageBackground source={require('../../assets/red.png')} style={styles.backgroundImage}>
       <View style={styles.container}>
@@ -193,6 +214,18 @@ export const LoginUserForm = () => {
           </ScrollView>
         </KeyboardAvoidingView>
       </View>
+      <CustomAlert
+  visible={showAlertInvalidUser} // Corrected the prop value
+  onClose={handledCloseInvalidAlert}
+  onConfirm={handledCloseInvalidAlert}
+  headerMessage="Invalid credentials"
+  message="Please Enter Correct Email & Password."
+  Button1="Cancel"
+  Button2="OK"
+  style={[styles.alertStyle, {height: "23%"}]}
+  modalHeaderStyle={[styles.modalheaderStyle, {right: 65}]}
+  textStyle={styles.textStyle}
+/>
     </ImageBackground>
   );
 };
@@ -302,6 +335,17 @@ const styles = StyleSheet.create({
     fontSize: 25,
     fontWeight: "bold"
   },
+  alertStyle:{
+    // backgroundColor: "blue",
+    width: "80%",
+      },
+      modalheaderStyle:{
+        // backgroundColor: "green",
+        right: 85
+      },
+      textStyle:{
+        // backgroundColor: "yellow"
+      }
 });
 
 export default LoginUserForm;

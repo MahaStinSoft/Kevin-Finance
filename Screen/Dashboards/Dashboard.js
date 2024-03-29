@@ -787,16 +787,7 @@ const DashboardScreen = ({ navigation, route }) => {
     <ActivityIndicator size="large" color="#0000ff" />
   ) : (
     <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
-      {(displayedHomeLoans.length === 0 && displayedPersonalLoans.length === 0) && (
-        <View style={[styles.noRecordsContainer, { marginTop: 80 }]}>
-          <Text style={styles.noRecordsText}>No Records Found</Text>
-        </View>
-      )}
-
-<View style={{ marginTop: 10 }}>
-        {displayedHomeLoans.length > 0 && (
-        <>
-            <View style={{  flexDirection: "row", justifyContent: "space-between"}}>
+<View style={{  flexDirection: "row", justifyContent: "space-between"}}>
           <Text style={[styles.heading, { marginBottom: 20 }]}>Home Loans</Text>
           
           <TouchableOpacity
@@ -806,6 +797,10 @@ const DashboardScreen = ({ navigation, route }) => {
                             </Text>
                           </TouchableOpacity>
                           </View>
+<View style={{ marginTop: 10 }}>
+        {displayedHomeLoans.length > 0 && (
+        <>
+            
           {displayedHomeLoans.map((homeLoan, index) => (
             <HomeLoanCard
               key={index}

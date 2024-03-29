@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 import axios from 'axios';
 import NetInfo from "@react-native-community/netinfo";
+import CustomAlert from '../../common/CustomAlert';
 
 import ButtonComponent from '../../common/ButtonComponent';
 
@@ -15,12 +16,22 @@ export const LoginForm = () => {
   const [kf_password, setPassword] = useState(null);
   const [isMounted, setIsMounted] = useState(false);
   const [isConnected, setIsConnected] = useState(true);
+  const [showAlert, setShowAlert] = useState(false); 
+  const [showAlertInvalidUser, setShowAlertInvalidUser] = useState(false); 
 
   const navigation = useNavigation();
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
+      console.log('Network state changed:', state.isConnected);
       setIsConnected(state.isConnected);
+
+      if (!state.isConnected) {
+        console.log('No Internet Connection');
+        setShowAlert(true);
+      } else {
+        setShowAlert(false);
+      }
     });
 
     return () => {
@@ -30,10 +41,10 @@ export const LoginForm = () => {
 
   const handleLogin = async () => {
 
-    if (!isConnected) {
-      Alert.alert("No Internet Connection", "Please check your internet connection and try again.");
-      return;
-    };
+    // if (!isConnected) {
+    //   Alert.alert("No Internet Connection", "Please check your internet connection and try again.");
+    //   return;
+    // };
 
     if (!kf_name || !kf_password ) {
       Alert.alert("Error", "Please enter both firstname and password");
@@ -84,13 +95,16 @@ export const LoginForm = () => {
           navigation.navigate("Dashboard", { authenticatedUser: matchedUser });
         } else {
           // Authentication failed, display an error message
-          console.log("Failed to authenticate. Invalid credentials.", response.data);
-          Alert.alert("Invalid credentials", "Please Enter Correct Email & Password.");
+          console.log("Failed to authenticate. Invalid credentials1.", response.data);
+          // Alert.alert("Invalid credentials", "Please Enter t Email & Password.");
+          handledShowInvalidAlert();
         }
       } else {
         // Authentication failed, display an error message
         console.log("Failed to authenticate. Response status:", response.status);
-        Alert.alert("Invalid credentials", "Please Enter Correct Email & Password.");
+        // Alert.alert("Invalid credentials", "Please Enter Correct ");
+        handledShowInvalidAlert();
+
       }
     } catch (error) {
       console.error("Error during login:", error);
@@ -105,6 +119,14 @@ export const LoginForm = () => {
       );
     }
   };
+
+  const handledShowInvalidAlert = () => {
+    setShowAlertInvalidUser(true);
+  }
+
+  const handledCloseInvalidAlert = () => {
+    setShowAlertInvalidUser(false);
+  }
 
   const isSignInDisabled = !kf_name || !kf_password;
 
@@ -157,6 +179,30 @@ export const LoginForm = () => {
         </ScrollView>
       </KeyboardAvoidingView>
       </View>
+      <CustomAlert
+  visible={showAlertInvalidUser} // Corrected the prop value
+  onClose={handledCloseInvalidAlert}
+  onConfirm={handledCloseInvalidAlert}
+  headerMessage="Invalid credentials"
+  message="Please Enter Correct Email & Password."
+  Button1="Cancel"
+  Button2="OK"
+  style={[styles.alertStyle, {height: "23%"}]}
+  modalHeaderStyle={[styles.modalheaderStyle, {right: 65}]}
+  textStyle={styles.textStyle}
+/>
+<CustomAlert
+  visible={showAlertInvalidUser} // Corrected the prop value
+  onClose={handledCloseInvalidAlert}
+  onConfirm={handledCloseInvalidAlert}
+  headerMessage="Invalid credentials"
+  message="Please Enter Correct Email & Password."
+  Button1="Cancel"
+  Button2="OK"
+  style={[styles.alertStyle, {height: "23%"}]}
+  modalHeaderStyle={[styles.modalheaderStyle, {right: 65}]}
+  textStyle={styles.textStyle}
+/>
     </ImageBackground>
   );
 };
@@ -265,6 +311,17 @@ const styles = StyleSheet.create({
     fontSize: 25,
     fontWeight: "bold"
   },
+  alertStyle:{
+    // backgroundColor: "blue",
+    width: "80%",
+      },
+      modalheaderStyle:{
+        // backgroundColor: "green",
+        right: 85
+      },
+      textStyle:{
+        // backgroundColor: "yellow"
+      }
 });
 
 

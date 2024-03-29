@@ -56,6 +56,19 @@ export const PersonalLoan = () => {
   const [isEmiCollectionDateTouched, setIsEmiCollectionDateTouched] = useState(false);
   const [showAlert, setShowAlert] = useState(false); 
   const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
+  const [showAlertDiscardChanges, setShowAlertDiscardChanges] = useState(false);
+
+  const handleShowDiscardChangesAlert = () => {
+    setShowAlertDiscardChanges(true);
+  };
+
+  const handleCloseDiscardChangesAlert = () => {
+    setShowAlertDiscardChanges(false);
+  };
+
+  const handleDiscardChanges = () => {
+    navigation.goBack({ resetState: true });
+  };
 
   const calculateEMI = () => {
     const P = parseFloat(kf_loanamountrequested); // Principal loan amount
@@ -218,46 +231,48 @@ const handleInterestRateChange = (text) => {
   };
 
   const handleGoBack = () => {
-    Alert.alert(
-      'Discard Changes',
-      'Are you sure you want to discard the changes?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Discard',
-          onPress: () => {
-            key = { resetFormKey }
-            navigation.goBack({ resetState: true }); 
-          },
-        },
-      ],
-      { cancelable: false }
-    );
+    // Alert.alert(
+    //   'Discard Changes',
+    //   'Are you sure you want to discard the changes?',
+    //   [
+    //     {
+    //       text: 'Cancel',
+    //       style: 'cancel',
+    //     },
+    //     {
+    //       text: 'Discard',
+    //       onPress: () => {
+    //         key = { resetFormKey }
+    //         navigation.goBack({ resetState: true }); 
+    //       },
+    //     },
+    //   ],
+    //   { cancelable: false }
+    // );
+    handleShowDiscardChangesAlert();
   };
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
       if (navigation.isFocused()) {
         // If the user is on the login screen, show the exit confirmation alert
-        Alert.alert(
-          'Discard Changes',
-          'Are you sure want to discard the changes?',
-          [
-            {
-              text: 'cancel',
-              onPress: () => null,
-              style: 'cancel',
-            },
-            {
-              text: 'Discard',
-              onPress: () => BackHandler.exitApp(),
-            },
-          ],
-          { cancelable: false }
-        );
+        // Alert.alert(
+        //   'Discard Changes',
+        //   'Are you sure want to discard the changes?',
+        //   [
+        //     {
+        //       text: 'cancel',
+        //       onPress: () => null,
+        //       style: 'cancel',
+        //     },
+        //     {
+        //       text: 'Discard',
+        //       onPress: () => BackHandler.exitApp(),
+        //     },
+        //   ],
+        //   { cancelable: false }
+        // );
+        handleShowDiscardChangesAlert();
         return true; // Prevent default back button behavior
       }
     });
@@ -995,7 +1010,18 @@ const handleInterestRateChange = (text) => {
           modalHeaderStyle={[styles.modalheaderStyle, {right: 80}]}
           textStyle={styles.textStyle}
         />
-
+<CustomAlert
+          visible={showAlertDiscardChanges}
+          onClose={handleCloseDiscardChangesAlert}
+          onConfirm={handleConfirmAlert}
+          headerMessage="Discard Changes"
+          message="Are you sure want to discard the changes?"
+          Button1="Cancel"
+          Button2="Discard"
+          style={[styles.alertStyle, {height: "23%"}]}
+          modalHeaderStyle={[styles.modalheaderStyle, {right: 70}]}
+          textStyle={styles.textStyle}
+        />
         </View>
       </ScrollView>
     </>

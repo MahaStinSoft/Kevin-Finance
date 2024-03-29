@@ -269,68 +269,63 @@ const HomeLoanDetailsScreen = ({ route }) => {
         <View style={[styles.personalDetailContainer]} >
           <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10, color: "red" }]}>Personal Details</Text>
           <View style={styles.detailItem}>
-            <Text style={styles.label}>Gender:</Text>
+            <Text style={styles.label}>Gender</Text>
             <Text style={styles.value}>{getGenderLabel()}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}>DOB :</Text>
+            <Text style={styles.label}>DOB</Text>
             <Text style={styles.value}>{formatDate(loanApplication.kf_dateofbirth)}</Text>
           </View>
 
           <View style={styles.detailItem}>
-  <Text style={styles.label}>Send Approval:</Text>
+  <Text style={styles.label}>Send Approval</Text>
   <Text style={styles.value}>{getSendApproval(sendApproval)}</Text>
 </View>
 
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}>Age:</Text>
+            <Text style={styles.label}>Age</Text>
             <Text style={styles.value}>{loanApplication.kf_age}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}>Mobile Number:</Text>
+            <Text style={styles.label}>Mobile Number</Text>
             <Text style={styles.value}>{loanApplication.kf_mobilenumber}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}>Email Address:</Text>
+            <Text style={styles.label}>Email Address</Text>
             <Text style={styles.value}>{loanApplication.kf_email}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}>Address 1:</Text>
+            <Text style={styles.label}>Address 1</Text>
             <Text style={styles.value}>{loanApplication.kf_address1}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}>Address 2:</Text>
+            <Text style={styles.label}>Address 2</Text>
             <Text style={styles.value}>{loanApplication.kf_address2}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}>Address 3:</Text>
+            <Text style={styles.label}>Address 3</Text>
             <Text style={styles.value}>{loanApplication.kf_address3}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}>City:</Text>
+            <Text style={styles.label}>City</Text>
             <Text style={styles.value}>{loanApplication.kf_city}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}>State:</Text>
+            <Text style={styles.label}>State</Text>
             <Text style={styles.value}>{loanApplication.kf_state}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}>Loan Amount Requested:</Text>
-            <Text style={styles.value}>{loanApplication.kf_loanamountrequested}</Text>
-          </View>
-
-          <View style={styles.detailItem}>
-            <Text style={styles.label}>Loan Status:</Text>
+            <Text style={styles.label}>Loan Status</Text>
             <Text style={styles.value}>{getLoanStatus()}</Text>
           </View>
         </View>
@@ -339,12 +334,12 @@ const HomeLoanDetailsScreen = ({ route }) => {
         <View style={styles.IndentityProofField}>
           <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10, color: "red" }]}>Indentity Proof</Text>
           <View style={styles.detailItem}>
-          <Text style={styles.label}>Aadhar Number:</Text>
+          <Text style={styles.label}>Aadhar Number</Text>
           <Text style={styles.value}>{loanApplication.kf_aadharnumber}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}>PAN Number:</Text>
+            <Text style={styles.label}>PAN Number</Text>
             <Text style={styles.value}>{loanApplication.kf_pannumber}</Text>
           </View>
         </View>
@@ -352,32 +347,37 @@ const HomeLoanDetailsScreen = ({ route }) => {
         <View style={styles.loanDetailContainer}>
           <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10, color: "red" }]}>Loan Details</Text>
           <View style={styles.detailItem}>
-            <Text style={styles.label}>EMI Schedule:</Text>
+            <Text style={styles.label}>Loan Amount</Text>
+            <Text style={styles.value}>{loanApplication.kf_loanamountrequested}</Text>
+          </View>
+
+          <View style={styles.detailItem}>
+            <Text style={styles.label}>EMI Schedule</Text>
             <Text style={styles.value}>{getEmiSchedule()}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}>Number Of EMI:</Text>
+            <Text style={styles.label}>Number Of EMI</Text>
             <Text style={styles.value}>{loanApplication.kf_numberofemi}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}>Interest Rate:</Text>
+            <Text style={styles.label}>Interest Rate</Text>
             <Text style={styles.value}>{loanApplication.kf_interestrate}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}>EMI:</Text>
+            <Text style={styles.label}>EMI</Text>
             <Text style={styles.value}>{loanApplication.kf_emi}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}>EMI Collection Date:</Text>
+            <Text style={styles.label}>EMI Collection Date</Text>
             <Text style={styles.value}> {formatDate(loanApplication.kf_emicollectiondate)}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}>Other Charges:</Text>
+            <Text style={styles.label}>Other Charges</Text>
             <Text style={styles.value}>{loanApplication.kf_othercharges}</Text>
           </View>
         </View>
@@ -386,67 +386,67 @@ const HomeLoanDetailsScreen = ({ route }) => {
           <View style={[styles.personalDetailContainer, { marginTop: 5 }]}>
           <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10, color: "red" }]}>Guarantor 1</Text>          
           <View style={styles.detailItem}>
-            <Text style={styles.label}> Firstname:</Text>
+            <Text style={styles.label}> Firstname</Text>
             <Text style={styles.value}>{loanApplication.kf_guarantorfirstname}</Text>
           </View>
           
           <View style={styles.detailItem}>
-            <Text style={styles.label}> Lastname:</Text>
+            <Text style={styles.label}> Lastname</Text>
             <Text style={styles.value}>{loanApplication.kf_guarantorlastname}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}> Gender:</Text>
+            <Text style={styles.label}> Gender</Text>
             <Text style={styles.value}>{getGenderLabelG1()}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}> Age :</Text>
+            <Text style={styles.label}> Age</Text>
             <Text style={styles.value}> {loanApplication.kf_guarantorage}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}> Mobilenumber :</Text>
+            <Text style={styles.label}> Mobilenumber</Text>
             <Text style={styles.value}>{loanApplication.kf_guarantormobilenumber}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}> Email :</Text>
+            <Text style={styles.label}> Email</Text>
             <Text style={styles.value}>{loanApplication.kf_guarantoremail}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}> Address 1:</Text>
+            <Text style={styles.label}> Address 1</Text>
             <Text style={styles.value}>{loanApplication.kf_guarantoraddress1}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}> Address 2:</Text>
+            <Text style={styles.label}> Address 2</Text>
             <Text style={styles.value}>{loanApplication.kf_guarantoraddress2}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}> Address 3:</Text>
+            <Text style={styles.label}> Address 3</Text>
             <Text style={styles.value}>{loanApplication.kf_guarantoraddress3}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}> City:</Text>
+            <Text style={styles.label}> City</Text>
             <Text style={styles.value}>{loanApplication.kf_guarantorcity}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}> State :</Text>
+            <Text style={styles.label}> State</Text>
             <Text style={styles.value}>{loanApplication.kf_guarantorstate}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}> Aadharnumber:</Text>
+            <Text style={styles.label}> Aadharnumber</Text>
             <Text style={styles.value}>{loanApplication.kf_guarantoraadharnumber}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}> Pannumber :</Text>
+            <Text style={styles.label}> Pannumber</Text>
             <Text style={styles.value}>{loanApplication.kf_guarantorpannumber}</Text>
           </View>
           
@@ -459,67 +459,67 @@ const HomeLoanDetailsScreen = ({ route }) => {
           <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10, color: "red" }]}>Guarantor 2</Text>
        
           <View style={styles.detailItem}>
-            <Text style={styles.label}> Firstname :</Text>
+            <Text style={styles.label}> Firstname</Text>
             <Text style={styles.value}>{loanApplication.kf_guarantor2firstname}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}> Lastname :</Text>
+            <Text style={styles.label}> Lastname</Text>
             <Text style={styles.value}>{loanApplication.kf_guarantor2lastname}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}> Gender :</Text>
+            <Text style={styles.label}> Gender</Text>
             <Text style={styles.value}>{getGenderLabelG2()}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}> Dateofbirth :</Text>
+            <Text style={styles.label}> Dateofbirth</Text>
             <Text style={styles.value}>{formatDate(loanApplication.kf_guarantor2dateofbirth)}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}> Age :</Text>
+            <Text style={styles.label}> Age</Text>
             <Text style={styles.value}>{loanApplication.kf_guarantor2age}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}> Mobilenumber :</Text>
+            <Text style={styles.label}> Mobilenumber</Text>
             <Text style={styles.value}>{loanApplication.kf_guarantor2mobilenumber}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}> Email  :</Text>
+            <Text style={styles.label}> Email</Text>
             <Text style={styles.value}>{loanApplication.kf_guarantor2email}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}> Address 1 :</Text>
+            <Text style={styles.label}> Address 1</Text>
             <Text style={styles.value}>{loanApplication.kf_guarantor2address1}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}> Address 2:</Text>
+            <Text style={styles.label}> Address 2</Text>
             <Text style={styles.value}>{loanApplication.kf_guarantor2address1}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}> Address 3:</Text>
+            <Text style={styles.label}> Address 3</Text>
             <Text style={styles.value}>{loanApplication.kf_guarantor2address1}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}> City :</Text>
+            <Text style={styles.label}> City</Text>
             <Text style={styles.value}>{loanApplication.kf_guarantor2city}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}> Aadharnumber :</Text>
+            <Text style={styles.label}> Aadharnumber</Text>
             <Text style={styles.value}>{loanApplication.kf_guarantor2aadharnumber}</Text>
           </View>
 
           <View style={styles.detailItem}>
-            <Text style={styles.label}> Pannumber :</Text>
+            <Text style={styles.label}> Pannumber</Text>
             <Text style={styles.value}>{loanApplication.kf_guarantor2pannumber}</Text>
           </View>  
           </View>
@@ -589,7 +589,7 @@ const styles = StyleSheet.create({
     // height: 180
   },
   personalDetailContainer: {
-    marginTop: 154,
+    marginTop: 134,
     width: "100%",
     paddingVertical: 10,
     backgroundColor: "white",

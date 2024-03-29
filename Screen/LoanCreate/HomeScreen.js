@@ -59,9 +59,21 @@ export const HomeScreen = ({ route }) => {
   const [isEmiCollectionDateTouched, setIsEmiCollectionDateTouched] = useState(false);
   const [showAlert, setShowAlert] = useState(false); 
   const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
-
+  const [showAlertDiscardChanges, setShowAlertDiscardChanges] = useState(false);
   const navigation = useNavigation();
   const isFocused = useIsFocused();
+
+  const handleShowDiscardChangesAlert = () => {
+    setShowAlertDiscardChanges(true);
+  };
+
+  const handleCloseDiscardChangesAlert = () => {
+    setShowAlertDiscardChanges(false);
+  };
+
+  const handleDiscardChanges = () => {
+    navigation.goBack({ resetState: true });
+  };
 
   console.log("pan", kf_pannumber);
 
@@ -115,22 +127,23 @@ export const HomeScreen = ({ route }) => {
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
       if (navigation.isFocused()) {
-        Alert.alert(
-          'Discard Changes',
-          'Are you sure want to discard the changes?',
-          [
-            {
-              text: 'cancel',
-              onPress: () => null,
-              style: 'cancel',
-            },
-            {
-              text: 'Discard',
-              onPress: () => BackHandler.exitApp(),
-            },
-          ],
-          { cancelable: false }
-        );
+        // Alert.alert(
+        //   'Discard Changes',
+        //   'Are you sure want to discard the changes?',
+        //   [
+        //     {
+        //       text: 'cancel',
+        //       onPress: () => null,
+        //       style: 'cancel',
+        //     },
+        //     {
+        //       text: 'Discard',
+        //       onPress: () => BackHandler.exitApp(),
+        //     },
+        //   ],
+        //   { cancelable: false }
+        // );
+        handleShowDiscardChangesAlert();
         return true; 
       }
     });
@@ -143,26 +156,27 @@ export const HomeScreen = ({ route }) => {
   };
 
   const handleGoBack = () => {
-    Alert.alert(
-      'Discard Changes',
-      'Are you sure you want to discard the changes?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Discard',
-          onPress: () => {
-            key = { resetFormKey }
-            // navigation.navigate('Dashboard', { resetState: true }); // Pass the parameter
-            navigation.goBack({ resetState: true }); // Pass the parameter
+    // Alert.alert(
+    //   'Discard Changes',
+    //   'Are you sure you want to discard the changes?',
+    //   [
+    //     {
+    //       text: 'Cancel',
+    //       style: 'cancel',
+    //     },
+    //     {
+    //       text: 'Discard',
+    //       onPress: () => {
+    //         key = { resetFormKey }
+    //         // navigation.navigate('Dashboard', { resetState: true }); // Pass the parameter
+    //         navigation.goBack({ resetState: true }); // Pass the parameter
 
-          },
-        },
-      ],
-      { cancelable: false }
-    );
+    //       },
+    //     },
+    //   ],
+    //   { cancelable: false }
+    // );
+    handleShowDiscardChangesAlert();
   };
 
   useEffect(() => {
@@ -905,6 +919,18 @@ export const HomeScreen = ({ route }) => {
           Button2="OK"
           style={styles.alertStyle}
           modalHeaderStyle={[styles.modalheaderStyle, {right: 80}]}
+          textStyle={styles.textStyle}
+        />
+        <CustomAlert
+          visible={showAlertDiscardChanges}
+          onClose={handleCloseDiscardChangesAlert}
+          onConfirm={handleConfirmAlert}
+          headerMessage="Discard Changes"
+          message="Are you sure want to discard the changes?"
+          Button1="Cancel"
+          Button2="Discard"
+          style={[styles.alertStyle, {height: "23%"}]}
+          modalHeaderStyle={[styles.modalheaderStyle, {right: 70}]}
           textStyle={styles.textStyle}
         />
     </>
