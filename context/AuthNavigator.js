@@ -237,6 +237,7 @@ import ManagerDashboard from '../Screen/Dashboards/ManagerDashboard';
 import UserDashboard from '../Screen/Dashboards/UserDashboard';
 // import LoginScreen from '../Screen/Login'; // Import your Login screen
 import LoginScreen from '../Screen/LoginPages/LoginScreen';
+import Setting from '../Screen/setting';
 
 const Stack = createStackNavigator();
 
@@ -294,6 +295,12 @@ const AuthNavigator = () => {
             component={LoginScreen}
             options={{ headerShown: false }}
           />
+          <Stack.Screen
+        name="Setting"
+        component={Setting}
+        options={{ headerShown: false }}
+        initialParams={{ isLoggedInAsManager: isLoggedInAsManager }}
+      />
         </>
       )}
     </Stack.Navigator>

@@ -104,7 +104,6 @@ export const LoginForm = () => {
         console.log("Failed to authenticate. Response status:", response.status);
         // Alert.alert("Invalid credentials", "Please Enter Correct ");
         handledShowInvalidAlert();
-
       }
     } catch (error) {
       console.error("Error during login:", error);
@@ -191,7 +190,7 @@ export const LoginForm = () => {
   modalHeaderStyle={[styles.modalheaderStyle, {right: 65}]}
   textStyle={styles.textStyle}
 />
-<CustomAlert
+{/* <CustomAlert
   visible={showAlertInvalidUser} // Corrected the prop value
   onClose={handledCloseInvalidAlert}
   onConfirm={handledCloseInvalidAlert}
@@ -202,7 +201,7 @@ export const LoginForm = () => {
   style={[styles.alertStyle, {height: "23%"}]}
   modalHeaderStyle={[styles.modalheaderStyle, {right: 65}]}
   textStyle={styles.textStyle}
-/>
+/> */}
     </ImageBackground>
   );
 };

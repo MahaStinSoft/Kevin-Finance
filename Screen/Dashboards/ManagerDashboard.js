@@ -528,7 +528,8 @@ const handleCloseAlert = () => {
 };
 
   const handlelogout = () => {
-    navigation.navigate("Setting");
+    // navigation.navigate("Setting");
+    navigation.navigate('Setting', { isLoggedInAsManager: true });
   };
 
   const handleNavigation = () => {
@@ -665,30 +666,25 @@ const handleCloseAlert = () => {
                 </TouchableOpacity>
               </View> */}
 
-              <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 8 }}>
+<View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 8 }}>
   {initialLoading ? (
     <ActivityIndicator size="large" color="#0000ff" />
   ) : (
     <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
-      {(displayedHomeLoans.length === 0 && displayedPersonalLoans.length === 0) && (
-        <View style={[styles.noRecordsContainer, { marginTop: 80 }]}>
-          <Text style={styles.noRecordsText}>No Records Found</Text>
-        </View>
-      )}
-
-<View style={{ marginTop: 10 }}>
-        {displayedHomeLoans.length > 0 && (
+      <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 15, width: "100%" }}>
+        <Text style={[styles.heading, { right: 0 }]}>Home Loans</Text>
+        
+        <TouchableOpacity 
+            onPress={toggleShowAllHomeLoans} 
+            style={[styles.viewMoreButton, { opacity: displayedHomeLoans.length === 0 ? 0 : 1 }]}
+            disabled={displayedHomeLoans.length === 0}>
+            <Text style={styles.viewMoreButtonText}>
+              {showAllHomeLoans ? 'View Less' : 'View More'}
+            </Text>
+          </TouchableOpacity>
+      </View>
+      {displayedHomeLoans.length > 0 ? (
         <>
-            <View style={{  flexDirection: "row", justifyContent: "space-between"}}>
-          <Text style={[styles.heading, { marginBottom: 20 }]}>Home Loans</Text>
-          
-          <TouchableOpacity
-                            onPress={toggleShowAllHomeLoans} style={{backgroundColor:'red', width: "30%", height: 30, marginTop: 10, borderRadius: 30}}>
-                              <Text style={{textAlign: "center", color: "white", marginTop: 4, fontWeight: "bold"}}>
-                                {showAllHomeLoans ? 'View Less' : 'View More'}
-                            </Text>
-                          </TouchableOpacity>
-                          </View>
           {displayedHomeLoans.map((homeLoan, index) => (
             <HomeLoanCard
               key={index}
@@ -697,21 +693,25 @@ const handleCloseAlert = () => {
             />
           ))}
         </>
+      ) : (
+        <View style={styles.noRecordsContainer}>
+          <Text style={styles.noRecordsText}>No Records Found</Text>
+        </View>
       )}
-</View>
-<View style={{ marginTop: 10, width: "100%" }}>
-      {displayedPersonalLoans.length > 0 && (
+
+      <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 15, width: "100%" }}>
+        <Text style={[styles.heading, { marginBottom: 0 }]}>Personal Loans</Text>
+        <TouchableOpacity 
+            onPress={toggleShowAllPersonalLoans} 
+            style={[styles.viewMoreButton, { opacity: displayedPersonalLoans.length === 0 ? 0 : 1 }]}
+            disabled={displayedPersonalLoans.length === 0}>
+            <Text style={styles.viewMoreButtonText}>
+              {showAllPersonalLoans ? 'View Less' : 'View More'}
+            </Text>
+          </TouchableOpacity>
+      </View>
+      {displayedPersonalLoans.length > 0 ? (
         <>
-           <View style={{  flexDirection: "row", justifyContent: "space-between"}}>
-          <Text style={[styles.heading, { marginBottom: 20 }]}>Personal Loans</Text>
-          
-          <TouchableOpacity
-                            onPress={toggleShowAllPersonalLoans} style={{backgroundColor:'red', width: "30%", height: 30, marginTop: 10, borderRadius: 30}}>
-                              <Text style={{textAlign: "center", color: "white", marginTop: 4, fontWeight: "bold"}}>
-                                {showAllPersonalLoans ? 'View Less' : 'View More'}
-                            </Text>
-                          </TouchableOpacity>
-                          </View>
           {displayedPersonalLoans.map((personalLoan, index) => (
             <PersonalLoanCard
               key={index}
@@ -720,17 +720,9 @@ const handleCloseAlert = () => {
             />
           ))}
         </>
-      )}
-</View>
-      {(displayedHomeLoans.length === 0 && displayedPersonalLoans.length > 0) && (
+      ) : (
         <View style={styles.noRecordsContainer}>
-          <Text style={styles.noRecordsText}>No Home Loan Records Found</Text>
-        </View>
-      )}
-
-      {(displayedHomeLoans.length > 0 && displayedPersonalLoans.length === 0) && (
-        <View style={styles.noRecordsContainer}>
-          <Text style={styles.noRecordsText}>No Personal Loan Records Found</Text>
+          <Text style={styles.noRecordsText}>No Records Found</Text>
         </View>
       )}
     </ScrollView>
@@ -855,6 +847,9 @@ const styles = StyleSheet.create({
     padding: 10,
     marginHorizontal: 10
   },
+  chart: {
+    marginLeft: 10
+  },
   input: {
     flex: 1,
     paddingTop: 10,
@@ -882,14 +877,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: "center"
   },
-  viewButton: {
-    backgroundColor: 'rgba(255, 28, 53, 255)',
-    borderRadius: 25,
-    padding: 10,
-    top: 40,
-    width: "28%",
-    alignSelf: "flex-end"
-  },
+  viewMoreButton: {
+    backgroundColor:'red',
+     width: "30%",
+     height: 30, 
+     marginTop: 10,
+    borderRadius: 30,
+    },
+    viewMoreButtonText: {
+      textAlign: "center",
+       color: "white",
+        marginTop: 4,
+         fontWeight: "bold"
+    },
   badgeContainer: {
     position: 'absolute',
     top: -7, // Adjust the position of the badge vertically
