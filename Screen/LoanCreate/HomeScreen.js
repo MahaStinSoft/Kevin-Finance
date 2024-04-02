@@ -693,7 +693,8 @@ export const HomeScreen = ({ route }) => {
 
   const handleConfirmAlert = () => {
     setShowAlertConfirmation(false);
-    navigation.navigate('Dashboard');
+    // navigation.navigate('Dashboard');
+    navigation.goBack();
   };
 
   return (

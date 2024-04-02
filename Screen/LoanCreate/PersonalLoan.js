@@ -755,7 +755,8 @@ const handleInterestRateChange = (text) => {
 
   const handleConfirmAlert = () => {
     setShowAlertConfirmation(false);
-    navigation.navigate('Dashboard');
+    // navigation.navigate('Dashboard');
+    navigation.goBack();
   };
 
   return (

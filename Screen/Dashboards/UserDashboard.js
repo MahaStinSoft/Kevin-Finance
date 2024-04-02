@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Alert, TouchableOpacity, KeyboardAvoidingView, StatusBar, FlatList, ScrollView, BackHandler } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Alert, TouchableOpacity, KeyboardAvoidingView, StatusBar, FlatList, ScrollView, BackHandler, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import HeaderComponent from '../../common/Header';
 import { Ionicons } from '@expo/vector-icons';
 import NetInfo from '@react-native-community/netinfo';
 import CustomAlert from '../../common/CustomAlert';
+import ButtonComponent from '../../common/ButtonComponent';
 
 const UserDashboard = ({ navigation }) => {
     const [loading, setLoading] = useState(true);
@@ -280,6 +281,13 @@ const UserDashboard = ({ navigation }) => {
         return `${day}/${month}/${year}`;
     };
 
+    const handleHomeLoan = () => {
+        navigation.navigate('HomeLoan');
+      };
+    
+      const handlePersonalLoan = () => {
+        navigation.navigate("PersonalLoan");
+      };
 
     return (
         <>
@@ -291,9 +299,6 @@ const UserDashboard = ({ navigation }) => {
                 <View style={styles.container}>
                     <View style={styles.navBar}>
                         <Text style={styles.text}>Kevin Small Finance</Text>
-                        {/* <TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
-                            <Ionicons name="notifications" size={25} color="#fff" />
-                        </TouchableOpacity> */}
                         <TouchableOpacity style={styles.iconButtonLogout} onPress={handleLogout}>
                             <Ionicons name="md-log-out" size={28} color="#fff" />
                         </TouchableOpacity>
@@ -301,105 +306,39 @@ const UserDashboard = ({ navigation }) => {
 
                     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                         <View style={styles.detailsContainer}>
-                            <View style={styles.row}>
-                                <Text style={styles.label}>Application Number :</Text>
-                                <Text style={styles.value}>{loanApplication?.kf_applicationnumber}</Text>
+                            <View style={styles.rowContainer}>
+                                <View style={styles.imageContainer}>
+                                    <Image
+                                        source={require('../../assets/red.png')}
+                                        style={styles.image}
+                                        resizeMode="cover"
+                                    />
+                                </View>
+                                <View style={styles.textContainer}>
+                                    <Text style={styles.detailText}>Name</Text>
+                                    <Text style={styles.detailText}>Mobile no</Text>
+                                </View>
                             </View>
-                            <View style={styles.row}>
-                                <Text style={styles.label}>Name :</Text>
-                                <Text style={styles.value}>{loanApplication?.kf_name}</Text>
+                        </View>
+                        <View>
+                            <View style={[styles.loanButton, {marginTop: 30}]}>
+                                <TouchableOpacity onPress={handleHomeLoan} style={{ backgroundColor: "red", padding: 15, borderRadius: 30, width: "60%", flexDirection: "row" }}>
+                                    <Text style={{ fontSize: 16, fontWeight: "bold", color: "white", textAlign: "center", marginLeft: 15 }}>Apply Home Loan</Text>
+                                    <Ionicons name="chevron-forward" size={25} color="white" style={[styles.icon, {marginLeft: 37}]} />
+                                </TouchableOpacity>
                             </View>
-                            <View style={styles.row}>
-                                <Text style={styles.label}>Email :</Text>
-                                <Text style={styles.value}>{loanApplication?.kf_email}</Text>
+                            <View style={styles.loanButton}>
+                                <TouchableOpacity onPress={handlePersonalLoan} style={{ backgroundColor: "red", padding: 15, borderRadius: 30, width: "60%", flexDirection: "row" }}>
+                                    <Text style={{ fontSize: 16, fontWeight: "bold", color: "white", textAlign: "center", marginLeft: 15 }}>Apply Personal Loan</Text>
+                                    <Ionicons name="chevron-forward" size={25} color="white" style={styles.icon} />
+                                </TouchableOpacity>
                             </View>
-                            <View style={styles.row}>
-                                <Text style={styles.label}>Mobile Number :</Text>
-                                <Text style={styles.value}>{loanApplication?.kf_mobilenumber}</Text>
-                            </View>
-                            <View style={styles.row}>
-                                <Text style={styles.label}>Gender :</Text>
-                                <Text style={styles.value}>{getGenderLabel(loanApplication?.kf_gender)}</Text>
-                            </View>
-                            <View style={styles.row}>
-                                <Text style={styles.label}>Date of Birth:</Text>
-                                <Text style={styles.value}>{formatDate(loanApplication?.kf_dateofbirth)}</Text>
-                            </View>
-                            <View style={styles.row}>
-                                <Text style={styles.label}>Age :</Text>
-                                <Text style={styles.value}>{loanApplication?.kf_age}</Text>
-                            </View>
-                            <View style={styles.row}>
-                                <Text style={styles.label}>City :</Text>
-                                <Text style={styles.value}>{loanApplication?.kf_city}</Text>
-                            </View>
-                            <View style={styles.row}>
-                                <Text style={styles.label}>State :</Text>
-                                <Text style={styles.value}>{loanApplication?.kf_state}</Text>
-                            </View>
-                            <View style={styles.row}>
-                                <Text style={styles.label}>Loan Amount Requested :</Text>
-                                <Text style={styles.value}>{loanApplication?.kf_loanamountrequested}</Text>
-                            </View>
-                            <View style={styles.row}>
-                                <Text style={styles.label}>EMI Schedule :</Text>
-                                <Text style={styles.value}>{loanApplication?.kf_emischedule}</Text>
-                            </View>
-                            <View style={styles.row}>
-                                <Text style={styles.label}>Number of EMI :</Text>
-                                <Text style={styles.value}>{loanApplication?.kf_numberofemi}</Text>
-                            </View>
-                            </View>
-
-                            <View style={styles.emiRecords}>
-                                <Text style={styles.createdRecordsTitle}>EMI Records</Text>
-                                <FlatList
-                                    data={loanRecords.filter(item => item.kf_applicationnumber === loanApplication?.kf_applicationnumber)}
-                                    renderItem={({ item }) => (
-                                        <View>
-                                            <View style={styles.amortizationTile}>
-                                                <TouchableOpacity key={item.kf_loanId} onPress={() => handlePress(item)}>
-                                                    <View style={styles.column}>
-                                                        <View style={styles.column1}>
-                                                            <Text style={styles.list} >Term</Text>
-                                                            <Text >{parseInt(item.kf_totalmonths)}</Text>
-                                                        </View>
-
-                                                        <View style={styles.column2}>
-                                                            <Text style={styles.list}>EMI Amount</Text>
-                                                            <Text>{item.kf_emiamount}</Text>
-                                                        </View>
-
-                                                        <View style={styles.column2}>
-                                                           
-                                                            <Text style={styles.list}>Payment Date</Text>
-                                                            <Text>{(item.kf_receiveddate)}</Text>
-                                                        </View>
-
-                                                        <View style={[styles.column3, {backgroundColor: item.kf_paidstatus ? "green" : "red"}]}>
-                                                             {/* <Text style={styles.label}>Paid Status :</Text> */}
-                                                            <Text style={[styles.value, { color: "white"}]}>
-                                                                {item.kf_paidstatus ? "Paid" : "Unpaid"}
-                                                            </Text>
-                                                        </View>
-
-
-                                                    </View>
-                                                </TouchableOpacity>
-
-                                            </View>
-
-                                        </View>
-
-                                    )}
-                                    keyExtractor={(item) => item.id}
-                                />
-                            </View>
+                        </View>
                      
                     </ScrollView>
                 </View>
                 <CustomAlert
-        visible={showAlertInvalidUser} // Corrected the prop value
+        visible={showAlertInvalidUser} 
         onClose={handledCloseInvalidAlert}
         onConfirm={handleConfirmLogout}
         headerMessage="Logout"
@@ -430,7 +369,8 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         elevation: 3,
         marginTop: 70,
-        marginHorizontal: 10
+        marginHorizontal: 10,
+        paddingVertical: 14,
     },
     row: {
         flexDirection: 'row',
@@ -512,8 +452,41 @@ const styles = StyleSheet.create({
     },
     emiRecords:{
         padding: 10
+    },
+    image: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 10,
+        objectFit: "fill"
+      },
+      detailText:{
+        fontSize: 16,
+        marginBottom: 5,
+        fontWeight: 'bold',
+        color: "red", 
+      },
+      rowContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 5
+      },
+      textContainer: {
+        flex: 1,
+        marginLeft: 10,
+      },
+      imageContainer: {
+        width: 120,
+        height: 120,
+        marginRight: 10,
+      },
+      icon: {
+        marginLeft: 15,
+      },
+    loanButton: {
+        marginTop: 20,
+        alignItems: "center"
     }
-
 });
 
 export default UserDashboard;
