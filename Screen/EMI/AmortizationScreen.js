@@ -1076,13 +1076,18 @@ const AmortizationScreen = ({ route }) => {
 
         <View style={styles.createdRecordsList}>
           <Text style={styles.amortizationTitle}>EMI Unpaid Records:</Text>
-          {fetchedRecords.filter(record => record.kf_applicationnumber === loanDetails.applicationNumber && record.kf_paidstatus === false).length === 0 ? (
+          {isLoading ? (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 20 }}>
+              <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+          ) : fetchedRecords
+            .filter(record => record.kf_applicationnumber === loanDetails.applicationNumber && record.kf_paidstatus === false)
+            .length === 0 ? (
             <View style={styles.noRecordsContainer}>
               <Text style={styles.noRecordsText}>No Records Found</Text>
             </View>
           ) : (
             <View style={[styles.scrollViewContent, { marginBottom: 20 }]}>
-              {/* <ScrollView contentContainerStyle={styles.scrollViewContent} ref={scrollViewRef}> */}
               {fetchedRecords
                 .filter(record => record.kf_applicationnumber === loanDetails.applicationNumber && record.kf_paidstatus === false)
                 .map((item) => (
@@ -1112,55 +1117,60 @@ const AmortizationScreen = ({ route }) => {
                     </View>
                   </View>
                 ))}
-              {/* </ScrollView> */}
             </View>
           )}
         </View>
 
         <View style={styles.createdRecordsContainer}>
           <Text style={styles.amortizationTitle}>EMI Paid Records:</Text>
-          {fetchedSavedRecords.filter(record => record.kf_applicationnumber === loanDetails.applicationNumber).length === 0 ? (
-            <View style={styles.noRecordsContainer}>
-              <Text style={styles.noRecordsText}>No Records Found</Text>
+          {isLoading ? (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 20 }}>
+              <ActivityIndicator size="large" color="#0000ff" />
             </View>
           ) : (
-            <View style={styles.scrollViewContent}>
-              {fetchedSavedRecords
-                .filter(record => record.kf_applicationnumber === loanDetails.applicationNumber)
-                .sort((a, b) => new Date(b.kf_receiveddate) - new Date(a.kf_receiveddate)) // Sort in descending order based on payment date
-                .reverse() // Reverse the array to display latest updated record first
-                .map((item) => (
-                  <View key={item.kf_loanId}>
-                    <View style={styles.amortizationTile}>
-                      <TouchableOpacity onPress={() => handlePress(item)}>
-                        <View style={styles.column}>
-                          <View style={styles.column1}>
-                            <Text>Term</Text>
-                            <Text>{parseInt(item.kf_totalmonths)}</Text>
+            fetchedSavedRecords.filter(record => record.kf_applicationnumber === loanDetails.applicationNumber).length === 0 ? (
+              <View style={styles.noRecordsContainer}>
+                <Text style={styles.noRecordsText}>No Records Found</Text>
+              </View>
+            ) : (
+              <View style={styles.scrollViewContent}>
+                {fetchedSavedRecords
+                  .filter(record => record.kf_applicationnumber === loanDetails.applicationNumber)
+                  .sort((a, b) => new Date(b.kf_receiveddate) - new Date(a.kf_receiveddate)) // Sort in descending order based on payment date
+                  .reverse() // Reverse the array to display latest updated record first
+                  .map((item) => (
+                    <View key={item.kf_loanId}>
+                      <View style={styles.amortizationTile}>
+                        <TouchableOpacity onPress={() => handlePress(item)}>
+                          <View style={styles.column}>
+                            <View style={styles.column1}>
+                              <Text>Term</Text>
+                              <Text>{parseInt(item.kf_totalmonths)}</Text>
+                            </View>
+                            <View style={styles.column2}>
+                              <Text>EMI Amount</Text>
+                              <Text>{item.kf_emiamount}</Text>
+                            </View>
+                            <View style={[styles.column3, { marginRight: -10 }]}>
+                              <Text>Received Date</Text>
+                              {item.kf_datepicker ? (
+                                <Text>{moment(item.kf_datepicker).format('DD-MM-YYYY')}</Text>
+                              ) : (
+                                <Text></Text>
+                              )}
+                            </View>
+                            <View style={[styles.column4, { backgroundColor: item.kf_paidstatus ? 'green' : 'red', marginRight: 5 }]}>
+                              <Text style={{ color: "white", fontWeight: "bold", textAlign: "center", marginVertical: -5 }}>
+                                {item.kf_paidstatus ? 'Paid' : 'Unpaid'}
+                              </Text>
+                            </View>
                           </View>
-                          <View style={styles.column2}>
-                            <Text>EMI Amount</Text>
-                            <Text>{item.kf_emiamount}</Text>
-                          </View>
-                          <View style={[styles.column3, {marginRight: -10}]}>
-                            <Text>Received Date</Text>
-                            {item.kf_datepicker ? (
-                              <Text>{moment(item.kf_datepicker).format('DD-MM-YYYY')}</Text>
-                            ) : (
-                              <Text></Text>
-                            )}
-                          </View>
-                          <View style={[styles.column4, { backgroundColor: item.kf_paidstatus ? 'green' : 'red', marginRight: 5 }]}>
-                            <Text style={{ color: "white", fontWeight: "bold", textAlign: "center", marginVertical: -5 }}>
-                              {item.kf_paidstatus ? 'Paid' : 'Unpaid'}
-                            </Text>
-                          </View>
-                        </View>
-                      </TouchableOpacity>
+                        </TouchableOpacity>
+                      </View>
                     </View>
-                  </View>
-                ))}
-            </View>
+                  ))}
+              </View>
+            )
           )}
         </View>
 

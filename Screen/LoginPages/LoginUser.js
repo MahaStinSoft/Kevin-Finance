@@ -11,7 +11,7 @@ import CustomAlert from '../../common/CustomAlert';
 export const LoginUserForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [kf_email, setKf_email] = useState('');
-  const [kf_mobilenumber, setKf_mobilenumber] = useState('');
+  const [kf_otp, setKf_mobilenumber] = useState('');
   const [isConnected, setIsConnected] = useState(true);
   const [showAlert, setShowAlert] = useState(false); 
   const [showAlertInvalidUser, setShowAlertInvalidUser] = useState(false);
@@ -54,32 +54,29 @@ export const LoginUserForm = () => {
     //   Alert.alert("No Internet Connection", "Please check your internet connection and try again.");
     //   return;
     // };
-
-    if (!kf_email || !kf_mobilenumber) {
+  
+    if (!kf_email || !kf_otp) {
       Alert.alert("Error", "Please enter both UserName and Password");
       return;
     };
-
+  
     try {
       // Authenticate and get the access token from Dynamics CRM
       const tokenResponse = await axios.post(
         "https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token",
-        `grant_type=client_credentials&client_id=d9dcdf05-37f4-4bab-b428-323957ad2f86&client_secret=JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2&resource=https://org0f7e6203.crm5.dynamics.com&kf_email=${kf_email}&kf_mobilenumber=${kf_mobilenumber}`,
+        `grant_type=client_credentials&client_id=d9dcdf05-37f4-4bab-b428-323957ad2f86&client_secret=JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2&resource=https://org0f7e6203.crm5.dynamics.com&kf_email=${kf_email}&kf_otp=${kf_otp}`,
         {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
           },
         }
       );
-
+  
       const accessToken = tokenResponse.data.access_token;
-
-      // Use the access token to make requests to Dynamics CRM API
-    
-
+  
       // Make requests to both kf_personalloans and kf_loanapplications tables based on the entered email
       try {
-       const personalLoansResponse = await axios.get(
+        const personalLoansResponse = await axios.get(
           "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans?$select=kf_email,kf_mobile,kf_applicationnumber",
           {
             headers: {
@@ -88,9 +85,9 @@ export const LoginUserForm = () => {
             },
           }
         );
-
-      const loanApplicationsResponse = await axios.get(
-          "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications?$select=kf_email,kf_mobilenumber,kf_applicationnumber",
+  
+        const userResponse = await axios.get(
+          "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_users?$select=kf_email,kf_otp",
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -98,41 +95,45 @@ export const LoginUserForm = () => {
             },
           }
         );
-
+  
+        const loanApplicationsResponse = await axios.get(
+          "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications?$select=kf_email,kf_otp,kf_applicationnumber",
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "application/json; charset=utf-8",
+            },
+          }
+        );
+  
         // Check if the user exists in either response
+        const matchedUser = userResponse.data.value.find(
+          (user) => user.kf_email === kf_email && user.kf_otp === kf_otp
+        );
+  
         if (
           personalLoansResponse.status === 200 &&
           loanApplicationsResponse.status === 200 &&
-          (kf_email.endsWith('.com') || kf_mobilenumber.length > 0)
+          userResponse.status === 200 &&
+          (kf_email.endsWith('.com') || kf_otp.length > 0) &&
+          matchedUser
         ) {
-          matchedUser = personalLoansResponse.data.value.find(
-            (user) => user.kf_email === kf_email && user.kf_mobile === kf_mobilenumber
-          ) || loanApplicationsResponse.data.value.find(
-            (user) => user.kf_email === kf_email && user.kf_mobilenumber === kf_mobilenumber
-          );
+          // Authentication successful, save the authentication state and navigate to the Dashboard
+          try {
+            await AsyncStorage.setItem('isLoggedIn', 'true');
+            await AsyncStorage.setItem('authenticatedUser', JSON.stringify(matchedUser));
+          } catch (error) {
+            console.error('Error storing authentication state:', error);
+          }
+  
+          console.log("Authenticated user:", matchedUser);
+          // Navigate to UserDashboard with the authenticated user's data
+          navigation.navigate("UserDashboard", { authenticatedUser: matchedUser });
+        } else {
+          // Authentication failed, display an error message
+          console.log("Failed to authenticate. Invalid credentials.");
+          setShowAlertInvalidUser(true);
         }
-        // const matchedUser = copyUser;
-
-       if (matchedUser) {
-  // Authentication successful, save the authentication state and navigate to the Dashboard
-  try {
-    await AsyncStorage.setItem('isLoggedIn', 'true');
-    await AsyncStorage.setItem('authenticatedUser', JSON.stringify(matchedUser));
-  } catch (error) {
-    console.error('Error storing authentication state:', error);
-  }
-
-  console.log("Authenticated user:", matchedUser);
-  // console.log("Personal Loans response data", personalLoansResponse.data);
-  // console.log("Loan Applications response data", loanApplicationsResponse.data);
-  // Navigate to HomeLoanDetailsScreen with the authenticated user's data
-  navigation.navigate("UserDashboard", { authenticatedUser: matchedUser });
-} else {
-  // Authentication failed, display an error message
-  console.log("Failed to authenticate. Invalid credentials.");
-  // Alert.alert("Error", "Invalid credentials. Please try again.");
-  handledShowInvalidAlert();
-}
       } catch (error) {
         console.error("Error during login:", error);
         if (error.response) {
@@ -167,7 +168,7 @@ export const LoginUserForm = () => {
     setShowAlertInvalidUser(false);
   }
 
-  const isSignInDisabled = !kf_email || !kf_mobilenumber;
+  const isSignInDisabled = !kf_email || !kf_otp;
 
   return (
     <ImageBackground source={require('../../assets/red.png')} style={styles.backgroundImage}>
@@ -194,7 +195,7 @@ export const LoginUserForm = () => {
                     autoCapitalize="none"
                     style={styles.passwordInput}
                     secureTextEntry={!showPassword}
-                    value={kf_mobilenumber}
+                    value={kf_otp}
                     onChangeText={(text) => setKf_mobilenumber(text)}
                   />
                   <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
