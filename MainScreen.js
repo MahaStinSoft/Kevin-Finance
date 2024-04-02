@@ -44,7 +44,9 @@ import LoginForm from './Screen/LoginPages/LoginForm';
 import LoginUserForm from './Screen/LoginPages/LoginUser';
 import UserDashboard from './Screen/Dashboards/UserDashboard';
 import UserLoanDetails from './Screen/EMI/UserLoanDetails';
-
+import UserRegisterScreen from './Screen/LoginPages/UserRegister';
+import Welcome from './Screen/LoginPages/Welcome';
+import UserConfrim from './Screen/LoginPages/USerConfrim';
 
 const Stack = createNativeStackNavigator();
 
@@ -86,8 +88,11 @@ const MainScreen = () => {
           <Stack.Screen name="Main" component={AllStackScreens} options={{ headerShown: false }} />
       ) : (
         <>
+          <Stack.Screen name="Welcome" component={Welcome} options={{ headerShown: false }} />
+          <Stack.Screen name="UserConfrim" component={UserConfrim} options={{ headerShown: false }} />
           <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
           <Stack.Screen name="LoginForm" component={LoginForm} options={{ headerShown: false }} />
+          <Stack.Screen name="UserRegisterScreen" component={UserRegisterScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Dashboard" component={DashboardScreen} options={{ headerShown: false }} />
           <Stack.Screen name="HomeLoan" component={HomeScreen} options={{ headerShown: false }} />
           <Stack.Screen name="PersonalLoan" component={PersonalLoan} options={{ headerShown: false }} />

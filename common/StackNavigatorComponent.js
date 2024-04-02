@@ -44,6 +44,9 @@ import LoginForm from '../Screen/LoginPages/LoginForm';
 import LoginUserForm from '../Screen/LoginPages/LoginUser';
 import UserDashboard from '../Screen/Dashboards/UserDashboard';
 import UserLoanDetails from '../Screen/EMI/UserLoanDetails';
+import UserRegisterScreen from '../Screen/LoginPages/UserRegister';
+import UserConfrim from '../Screen/LoginPages/USerConfrim';
+import Welcome from '../Screen/LoginPages/Welcome';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -57,6 +60,9 @@ const SettingIcon = () => <Ionicons name="md-settings" size={24} color="red" />;
 const StackNavigator = () => (
   <Stack.Navigator>
     <Stack.Screen name="AuthNavigator" component={AuthNavigator} options={{ headerShown: false }} />
+    <Stack.Screen name="Welcome" component={Welcome} options={{ headerShown: false }} />
+    <Stack.Screen name="UserConfrim" component={UserConfrim} options={{ headerShown: false }} />
+    <Stack.Screen name="UserRegisterScreen" component={UserRegisterScreen} options={{ headerShown: false }} />
     <Stack.Screen name="Dashboard" component={DashboardScreen} options={{ headerShown: false }} />
     <Stack.Screen name="ManagerDashboard" component={ManagerDashboard} options={{ headerShown: false }} />
     <Stack.Screen name="LoginForm" component={LoginForm} options={{ headerShown: false }} />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Alert, Image, Text, TouchableOpacity, StatusBar, TextInput, Modal, BackHandler } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, Image, Text, TouchableOpacity, StatusBar, Dimensions, Modal, BackHandler, ImageBackground } from 'react-native';
 import { useNavigation, useIsFocused, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -10,7 +10,7 @@ import LoanStatusPicker from '../../common/LoanStatusPicker ';
 import ComponentDatePicker from '../../common/ComponentDatePicker';
 import CustomAlert from '../../common/CustomAlert';
 
-export const UerRegisterScreen = ({ route }) => {
+export const UserRegisterScreen = ({ route }) => {
 
   const [kf_name, setkf_name] = useState(null);
   const [kf_lastname, setkf_lastname] = useState(null);
@@ -303,12 +303,13 @@ const generateOtp = () => {
 };
 
   return (
-    <>
-      <StatusBar />
-      <HeaderComponent titleText="Registration Screen" onPress={handleGoBack} />
+    <View style={styles.container}>
+
+        <ImageBackground source={require('../../assets/red.png')} style={styles.backgroundImage}>
+     
+      <Text style={styles.Heading}>Registeration</Text>
       <ScrollView key={resetFormKey} keyboardShouldPersistTaps="handled">
-        <View style={styles.container}>
-          
+          <View style={styles.formContent}>
           <TextInputComponent
             placeholder="Name"
             autoCapitalize="none"
@@ -320,7 +321,7 @@ const generateOtp = () => {
           )}
 
           <ComponentDatePicker
-            style={{ height: 48, marginBottom: 15 }}
+            style={{ height: 48, marginBottom: 10, marginTop: 15 }}
             selectedDate={kf_dateofbirth}
             onDateChange={handleDateOfBirth}
             placeholder="Date of Birth"
@@ -368,22 +369,40 @@ const generateOtp = () => {
             onPress={handleSaveRecord}
             disabled={formDisabled}
           />
-
-        </View>
+</View>
       </ScrollView>
-    </>
+      </ImageBackground>
+      </View>
+
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    // marginHorizontal: 10,
+    position:"absolute"
   },
   errorText: {
     color: 'red',
     fontSize: 15,
     marginHorizontal: 25,
   },
+  Heading:{
+    fontWeight: 'bold',
+    color: "white",
+    fontSize: 30,
+    textAlign: 'center',
+    marginTop: 140
+  },
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover',
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
+    position:"relative"
+  },
+  formContent:{
+    marginTop: 80
+  }
 });
   
-  export default UerRegisterScreen;
+  export default UserRegisterScreen;
