@@ -58,17 +58,18 @@ export const UserRegisterScreen = ({ route }) => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
       if (navigation.isFocused()) {
         Alert.alert(
-          'Discard Changes',
-          'Are you sure want to discard the changes?',
+          'Cancel Register',
+          'Are you sure want to cancel the Registration ?',
           [
             {
-              text: 'cancel',
+              text: 'No',
               onPress: () => null,
               style: 'cancel',
             },
             {
-              text: 'Discard',
-              onPress: () => BackHandler.exitApp(),
+              text: 'Yes',
+              // onPress: () => BackHandler.exitApp(),
+              onPress: () => navigation.navigate("Welcome"),
             },
           ],
           { cancelable: false }
