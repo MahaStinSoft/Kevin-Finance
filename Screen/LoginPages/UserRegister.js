@@ -158,8 +158,8 @@ export const UserRegisterScreen = ({ route }) => {
   const handleMobileNumberChange = (text) => {
     setkf_mobilenumber(text);
 
-    if (text.trim() === '') {
-      setIsMobileNumberValid(false);
+    if (text && text.trim() === '') {
+    setIsMobileNumberValid(false);
       setErrorMessages({
         ...errorMessages,
         mobileNumber: 'Enter a Mobile Number',
@@ -322,14 +322,14 @@ const generateOtp = () => {
           )}
 
           <ComponentDatePicker
-            style={{ height: 48, marginBottom: 10, marginTop: 15 }}
+            style={{ height: 48, marginBottom: 10, marginTop: 8 }}
             selectedDate={kf_dateofbirth}
             onDateChange={handleDateOfBirth}
             placeholder="Date of Birth"
           />
 
           {errorMessages.dateOfBirth !== '' && (
-            <Text style={[styles.errorText, { marginTop: -10, marginBottom: 15 }]}>
+            <Text style={[styles.errorText, { marginTop: -5, marginBottom: 0 }]}>
               {errorMessages.dateOfBirth}
             </Text>
           )}
@@ -341,18 +341,18 @@ const generateOtp = () => {
           // initialOption="Option1"
           Optiontitle= "Gender"
           />
-
-          <TextInputComponent
-            placeholder="Mobile Number"
-            autoCapitalize="none"
-            value={kf_mobilenumber}
-            onChangeText={handleMobileNumberChange}
-            keyboardType="numeric"
-          />
-          {errorMessages.mobileNumber !== '' && (
-            <Text style={styles.errorText}>{errorMessages.mobileNumber}</Text>
-          )}
-
+            <View style={{marginVertical: 6}}>
+              <TextInputComponent
+                placeholder="Mobile Number"
+                autoCapitalize="none"
+                value={kf_mobilenumber}
+                onChangeText={handleMobileNumberChange}
+                keyboardType="numeric"
+              />
+              {errorMessages.mobileNumber !== '' && (
+                <Text style={styles.errorText}>{errorMessages.mobileNumber}</Text>
+              )}
+            </View>
           <TextInputComponent
             placeholder="Email Address"
             autoCapitalize="none"
@@ -403,7 +403,13 @@ const styles = StyleSheet.create({
   },
   formContent:{
     marginTop: 80
-  }
+  },
+  input: {
+    // marginBottom: -15, // Default marginBottom when no error message
+},
+errorInput: {
+    marginBottom: 50, // MarginBottom when error message is displayed
+},
 });
   
   export default UserRegisterScreen;

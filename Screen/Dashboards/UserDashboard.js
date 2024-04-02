@@ -228,7 +228,7 @@ const UserDashboard = ({ navigation }) => {
           // Reset the navigation stack and navigate to the login screen
           navigation.reset({
             index: 0,
-            routes: [{ name: 'LoginScreen' }],
+            routes: [{ name: 'Welcome' }],
           });
         } catch (error) {
           console.error('Error clearing authentication state:', error);

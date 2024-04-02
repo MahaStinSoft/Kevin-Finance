@@ -3,7 +3,7 @@ import { View, StyleSheet, TextInput } from 'react-native';
 import { secondaryColor } from '../Screen/constant/color';
 
 const TextInputComponent = (props) => {
-  const { textInput, onChangeText, placeholder } = props;
+  const { textInput, onChangeText, placeholder, style } = props;
 
   return (
     <View style={styles.container}>
@@ -13,7 +13,7 @@ const TextInputComponent = (props) => {
             placeholder={placeholder}
             value={textInput}
             onChangeText={onChangeText}
-            style={styles.textInput}
+            style={[styles.textInput, style]}
           />
         </View>
       </View>

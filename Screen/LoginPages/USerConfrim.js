@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity,Alert, StyleSheet,StatusBar, BackHandler} from 'react-native';
+import { View, Text, TouchableOpacity,Alert, StyleSheet,StatusBar, BackHandler, ImageBackground, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import HeaderComponent from '../../common/Header';
 import CustomAlert from '../../common/CustomAlert';
@@ -42,16 +42,16 @@ const UserConfrim = () => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
       if (navigation.isFocused()) {
         Alert.alert(
-          'Discard Changes',
-          'Are you sure want to discard the changes?',
+          'Alert',
+          'Are you sure want to cancle?',
           [
             {
-              text: 'cancel',
+              text: 'No',
               onPress: () => null,
               style: 'cancel',
             },
             {
-              text: 'Discard',
+              text: 'Yes',
               onPress: () => BackHandler.exitApp(),
             },
           ],
@@ -67,10 +67,8 @@ const UserConfrim = () => {
   
 
   return (
-
+    <ImageBackground source={require('../../assets/red.png')} style={styles.backgroundImage}>
     <View style={styles.container}>
-         <StatusBar />
-      {/* <HeaderComponent titleText="Registration Screen" onPress={handleGoBack} /> */}
       <Text style={styles.title}>Are you above 18 years old?</Text>
       <Text style={styles.subTitle}>Click to proceed</Text>
 
@@ -84,6 +82,7 @@ const UserConfrim = () => {
         </TouchableOpacity>
       </View>
     </View>
+    </ImageBackground>
   );
 };
 
@@ -93,7 +92,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
-    backgroundColor: '#f0f0f0',
   },
   title: {
     fontSize: 28,
@@ -127,11 +125,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   leftButton: {
-    marginLeft: 70
+    marginLeft: 85
   },
   rightButton: {
     marginLeft: 10
   },
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover',
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height
+  }
 });
 
 export default UserConfrim;

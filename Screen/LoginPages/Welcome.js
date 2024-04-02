@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 const Welcome = () => {
@@ -14,6 +14,7 @@ const Welcome = () => {
   };
 
   return (
+    <ImageBackground source={require('../../assets/red.png')} style={styles.backgroundImage}>
     <View style={styles.container}>
       <Text style={styles.title}>Welcome to Kevin Finance </Text>
       <TouchableOpacity style={styles.button} onPress={handleRegister}>
@@ -22,9 +23,8 @@ const Welcome = () => {
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login </Text>
       </TouchableOpacity>
-     
     </View>
-    
+    </ImageBackground>
   );
 };
 
@@ -52,6 +52,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     fontWeight:"bold"
+  },
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover',
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height
   },
 });
 
