@@ -68,8 +68,11 @@ const UserConfrim = () => {
 
   return (
     <ImageBackground source={require('../../assets/red.png')} style={styles.backgroundImage}>
-    <View style={styles.container}>
-      <Text style={styles.title}>Are you above 18 years old?</Text>
+    <View style={styles.container}>    
+    <Text style={styles.title}>Kevin Small Finance</Text>
+    </View>
+    <View style={styles.contentContainer}>
+      <Text style={styles.contenttitle}>Are you above 18 years old?</Text>
       <Text style={styles.subTitle}>Click to proceed</Text>
 
       <View style={styles.buttonContainer}>
@@ -88,20 +91,36 @@ const UserConfrim = () => {
 
 const styles = StyleSheet.create({
   container: {
+    // flex: 1,
+    // justifyContent: 'center',
+    // alignItems: 'center',
+    // paddingHorizontal: 20,
+        paddingTop: StatusBar.currentHeight,
+    paddingHorizontal: 20,
+  },
+  contentContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
   },
   title: {
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 20,
+    color: '#fff',
+    // marginHorizontal: 50,/
+    textAlign: 'center',
+    top: 50,
+  },
+  contenttitle: {
+    fontSize: 30,
+    fontWeight: 'bold',
     textAlign: 'center',
   },
   subTitle: {
     fontSize: 18,
-    marginBottom: 20,
+    margin: 20,
     textAlign: 'center',
   },
   buttonContainer: {
