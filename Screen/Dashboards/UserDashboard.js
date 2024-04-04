@@ -159,7 +159,7 @@ const UserDashboard = ({ navigation, route }) => {
     };
 
     const handlePersonalLoan = () => {
-        navigation.navigate("PersonalLoan");
+        navigation.navigate("PersonalLoan", { userapplicationid });
     };
 
     useEffect(() => {
@@ -514,9 +514,7 @@ const UserDashboard = ({ navigation, route }) => {
                     >
 
                         <View style={styles.chart}>
-                            <Text style={styles.heading}>Loan Status Chart</Text>
                             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                                     <View style={styles.detailsContainer}>
                                         <View style={styles.rowContainer}>
                                             {name ? (
@@ -531,7 +529,6 @@ const UserDashboard = ({ navigation, route }) => {
                                             </View>
                                         </View>
                                     </View>
-                                </ScrollView>
 
 
                                 <View>
@@ -730,7 +727,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 10
     },
     chart: {
-        marginLeft: 10
+        marginLeft: 0
     },
     input: {
         flex: 1,
