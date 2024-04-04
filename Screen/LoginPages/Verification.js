@@ -315,7 +315,7 @@ export const VerificationScreen = () => {
                         <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={24} color="#888" style={styles.eyeIcon} />
                       </TouchableOpacity>
                     </View>
-                    <ButtonComponent
+                    <ButtonComponent style={{top: 20}}
                       title="VERIFY"
                       onPress={handleLogin}
                       disabled={isSignInDisabled}
