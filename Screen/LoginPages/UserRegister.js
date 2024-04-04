@@ -291,14 +291,14 @@ export const UserRegisterScreen = ({ route }) => {
                 <Text style={styles.errorText}>{errorMessages.mobileNumber}</Text>
               )}
             </View>
-          <TextInputComponent
+          <TextInput style={styles.textInputContainer}
             placeholder="Email Address"
             autoCapitalize="none"
             value={kf_email}
             onChangeText={handleEmailChange}
           />
           {errorMessages.email !== '' && (
-            <Text style={styles.errorText}>{errorMessages.email}</Text>
+            <Text style={[styles.errorText, {top: 8}]}>{errorMessages.email}</Text>
           )}
  <ButtonComponent
             title="Verify OTP"
@@ -374,6 +374,22 @@ const styles = StyleSheet.create({
 },
 errorInput: {
     marginBottom: 50, // MarginBottom when error message is displayed
+},
+textInputContainer: {
+  marginVertical: 5,
+  shadowColor: '#000',
+  shadowOffset: {
+    width: 0,
+    height: 2,
+  },
+  shadowOpacity: 0.25,
+  shadowRadius: 3.84,
+  elevation: 5,
+  borderRadius: 8,
+  backgroundColor: '#FBFCFC',
+  padding: 10,
+  marginHorizontal: 20,
+  top: 6
 },
 });
   
