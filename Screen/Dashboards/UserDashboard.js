@@ -155,7 +155,7 @@ const UserDashboard = ({ navigation, route }) => {
     const textColor = deviceWidth < 390 ? 'red' : 'blue';
 
     const handleHomeLoan = () => {
-        navigation.navigate('HomeLoan');
+        navigation.navigate('HomeLoan', { userapplicationid });
     };
 
     const handlePersonalLoan = () => {

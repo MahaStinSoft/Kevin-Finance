@@ -60,6 +60,9 @@ export const HomeScreen = ({ route }) => {
   const [showAlert, setShowAlert] = useState(false); 
   const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
   const [showAlertDiscardChanges, setShowAlertDiscardChanges] = useState(false);
+
+  const { userapplicationid } = route.params;
+
   const navigation = useNavigation();
   const isFocused = useIsFocused();
 
@@ -709,6 +712,9 @@ export const HomeScreen = ({ route }) => {
               )}
             </View> */}
 
+            {/* <Text>id{userapplicationid}</Text>
+            <Text>employee{authenticatedUser ? authenticatedUser.kf_adminname : ''}</Text> */}
+
           <TextInput style={[styles.textInputContainer, { marginTop: 20, color: "gray" }]}
             placeholder="Created by"
             autoCapitalize="none"
@@ -716,6 +722,16 @@ export const HomeScreen = ({ route }) => {
             onChangeText={(text) => {
               setkf_createdby(text)
             }}
+            editable={false}
+          />
+
+<TextInput style={[styles.textInputContainer, { marginTop: 20, color: "gray" }]}
+            // placeholder="Created by"
+            autoCapitalize="none"
+            value={userapplicationid}
+            // onChangeText={(text) => {
+            //   setkf_createdby(text)
+            // }}
             editable={false}
           />
           
