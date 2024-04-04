@@ -405,7 +405,7 @@ export const LoginUserForm = () => {
           }
         );
         const userResponse = await axios.get(
-          "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_users?$select=kf_email,kf_otp",
+          "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_users?$select=kf_email,kf_otp,kf_applicantid",
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,

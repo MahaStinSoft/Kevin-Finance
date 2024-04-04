@@ -60,7 +60,7 @@ export const HomeScreen = ({ route }) => {
   const [showAlert, setShowAlert] = useState(false); 
   const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
   const [showAlertDiscardChanges, setShowAlertDiscardChanges] = useState(false);
-  const [kf_userid, setkf_userid] = useState(null);
+  const [kf_userapplicantid, setkf_userid] = useState(null);
 
   const { userapplicationid } = route.params;
 
@@ -620,7 +620,7 @@ export const HomeScreen = ({ route }) => {
       // const applicantImageData = await prepareImageData(kf_applicantimage);
 
       console.log("userAdminName", userAdminName);
-      console.log("userid: ",kf_userid);
+      console.log("userid: ",kf_userapplicantid);
 
       const createRecordResponse = await axios.post(
         "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications",
@@ -650,7 +650,7 @@ export const HomeScreen = ({ route }) => {
           kf_emicollectiondate: kf_emicollectiondate,
           kf_othercharges: kf_othercharges,
           kf_createdby: userAdminName,
-          kf_userid: userapplicationid
+          kf_userapplicantid: userapplicationid
         },
         {
           headers: {

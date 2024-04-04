@@ -57,7 +57,7 @@ export const PersonalLoan = ({route}) => {
   const [showAlert, setShowAlert] = useState(false); 
   const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
   const [showAlertDiscardChanges, setShowAlertDiscardChanges] = useState(false);
-  const [kf_userid, setkf_userid] = useState(null);
+  const [kf_userapplicantid, setkf_userid] = useState(null);
   
   const { userapplicationid } = route.params;
 
@@ -712,7 +712,7 @@ const handleInterestRateChange = (text) => {
           kf_emicollectiondate: kf_emicollectiondate,
           kf_othercharges: kf_othercharges,
           kf_applicantimage:kf_applicantimage.fileContent,
-          kf_userid: userapplicationid
+          kf_userapplicantid: userapplicationid
         },
         {
           headers: {
