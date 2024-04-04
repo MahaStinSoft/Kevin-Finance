@@ -21,6 +21,7 @@ export const VerificationScreen = () => {
   const [kf_userid, setKf_userid] = useState('');
   const [recordId, setRecordId] = useState(kf_userid);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isPasswordUpdating, setIsPasswordUpdating] = useState(false);
 
   const navigation = useNavigation();
 
@@ -178,9 +179,17 @@ export const VerificationScreen = () => {
   };
 
   const handleUpdatePassword = async () => {
-    
+    setIsPasswordUpdating(true);
+
+    if (password.length < 6 || reEnteredPassword.length < 6) {
+      setErrorMessage("Password should be at least 6 characters long");
+      setIsPasswordUpdating(false);
+      return;
+    }
+
     if (password !== reEnteredPassword) {
       setErrorMessage("Passwords do not match");
+      setIsPasswordUpdating(false);
       return; // Prevent further execution
     } else {
       setErrorMessage(""); // Clear the error message
@@ -221,9 +230,11 @@ export const VerificationScreen = () => {
           { text: "OK", onPress: () => navigation.navigate("LoginUserForm") }
         ]
       );
+      setIsPasswordUpdating(false);
     } catch (error) {
       console.error("Error while updating password:", error);
       Alert.alert("Error", "An unexpected error occurred. Please try again later.");
+      setIsPasswordUpdating(false);
     }
   };
   
@@ -245,10 +256,11 @@ export const VerificationScreen = () => {
           <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
             <View style={styles.backgroundContainer}>
               <View style={styles.modalText}>
-                <Text style={{ textAlign: "center", marginBottom: 40, fontSize: 18, fontWeight: "bold", color: "red" }}>OTP Verification</Text>
+                {/* <Text style={{ textAlign: "center", marginBottom: 40, fontSize: 18, fontWeight: "bold", color: "red" }}>OTP Verification</Text> */}
                 
                 {isOTPVerified ? (
-                  <View style={{}}>
+                  <View>
+                    <Text style={{ textAlign: "center", marginBottom: 40, fontSize: 18, fontWeight: "bold", color: "red" }}>Password Verification</Text>
                     <View style={styles.passwordContainer}>
                       <Ionicons name="lock-closed" size={20} color="#888" style={styles.icon} />
                       <TextInput
@@ -283,11 +295,12 @@ export const VerificationScreen = () => {
                     <ButtonComponent style={{width:"70%", top: 30}}
                       title="UPDATE PASSWORD"
                       onPress={handleUpdatePassword}
-                      disabled={!password || !reEnteredPassword}
-                    />
+                      disabled={!password || !reEnteredPassword || isPasswordUpdating}
+                      />
                   </View>
                 ) : (
                   <>
+                    <Text style={{ textAlign: "center", marginBottom: 40, fontSize: 18, fontWeight: "bold", color: "red" }}>OTP Verification</Text>
                     <View style={styles.passwordContainer}>
                       <Ionicons name="lock-closed" size={20} color="#888" style={styles.icon} />
                       <TextInput
