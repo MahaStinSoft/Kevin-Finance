@@ -14,6 +14,7 @@ export const VerificationScreen = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [showAlertInvalidUser, setShowAlertInvalidUser] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showRePassword, setshowRePassword] = useState(false);
   const [password, setPassword] = useState('');
   const [reEnteredPassword, setReEnteredPassword] = useState('');
   const [isOTPVerified, setIsOTPVerified] = useState(false);
@@ -235,51 +236,65 @@ export const VerificationScreen = () => {
             <View style={styles.backgroundContainer}>
               <View style={styles.modalText}>
                 <Text style={{ textAlign: "center", marginBottom: 40, fontSize: 18, fontWeight: "bold", color: "red" }}>OTP Verification</Text>
-                <View style={styles.passwordContainer}>
-                  <Ionicons name="lock-closed" size={20} color="#888" style={styles.icon} />
-                  <TextInput
-                    placeholder="OTP"
-                    autoCapitalize="none"
-                    style={styles.passwordInput}
-                    secureTextEntry={!showPassword}
-                    value={kf_otp}
-                    onChangeText={(text) => setKf_otp(text)}
-                  />
-                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                    <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={24} color="#888" style={styles.eyeIcon} />
-                  </TouchableOpacity>
-                </View>
-                {isOTPVerified && (
-                  <>
-                    <TextInput
-                      placeholder="Password"
-                      autoCapitalize="none"
-                      style={styles.passwordInput}
-                      secureTextEntry={!showPassword}
-                      value={password}
-                      onChangeText={(text) => setPassword(text)}
-                    />
-                    <TextInput
-                      placeholder="Re-enter Password"
-                      autoCapitalize="none"
-                      style={styles.passwordInput}
-                      secureTextEntry={!showPassword}
-                      value={reEnteredPassword}
-                      onChangeText={(text) => setReEnteredPassword(text)}
-                    />
-                    <ButtonComponent
+                
+                {isOTPVerified ? (
+                  <View style={{}}>
+                    <View style={styles.passwordContainer}>
+                      <Ionicons name="lock-closed" size={20} color="#888" style={styles.icon} />
+                      <TextInput
+                        placeholder="Password"
+                        autoCapitalize="none"
+                        style={styles.passwordInput}
+                        secureTextEntry={!showPassword}
+                        value={password}
+                        onChangeText={(text) => setPassword(text)}
+                      />
+                      <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                        <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={24} color="#888" style={styles.eyeIcon} />
+                      </TouchableOpacity>
+                    </View>
+                    <View style={styles.passwordContainer}>
+                      <Ionicons name="lock-closed" size={20} color="#888" style={styles.icon} />
+                      <TextInput
+                        placeholder="Re-enter Password"
+                        autoCapitalize="none"
+                        style={styles.passwordInput}
+                        secureTextEntry={!showRePassword}
+                        value={reEnteredPassword}
+                        onChangeText={(text) => setReEnteredPassword(text)}
+                      />
+                      <TouchableOpacity onPress={() => setshowRePassword(!showRePassword)}>
+                        <Ionicons name={showRePassword ? 'eye' : 'eye-off'} size={24} color="#888" style={styles.eyeIcon} />
+                      </TouchableOpacity>
+                    </View>
+                    <ButtonComponent style={{width:"70%", top: 30}}
                       title="UPDATE PASSWORD"
                       onPress={handleUpdatePassword}
                       disabled={!password || !reEnteredPassword}
                     />
+                  </View>
+                ) : (
+                  <>
+                    <View style={styles.passwordContainer}>
+                      <Ionicons name="lock-closed" size={20} color="#888" style={styles.icon} />
+                      <TextInput
+                        placeholder="OTP"
+                        autoCapitalize="none"
+                        style={styles.passwordInput}
+                        secureTextEntry={!showPassword}
+                        value={kf_otp}
+                        onChangeText={(text) => setKf_otp(text)}
+                      />
+                      <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                        <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={24} color="#888" style={styles.eyeIcon} />
+                      </TouchableOpacity>
+                    </View>
+                    <ButtonComponent
+                      title="VERIFY"
+                      onPress={handleLogin}
+                      disabled={isSignInDisabled}
+                    />
                   </>
-                )}
-                {!isOTPVerified && (
-                  <ButtonComponent
-                    title="VERIFY"
-                    onPress={handleLogin}
-                    disabled={isSignInDisabled}
-                  />
                 )}
               </View>
             </View>
@@ -300,6 +315,7 @@ export const VerificationScreen = () => {
       />
     </ImageBackground>
   );
+  
 };
 
 const styles = StyleSheet.create({
