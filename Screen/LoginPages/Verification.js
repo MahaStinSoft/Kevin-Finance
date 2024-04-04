@@ -20,6 +20,7 @@ export const VerificationScreen = () => {
   const [isOTPVerified, setIsOTPVerified] = useState(false);
   const [kf_userid, setKf_userid] = useState('');
   const [recordId, setRecordId] = useState(kf_userid);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const navigation = useNavigation();
 
@@ -79,11 +80,6 @@ export const VerificationScreen = () => {
       Alert.alert("Error", "Please enter OTP");
       return;
     };
-
-    if (password !== reEnteredPassword) {
-        Alert.alert("Error", "Passwords do not match");
-        return;
-      }
 
     try {
       // Authenticate and get the access token from Dynamics CRM
@@ -182,6 +178,14 @@ export const VerificationScreen = () => {
   };
 
   const handleUpdatePassword = async () => {
+    
+    if (password !== reEnteredPassword) {
+      setErrorMessage("Passwords do not match");
+      return; // Prevent further execution
+    } else {
+      setErrorMessage(""); // Clear the error message
+    }
+
     try {
       // Authenticate and get the access token from Dynamics CRM
       const tokenResponse = await axios.post(
@@ -210,7 +214,13 @@ export const VerificationScreen = () => {
         }
       );
       console.log("Password updated successfully:", patchResponse.data);
-      Alert.alert("Success", "Password updated successfully");
+      Alert.alert(
+        "Success",
+        "Password updated successfully",
+        [
+          { text: "OK", onPress: () => navigation.navigate("LoginUserForm") }
+        ]
+      );
     } catch (error) {
       console.error("Error while updating password:", error);
       Alert.alert("Error", "An unexpected error occurred. Please try again later.");
@@ -267,6 +277,9 @@ export const VerificationScreen = () => {
                         <Ionicons name={showRePassword ? 'eye' : 'eye-off'} size={24} color="#888" style={styles.eyeIcon} />
                       </TouchableOpacity>
                     </View>
+                    {errorMessage !== '' && (
+                      <Text style={styles.errorText}>{errorMessage}</Text>
+                    )}
                     <ButtonComponent style={{width:"70%", top: 30}}
                       title="UPDATE PASSWORD"
                       onPress={handleUpdatePassword}
@@ -377,7 +390,7 @@ const styles = StyleSheet.create({
   errorText: {
     color: 'red',
     marginLeft: 30,
-    marginTop: -15,
+    marginTop: -10,
   },
   toggleButtons: {
     marginTop: 50,
