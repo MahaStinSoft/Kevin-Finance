@@ -47,6 +47,7 @@ import UserLoanDetails from './Screen/EMI/UserLoanDetails';
 import UserRegisterScreen from './Screen/LoginPages/UserRegister';
 import Welcome from './Screen/LoginPages/Welcome';
 import UserConfrim from './Screen/LoginPages/USerConfrim';
+import VerificationScreen from './Screen/LoginPages/Verification';
 
 const Stack = createNativeStackNavigator();
 
@@ -125,6 +126,7 @@ const MainScreen = () => {
           <Stack.Screen name="LoginUserForm" component={LoginUserForm} options={{ headerShown: false }} />
           <Stack.Screen name="UserDashboard" component={UserDashboard} options={{ headerShown: false }} />
           <Stack.Screen name="UserLoanDetails" component={UserLoanDetails} options={{ headerShown: false }} />
+          <Stack.Screen name="VerificationScreen" component={VerificationScreen} options={{ headerShown: false }} />
           </>
       )}
       </Stack.Navigator>

@@ -60,6 +60,7 @@ export const HomeScreen = ({ route }) => {
   const [showAlert, setShowAlert] = useState(false); 
   const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
   const [showAlertDiscardChanges, setShowAlertDiscardChanges] = useState(false);
+  const [kf_userid, setkf_userid] = useState(null);
 
   const { userapplicationid } = route.params;
 
@@ -619,6 +620,7 @@ export const HomeScreen = ({ route }) => {
       // const applicantImageData = await prepareImageData(kf_applicantimage);
 
       console.log("userAdminName", userAdminName);
+      console.log("userid: ",kf_userid);
 
       const createRecordResponse = await axios.post(
         "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications",
@@ -647,7 +649,8 @@ export const HomeScreen = ({ route }) => {
           kf_numberofemi: kf_numberofemi,
           kf_emicollectiondate: kf_emicollectiondate,
           kf_othercharges: kf_othercharges,
-          kf_createdby: userAdminName
+          kf_createdby: userAdminName,
+          kf_userid: userapplicationid
         },
         {
           headers: {
@@ -712,8 +715,8 @@ export const HomeScreen = ({ route }) => {
               )}
             </View> */}
 
-            {/* <Text>id{userapplicationid}</Text>
-            <Text>employee{authenticatedUser ? authenticatedUser.kf_adminname : ''}</Text> */}
+           {/* <Text>id{userapplicationid}</Text> */}
+            {/*  <Text>employee{authenticatedUser ? authenticatedUser.kf_adminname : ''}</Text> */}
 
           <TextInput style={[styles.textInputContainer, { marginTop: 20, color: "gray" }]}
             placeholder="Created by"
@@ -726,12 +729,8 @@ export const HomeScreen = ({ route }) => {
           />
 
 <TextInput style={[styles.textInputContainer, { marginTop: 20, color: "gray" }]}
-            // placeholder="Created by"
             autoCapitalize="none"
             value={userapplicationid}
-            // onChangeText={(text) => {
-            //   setkf_createdby(text)
-            // }}
             editable={false}
           />
           

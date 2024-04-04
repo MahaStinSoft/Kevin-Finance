@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Alert, Image, Text, TouchableOpacity, StatusBar, Dimensions, Modal, BackHandler, ImageBackground } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, Image, Text, TextInput, TouchableOpacity, StatusBar, Dimensions, Modal, BackHandler, ImageBackground } from 'react-native';
 import { useNavigation, useIsFocused, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -9,32 +9,36 @@ import ButtonComponent from '../../common/ButtonComponent';
 import LoanStatusPicker from '../../common/LoanStatusPicker ';
 import ComponentDatePicker from '../../common/ComponentDatePicker';
 import CustomAlert from '../../common/CustomAlert';
+import { Ionicons } from '@expo/vector-icons';
+
+// Import the generateOTP function
+function generateOTP() {
+  // Generate a random 6-digit OTP
+  var otp = Math.floor(100000 + Math.random() * 900000);
+  return otp.toString();
+}
 
 export const UserRegisterScreen = ({ route }) => {
-
   const [kf_name, setkf_name] = useState(null);
-  const [kf_lastname, setkf_lastname] = useState(null);
-  const [kf_gender, setkf_gender] = useState(null);
-  const [kf_dateofbirth, setkf_dateofbirth] = useState(null);
-  const [kf_age, setkf_age] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
   const [kf_mobilenumber, setkf_mobilenumber] = useState(null);
   const [kf_email, setkf_email] = useState(null);
-  const [kf_otp, setkf_otp] = useState(null);
+  const [kf_password, setkf_password] = useState(null);
+  const [kf_confirmpassword, setKf_confirmpassword] = useState(null);
   const [resetFormKey, setResetFormKey] = useState(0);
   const [authenticatedUser, setAuthenticatedUser] = useState(null);
- 
+
   const [formDisabled, setFormDisabled] = useState(false);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const [isMobileNumberValid, setIsMobileNumberValid] = useState(true);
   const [isEmailValid, setIsEmailValid] = useState(true);
+  const [otp, setOTP] = useState(null); // State variable to hold OTP
 
   const navigation = useNavigation();
   const isFocused = useIsFocused();
 
   const [errorMessages, setErrorMessages] = useState({
     UserName: '',
-    dateOfBirth: '',
-    age: '',
     mobileNumber: '',
     email: '',
   });
@@ -42,15 +46,15 @@ export const UserRegisterScreen = ({ route }) => {
   useFocusEffect(
     React.useCallback(() => {
       getAuthenticatedUser();
-      generateOtp(); // Generate OTP when the component is focused
+      setOTP(generateOTP()); // Generate OTP when the component is focused
     }, [])
   );
 
+
   const resetForm = () => {
     setkf_name('');
-    setkf_gender(null);
     setkf_mobilenumber(null);
-    setkf_email(null);  
+    setkf_email(null);
     setResetFormKey((prevKey) => prevKey + 1);
   };
 
@@ -74,7 +78,7 @@ export const UserRegisterScreen = ({ route }) => {
           ],
           { cancelable: false }
         );
-        return true; 
+        return true;
       }
     });
 
@@ -104,29 +108,13 @@ export const UserRegisterScreen = ({ route }) => {
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       resetForm();
-      generateOtp(); // Generate OTP when the screen is focused
     });
     return unsubscribe;
   }, [navigation]);
 
-  const handleGenderOptionset = (selectedOptionGender) => {
-    let numericValue;
-    switch (selectedOptionGender) {
-      case 'Male':
-        numericValue = 123950000;
-        break;
-      case 'Female':
-        numericValue = 123950001;
-        break;
-      default:
-        numericValue = null;
-    }
-    setkf_gender(numericValue);
-  };
-
   const handleFirstNameChange = (text) => {
     const onlyAlphabets = /^[^!-\/:-@\[-`{-~]+$/;
-    
+
     if (onlyAlphabets.test(text) || text === '') {
       setkf_name(text);
       setErrorMessages({ ...errorMessages, firstName: '' });
@@ -135,31 +123,11 @@ export const UserRegisterScreen = ({ route }) => {
     }
   };
 
-  const handleDateOfBirth = (newDate) => {
-    if (!newDate) {
-      setkf_dateofbirth(null);
-      setErrorMessages({
-        ...errorMessages,
-        dateOfBirth: 'Please enter date of birth',
-      });
-      return;
-    }
-  
-    // Extracting date part from the newDate
-    const selectedDate = new Date(newDate.getFullYear(), newDate.getMonth(), newDate.getDate());
-    
-    setkf_dateofbirth(selectedDate);
-    setErrorMessages({
-      ...errorMessages,
-      dateOfBirth: '', // Clearing the error message if date is selected
-    });
-  };
- 
   const handleMobileNumberChange = (text) => {
     setkf_mobilenumber(text);
 
     if (text && text.trim() === '') {
-    setIsMobileNumberValid(false);
+      setIsMobileNumberValid(false);
       setErrorMessages({
         ...errorMessages,
         mobileNumber: 'Enter a Mobile Number',
@@ -215,6 +183,8 @@ export const UserRegisterScreen = ({ route }) => {
     }
   };
 
+
+
   const handleSaveRecord = async () => {
     setIsFormSubmitted(true);
     if (handleMobileNumberChange(kf_mobilenumber) > 10) {
@@ -227,10 +197,8 @@ export const UserRegisterScreen = ({ route }) => {
 
     const newErrorMessages = {
       firstName: !kf_name ? ' Enter a First Name' : '',
-      dateOfBirth: !kf_dateofbirth ? ' Enter a Date of Birth' : '',
       mobileNumber: /^[6-9]\d{9}$/.test(kf_mobilenumber) ? '' : 'Enter a Valid 10-digit mobile number.',
       email: !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(kf_email) ? 'Enter a Valid Email Address' : '',
-      
     };
     setErrorMessages(newErrorMessages);
     if (Object.values(newErrorMessages).some(message => message !== '')) {
@@ -249,21 +217,15 @@ export const UserRegisterScreen = ({ route }) => {
         data,
         { headers: { "content-type": "application/x-www-form-urlencoded" } }
       );
-      // console.log("tokenResponse", tokenResponse);
       const accessToken = tokenResponse.data.access_token;
-      // console.log("Access Token:", accessToken);
-
-      const formattedDateOfBirth = kf_dateofbirth ? kf_dateofbirth : null;
 
       const createRecordResponse = await axios.post(
         "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_users",
         {
           kf_name: kf_name,
-          kf_gender: kf_gender,
-          kf_dateofbirth: formattedDateOfBirth,
           kf_mobilenumber: kf_mobilenumber,
           kf_email: kf_email,
-          kf_otp: kf_otp
+          kf_otp: otp, // Include OTP in request payload
         },
         {
           headers: {
@@ -274,74 +236,50 @@ export const UserRegisterScreen = ({ route }) => {
       );
       if (createRecordResponse.status === 204) {
         setFormDisabled(true);
-        console.log("Record created successfully in CRM");
         Alert.alert(
-          'User Registeration',
-          ' Registeration successfully done.',
+          'User Registration',
+          'Registration successfully done.',
           [
             {
               text: 'OK',
-              onPress: () => navigation.navigate('LoginUserForm', { resetState: true }),
+              onPress: () => navigation.navigate('VerificationScreen', { resetState: true }),
             },
           ]
         );
       } else {
-        console.log("else part");
         Alert.alert("Error", "Failed to create a record in CRM.");
-      }    
-  } catch (error) {
-    console.error("Error during record creation:", error);
-    if (error.response) {
-      console.log("Detailed Error Response:", error.response.data);
+      }
+    } catch (error) {
+      console.error("Error during record creation:", error);
+      if (error.response) {
+        console.log("Detailed Error Response:", error.response.data);
+      }
+      Alert.alert("Error", "An unexpected error occurred. Try again later.");
     }
-    Alert.alert("Error", "An unexpected error occurred. Try again later.");
-  }
-};
+  };
 
-const generateOtp = () => {
-  const otp = Math.floor(1000 + Math.random() * 9000); // Generate a random number between 1000 and 9999
-  setkf_otp(otp.toString());
-};
+
 
   return (
     <View style={styles.container}>
 
-        <ImageBackground source={require('../../assets/red.png')} style={styles.backgroundImage}>
-     
-      <Text style={styles.Heading}>Registeration</Text>
-      <ScrollView key={resetFormKey} keyboardShouldPersistTaps="handled">
+      <ImageBackground source={require('../../assets/red.png')} style={styles.backgroundImage}>
+
+        <Text style={styles.Heading}>Registeration</Text>
+        <ScrollView key={resetFormKey} keyboardShouldPersistTaps="handled">
           <View style={styles.formContent}>
-          <TextInputComponent
-            placeholder="Name"
-            autoCapitalize="none"
-            value={kf_name}
-            onChangeText={handleFirstNameChange}
-          />
-          {errorMessages.firstName !== '' && (
-            <Text style={styles.errorText}>{errorMessages.firstName}</Text>
-          )}
+            <TextInputComponent
+              placeholder="Name"
+              autoCapitalize="none"
+              value={kf_name}
+              onChangeText={handleFirstNameChange}
+            />
+            {errorMessages.firstName !== '' && (
+              <Text style={styles.errorText}>{errorMessages.firstName}</Text>
+            )}
 
-          <ComponentDatePicker
-            style={{ height: 48, marginBottom: 10, marginTop: 8 }}
-            selectedDate={kf_dateofbirth}
-            onDateChange={handleDateOfBirth}
-            placeholder="Date of Birth"
-          />
 
-          {errorMessages.dateOfBirth !== '' && (
-            <Text style={[styles.errorText, { marginTop: -5, marginBottom: 0 }]}>
-              {errorMessages.dateOfBirth}
-            </Text>
-          )}
-
-          <LoanStatusPicker
-            onOptionChange={handleGenderOptionset}
-            title="Gender"
-            options={['Male', 'Female']}
-          // initialOption="Option1"
-          Optiontitle= "Gender"
-          />
-            <View style={{marginVertical: 6}}>
+            <View style={{ marginVertical: 6 }}>
               <TextInputComponent
                 placeholder="Mobile Number"
                 autoCapitalize="none"
@@ -353,63 +291,90 @@ const generateOtp = () => {
                 <Text style={styles.errorText}>{errorMessages.mobileNumber}</Text>
               )}
             </View>
-          <TextInputComponent
-            placeholder="Email Address"
-            autoCapitalize="none"
-            value={kf_email}
-            onChangeText={handleEmailChange}
-          />
-          {errorMessages.email !== '' && (
-            <Text style={styles.errorText}>{errorMessages.email}</Text>
-          )}
-
-{/* <Text>Generated OTP: {kf_otp}</Text> */}
-
-          <ButtonComponent
-            title="SUBMIT"
-            onPress={handleSaveRecord}
-            disabled={formDisabled}
-          />
-</View>
-      </ScrollView>
+            <TextInputComponent
+              placeholder="Email Address"
+              autoCapitalize="none"
+              value={kf_email}
+              onChangeText={handleEmailChange}
+            />
+            {errorMessages.email !== '' && (
+              <Text style={styles.errorText}>{errorMessages.email}</Text>
+            )}
+            <ButtonComponent
+              title="REGISTER"
+              onPress={handleSaveRecord}
+              disabled={formDisabled}
+            />
+            {/* <View style={styles.passwordContainer}>
+                  <Ionicons name="lock-closed" size={20} color="#888" style={styles.icon} /> */}
+            {/* <TextInput
+                    placeholder="OTP "
+                    autoCapitalize="none"
+                    style={styles.passwordInput}
+                    secureTextEntry={!showPassword}
+                    value={kf_otp}
+                    onChangeText={(text) => setkf_otp(text)}
+                  /> */}
+            {/* <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                    <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={24} color="#888" style={styles.eyeIcon} />
+                  </TouchableOpacity>
+                </View> */}
+            {/* <Text>Generated OTP: {kf_otp}</Text> */}
+          </View>
+        </ScrollView>
       </ImageBackground>
-      </View>
+    </View>
 
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    position:"absolute"
+    position: "absolute"
   },
   errorText: {
     color: 'red',
     fontSize: 15,
     marginHorizontal: 25,
   },
-  Heading:{
+  Heading: {
     fontWeight: 'bold',
     color: "white",
     fontSize: 30,
     textAlign: 'center',
     marginTop: 140
+  }, passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomColor: '#DAD7D7',
+    borderBottomWidth: 1,
+    marginHorizontal: 20,
+    marginVertical: 15,
+  },
+  passwordInput: {
+    flex: 1,
+    height: 40,
+    paddingHorizontal: 0
+  },
+  eyeIcon: {
+    padding: 10,
   },
   backgroundImage: {
     flex: 1,
     resizeMode: 'cover',
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
-    position:"relative"
+    position: "relative"
   },
-  formContent:{
+  formContent: {
     marginTop: 80
   },
   input: {
     // marginBottom: -15, // Default marginBottom when no error message
-},
-errorInput: {
+  },
+  errorInput: {
     marginBottom: 50, // MarginBottom when error message is displayed
-},
+  },
 });
-  
-  export default UserRegisterScreen;
+
+export default UserRegisterScreen;

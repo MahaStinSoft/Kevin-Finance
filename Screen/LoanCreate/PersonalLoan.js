@@ -12,7 +12,7 @@ import ComponentDatePicker from '../../common/ComponentDatePicker';
 import CardImage from '../../common/CardImage';
 import CustomAlert from '../../common/CustomAlert';
 
-export const PersonalLoan = () => {
+export const PersonalLoan = ({route}) => {
   const [kf_firstname, setkf_firstname] = useState('');
   const [kf_lastname, setkf_lastname] = useState('');
   const [kf_name, setkf_name] = useState(null);
@@ -57,6 +57,9 @@ export const PersonalLoan = () => {
   const [showAlert, setShowAlert] = useState(false); 
   const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
   const [showAlertDiscardChanges, setShowAlertDiscardChanges] = useState(false);
+  const [kf_userid, setkf_userid] = useState(null);
+  
+  const { userapplicationid } = route.params;
 
   const handleShowDiscardChangesAlert = () => {
     setShowAlertDiscardChanges(true);
@@ -709,6 +712,7 @@ const handleInterestRateChange = (text) => {
           kf_emicollectiondate: kf_emicollectiondate,
           kf_othercharges: kf_othercharges,
           kf_applicantimage:kf_applicantimage.fileContent,
+          kf_userid: userapplicationid
         },
         {
           headers: {
@@ -773,6 +777,12 @@ const handleInterestRateChange = (text) => {
             onChangeText={(text) => {
               setkf_createdby(text)
             }}
+            editable={false}
+          />
+
+<TextInput style={[styles.textInputContainer, { marginTop: 20, color: "gray" }]}
+            autoCapitalize="none"
+            value={userapplicationid}
             editable={false}
           />
 
