@@ -18,7 +18,7 @@ import SendNotification from '../../common/SendNotification';
 import CustomAlert from '../../common/CustomAlert';
 
 const EditPersonalLoan = ({ route, navigation }) => {
-  // const { personalLoan, onUpdateSuccess } = route.params || {};
+  const { onUpdateSuccess } = route.params || {};
   const [personalLoan, setpersonalLoan] = useState(route.params.personalLoan);
   const [applicationnumber, setapplicationnumber] = useState(personalLoan?.kf_applicationnumber || '');
   const [createdby, setcreatedby] = useState(personalLoan?.kf_createdby || '');

@@ -626,25 +626,24 @@ const UserDashboard = ({ navigation, route }) => {
         <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
             {displayedHomeLoans.length === 0 && displayedPersonalLoans.length === 0 ? (
                 <View style={styles.noRecordsContainer}>
-                    <Text style={styles.noRecordsText}>No Records Found</Text>
+                    {/* <Text style={styles.noRecordsText}>No Records Found</Text> */}
                 </View>
             ) : (
                 <>
                     <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 15, width: "100%" }}>
                         <Text style={[styles.heading, { right: 0 }]}>Home Loans</Text>
-
-                        <TouchableOpacity
+                        {/* <TouchableOpacity
                             onPress={toggleShowAllHomeLoans}
                             style={[styles.viewMoreButton, { opacity: displayedHomeLoans.length === 0 ? 0 : 1 }]}
                             disabled={displayedHomeLoans.length === 0}>
                             <Text style={styles.viewMoreButtonText}>
                                 {showAllHomeLoans ? 'View Less' : 'View More'}
                             </Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                     </View>
                     {displayedHomeLoans.length > 0 && (
                         <>
-                            {displayedHomeLoans
+                            {/* {displayedHomeLoans
                                 .filter(record => record.kf_userapplicantid === authenticatedUser?.kf_applicantid)
                                 .map((homeLoan, index) => (
                                     <HomeLoanCard
@@ -653,24 +652,44 @@ const UserDashboard = ({ navigation, route }) => {
                                         onPress={() => navigateToHomeDetails(homeLoan)}
                                     />
                                 ))
-                            }
+                            } */}
+                            {displayedHomeLoans
+    .filter(record => record.kf_userapplicantid === authenticatedUser?.kf_applicantid)
+    .map((homeLoan, index) => (
+        <HomeLoanCard
+            key={index}
+            loanApplication={homeLoan}
+            onPress={() => navigateToHomeDetails(homeLoan)}
+        />
+    ))
+}
+
+{displayedHomeLoans
+    .filter(record => record.kf_userapplicantid === authenticatedUser?.kf_applicantid)
+    .length === 0 && (
+        <View style={styles.noRecordsContainer}>
+            <Text style={styles.noRecordsText}>No Records Found</Text>
+        </View>
+    )
+}
+
                         </>
                     )}
 
                     <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 15, width: "100%" }}>
                         <Text style={[styles.heading, { marginBottom: 0 }]}>Personal Loans</Text>
-                        <TouchableOpacity
+                        {/* <TouchableOpacity
                             onPress={toggleShowAllPersonalLoans}
                             style={[styles.viewMoreButton, { opacity: displayedPersonalLoans.length === 0 ? 0 : 1 }]}
                             disabled={displayedPersonalLoans.length === 0}>
                             <Text style={styles.viewMoreButtonText}>
                                 {showAllPersonalLoans ? 'View Less' : 'View More'}
                             </Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                     </View>
                     {displayedPersonalLoans.length > 0 && (
                         <>
-                            {displayedPersonalLoans
+                            {/* {displayedPersonalLoans
                                 .filter(record => record.kf_userapplicantid === authenticatedUser?.kf_applicantid)
                                 .map((personalLoan, index) => (
                                     <PersonalLoanCard
@@ -679,7 +698,27 @@ const UserDashboard = ({ navigation, route }) => {
                                         onPress={() => navigateToPersonalDetails(personalLoan)}
                                     />
                                 ))
-                            }
+                            } */}
+
+{displayedPersonalLoans
+    .filter(record => record.kf_userapplicantid === authenticatedUser?.kf_applicantid)
+    .map((personalLoan, index) => (
+        <PersonalLoanCard
+            key={index}
+            personalLoan={personalLoan}
+            onPress={() => navigateToPersonalDetails(personalLoan)}
+        />
+    ))
+}
+{displayedPersonalLoans
+    .filter(record => record.kf_userapplicantid === authenticatedUser?.kf_applicantid)
+    .length === 0 && (
+        <View style={[styles.noRecordsContainer,{textAlign: "center"}]}>
+            <Text style={styles.noRecordsText}>No Records Found</Text>
+        </View>
+    )
+}
+
                         </>
                     )}
                 </>
@@ -887,6 +926,8 @@ const styles = StyleSheet.create({
         // elevation: 5, // Elevation for Android shadow
         justifyContent: 'center', // Center the text vertically
         alignItems: 'center', // Center the text horizontally
+        marginHorizontal: 80,
+        width: "80%"
     },
     noRecordsText: {
         color: '#0000cc', // Text color
