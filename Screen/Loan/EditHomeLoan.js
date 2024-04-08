@@ -1020,6 +1020,21 @@ const EditHomeLoan = ({ route, navigation }) => {
     }
   };
 
+  // const handleSendApproval = (selectedOptionGender) => {
+  //   let booleanValue;
+  //   switch (selectedOptionGender) {
+  //     case 'No':
+  //       booleanValue = false;
+  //       break;
+  //     case 'Yes':
+  //       booleanValue = true;
+  //       break;
+  //     default:
+  //       booleanValue = null;
+  //   }
+  //   setSendApproval(booleanValue);
+  // };
+
   const handleSendApproval = (selectedOptionGender) => {
     let booleanValue;
     switch (selectedOptionGender) {
@@ -1027,14 +1042,34 @@ const EditHomeLoan = ({ route, navigation }) => {
         booleanValue = false;
         break;
       case 'Yes':
-        booleanValue = true;
-        break;
+        // Display an alert for approval
+        Alert.alert(
+          'Confirm Send Approval',
+          'Are you sure you want to send approval?',
+          [
+            {
+              text: 'Cancel',
+              onPress: () => console.log('Approval not sent'),
+              style: 'cancel',
+            },
+            {
+              text: 'OK',
+              onPress: () => {
+                // Handle sending approval
+                // handleUpdateRecordAndSendAnnotation();
+                setSendApproval(true); // Set sendApproval to true after confirmation
+              },
+            },
+          ],
+          { cancelable: false }
+        );
+        return; // Return immediately after displaying the alert
       default:
         booleanValue = null;
     }
     setSendApproval(booleanValue);
   };
-
+  
   const getSendApproval = (booleanValue) => {
     switch (booleanValue) {
       case false:

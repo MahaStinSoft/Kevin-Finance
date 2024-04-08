@@ -1138,8 +1138,28 @@ const EditPersonalLoan = ({ route, navigation }) => {
         booleanValue = false;
         break;
       case 'Yes':
-        booleanValue = true;
-        break;
+        // Display an alert for approval
+        Alert.alert(
+          'Confirm Send Approval',
+          'Are you sure you want to send approval?',
+          [
+            {
+              text: 'Cancel',
+              onPress: () => console.log('Approval not sent'),
+              style: 'cancel',
+            },
+            {
+              text: 'OK',
+              onPress: () => {
+                // Handle sending approval
+                // handleUpdateRecordAndSendAnnotation();
+                setSendApproval(true); // Set sendApproval to true after confirmation
+              },
+            },
+          ],
+          { cancelable: false }
+        );
+        return; // Return immediately after displaying the alert
       default:
         booleanValue = null;
     }

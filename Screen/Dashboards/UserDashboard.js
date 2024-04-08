@@ -480,26 +480,29 @@ const UserDashboard = ({ navigation, route }) => {
 
                 <View style={styles.container}>
 
-                    <View style={styles.navBar}>
+                <View style={styles.navBar}>
 
-                        <TouchableOpacity style={styles.iconButton} onPress={handlelogout}>
-                            <Ionicons name="list-sharp" size={25} color="#fff" />
-                        </TouchableOpacity>
-                        <Text style={styles.text}>Kevin Small Finance</Text>
-                        <TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
-                            <View>
-                                <TouchableOpacity style={styles.iconButtonLogout} onPress={handleLogout}>
-                                    <Ionicons name="md-log-out" size={28} color="#fff" />
-                                </TouchableOpacity>
-                                {/* <Ionicons name="notifications" size={25} color="#fff" /> */}
-                                {unreadMessagesCount > 0 && (
-                                    <View style={styles.badgeContainer}>
-                                        <Text style={styles.badgeText}>{unreadMessagesCount}</Text>
-                                    </View>
-                                )}
-                            </View>
-                        </TouchableOpacity>
-                    </View>
+{/* <TouchableOpacity style={styles.iconButton} onPress={handlelogout}>
+    <Ionicons name="list-sharp" size={25} color="#fff" />
+</TouchableOpacity> */}
+<Text style={styles.text}>Kevin Small Finance</Text>
+
+<TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
+    <View>
+        <Ionicons name="notifications" size={25} color="#fff" />
+        {unreadMessagesCount > 0 && (
+            <View style={styles.badgeContainer}>
+                <Text style={styles.badgeText}>{unreadMessagesCount}</Text>
+            </View>
+        )}
+    </View>
+   
+</TouchableOpacity>
+
+<TouchableOpacity style={styles.iconButtonLogout} onPress={handleLogout}>
+            <Ionicons name="md-log-out" size={28} color="#fff" />
+        </TouchableOpacity>
+        </View>
 
                     <ScrollView
                         contentContainerStyle={{ width: '100%' }}
@@ -661,7 +664,7 @@ const styles = StyleSheet.create({
         color: "#007bff",
     },
     iconButton: {
-        marginHorizontal: 10,
+        marginLeft: 50,
 
     },
     plusIconScetion: {
