@@ -1125,15 +1125,22 @@ const EditHomeLoan = ({ route, navigation }) => {
 
         <View style={styles.detailContainer}>
           <View style={styles.wrapper}>
-            {/* <Button title="Send Notification" onPress={handleSendNotification} /> */}
+            {/* <LoanStatusPicker
+              onOptionChange={handleSendApproval}
+              title="Send Approval"
+              options={['No', 'Yes']}
+              initialOption={sendApproval ? 'Yes' : 'No'}
+              style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
+              disabled={sendApproval}
+            /> */}
+
             <LoanStatusPicker
               onOptionChange={handleSendApproval}
               title="Send Approval"
               options={['No', 'Yes']}
-              // initialOption={sendApproval ? getSendApproval(sendApproval) : ''}
               initialOption={sendApproval ? 'Yes' : 'No'}
-              style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
-              disabled={sendApproval}
+              style={{ width: '100%', marginLeft: 0, marginTop: 5 }}
+              disabled={UserApplicantID || sendApproval}
             />
             <TextInput
               style={[styles.textInputContainer, { color: "gray" }]}
@@ -1548,7 +1555,7 @@ const EditHomeLoan = ({ route, navigation }) => {
 
             <View style={{ flexDirection: "row" ,marginTop: 10,marginLeft: 20}}>
               <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={[styles.buttonContainer, { width: "40%", marginLeft: -5 }]}>
-                <Text style={styles.buttonText}>Guarantor1</Text>
+                <Text style={styles.buttonTextGurantor}>Guarantor1</Text>
               </TouchableOpacity>
               {/* <TouchableOpacity onPress={handleNavigateToGuaranteeScreen2} style={[styles.buttonContainer, {width: "42%", marginLeft: 10}]}>
             <Text style={styles.buttonText}>Guarantee2</Text>
@@ -1563,7 +1570,7 @@ const EditHomeLoan = ({ route, navigation }) => {
                 ]}
                 disabled={!loanApplication.kf_guarantorfirstname} // Disable button if HomeGuarantee 1 doesn't contain any values
               >
-                <Text style={styles.buttonText}>Guarantor2</Text>
+                <Text style={styles.buttonTextGurantor}>Guarantor2</Text>
               </TouchableOpacity>
             </View>
 
@@ -1735,7 +1742,7 @@ const styles = StyleSheet.create({
     width: "33%"
   },
   buttonText: {
-    fontSize: 14,
+    fontSize: 12,
     color: 'white',
     padding: 5,
     fontWeight: "bold"
@@ -1784,12 +1791,13 @@ const styles = StyleSheet.create({
         width: "55%",
         height: 35
       },
-      buttonText: {
+      buttonTextGurantor: {
         color: 'white',
         fontWeight: 'bold',
         textAlign: 'center',
         fontSize: 12,
-      }, disabledButton: {
+      }, 
+      disabledButton: {
         backgroundColor: 'gray', 
       },
       saveButton: {

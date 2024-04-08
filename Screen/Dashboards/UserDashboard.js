@@ -532,13 +532,13 @@ const UserDashboard = ({ navigation, route }) => {
 
 
                                 <View>
-                                    <View style={[styles.loanButton, { marginTop: 30 }]}>
+                                    <View style={[styles.loanButton, { marginTop: 20 }]}>
                                         <TouchableOpacity onPress={handleHomeLoan} style={styles.button}>
                                             <Text style={styles.buttonText}>Apply Home Loan</Text>
                                             <Ionicons name="chevron-forward" size={25} color="white" style={styles.icon} />
                                         </TouchableOpacity>
                                     </View>
-                                    <View style={[styles.loanButton, { marginTop: 30 }]}>
+                                    <View style={[styles.loanButton, { marginTop: 20 }]}>
                                         <TouchableOpacity onPress={handlePersonalLoan} style={styles.button}>
                                             <Text style={[styles.buttonText, { left: 8 }]}>Apply Personal Loan</Text>
                                             <Ionicons name="chevron-forward" size={25} color="white" style={[styles.icon, { right: 10 }]} />
@@ -879,15 +879,15 @@ const styles = StyleSheet.create({
     },
     button: {
         backgroundColor: "red",
-        padding: 15,
+        padding: 5,
         borderRadius: 30,
-        width: "60%",
+        width: "50%",
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center"
     },
     buttonText: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: "bold",
         color: "white",
         textAlign: "center",
