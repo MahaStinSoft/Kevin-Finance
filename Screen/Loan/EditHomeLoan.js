@@ -57,7 +57,7 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [sendApproval, setSendApproval] = useState(loanApplication?.kf_sendapproval || '');
   const [reason, setReason] = useState(loanApplication?.kf_reason || '');
   const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fileContent: null });
-
+  const [UserApplicantID, setUserApplicantID] = useState(loanApplication?.kf_userapplicantid || '');
   const [isfirstnameValid, setIsfirstnameValid] = useState(true);
   const [isLastNameValid, setIsLastNameValid] = useState(true);
   const [isMobileNumberValid, setIsMobileNumberValid] = useState(true);
@@ -76,7 +76,8 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [showAlert, setShowAlert] = useState(false); 
   const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
 
-  const { signatureImage } = route.params;
+  // const { userapplicationid } = route.params;
+  const { signatureImage, userapplicationid } = route.params;
   console.log('signature', signatureImage);
   // const [signatureImage, setSignatureImage] = useState(null);
   const [recordId, setRecordId] = useState(loanApplication.kf_loanapplicationid);
@@ -97,8 +98,16 @@ const EditHomeLoan = ({ route, navigation }) => {
     navigation.navigate("HomeLoanDetailsScreen", { loanApplication });
   };
   // console.log("send home approval ", sendApproval);
+
+  useEffect(() => {
+    if (loanApplication && loanApplication.kf_userapplicantid) {
+      setUserApplicantID(loanApplication.kf_userapplicantid);
+    }
+  }, [loanApplication?.kf_userapplicantid]);
+
   useEffect(() => {
     setapplicationnumber(loanApplication.kf_applicationnumber);
+    setUserApplicantID(loanApplication.kf_userapplicantid);
     setcreatedby(loanApplication.kf_createdby);
     setfirstname(loanApplication.kf_name);
     setLastname(loanApplication.kf_lastname);
@@ -247,6 +256,7 @@ const EditHomeLoan = ({ route, navigation }) => {
           kf_numberofemi: numberOfEMI,
           kf_sendapproval: sendApproval,
           kf_reason: reason,
+          kf_userapplicantid: UserApplicantID,
         },
         {
           headers: {
@@ -1143,6 +1153,15 @@ const EditHomeLoan = ({ route, navigation }) => {
                 setcreatedby(text);
               }}
               editable={false}
+            />
+
+            <TextInput
+              style={[styles.textInputContainer, { marginTop: 5, color: "gray" }]}
+              placeholder="User Applicant ID"
+              autoCapitalize="none"
+              value={UserApplicantID}
+              // onChangeText={UserApplicantID}
+              editable={false} // Make editable only if sendApproval is false
             />
 
             <TextInput

@@ -55,7 +55,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
   const [signature, setSignature] = useState({ fileName: null });
   const [sendApproval, setSendApproval] = useState(personalLoan?.kf_sendapproval || '');
   const [reason, setReason] = useState(personalLoan?.kf_reason || '');
-
+  const [UserApplicantID, setUserApplicantID] = useState(personalLoan?.kf_userapplicantid || '');
   const [isfirstnameValid, setIsfirstnameValid] = useState(true);
   const [isLastNameValid, setIsLastNameValid] = useState(true);
   const [isMobileNumberValid, setIsMobileNumberValid] = useState(true);
@@ -72,8 +72,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
   const [aadharImageContent, setAadharImageContent] = useState(null);
   const [showAlert, setShowAlert] = useState(false); 
   const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
-
-  const { signatureFile } = route.params;
+  // const { userapplicationid } = route.params;
+  const { signatureFile, userapplicationid } = route.params;
   console.log('signature', signatureFile);
   const [recordId, setRecordId] = useState(personalLoan.kf_personalloanid);
   const [imageSource, setImageSource] = useState(null);
@@ -94,8 +94,15 @@ const EditPersonalLoan = ({ route, navigation }) => {
   };
 
   useEffect(() => {
+    if (personalLoan && personalLoan.kf_userapplicantid) {
+      setUserApplicantID(personalLoan.kf_userapplicantid);
+    }
+  }, [personalLoan?.kf_userapplicantid]);
+
+  useEffect(() => {
     // Update state and variables when the route parameters change
     setapplicationnumber(personalLoan.kf_applicationnumber);
+    setUserApplicantID(personalLoan.kf_userapplicantid);
     setcreatedby(personalLoan.kf_createdby);
     setfirstname(personalLoan.kf_firstname);
     setLastname(personalLoan.kf_lastname);
@@ -247,7 +254,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
           kf_numberofemi: numberOfEMI,
           kf_sendapproval: sendApproval,
           kf_reason: reason,
-          // kf_applicantimage: applicantImage.fileContent,
+          kf_userapplicantid: UserApplicantID,
         },
         {
           headers: {
@@ -293,7 +300,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
             kf_numberofemi: numberOfEMI,
             kf_sendapproval: sendApproval,
             kf_reason: reason,
-            // kf_applicantimage: applicantImage.fileContent,
+            kf_userapplicantid: UserApplicantID,
           });
         }
         // console.log(age);
@@ -1246,6 +1253,15 @@ const EditPersonalLoan = ({ route, navigation }) => {
                 setcreatedby(text);
               }}
               editable={false}
+            />
+
+            <TextInput
+              style={[styles.textInputContainer, { marginTop: 5, color: "gray" }]}
+              placeholder="User Applicant ID"
+              autoCapitalize="none"
+              value={UserApplicantID}
+              // onChangeText={UserApplicantID}
+              editable={false} // Make editable only if sendApproval is false
             />
 
             <TextInput

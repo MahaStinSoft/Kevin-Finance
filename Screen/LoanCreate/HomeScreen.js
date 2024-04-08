@@ -62,7 +62,7 @@ export const HomeScreen = ({ route }) => {
   const [showAlertDiscardChanges, setShowAlertDiscardChanges] = useState(false);
   const [kf_userapplicantid, setkf_userid] = useState(null);
 
-  const { userapplicationid } = route.params;
+  const { userapplicationid } = route.params || {};
 
   const navigation = useNavigation();
   const isFocused = useIsFocused();
@@ -715,7 +715,7 @@ export const HomeScreen = ({ route }) => {
               )}
             </View> */}
 
-           {/* <Text>id{userapplicationid}</Text> */}
+           
             {/*  <Text>employee{authenticatedUser ? authenticatedUser.kf_adminname : ''}</Text> */}
 
           <TextInput style={[styles.textInputContainer, { marginTop: 20, color: "gray" }]}
@@ -728,12 +728,14 @@ export const HomeScreen = ({ route }) => {
             editable={false}
           />
 
-<TextInput style={[styles.textInputContainer, { marginTop: 20, color: "gray" }]}
+          <TextInput
+            style={[styles.textInputContainer, { marginTop: 20, color: "gray" }]}
+            // placeholder="User Applicant ID"
             autoCapitalize="none"
-            value={userapplicationid}
+            value={userapplicationid ? userapplicationid.toString() : 'User Applicant ID'}
             editable={false}
           />
-          
+
           <TextInputComponent
             placeholder="First Name"
             autoCapitalize="none"

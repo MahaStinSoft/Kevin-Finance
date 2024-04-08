@@ -59,8 +59,8 @@ export const PersonalLoan = ({route}) => {
   const [showAlertDiscardChanges, setShowAlertDiscardChanges] = useState(false);
   const [kf_userapplicantid, setkf_userid] = useState(null);
   
-  const { userapplicationid } = route.params;
-
+  const { userapplicationid } = route.params || {};
+   
   const handleShowDiscardChangesAlert = () => {
     setShowAlertDiscardChanges(true);
   };
@@ -780,9 +780,11 @@ const handleInterestRateChange = (text) => {
             editable={false}
           />
 
-<TextInput style={[styles.textInputContainer, { marginTop: 20, color: "gray" }]}
+          <TextInput
+            style={[styles.textInputContainer, { marginTop: 20, color: "gray" }]}
+            // placeholder="User Applicant ID"
             autoCapitalize="none"
-            value={userapplicationid}
+            value={userapplicationid ? userapplicationid.toString() : 'User Applicant ID'}
             editable={false}
           />
 
