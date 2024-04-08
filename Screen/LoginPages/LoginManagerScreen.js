@@ -205,6 +205,18 @@ export const LoginManagerScreen = () => {
   modalHeaderStyle={[styles.modalheaderStyle, {right: 65}]}
   textStyle={styles.textStyle}
 />
+<CustomAlert
+  visible={showAlertInvalidUser}
+  onClose={handledCloseInvalidAlert}
+  onConfirm={handledCloseInvalidAlert}
+  headerMessage="Invalid credentials"
+  message="Please Enter Correct Email & Password."
+  Button1="Cancel"
+  Button2="OK"
+  style={[styles.alertStyle, {height: "23%"}]}
+  modalHeaderStyle={[styles.modalheaderStyle, {right: 65}]}
+  textStyle={styles.textStyle}
+/>
     </ImageBackground>
   );
 };

@@ -1103,34 +1103,49 @@ const EditPersonalLoan = ({ route, navigation }) => {
   };
 
 
-  const handleSendApproval = () => {
-    // If already approved, show alert to confirm sending approval
-    if (sendApproval) {
-      Alert.alert(
-        'Confirm Send Approval',
-        'Are you sure you want to send approval?',
-        [
-          {
-            text: 'No',
-            onPress: () => console.log('Approval not sent'),
-            style: 'cancel',
-          },
-          {
-            text: 'Yes',
-            onPress: () => {
-              // Handle sending approval
-              handleUpdateRecordAndSendAnnotation();
-            },
-          },
-        ],
-        { cancelable: false }
-      );
-    } else {
-      // Toggle sendApproval status if switch is not enabled
-      setSendApproval(previousValue => !previousValue);
-    }
-  };
+  // const handleSendApproval = () => {
+  //   // If already approved, show alert to confirm sending approval
+  //   if (sendApproval) {
+  //     Alert.alert(
+  //       'Confirm Send Approval',
+  //       'Are you sure you want to send approval?',
+  //       [
+  //         {
+  //           text: 'No',
+  //           onPress: () => console.log('Approval not sent'),
+  //           style: 'cancel',
+  //         },
+  //         {
+  //           text: 'Yes',
+  //           onPress: () => {
+  //             // Handle sending approval
+  //             handleUpdateRecordAndSendAnnotation();
+  //           },
+  //         },
+  //       ],
+  //       { cancelable: false }
+  //     );
+  //   } else {
+  //     // Toggle sendApproval status if switch is not enabled
+  //     setSendApproval(previousValue => !previousValue);
+  //   }
+  // };
   
+  const handleSendApproval = (selectedOptionGender) => {
+    let booleanValue;
+    switch (selectedOptionGender) {
+      case 'No':
+        booleanValue = false;
+        break;
+      case 'Yes':
+        booleanValue = true;
+        break;
+      default:
+        booleanValue = null;
+    }
+    setSendApproval(booleanValue);
+  };
+
   const getLoanStatus = () => {
     switch (personalLoan.kf_status) {
       case 123950000:
