@@ -11,8 +11,8 @@ import { Ionicons } from '@expo/vector-icons'; // Import the close icon from you
 import CustomAlert from '../../common/CustomAlert';
 
 const EditLoanDetail = ({ route, navigation }) => {
-  const { record, recordId } = route.params;
-  // console.log('Record ID:', record); 
+  const { record, userid  } = route.params;
+  // console.log('Record ID:', route.params); 
   const [principalLoanAmount, setPrincipalLoanAmount] = useState(record.kf_principalloanamount);
   const [kf_paidstatus, setkf_paidstatus] = useState(record.kf_paidstatus);
   const [PaymentDate, setPaymentDate] = useState(record.kf_receiveddate);
@@ -22,6 +22,7 @@ const EditLoanDetail = ({ route, navigation }) => {
   const [interestPayment, setInterestPayment] = useState(record.kf_annualinterest);
   const [emiAmount, setEmiAmount] = useState(record.kf_emiamount);
   const [applicationNumber, setApplicationNumber] = useState(record.kf_applicationnumber);
+  // const [userid, setuserapplicationid] = useState(record.kf);
   const [penalty, setPenalty] = useState(record.kf_penalty);
   const [isLoading, setIsLoading] = useState(false);
   const emiStatusOptions = ['Paid', 'Unpaid'];
@@ -82,7 +83,7 @@ const EditLoanDetail = ({ route, navigation }) => {
     setSelectedDate(date);
   };
 
-  console.log('Selected Date:', kf_datepicker);
+  console.log('Selected Date:', userid );
 
   const formatDate = (date) => {
     if (!date) return ''; // Handle null or undefined dates
@@ -130,6 +131,7 @@ const EditLoanDetail = ({ route, navigation }) => {
 
       const payload = {
         kf_applicationnumber: applicationNumber,
+        // userid: userid,
         kf_principalloanamount: principalLoanAmount,
         kf_receiveddate: PaymentDate,
         kf_emiamount: emiAmount,
@@ -281,6 +283,15 @@ const EditLoanDetail = ({ route, navigation }) => {
           />
         </View>
         <View style={styles.row}>
+          <Text style={styles.label}>User ID:</Text>
+          <TextInput
+            style={styles.valueInput}
+            value={userid}
+            onChangeText={(text) => setuserapplicationid(text)}
+            editable={false}
+          />
+        </View>
+        <View style={styles.row}>
           <Text style={styles.label}>Loan Terms:</Text>
           <TextInput
             style={styles.valueInput}
@@ -383,12 +394,20 @@ const EditLoanDetail = ({ route, navigation }) => {
           </View>
         </View>
 
+        {/* <ButtonComponent
+          title={isPaid ? "Paid" : "Update"}
+          onPress={handleUpdate}
+          disabled={isPaid || isLoading || emiStatusUpdated || updatePerformed}
+          style={isPaid ? styles.disabledButton : styles.button}
+        /> */}
+         {userid ? null : (
         <ButtonComponent
           title={isPaid ? "Paid" : "Update"}
           onPress={handleUpdate}
           disabled={isPaid || isLoading || emiStatusUpdated || updatePerformed}
           style={isPaid ? styles.disabledButton : styles.button}
         />
+      )}
 
         <CustomAlert
         visible={showAlert}

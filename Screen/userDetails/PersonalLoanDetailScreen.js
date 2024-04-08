@@ -198,6 +198,7 @@ const PersonalLoanDetailsScreen = ({ route }) => {
       panCardNumber: personalLoan.kf_pannumber,
       emiSchedule: personalLoan.kf_emischedule,
       applicationNumber: personalLoan.kf_applicationnumber,
+      kf_userapplicantid: personalLoan.kf_userapplicantid
     });
   };
 
@@ -302,6 +303,11 @@ const PersonalLoanDetailsScreen = ({ route }) => {
       <View style={styles.detailItem}>
             <Text style={styles.label}>Gender</Text>
             <Text style={styles.value}>{getGenderLabel()}</Text>
+          </View>
+
+          <View style={styles.detailItem}>
+            <Text style={styles.label}>User ID</Text>
+            <Text style={styles.value}>{personalLoan.kf_userapplicantid}</Text>
           </View>
 
           <View style={styles.detailItem}>

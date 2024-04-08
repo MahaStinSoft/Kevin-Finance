@@ -201,6 +201,7 @@ const HomeLoanDetailsScreen = ({ route }) => {
       panCardNumber: loanApplication.kf_pannumber,
       emiSchedule: loanApplication.kf_emischedule,
       applicationNumber: loanApplication.kf_applicationnumber,
+      kf_userapplicantid: loanApplication.kf_userapplicantid
     });
   };
 
@@ -271,6 +272,11 @@ const HomeLoanDetailsScreen = ({ route }) => {
           <View style={styles.detailItem}>
             <Text style={styles.label}>Gender</Text>
             <Text style={styles.value}>{getGenderLabel()}</Text>
+          </View>
+
+          <View style={styles.detailItem}>
+            <Text style={styles.label}>User ID</Text>
+            <Text style={styles.value}>{loanApplication.kf_userapplicantid}</Text>
           </View>
 
           <View style={styles.detailItem}>
