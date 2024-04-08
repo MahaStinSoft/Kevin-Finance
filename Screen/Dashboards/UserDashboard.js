@@ -665,7 +665,6 @@ const styles = StyleSheet.create({
     },
     iconButton: {
         marginLeft: 50,
-
     },
     plusIconScetion: {
         position: 'absolute',

@@ -241,7 +241,7 @@ export const LoginUserForm = () => {
                 <View style={styles.passwordContainer}>
                   <Ionicons name="lock-closed" size={20} color="#888" style={styles.icon} />
                   <TextInput
-                    placeholder="Mobile No or Password "
+                    placeholder="Enter Password "
                     autoCapitalize="none"
                     style={styles.passwordInput}
                     secureTextEntry={!showPassword}
