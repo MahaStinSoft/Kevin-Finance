@@ -357,12 +357,12 @@ const EditLoanDetail = ({ route, navigation }) => {
             style={[styles.valueInput, { color: kf_paidstatus ? "gray" : "black" }]}
             value={penalty}
             onChangeText={(text) => setPenalty(text)}
-            editable={!kf_paidstatus}
+            editable={!kf_paidstatus && !userid}
             placeholder= "Enter penalty"
           />
         </View>
 
-        {kf_paidstatus ? (
+        {/* {kf_paidstatus ? (
           <View style={styles.row}>
             <Text style={styles.label}>Payment Received Date:</Text>
             <Text style={[styles.valueInput, { height: 40, padding: 5 }]}>{formatDate(date)}</Text>
@@ -378,7 +378,35 @@ const EditLoanDetail = ({ route, navigation }) => {
               />
             </View>
           </View>
-        )}
+        )} */}
+
+{userid ? (
+  <View style={styles.row}>
+    <Text style={styles.label}>Payment Received Date:</Text>
+    <Text style={[styles.valueInput, { height: 40, padding: 10 }]}>
+      {formatDate(date) ? formatDate(date) : "Payment Received Date"}
+    </Text>
+  </View>
+) : (
+  <View style={styles.row}>
+    <Text style={styles.label}>
+      {kf_paidstatus ? 'Payment Received Date:' : 'Received Date:'}
+    </Text>
+    {kf_paidstatus ? (
+      <Text style={[styles.valueInput, { height: 40, padding: 5 }]}>
+        {formatDate(date)}
+      </Text>
+    ) : (
+      <View style={[styles.datepicker, { left: 18 }]}>
+        <ComponentDatePicker
+          selectedDate={date}
+          onDateChange={handleReceivedDate}
+          placeholder="Payment Received Date"
+        />
+      </View>
+    )}
+  </View>
+)}
 
         <View style={styles.row}>
           <Text style={[styles.label,{top: -10}]}>EMI Status:</Text>
@@ -389,7 +417,7 @@ const EditLoanDetail = ({ route, navigation }) => {
             options={['Paid', 'Unpaid']}
             initialOption={kf_paidstatus ? 'Paid' : 'Unpaid'}
             Optiontitle= "EMI Status"
-          disabled={kf_paidstatus}
+          disabled={kf_paidstatus || userid}
           />
           </View>
         </View>
