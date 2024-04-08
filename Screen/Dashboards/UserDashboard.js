@@ -30,6 +30,7 @@ const UserDashboard = ({ navigation, route }) => {
     const [lastMonthData, setLastMonthData] = useState([]);
     const [selectedLoanStatus, setSelectedLoanStatus] = useState(null);
     const [kf_adminname, setkf_adminname] = useState(null);
+    const [personalLoans, setPersonalLoans] = useState([]);
 
     const [loading, setLoading] = useState(true);
     const [authenticatedUser, setAuthenticatedUser] = useState(null);
@@ -231,96 +232,112 @@ const UserDashboard = ({ navigation, route }) => {
         }
     }, [searchQuery, isFocused, authenticatedUser]);
 
-    useFocusEffect(
-        React.useCallback(() => {
-            const fetchLoanData = async () => {
-                try {
-                    setLoading(true);
-
-                    const data = {
+    useEffect(() => {
+        const fetchLoanApplications = async () => {
+            try {
+                setLoading(true);
+                const tokenResponse = await axios.post(
+                    "https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token",
+                    {
                         grant_type: "client_credentials",
                         client_id: "d9dcdf05-37f4-4bab-b428-323957ad2f86",
                         resource: "https://org0f7e6203.crm5.dynamics.com",
                         scope: "https://org0f7e6203.crm5.dynamics.com/.default",
                         client_secret: "JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2",
-                    };
-
-                    const tokenResponse = await axios.post(
-                        "https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token",
-                        new URLSearchParams(data).toString(),
-                        { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
-                    );
-
-                    const accessToken = tokenResponse.data.access_token;
-
-                    const responseLoanApplications = await axios.get(
-                        "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications",
-                        {
-                            headers: {
-                                Authorization: `Bearer ${accessToken}`,
-                                "Content-Type": "application/json",
-                            },
-                            // params: {
-                            //   "$filter": `kf_createdby eq '${authenticatedUser.kf_adminname}'`
-                            // }
+                    },
+                    {
+                        headers: {
+                            "content-type": "application/x-www-form-urlencoded"
                         }
-                    );
-
-                    const responsePersonalLoans = await axios.get(
-                        "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans",
-                        {
-                            headers: {
-                                Authorization: `Bearer ${accessToken}`,
-                                "Content-Type": "application/json",
-                            },
-                            // params: {
-                            //   "$filter": `kf_createdby eq '${authenticatedUser.kf_adminname}'`
-                            // }
+                    }
+                );
+                const accessToken = tokenResponse.data.access_token;
+    
+                const responseLoanApplications = await axios.get(
+                    "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                            "Content-Type": "application/json",
+                        },
+                        params: {
+                            "$filter": `kf_userapplicantid eq '${authenticatedUser.kf_userid}'`
                         }
-                    );
-
-                    const homeLoans = responseLoanApplications.data.value;
-                    const personalLoans = responsePersonalLoans.data.value;
-
-                    const filteredHomeLoans = homeLoans.filter(
-                        (homeLoan) => homeLoan.kf_status !== null
-                    );
-
-                    const filteredPersonalLoans = personalLoans.filter(
-                        (personalLoan) => personalLoan.kf_status !== null
-                    );
-
-                    const combinedData = [...filteredHomeLoans, ...filteredPersonalLoans];
-
-                    setLoanData(combinedData);
-
-                    const today = new Date();
-                    const lastMonth = new Date(today);
-                    lastMonth.setMonth(today.getMonth() - 1);
-
-                    const lastMonthRecords = combinedData.filter((item) => {
-                        const createdDate = new Date(item.createdon);
-                        return createdDate >= lastMonth && createdDate <= today;
-                    });
-
-                    setLastMonthData(lastMonthRecords);
-
-                } catch (error) {
-                    console.error("Error fetching loan data:", error);
-                    console.log("API Response:", error.response?.data);
-                } finally {
-                    setLoading(false);
-                }
-            };
-
-            if (authenticatedUser) {
-                fetchLoanData();
-            } else {
-                console.log('authenticatedUser is null, cannot fetch data');
+                    }
+                );
+    
+                const loanApplicationsData = responseLoanApplications.data.value;
+                console.log("Loan Applications Data:", loanApplicationsData);
+    
+                // Set state with fetched loan applications data
+                setLoanApplications(loanApplicationsData);
+            } catch (error) {
+                console.error("Error fetching loan applications:", error);
+                // Handle error, show alert or retry mechanism
+            } finally {
+                setLoading(false);
             }
-        }, [authenticatedUser])
-    );
+        };
+    
+        // Fetch loan applications when authenticated user changes or on initial load
+        if (authenticatedUser) {
+            fetchLoanApplications();
+        }
+    }, [authenticatedUser]);
 
+    useEffect(() => {
+        const fetchPersonalLoans = async () => {
+            try {
+                setLoading(true);
+                const tokenResponse = await axios.post(
+                    "https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token",
+                    {
+                        grant_type: "client_credentials",
+                        client_id: "d9dcdf05-37f4-4bab-b428-323957ad2f86",
+                        resource: "https://org0f7e6203.crm5.dynamics.com",
+                        scope: "https://org0f7e6203.crm5.dynamics.com/.default",
+                        client_secret: "JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2",
+                    },
+                    {
+                        headers: {
+                            "content-type": "application/x-www-form-urlencoded"
+                        }
+                    }
+                );
+                const accessToken = tokenResponse.data.access_token;
+    
+                const responsePersonalLoans = await axios.get(
+                    "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                            "Content-Type": "application/json",
+                        },
+                        params: {
+                            "$filter": `kf_userapplicantid eq '${authenticatedUser.kf_userid}'`
+                        }
+                    }
+                );
+    
+                const personalLoansData = responsePersonalLoans.data.value;
+                console.log("Personal Loans Data:", personalLoansData);
+    
+                // Set state with fetched personal loans data
+                setPersonalLoans(personalLoansData);
+            } catch (error) {
+                console.error("Error fetching personal loans:", error);
+                // Handle error, show alert or retry mechanism
+            } finally {
+                setLoading(false);
+            }
+        };
+    
+        // Fetch personal loans when authenticated user changes or on initial load
+        if (authenticatedUser) {
+            fetchPersonalLoans();
+        }
+    }, [authenticatedUser]);
+    
     const navigateToHomeDetails = (loanApplication) => {
         setSelectedContact(loanApplication);
         navigation.navigate('HomeLoanDetailsScreen', { loanApplication });
@@ -336,21 +353,13 @@ const UserDashboard = ({ navigation, route }) => {
         setRefresh(!refresh);
     };
 
-    const handleDynamicDashboard = () => {
-        try {
-            navigation.navigate('DynamicDashboardScreen');
-        } catch (error) {
-            console.error('Error navigating to DynamicDashboardScreen:', error);
-        }
-    }
-
     const handlelogout = () => {
         // navigation.navigate("Setting");
         navigation.navigate('Setting', { isLoggedInAsManager: true });
     };
 
     const handleNavigation = () => {
-        navigation.navigate("Notification", { kf_adminname });
+        navigation.navigate("UserNotification", { userapplicationid });
     };
 
     useEffect(() => {
@@ -550,76 +559,74 @@ const UserDashboard = ({ navigation, route }) => {
                                 </View>
                             </ScrollView>
                         </View>
+<View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 8 }}>
+    {initialLoading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+    ) : (
+        <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
+            {displayedHomeLoans.length === 0 && displayedPersonalLoans.length === 0 ? (
+                <View style={styles.noRecordsContainer}>
+                    <Text style={styles.noRecordsText}>No Records Found</Text>
+                </View>
+            ) : (
+                <>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 15, width: "100%" }}>
+                        <Text style={[styles.heading, { right: 0 }]}>Home Loans</Text>
 
-                        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 8 }}>
-                            {initialLoading ? (
-                                <ActivityIndicator size="large" color="#0000ff" />
-                            ) : (
-                                <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
-                                    {displayedHomeLoans.length === 0 && displayedPersonalLoans.length === 0 ? (
-                                        <View style={styles.noRecordsContainer}>
-                                            {/* <Text style={styles.noRecordsText}>No Records Found</Text> */}
-                                        </View>
-                                    ) : (
-                                        <>
-                                            <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 15, width: "100%" }}>
-                                                <Text style={[styles.heading, { right: 0 }]}>Home Loans</Text>
-                                            </View>
-                                            {displayedHomeLoans.length > 0 && (
-                                                <>
-                                                    {displayedHomeLoans
-                                                        .filter(record => record.kf_userapplicantid === authenticatedUser?.kf_applicantid)
-                                                        .map((homeLoan, index) => (
-                                                            <HomeLoanCard
-                                                                key={index}
-                                                                loanApplication={homeLoan}
-                                                                onPress={() => navigateToHomeDetails(homeLoan)}
-                                                            />
-                                                        ))
-                                                    }
+                        <TouchableOpacity
+                            onPress={toggleShowAllHomeLoans}
+                            style={[styles.viewMoreButton, { opacity: displayedHomeLoans.length === 0 ? 0 : 1 }]}
+                            disabled={displayedHomeLoans.length === 0}>
+                            <Text style={styles.viewMoreButtonText}>
+                                {showAllHomeLoans ? 'View Less' : 'View More'}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                    {displayedHomeLoans.length > 0 && (
+                        <>
+                            {displayedHomeLoans
+                                .filter(record => record.kf_userapplicantid === authenticatedUser?.kf_applicantid)
+                                .map((homeLoan, index) => (
+                                    <HomeLoanCard
+                                        key={index}
+                                        loanApplication={homeLoan}
+                                        onPress={() => navigateToHomeDetails(homeLoan)}
+                                    />
+                                ))
+                            }
+                        </>
+                    )}
 
-                                                    {displayedHomeLoans
-                                                        .filter(record => record.kf_userapplicantid === authenticatedUser?.kf_applicantid)
-                                                        .length === 0 && (
-                                                            <View style={styles.noRecordsContainer}>
-                                                                <Text style={styles.noRecordsText}>No Records Found</Text>
-                                                            </View>
-                                                        )
-                                                    }
-
-                                                </>
-                                            )}
-
-                                            <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 15, width: "100%" }}>
-                                                <Text style={[styles.heading, { marginBottom: 0 }]}>Personal Loans</Text>
-                                            </View>
-                                            {displayedPersonalLoans.length > 0 && (
-                                                <>
-                                                    {displayedPersonalLoans
-                                                        .filter(record => record.kf_userapplicantid === authenticatedUser?.kf_applicantid)
-                                                        .map((personalLoan, index) => (
-                                                            <PersonalLoanCard
-                                                                key={index}
-                                                                personalLoan={personalLoan}
-                                                                onPress={() => navigateToPersonalDetails(personalLoan)}
-                                                            />
-                                                        ))
-                                                    }
-                                                    {displayedPersonalLoans
-                                                        .filter(record => record.kf_userapplicantid === authenticatedUser?.kf_applicantid)
-                                                        .length === 0 && (
-                                                            <View style={[styles.noRecordsContainer, { textAlign: "center" }]}>
-                                                                <Text style={styles.noRecordsText}>No Records Found</Text>
-                                                            </View>
-                                                        )
-                                                    }
-                                                </>
-                                            )}
-                                        </>
-                                    )}
-                                </ScrollView>
-                            )}
-                        </View>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 15, width: "100%" }}>
+                        <Text style={[styles.heading, { marginBottom: 0 }]}>Personal Loans</Text>
+                        <TouchableOpacity
+                            onPress={toggleShowAllPersonalLoans}
+                            style={[styles.viewMoreButton, { opacity: displayedPersonalLoans.length === 0 ? 0 : 1 }]}
+                            disabled={displayedPersonalLoans.length === 0}>
+                            <Text style={styles.viewMoreButtonText}>
+                                {showAllPersonalLoans ? 'View Less' : 'View More'}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                    {displayedPersonalLoans.length > 0 && (
+                        <>
+                            {displayedPersonalLoans
+                                .filter(record => record.kf_userapplicantid === authenticatedUser?.kf_applicantid)
+                                .map((personalLoan, index) => (
+                                    <PersonalLoanCard
+                                        key={index}
+                                        personalLoan={personalLoan}
+                                        onPress={() => navigateToPersonalDetails(personalLoan)}
+                                    />
+                                ))
+                            }
+                        </>
+                    )}
+                </>
+            )}
+        </ScrollView>
+    )}
+</View>
 
 
                     </ScrollView>

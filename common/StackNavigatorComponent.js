@@ -48,6 +48,7 @@ import UserRegisterScreen from '../Screen/LoginPages/UserRegister';
 import UserConfrim from '../Screen/LoginPages/USerConfrim';
 import Welcome from '../Screen/LoginPages/Welcome';
 import VerificationScreen from '../Screen/LoginPages/Verification';
+import UserNotification from '../Screen/Dashboards/UserNotification';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -99,6 +100,7 @@ const StackNavigator = () => (
     <Stack.Screen name="UserDashboard" component={UserDashboard} options={{ headerShown: false }} />
     <Stack.Screen name="UserLoanDetails" component={UserLoanDetails} options={{ headerShown: false }} />
     <Stack.Screen name="VerificationScreen" component={VerificationScreen} options={{ headerShown: false }} />
+    <Stack.Screen name="UserNotification" component={UserNotification} options={{ headerShown: false }} />
     <Stack.Screen name="DynamicDashboardScreen" component={DynamicDashboardScreen} options={{
       headerShown: false,
       unmountOnBlur: true,
