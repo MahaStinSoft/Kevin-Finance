@@ -572,15 +572,6 @@ const UserDashboard = ({ navigation, route }) => {
                 <>
                     <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 15, width: "100%" }}>
                         <Text style={[styles.heading, { right: 0 }]}>Home Loans</Text>
-
-                        <TouchableOpacity
-                            onPress={toggleShowAllHomeLoans}
-                            style={[styles.viewMoreButton, { opacity: displayedHomeLoans.length === 0 ? 0 : 1 }]}
-                            disabled={displayedHomeLoans.length === 0}>
-                            <Text style={styles.viewMoreButtonText}>
-                                {showAllHomeLoans ? 'View Less' : 'View More'}
-                            </Text>
-                        </TouchableOpacity>
                     </View>
                     {displayedHomeLoans.length > 0 && (
                         <>
@@ -599,14 +590,6 @@ const UserDashboard = ({ navigation, route }) => {
 
                     <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 15, width: "100%" }}>
                         <Text style={[styles.heading, { marginBottom: 0 }]}>Personal Loans</Text>
-                        <TouchableOpacity
-                            onPress={toggleShowAllPersonalLoans}
-                            style={[styles.viewMoreButton, { opacity: displayedPersonalLoans.length === 0 ? 0 : 1 }]}
-                            disabled={displayedPersonalLoans.length === 0}>
-                            <Text style={styles.viewMoreButtonText}>
-                                {showAllPersonalLoans ? 'View Less' : 'View More'}
-                            </Text>
-                        </TouchableOpacity>
                     </View>
                     {displayedPersonalLoans.length > 0 && (
                         <>
