@@ -1186,21 +1186,21 @@ const EditPersonalLoan = ({ route, navigation }) => {
             {
               text: 'OK',
               onPress: () => {
-                // Handle sending approval
-                // handleUpdateRecordAndSendAnnotation();
-                setSendApproval(true); // Set sendApproval to true after confirmation
+                setapplyForLoan(true); 
+                console.log('applyForLoan set to true'); // Add logging
               },
             },
           ],
           { cancelable: false }
         );
-        return; // Return immediately after displaying the alert
+        return; 
       default:
         booleanValue = null;
     }
-    setSendApproval(booleanValue);
+    setapplyForLoan(booleanValue);
+    console.log('applyForLoan set to', booleanValue); // Add logging
   };
-  
+   
   const getLoanStatus = () => {
     switch (personalLoan.kf_status) {
       case 123950000:
@@ -1296,13 +1296,12 @@ const EditPersonalLoan = ({ route, navigation }) => {
 
       <View style={styles.detailContainer}>
           <View style={styles.wrapper}>
-            <LoanStatusPicker
+          <LoanStatusPicker
               onOptionChange={handleSendApproval}
               Optiontitle="Send Approval"
               options={['No', 'Yes']}
-              // initialOption={sendApproval ? getSendApproval(sendApproval) : ''}
               initialOption={sendApproval ? 'Yes' : 'No'}
-              style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
+              style={{ width: '100%', marginLeft: 0, marginTop: 5 }}
               disabled={UserApplicantID || sendApproval}
             />
             <TextInput
@@ -1659,6 +1658,17 @@ const EditPersonalLoan = ({ route, navigation }) => {
                 style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
               />
             )} */}
+             {UserApplicantID && (
+              <LoanStatusPicker
+              onOptionChange={handleApplyForLoan}
+              title="Apply For Loan" // Corrected the prop name here
+              options={['Yes', 'No']}
+              Optiontitle= "Apply For Loan?"
+              initialOption={applyForLoan ? 'Yes' : 'No'}
+              style={{ width: "100%", marginLeft: 0, marginTop: 5}}
+              disabled={applyForLoan}
+            />
+            )}
            <View style={styles.indentityImage}>
               <View style={{ marginVertical: 3 }}>
                 <CardImage
@@ -1707,17 +1717,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
                   />
              </View>
             </View>
-            {UserApplicantID && (
-            <LoanStatusPicker
-              onOptionChange={handleApplyForLoan}
-              Optiontitle="Apply For Loan"
-              options={['No', 'Yes']}
-              // initialOption={sendApproval ? getSendApproval(sendApproval) : ''}
-              initialOption={applyForLoan ? 'Yes' : 'No'}
-              style={{ width: "100%", marginLeft: 0, marginTop: 15 }}
-              disabled={applyForLoan || !UserApplicantID}
-            />
-            )}
+           
             <View style={{ flexDirection: "row" ,marginTop: -10,marginLeft: 30, marginBottom: 20}}>
 <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={[styles.buttonContainer, { width: "42%", marginLeft: -15 }]}>
                 <Text style={styles.buttonTextGurantor}>Guarantor1</Text>

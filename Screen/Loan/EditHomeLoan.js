@@ -304,6 +304,7 @@ const EditHomeLoan = ({ route, navigation }) => {
             kf_numberofemi: numberOfEMI,
             kf_sendapproval: sendApproval,
             kf_reason: reason,
+            kf_applyforloan: applyForLoan,
           });
         }
         // console.log(loanAmountRequested)
@@ -1071,34 +1072,6 @@ const EditHomeLoan = ({ route, navigation }) => {
     setSendApproval(booleanValue);
   };
 
-  // const handleApplyForLoan = () => {
-  //   // If already approved, show alert to confirm sending approval
-  //   if (sendApproval) {
-  //     Alert.alert(
-  //       'Confirm Send Approval',
-  //       'Are you sure you want to send approval?',
-  //       [
-  //         {
-  //           text: 'No',
-  //           onPress: () => console.log('Approval not sent'),
-  //           style: 'cancel',
-  //         },
-  //         {
-  //           text: 'Yes',
-  //           onPress: () => {
-  //             // Handle sending approval
-  //             handleUpdateRecordAndSendAnnotation();
-  //           },
-  //         },
-  //       ],
-  //       { cancelable: false }
-  //     );
-  //   } else {
-  //     // Toggle sendApproval status if switch is not enabled
-  //     setSendApproval(previousValue => !previousValue);
-  //   }
-  // };
-
   const handleApplyForLoan = (selectedOptionGender) => {
     let booleanValue;
     switch (selectedOptionGender) {
@@ -1119,21 +1092,21 @@ const EditHomeLoan = ({ route, navigation }) => {
             {
               text: 'OK',
               onPress: () => {
-                // Handle sending approval
-                // handleUpdateRecordAndSendAnnotation();
-                setSendApproval(true); // Set sendApproval to true after confirmation
+                setapplyForLoan(true); 
+                console.log('applyForLoan set to true'); // Add logging
               },
             },
           ],
           { cancelable: false }
         );
-        return; // Return immediately after displaying the alert
+        return; 
       default:
         booleanValue = null;
     }
-    setSendApproval(booleanValue);
+    setapplyForLoan(booleanValue);
+    console.log('applyForLoan set to', booleanValue); // Add logging
   };
-  
+   
   const getSendApproval = (booleanValue) => {
     switch (booleanValue) {
       case false:
@@ -1153,29 +1126,7 @@ const EditHomeLoan = ({ route, navigation }) => {
         screenIcon="md-save"
         screenIconStyle={{ marginTop: 5 }}
       />
-
       <ScrollView>
-
-        {/* <View style={styles.Imagepart}>
-          <View style={{ width: 100, height:100, left: 0, bottom: 5 }}>{renderImage()}</View>
-          <View style={{ right: 25, top: 30 }}>
-            <View style={styles.touch}>
-              <TouchableOpacity onPress={pickImage} style={styles.button}>
-                <Text style={styles.buttonText}>Choose File</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity onPress={takePictureWithCamera} style={styles.button}>
-                <Text style={styles.buttonText}>Camera</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity onPress={handleUpdateField} style={{marginLeft:10}} >
-                <Ionicons name="save" size={26} color="red" />
-              </TouchableOpacity>
-
-            </View>
-          </View>
-        </View> */}
-
         <View style={styles.Imagepart}>
           <View style={{ width: 100, height: 100, left: 0, bottom: 5 }}>{renderImage()}</View>
           <View style={{ right: 25, top: 30 }}>
@@ -1211,15 +1162,6 @@ const EditHomeLoan = ({ route, navigation }) => {
 
         <View style={styles.detailContainer}>
           <View style={styles.wrapper}>
-            {/* <LoanStatusPicker
-              onOptionChange={handleSendApproval}
-              title="Send Approval"
-              options={['No', 'Yes']}
-              initialOption={sendApproval ? 'Yes' : 'No'}
-              style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
-              disabled={sendApproval}
-            /> */}
-
             <LoanStatusPicker
               onOptionChange={handleSendApproval}
               Optiontitle="Send Approval"
@@ -1286,7 +1228,7 @@ const EditHomeLoan = ({ route, navigation }) => {
               value={lastname}
               placeholder="Last Name"
               onChangeText={(text) => {
-                if (isValidInput(text) || text === '') { // Call isValidInput function
+                if (isValidInput(text) || text === '') { 
                   setLastname(text);
                   setIsLastNameValid(text.trim() !== '')
                   setErrorMessages({
@@ -1300,15 +1242,6 @@ const EditHomeLoan = ({ route, navigation }) => {
             />
             {errorMessages.lastNameEdit !== '' && <Text style={styles.errorText}>{errorMessages.lastNameEdit}</Text>}
 
-            {/* <LoanStatusPicker
-              onOptionChange={handleGenderOptionset}
-              title="Gender"
-              options={['Male', 'Female']}
-              initialOption={gender ? getGenderOptionsetStringFromNumericValue(gender) : ''}
-              style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
-            /> */}
-
-
             <LoanStatusPicker
               onOptionChange={handleGenderOptionset}
               Optiontitle="Gender"
@@ -1320,15 +1253,6 @@ const EditHomeLoan = ({ route, navigation }) => {
               ]}
               disabled={getStatusStringFromNumericValue(status) === 'Approved'} // Disable the picker based on loan status
             />
-
-            {/* <ComponentDatePicker
-              selectedDate={dateofbirth}
-              onDateChange={handleDateOfBirth}
-              placeholder="Date of Birth"
-              style={{ width: "100%", height: 45, marginTop: 5, marginLeft: 0 }}
-            />
-            {errorMessages.dateOfBirthEdit !== '' && <Text style={styles.errorText}>{errorMessages.dateOfBirthEdit}</Text>} */}
-
 
             <View style={{ position: 'relative' }}>
               <ComponentDatePicker
@@ -1456,7 +1380,6 @@ const EditHomeLoan = ({ route, navigation }) => {
             {errorMessages.aadharCardNumberEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.aadharCardNumberEdit}</Text>
             )}
-
 
             <TextInput
               style={[
@@ -1595,6 +1518,18 @@ const EditHomeLoan = ({ route, navigation }) => {
               )}
             </View> */}
 
+            {UserApplicantID && (
+              <LoanStatusPicker
+              onOptionChange={handleApplyForLoan}
+              title="Apply For Loan" // Corrected the prop name here
+              options={['Yes', 'No']}
+              Optiontitle= "Apply For Loan?"
+              initialOption={applyForLoan ? 'Yes' : 'No'}
+              style={{ width: "100%", marginLeft: 0, marginTop: 5}}
+              disabled={applyForLoan}
+            />
+            )}
+
             <View style={styles.indentityImage}>
 
               <View style={{ marginVertical: 3, marginHorizontal: 0  }}>
@@ -1638,18 +1573,6 @@ const EditHomeLoan = ({ route, navigation }) => {
                 />
               </View>
             </View>
-
-            {UserApplicantID && (
-              <LoanStatusPicker
-                onOptionChange={handleApplyForLoan}
-                Optiontitle="Apply For Loan"
-                options={['No', 'Yes']}
-                // initialOption={sendApproval ? getSendApproval(sendApproval) : ''}
-                initialOption={applyForLoan ? 'Yes' : 'No'}
-                style={{ width: "100%", marginLeft: 0, top: -30 }}
-                disabled={applyForLoan}
-              />
-            )}
 
             <View style={{ flexDirection: "row" ,marginTop: -20,marginLeft: 20, marginBottom: 20}}>
               <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={[styles.buttonContainer, { width: "40%", marginLeft: -5 }]}>
