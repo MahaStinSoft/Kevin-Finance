@@ -113,8 +113,8 @@ const UserDashboard = ({ navigation, route }) => {
     }, [navigation]);
 
     useEffect(() => {
-        setDisplayedHomeLoans(showAllHomeLoans ? HomeLoanRecords : HomeLoanRecords.slice(0, 3));
-        setDisplayedPersonalLoans(showAllPersonalLoans ? PersonalLoanRecords : PersonalLoanRecords.slice(0, 3));
+        setDisplayedHomeLoans(showAllHomeLoans ? HomeLoanRecords : HomeLoanRecords.slice(0, 0));
+        setDisplayedPersonalLoans(showAllPersonalLoans ? PersonalLoanRecords : PersonalLoanRecords.slice(0, 0));
     }, [showAllHomeLoans, showAllPersonalLoans, HomeLoanRecords, PersonalLoanRecords]);
 
     // Function to toggle showing all home loans
@@ -205,16 +205,16 @@ const UserDashboard = ({ navigation, route }) => {
                 const homeLoans = responseLoanApplications.data.value;
                 const personalLoans = responsePersonalLoans.data.value;
 
-                const sortedHomeLoans = homeLoans.sort((a, b) => new Date(b.createdon) - new Date(a.createdon));
-                const sortedPersonalLoans = personalLoans.sort((a, b) => new Date(b.createdon) - new Date(a.createdon));
+                // const sortedHomeLoans = homeLoans.sort((a, b) => new Date(b.createdon) - new Date(a.createdon));
+                // const sortedPersonalLoans = personalLoans.sort((a, b) => new Date(b.createdon) - new Date(a.createdon));
 
-                const latestHomeLoans = sortedHomeLoans.slice(0, 3);
-                const latestPersonalLoans = sortedPersonalLoans.slice(0, 3);
+                // const latestHomeLoans = sortedHomeLoans.slice(0, 3);
+                // const latestPersonalLoans = sortedPersonalLoans.slice(0, 3);
 
                 const userAdmin = authenticatedUser ? authenticatedUser.kf_adminname : '';
 
-                setDisplayedHomeLoans(latestHomeLoans);
-                setDisplayedPersonalLoans(latestPersonalLoans);
+                setDisplayedHomeLoans(homeLoans);
+                setDisplayedPersonalLoans(personalLoans);
 
 
             } catch (error) {

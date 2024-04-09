@@ -141,6 +141,14 @@ const UserNotification = ({ navigation, route }) => {
     navigation.goBack();
   };
 
+  const statusNames = {
+    123950000: 'Approved',
+    123950001: 'Pending Approval',
+    123950002: 'Draft',
+    123950003: 'Cancelled',
+    123950004: 'Expired',
+  };
+
   return (
     <View>
       <HeaderComponent titleText="User Notification"
@@ -152,12 +160,17 @@ const UserNotification = ({ navigation, route }) => {
       <ScrollView>
         <View style={styles.container}>
           <View style={styles.notificationContainer}>
+            
             <Text style={styles.header}>Home Loan</Text>
             {loanApplications.map((application, index) => (
               <View key={index} style={styles.itemContainer}>
+                {application.kf_status === 123950000 && ( // Assuming 123950000 represents the approved status
+                  <Ionicons name="md-checkmark-circle" size={24} color="green" style={{ alignSelf: "flex-end" }} />
+                )}
                 <Text style={styles.textContent}>Name: {application.kf_name}</Text>
                 <Text style={styles.textContent}>ID: {application.kf_userapplicantid}</Text>
                 <Text style={styles.textContent}>Mobile Number: {application.kf_mobilenumber}</Text>
+                <Text style={styles.textContent}>Loan Status: {statusNames[application.kf_status]}</Text>
                 <View style={styles.buttonContainer}>
                 <Button title="View Record" onPress={() => handleViewHomeLoan(application)} style={{width: "50%"}}/>
                 </View>
@@ -169,9 +182,13 @@ const UserNotification = ({ navigation, route }) => {
             <Text style={styles.header}>Personal Loan</Text>
             {notifications.map((notification, index) => (
               <View key={index} style={styles.itemContainer}>
+                {notification.kf_status === 123950000 && ( // Assuming 123950000 represents the approved status
+                  <Ionicons name="md-checkmark-circle" size={24} color="green" style={{ alignSelf: "flex-end" }} />
+                )}
                 <Text style={styles.textContent}>Name: {notification.kf_firstname}</Text>
                 <Text style={styles.textContent}>ID: {notification.kf_userapplicantid}</Text>
                 <Text style={styles.textContent}>Mobile Number: {notification.kf_mobile}</Text>
+                <Text style={styles.textContent}>Loan Status: {statusNames[notification.kf_status]}</Text>
                 <View style={styles.buttonContainer}>
                 <Button title="View Record" onPress={() => sendNotification(notification)} />
                 </View>
