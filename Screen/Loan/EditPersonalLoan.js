@@ -1200,7 +1200,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
     setapplyForLoan(booleanValue);
     console.log('applyForLoan set to', booleanValue); // Add logging
   };
-   
+  
   const getLoanStatus = () => {
     switch (personalLoan.kf_status) {
       case 123950000:
