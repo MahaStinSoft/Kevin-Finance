@@ -77,6 +77,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
   console.log('signature', signatureFile);
   const [recordId, setRecordId] = useState(personalLoan.kf_personalloanid);
   const [imageSource, setImageSource] = useState(null);
+  const [applyForLoan, setapplyForLoan] = useState(personalLoan?.kf_applyforloan || '');
 
   const [errorMessages, setErrorMessages] = useState({
     firstNameEdit: '',
@@ -133,6 +134,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
     setReason(personalLoan.kf_reason);
     setRecordId(personalLoan.kf_personalloanid);
     setSendApproval(personalLoan.kf_sendapproval);
+    setapplyForLoan(personalLoan.kf_applyforloan);
     setAadharcard({ fileName: null, fileContent: null });
     setPancard({ fileName: null, fileContent: null });
     setkf_applicantimage({ fileName: null, fileContent: null });
@@ -301,6 +303,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
             kf_sendapproval: sendApproval,
             kf_reason: reason,
             kf_userapplicantid: UserApplicantID,
+            kf_applyforloan:applyForLoan
           });
         }
         // console.log(age);
@@ -1166,6 +1169,41 @@ const EditPersonalLoan = ({ route, navigation }) => {
     setSendApproval(booleanValue);
   };
 
+  const handleApplyForLoan = (selectedOptionGender) => {
+    let booleanValue;
+    switch (selectedOptionGender) {
+      case 'No':
+        booleanValue = false;
+        break;
+      case 'Yes':
+        // Display an alert for approval
+        Alert.alert(
+          'Confirm Send Approval',
+          'Are you sure you want to send approval?',
+          [
+            {
+              text: 'Cancel',
+              onPress: () => console.log('Approval not sent'),
+              style: 'cancel',
+            },
+            {
+              text: 'OK',
+              onPress: () => {
+                // Handle sending approval
+                // handleUpdateRecordAndSendAnnotation();
+                setSendApproval(true); // Set sendApproval to true after confirmation
+              },
+            },
+          ],
+          { cancelable: false }
+        );
+        return; // Return immediately after displaying the alert
+      default:
+        booleanValue = null;
+    }
+    setSendApproval(booleanValue);
+  };
+  
   const getLoanStatus = () => {
     switch (personalLoan.kf_status) {
       case 123950000:
@@ -1263,7 +1301,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
           <View style={styles.wrapper}>
             <LoanStatusPicker
               onOptionChange={handleSendApproval}
-              title="Send Approval"
+              Optiontitle="Send Approval"
               options={['No', 'Yes']}
               // initialOption={sendApproval ? getSendApproval(sendApproval) : ''}
               initialOption={sendApproval ? 'Yes' : 'No'}
@@ -1358,7 +1396,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
 <View style={{ position: 'relative' }}>
   <LoanStatusPicker
     onOptionChange={handleGenderOptionset}
-    title="Gender"
+    Optiontitle="Gender"
     options={['Male', 'Female']}
     initialOption={gender === 123950000 ? 'Male' : 'Female'}
     style={[
@@ -1672,7 +1710,18 @@ const EditPersonalLoan = ({ route, navigation }) => {
                   />
              </View>
             </View>
-            <View style={{ flexDirection: "row" ,marginTop: 10,marginLeft: 30}}>
+            {UserApplicantID && (
+            <LoanStatusPicker
+              onOptionChange={handleApplyForLoan}
+              Optiontitle="Apply For Loan"
+              options={['No', 'Yes']}
+              // initialOption={sendApproval ? getSendApproval(sendApproval) : ''}
+              initialOption={applyForLoan ? 'Yes' : 'No'}
+              style={{ width: "100%", marginLeft: 0, marginTop: 15 }}
+              disabled={applyForLoan || !UserApplicantID}
+            />
+            )}
+            <View style={{ flexDirection: "row" ,marginTop: -10,marginLeft: 30, marginBottom: 20}}>
 <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={[styles.buttonContainer, { width: "42%", marginLeft: -15 }]}>
                 <Text style={styles.buttonTextGurantor}>Guarantor1</Text>
               </TouchableOpacity>
@@ -1690,8 +1739,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
               </TouchableOpacity>
             </View>
 
-           {/* Send Approval Section */}
-      <View style={styles.Approval}>
+       
+      {/* <View style={styles.Approval}>
         <Text style={{ fontWeight: 'bold', marginRight: 20 }}>Send Approval</Text>
 
         <TouchableOpacity onPress={handleSendApproval} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: sendApproval ? 'green' : 'black', paddingVertical: 5,marginRight:10, paddingHorizontal: 10, borderRadius: 20 }}>
@@ -1709,7 +1758,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
         >
           <Text style={styles.saveButtonText}>Send Approval</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
           </View>
          
         </View>
@@ -1734,7 +1783,7 @@ const styles = StyleSheet.create({
   container:{
     flex: 1,
     width: "100%",
-    marginBottom: 20
+    // marginBottom: 30
   },
   imageContent: {
     flexDirection: "row",

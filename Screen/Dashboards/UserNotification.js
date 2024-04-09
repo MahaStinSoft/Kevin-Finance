@@ -5,6 +5,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import querystring from 'querystring';
 import moment from 'moment';
 import { Ionicons } from '@expo/vector-icons';
+import HeaderComponent from '../../common/Header';
 
 const UserNotification = ({ navigation, route }) => {
   const [loanApplications, setLoanApplications] = useState([]);
@@ -135,18 +136,31 @@ const UserNotification = ({ navigation, route }) => {
     }
   };
 
+  const handleGoBack = () => {
+    // navigation.navigate("Dashboard");
+    navigation.goBack();
+  };
+
   return (
     <View>
+      <HeaderComponent titleText="User Notification"
+        onPress={handleGoBack}
+        // onIconPress={handleUpdateRecordAndSendAnnotation}
+        screenIcon="md-save"
+        screenIconStyle={{ marginTop: 5 }}
+      />
       <ScrollView>
         <View style={styles.container}>
           <View style={styles.notificationContainer}>
             <Text style={styles.header}>Home Loan</Text>
             {loanApplications.map((application, index) => (
               <View key={index} style={styles.itemContainer}>
-                <Text>Name: {application.kf_name}</Text>
-                <Text>ID: {application.kf_userapplicantid}</Text>
-                <Text>Mobile Number: {application.kf_mobilenumber}</Text>
-                <Button title="View Record" onPress={() => handleViewHomeLoan(application)} />
+                <Text style={styles.textContent}>Name: {application.kf_name}</Text>
+                <Text style={styles.textContent}>ID: {application.kf_userapplicantid}</Text>
+                <Text style={styles.textContent}>Mobile Number: {application.kf_mobilenumber}</Text>
+                <View style={styles.buttonContainer}>
+                <Button title="View Record" onPress={() => handleViewHomeLoan(application)} style={{width: "50%"}}/>
+                </View>
               </View>
             ))}
           </View>
@@ -155,10 +169,12 @@ const UserNotification = ({ navigation, route }) => {
             <Text style={styles.header}>Personal Loan</Text>
             {notifications.map((notification, index) => (
               <View key={index} style={styles.itemContainer}>
-                <Text>Name: {notification.kf_firstname}</Text>
-                <Text>ID: {notification.kf_userapplicantid}</Text>
-                <Text>Mobile Number: {notification.kf_mobile}</Text>
+                <Text style={styles.textContent}>Name: {notification.kf_firstname}</Text>
+                <Text style={styles.textContent}>ID: {notification.kf_userapplicantid}</Text>
+                <Text style={styles.textContent}>Mobile Number: {notification.kf_mobile}</Text>
+                <View style={styles.buttonContainer}>
                 <Button title="View Record" onPress={() => sendNotification(notification)} />
+                </View>
               </View>
             ))}
           </View>
@@ -172,7 +188,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    marginTop: 40,
+    // marginTop: 40,
   },
   notificationContainer: {
     borderWidth: 1,
@@ -185,14 +201,25 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: "red",
+    marginTop: 10
   },
   itemContainer: {
     borderWidth: 1,
     width: '100%',
-    padding: 10,
+    padding: 15,
     marginBottom: 10,
     borderRadius: 5,
+    borderColor: 'grey'
   },
+  textContent: {
+    padding: 2
+  },
+  buttonContainer: {
+    width: "40%",
+    marginTop: 8,
+    alignSelf: "center"
+  }
 });
 
 export default UserNotification;

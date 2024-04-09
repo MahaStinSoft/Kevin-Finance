@@ -28,9 +28,9 @@ const AdminNotification = ({ loanApplication, navigation, personalLoan, route })
 
     // Reset refresh state after re-render
     setRefresh(false);
-  }, [refresh]);
+  } ,[refresh]);
 
-  useState(() =>{
+  useEffect(() =>{
     fetchLoanApplication();
     fetchNotification();
   } ,[refresh]);
@@ -479,7 +479,7 @@ const fetchNotification = async () => {
           styles.itemContainer1,
           application.kf_markasread ? styles.readItemContainer : styles.unreadItemContainer
         ]}
-      >
+      >      
         <View key={index}>
           <Text>Application Number: {application.kf_applicationnumber}</Text>
           <Text>Created By: {application.kf_createdby}</Text>
@@ -520,7 +520,7 @@ const fetchNotification = async () => {
              .filter(notification => 
               ((kf_applyforloan === null || notification.kf_applyforloan === (kf_applyforloan ? 1 : 0)) &&
               (authenticatedUser && (notification.kf_createdby === authenticatedUser.kf_adminname || notification.kf_createdby === null) || !authenticatedUser))
-            )
+            )   
               .sort((a, b) => (a.kf_markasread === b.kf_markasread ? 0 : a.kf_markasread ? 1 : -1)) 
               .map((notification, index) => (
                 <View
@@ -564,7 +564,7 @@ const fetchNotification = async () => {
           </View>
         </View>
       </ScrollView>
-    </View> 
+    </View>
   );
 };
 
@@ -578,6 +578,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: "red"
   },
   // itemContainer: {
   //   borderWidth: 1,

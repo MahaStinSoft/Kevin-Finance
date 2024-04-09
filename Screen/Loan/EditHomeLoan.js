@@ -75,7 +75,7 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [sendApprovalDisabled, setSendApprovalDisabled] = useState(false);
   const [showAlert, setShowAlert] = useState(false); 
   const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
-
+  const [applyForLoan, setapplyForLoan] = useState(loanApplication?.kf_applyforloan || '');
   // const { userapplicationid } = route.params;
   const { signatureImage, userapplicationid } = route.params;
   console.log('signature', signatureImage);
@@ -137,6 +137,7 @@ const EditHomeLoan = ({ route, navigation }) => {
     setNumberOfEMI(loanApplication.kf_numberofemi);
     setSendApproval(loanApplication.kf_sendapproval);
     setReason(loanApplication.kf_reason);
+    setapplyForLoan(loanApplication.kf_applyforloan);
     setRecordId(loanApplication.kf_loanapplicationid);
     setAadharcard({ fileName: null, fileContent: null });
     setPancard({ fileName: null, fileContent: null });
@@ -257,6 +258,7 @@ const EditHomeLoan = ({ route, navigation }) => {
           kf_sendapproval: sendApproval,
           kf_reason: reason,
           kf_userapplicantid: UserApplicantID,
+          kf_applyforloan:applyForLoan,
         },
         {
           headers: {
@@ -1069,6 +1071,69 @@ const EditHomeLoan = ({ route, navigation }) => {
     }
     setSendApproval(booleanValue);
   };
+
+  // const handleApplyForLoan = () => {
+  //   // If already approved, show alert to confirm sending approval
+  //   if (sendApproval) {
+  //     Alert.alert(
+  //       'Confirm Send Approval',
+  //       'Are you sure you want to send approval?',
+  //       [
+  //         {
+  //           text: 'No',
+  //           onPress: () => console.log('Approval not sent'),
+  //           style: 'cancel',
+  //         },
+  //         {
+  //           text: 'Yes',
+  //           onPress: () => {
+  //             // Handle sending approval
+  //             handleUpdateRecordAndSendAnnotation();
+  //           },
+  //         },
+  //       ],
+  //       { cancelable: false }
+  //     );
+  //   } else {
+  //     // Toggle sendApproval status if switch is not enabled
+  //     setSendApproval(previousValue => !previousValue);
+  //   }
+  // };
+
+  const handleApplyForLoan = (selectedOptionGender) => {
+    let booleanValue;
+    switch (selectedOptionGender) {
+      case 'No':
+        booleanValue = false;
+        break;
+      case 'Yes':
+        // Display an alert for approval
+        Alert.alert(
+          'Confirm Send Approval',
+          'Are you sure you want to send approval?',
+          [
+            {
+              text: 'Cancel',
+              onPress: () => console.log('Approval not sent'),
+              style: 'cancel',
+            },
+            {
+              text: 'OK',
+              onPress: () => {
+                // Handle sending approval
+                // handleUpdateRecordAndSendAnnotation();
+                setSendApproval(true); // Set sendApproval to true after confirmation
+              },
+            },
+          ],
+          { cancelable: false }
+        );
+        return; // Return immediately after displaying the alert
+      default:
+        booleanValue = null;
+    }
+    setSendApproval(booleanValue);
+  };
   
   const getSendApproval = (booleanValue) => {
     switch (booleanValue) {
@@ -1158,7 +1223,7 @@ const EditHomeLoan = ({ route, navigation }) => {
 
             <LoanStatusPicker
               onOptionChange={handleSendApproval}
-              title="Send Approval"
+              Optiontitle="Send Approval"
               options={['No', 'Yes']}
               initialOption={sendApproval ? 'Yes' : 'No'}
               style={{ width: '100%', marginLeft: 0, marginTop: 5 }}
@@ -1247,7 +1312,7 @@ const EditHomeLoan = ({ route, navigation }) => {
 
             <LoanStatusPicker
               onOptionChange={handleGenderOptionset}
-              title="Gender"
+              Optiontitle="Gender"
               options={['Male', 'Female']}
               initialOption={gender ? getGenderOptionsetStringFromNumericValue(gender) : ''}
               style={[
@@ -1575,7 +1640,19 @@ const EditHomeLoan = ({ route, navigation }) => {
               </View>
             </View>
 
-            <View style={{ flexDirection: "row" ,marginTop: 10,marginLeft: 20}}>
+            {UserApplicantID && (
+              <LoanStatusPicker
+                onOptionChange={handleApplyForLoan}
+                Optiontitle="Apply For Loan"
+                options={['No', 'Yes']}
+                // initialOption={sendApproval ? getSendApproval(sendApproval) : ''}
+                initialOption={applyForLoan ? 'Yes' : 'No'}
+                style={{ width: "100%", marginLeft: 0, top: -30 }}
+                disabled={applyForLoan}
+              />
+            )}
+
+            <View style={{ flexDirection: "row" ,marginTop: -20,marginLeft: 20, marginBottom: 20}}>
               <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={[styles.buttonContainer, { width: "40%", marginLeft: -5 }]}>
                 <Text style={styles.buttonTextGurantor}>Guarantor1</Text>
               </TouchableOpacity>
@@ -1600,7 +1677,7 @@ const EditHomeLoan = ({ route, navigation }) => {
 
 
       {/* Send Approval Section */}
-      <View style={styles.Approval}>
+      {/* <View style={styles.Approval}>
         <Text style={{ fontWeight: 'bold', marginRight: 20 }}>Send Approval</Text>
 
         <TouchableOpacity onPress={handleSendApproval} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: sendApproval ? 'green' : 'black', paddingVertical: 5,marginRight:10, paddingHorizontal: 10, borderRadius: 20 }}>
@@ -1618,7 +1695,7 @@ const EditHomeLoan = ({ route, navigation }) => {
         >
           <Text style={styles.saveButtonText}>Send Approval</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
 
           </View>
         </View>
@@ -1643,7 +1720,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: "100%",
-    marginBottom: 20
+    // marginBottom: 20
   },
   imageContent: {
     flexDirection: "row",

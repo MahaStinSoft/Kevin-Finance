@@ -33,10 +33,29 @@ const AuthNavigator = () => {
     fetchAuthenticatedUser();
   }, []);
 
- 
+  // Add this useEffect to store the authenticated user in AsyncStorage whenever it changes
+  useEffect(() => {
+    const storeAuthenticatedUser = async () => {
+      try {
+        if (matchedUser) {
+          await AsyncStorage.setItem('authenticatedUser', JSON.stringify(matchedUser));
+        } else {
+          await AsyncStorage.removeItem('authenticatedUser');
+        }
+      } catch (error) {
+        console.error('Error storing authenticated user:', error);
+      }
+    };
+
+    storeAuthenticatedUser();
+  }, [matchedUser]);
 
   const isLoggedInAsManager = matchedUser && matchedUser.accountrolecode === 3;
   const isLoggedInAsUser = matchedUser && matchedUser.kf_email && matchedUser.kf_email.endsWith('.com');
+
+  if (loading) {
+    return null; // Or you can render a loading indicator here
+  }
 
   return (
     <Stack.Navigator>
@@ -52,7 +71,7 @@ const AuthNavigator = () => {
           component={ManagerDashboard}
           options={{ headerShown: false }}
         />
-      ) :(
+      ) : (
         <>
           <Stack.Screen
             name="Dashboard"
@@ -65,11 +84,11 @@ const AuthNavigator = () => {
             options={{ headerShown: false }}
           />
           <Stack.Screen
-        name="Setting"
-        component={Setting}
-        options={{ headerShown: false }}
-        initialParams={{ isLoggedInAsManager: isLoggedInAsManager }}
-      />
+            name="Setting"
+            component={Setting}
+            options={{ headerShown: false }}
+            initialParams={{ isLoggedInAsManager: isLoggedInAsManager }}
+          />
         </>
       )}
     </Stack.Navigator>
@@ -77,3 +96,5 @@ const AuthNavigator = () => {
 };
 
 export default AuthNavigator;
+
+

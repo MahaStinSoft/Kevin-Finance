@@ -163,6 +163,7 @@ import { captureRef } from 'react-native-view-shot';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CardImageSignature from '../../common/CardImageSignature';
 import ButtonComponent from '../../common/ButtonComponent';
+import CustomAlert from '../../common/CustomAlert';
 
 const SignatureScreen = ({ route, navigation }) => {
   const { loanApplication } = route.params || {};
@@ -171,6 +172,9 @@ const SignatureScreen = ({ route, navigation }) => {
   const [signatureImage, setSignatureImage] = useState(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [isLoading, setIsLoading] = useState(false); // State for loading indicator
+  const [showAlert, setShowAlertConfirmation] = useState(false); 
+  const [base64Data, setBase64Data] = useState(null);
+
   const svgRef = useRef(null);
 
   useEffect(() => {
@@ -241,39 +245,21 @@ const SignatureScreen = ({ route, navigation }) => {
   const captureSignature = async () => {
     try {
       setIsLoading(true); // Start loading indicator
-      const base64Data = await captureRef(svgRef, {
+      const capturedData = await captureRef(svgRef, {
         format: 'png',
         quality: 1,
         result: 'base64',
       });
-
-      if (!base64Data) {
+  
+      if (!capturedData) {
         console.error('Captured base64 data is undefined');
         return;
       }
-
-      setSignatureImage(base64Data);
-      await AsyncStorage.setItem('signaturefile', base64Data);
-      // setIsLoading(false); // Stop loading indicator
-      // Alert.alert(
-      //   'Image Picked Successfully',
-      //   'The image has been successfully picked',
-      //   [
-      //     { text: 'OK'}
-      //   ]
-      // );
-      // navigation.navigate('EditHomeLoan', { signatureImage: base64Data, loanApplication: loanApplication });
-      setTimeout(() => {
-        setIsLoading(false); // Stop loading indicator
-        Alert.alert(
-          'Image Picked Successfully',
-          'The image has been successfully picked',
-          [
-            { text: 'OK'}
-          ]
-        );
-        navigation.navigate('EditHomeLoan', { signatureImage: base64Data, loanApplication: loanApplication });
-      }, 6000);
+  
+      setSignatureImage(capturedData);
+      await AsyncStorage.setItem('signaturefile', capturedData);
+      setBase64Data(capturedData); // Store captured data in state
+      handleShowAlert();
     } catch (error) {
       setIsLoading(false); // Stop loading indicator
       console.error('Error capturing signature:', error);
@@ -283,6 +269,19 @@ const SignatureScreen = ({ route, navigation }) => {
   const handleModalClose = () => {
     // setModalVisible(false);
     navigation.goBack();
+  };
+
+  const handleShowAlert = () => {
+    setShowAlertConfirmation(true);
+  };
+
+  const handleCloseAlert = () => {
+    setShowAlertConfirmation(false);
+  };
+
+  const handleCloseAlertConfirmation = () => {
+    setShowAlertConfirmation(false);
+    navigation.navigate('EditHomeLoan', { signatureImage: base64Data, loanApplication: loanApplication });
   };
 
   return (
@@ -330,6 +329,18 @@ const SignatureScreen = ({ route, navigation }) => {
           <ActivityIndicator size="large" color="black" />
         </View>
       )}
+      <CustomAlert
+          visible={showAlert}
+          onClose={handleCloseAlert}
+          onConfirm={handleCloseAlertConfirmation}
+          headerMessage="Signature"
+          message="Signature Captutred Successfully"
+          Button1="Cancel"
+          Button2="OK"
+          style={styles.alertStyle}
+          modalHeaderStyle={[styles.modalheaderStyle, {right: 90}]}
+          textStyle={styles.textStyle}
+        />
     </View>
   );
 };
