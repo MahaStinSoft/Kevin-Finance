@@ -482,14 +482,14 @@ const CardImageSignature = ({ title, setImageContent, navigation, pickImage }) =
       if (!result.cancelled) {
         setImageContent({ fileName: result.uri.split('/').pop(), fileContent: result.base64 });
         await AsyncStorage.setItem('selectedImage', JSON.stringify({ fileName: result.uri.split('/').pop(), fileContent: result.base64 }));
-        Alert.alert(
-          'Signature Captured Successfully',
-          'The image has been successfully picked',
-          [
-            { text: 'OK', onPress: closeModal }
-          ]
-        );
-      // handleShowAlert();
+        // Alert.alert(
+        //   'Signature Captured Successfully',
+        //   'The image has been successfully picked',
+        //   [
+        //     { text: 'OK', onPress: closeModal }
+        //   ]
+        // );
+      handleShowAlert();
       }
     } catch (error) {
       console.error('Error taking picture:', error);
