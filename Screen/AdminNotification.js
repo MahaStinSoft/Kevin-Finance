@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Button, TouchableOpacity, Alert } from 'react-native';
 import axios from 'axios';
 import { ScrollView } from 'react-native-gesture-handler';
 import querystring from 'querystring';
@@ -25,95 +25,96 @@ const AdminNotification = ({ loanApplication, navigation, personalLoan, route })
     fetchLoanApplications();
     fetchNotifications();
     fetchUnreadCount();
-
+    // fetchLoanApplication();
+    // fetchNotification();
     // Reset refresh state after re-render
     setRefresh(false);
   } ,[refresh]);
 
-  useEffect(() =>{
-    fetchLoanApplication();
-    fetchNotification();
-  } ,[refresh]);
+  // useEffect(() =>{
+    
+  // } ,[refresh]);
   
-  const fetchLoanApplication = async () => {
-  try {
-    const tokenResponse = await axios.post(
-      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
-      querystring.stringify({
-        grant_type: 'client_credentials',
-        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
-        resource: 'https://org0f7e6203.crm5.dynamics.com',
-        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
-        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
-      }),
-      {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      }
-    );
 
-    const accessToken = tokenResponse.data.access_token;
+//   const fetchLoanApplication = async () => {
+//   try {
+//     const tokenResponse = await axios.post(
+//       'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+//       querystring.stringify({
+//         grant_type: 'client_credentials',
+//         client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+//         resource: 'https://org0f7e6203.crm5.dynamics.com',
+//         scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+//         client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+//       }),
+//       {
+//         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+//       }
+//     );
 
-    const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+//     const accessToken = tokenResponse.data.access_token;
 
-    if (response.data && response.data.value && Array.isArray(response.data.value)) {
-      // Filter loan applications where kf_sendapproval is equal to 1, kf_createdby is null or empty, and kf_applyforloan is 1
-      const filteredApplications = response.data.value.filter(application => 
-        (!application.kf_createdby || application.kf_createdby.trim() === '') &&
-        application.kf_applyforloan == 1
-      );
-      setLoanApplications(filteredApplications);
-      setLoanApplicationsCount(filteredApplications.length);
-    } else {
-      console.error('Invalid loan applications response format:', response.data);
-    }
-  } catch (error) {
-    console.error('Error fetching loan applications:', error);
-  }
-};
+//     const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications', {
+//       headers: {
+//         Authorization: `Bearer ${accessToken}`,
+//       },
+//     });
 
-const fetchNotification = async () => {
-  try {
-    const tokenResponse = await axios.post(
-      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
-      querystring.stringify({
-        grant_type: 'client_credentials',
-        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
-        resource: 'https://org0f7e6203.crm5.dynamics.com',
-        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
-        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
-      }),
-      {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      }
-    );
+//     if (response.data && response.data.value && Array.isArray(response.data.value)) {
+//       // Filter loan applications where kf_sendapproval is equal to 1, kf_createdby is null or empty, and kf_applyforloan is 1
+//       const filteredApplications = response.data.value.filter(application => 
+//         (!application.kf_createdby || application.kf_createdby.trim() === '') &&
+//         application.kf_applyforloan == 1
+//       );
+//       setLoanApplications(filteredApplications);
+//       setLoanApplicationsCount(filteredApplications.length);
+//     } else {
+//       console.error('Invalid loan applications response format:', response.data);
+//     }
+//   } catch (error) {
+//     console.error('Error fetching loan applications:', error);
+//   }
+// };
 
-    const accessToken = tokenResponse.data.access_token;
+// const fetchNotification = async () => {
+//   try {
+//     const tokenResponse = await axios.post(
+//       'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+//       querystring.stringify({
+//         grant_type: 'client_credentials',
+//         client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+//         resource: 'https://org0f7e6203.crm5.dynamics.com',
+//         scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+//         client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+//       }),
+//       {
+//         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+//       }
+//     );
 
-    const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+//     const accessToken = tokenResponse.data.access_token;
 
-    if (response.data && response.data.value && Array.isArray(response.data.value)) {
-      // Filter personal loan notifications where kf_sendapproval is equal to 1
-      const filteredNotifications = response.data.value.filter(notification => 
-        (!notification.kf_createdby || notification.kf_createdby.trim() === '') &&
-        notification.kf_applyforloan == 1);
-      // const filteredNotifications = response.data.value.filter(notification => notification.kf_sendapproval == 1);
-      setNotifications(filteredNotifications);
-      setNotificationsCount(filteredNotifications.length); // Update count based on the fetched data
-    } else {
-      console.error('Invalid notifications response format:', response.data);
-    }
-  } catch (error) {
-    console.error('Error fetching notifications:', error);
-  }
-};
+//     const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans', {
+//       headers: {
+//         Authorization: `Bearer ${accessToken}`,
+//       },
+//     });
+
+//     if (response.data && response.data.value && Array.isArray(response.data.value)) {
+//       // Filter personal loan notifications where kf_sendapproval is equal to 1
+//       const filteredNotifications = response.data.value.filter(notification => 
+//         (!notification.kf_createdby || notification.kf_createdby.trim() === '') &&
+//         notification.kf_applyforloan == 1);
+//       // const filteredNotifications = response.data.value.filter(notification => notification.kf_sendapproval == 1);
+//       setNotifications(filteredNotifications);
+//       setNotificationsCount(filteredNotifications.length); // Update count based on the fetched data
+//     } else {
+//       console.error('Invalid notifications response format:', response.data);
+//     }
+//   } catch (error) {
+//     console.error('Error fetching notifications:', error);
+//   }
+// };
 
 
 // Over all count of user creatations without apply for loan = yes (1)
@@ -154,43 +155,88 @@ const fetchNotification = async () => {
 //     console.error('Error fetching loan applications:', error);
 //   }
 // };
+const fetchLoanApplications = async () => {
+  try {
+    const tokenResponse = await axios.post(
+      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+      querystring.stringify({
+        grant_type: 'client_credentials',
+        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+        resource: 'https://org0f7e6203.crm5.dynamics.com',
+        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+      }),
+      {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      }
+    );
 
-  const fetchLoanApplications = async () => {
-    try {
-      const tokenResponse = await axios.post(
-        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
-        querystring.stringify({
-          grant_type: 'client_credentials',
-          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
-          resource: 'https://org0f7e6203.crm5.dynamics.com',
-          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
-          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
-        }),
-        {
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    const accessToken = tokenResponse.data.access_token;
+
+    const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (response.data && response.data.value && Array.isArray(response.data.value)) {
+      // Filter loan applications based on conditions
+      const filteredApplications = response.data.value.filter(application => {
+        if ((!application.kf_createdby || application.kf_createdby.trim() === '') && application.kf_applyforloan == 1) {
+          return true;
+        } else if (application.kf_sendapproval == 1) {
+          return true;
+        } else {
+          return false;
         }
-      );
-
-      const accessToken = tokenResponse.data.access_token;
-
-      const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
       });
 
-      if (response.data && response.data.value && Array.isArray(response.data.value)) {
-        // Filter loan applications where kf_sendapproval is equal to 1
-        const filteredApplications = response.data.value.filter(application => application.kf_sendapproval == 1);
-        setLoanApplications(filteredApplications);
-        setLoanApplicationsCount(filteredApplications.length);
-      } else {
-        console.error('Invalid loan applications response format:', response.data);
-      }
-    } catch (error) {
-      console.error('Error fetching loan applications:', error);
+      setLoanApplications(filteredApplications);
+      setLoanApplicationsCount(filteredApplications.length);
+    } else {
+      console.error('Invalid loan applications response format:', response.data);
     }
-  };
+  } catch (error) {
+    console.error('Error fetching loan applications:', error);
+  }
+};
+
+  // const fetchLoanApplications = async () => {
+  //   try {
+  //     const tokenResponse = await axios.post(
+  //       'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+  //       querystring.stringify({
+  //         grant_type: 'client_credentials',
+  //         client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+  //         resource: 'https://org0f7e6203.crm5.dynamics.com',
+  //         scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+  //         client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+  //       }),
+  //       {
+  //         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  //       }
+  //     );
+
+  //     const accessToken = tokenResponse.data.access_token;
+
+  //     const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications', {
+  //       headers: {
+  //         Authorization: `Bearer ${accessToken}`,
+  //       },
+  //     });
+
+  //     if (response.data && response.data.value && Array.isArray(response.data.value)) {
+  //       // Filter loan applications where kf_sendapproval is equal to 1
+  //       const filteredApplications = response.data.value.filter(application => application.kf_sendapproval == 1);
+  //       setLoanApplications(filteredApplications);
+  //       setLoanApplicationsCount(filteredApplications.length);
+  //     } else {
+  //       console.error('Invalid loan applications response format:', response.data);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching loan applications:', error);
+  //   }
+  // };
 
   const fetchNotifications = async () => {
     try {
@@ -207,20 +253,29 @@ const fetchNotification = async () => {
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         }
       );
-
+  
       const accessToken = tokenResponse.data.access_token;
-
+  
       const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans', {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-
+  
       if (response.data && response.data.value && Array.isArray(response.data.value)) {
-        // Filter personal loan notifications where kf_sendapproval is equal to 1
-        const filteredNotifications = response.data.value.filter(notification => notification.kf_sendapproval == 1);
+        // Filter personal loan notifications based on conditions
+        const filteredNotifications = response.data.value.filter(notification => {
+          if ((!notification.kf_createdby || notification.kf_createdby.trim() === '') && notification.kf_applyforloan == 1) {
+            return true;
+          } else if (notification.kf_sendapproval == 1) {
+            return true;
+          } else {
+            return false;
+          }
+        });
+  
         setNotifications(filteredNotifications);
-        setNotificationsCount(filteredNotifications.length); // Update count based on the fetched data
+        setNotificationsCount(filteredNotifications.length);
       } else {
         console.error('Invalid notifications response format:', response.data);
       }
@@ -228,6 +283,43 @@ const fetchNotification = async () => {
       console.error('Error fetching notifications:', error);
     }
   };
+  
+  // const fetchNotifications = async () => {
+  //   try {
+  //     const tokenResponse = await axios.post(
+  //       'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+  //       querystring.stringify({
+  //         grant_type: 'client_credentials',
+  //         client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+  //         resource: 'https://org0f7e6203.crm5.dynamics.com',
+  //         scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+  //         client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+  //       }),
+  //       {
+  //         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  //       }
+  //     );
+
+  //     const accessToken = tokenResponse.data.access_token;
+
+  //     const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans', {
+  //       headers: {
+  //         Authorization: `Bearer ${accessToken}`,
+  //       },
+  //     });
+
+  //     if (response.data && response.data.value && Array.isArray(response.data.value)) {
+  //       // Filter personal loan notifications where kf_sendapproval is equal to 1
+  //       const filteredNotifications = response.data.value.filter(notification => notification.kf_sendapproval == 1);
+  //       setNotifications(filteredNotifications);
+  //       setNotificationsCount(filteredNotifications.length); // Update count based on the fetched data
+  //     } else {
+  //       console.error('Invalid notifications response format:', response.data);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching notifications:', error);
+  //   }
+  // };
 
 
 
@@ -349,11 +441,56 @@ const fetchNotification = async () => {
         notification => !notification.kf_markasread && notification.kf_createdby === authenticatedUser.kf_adminname
       ).length;
 
+      // Update the unread count state variable
       setUnreadCount(unreadHomeCount + unreadPersonalLoansCount);
     } catch (error) {
       console.error('Error fetching unread count:', error);
     }
   };
+
+  // const fetchUnreadCount = async () => {
+  //   try {
+  //     const tokenResponse = await axios.post(
+  //       'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+  //       querystring.stringify({
+  //         grant_type: 'client_credentials',
+  //         client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+  //         resource: 'https://org0f7e6203.crm5.dynamics.com',
+  //         scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+  //         client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+  //       }),
+  //       {
+  //         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  //       }
+  //     );
+
+  //     const accessToken = tokenResponse.data.access_token;
+
+  //     const responseHome = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications', {
+  //       headers: {
+  //         Authorization: `Bearer ${accessToken}`,
+  //       },
+  //     });
+
+  //     const responsePersonalLoans = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans', {
+  //       headers: {
+  //         Authorization: `Bearer ${accessToken}`,
+  //       },
+  //     });
+
+  //     const unreadHomeCount = responseHome.data.value.filter(
+  //       notification => !notification.kf_markasread && notification.kf_createdby === authenticatedUser.kf_adminname
+  //     ).length;
+
+  //     const unreadPersonalLoansCount = responsePersonalLoans.data.value.filter(
+  //       notification => !notification.kf_markasread && notification.kf_createdby === authenticatedUser.kf_adminname
+  //     ).length;
+
+  //     setUnreadCount(unreadHomeCount + unreadPersonalLoansCount);
+  //   } catch (error) {
+  //     console.error('Error fetching unread count:', error);
+  //   }
+  // };
 
   // Function to update kf_markasread field in CRM
   const updateKfMarkAsRead = async (recordId) => {
@@ -402,6 +539,116 @@ const fetchNotification = async () => {
   const handleNavigation = () => {
     navigation.navigate("AdminNotification", { authenticatedUser });
   };
+  const pickRecord = async (record) => {
+    // Display an alert to confirm picking the record
+    Alert.alert(
+        'Confirm Accept Record',
+        'Are you sure you want to Select this record?',
+        [
+            { text: 'No', onPress: () => console.log('Cancel pressed') },
+            {
+                text: 'Yes',
+                onPress: async () => {
+                    try {
+                        // Make the necessary API call to update the record's "created by" field
+                        const tokenResponse = await axios.post(
+                            'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+                            querystring.stringify({
+                                grant_type: 'client_credentials',
+                                client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+                                resource: 'https://org0f7e6203.crm5.dynamics.com',
+                                scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+                                client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+                            }),
+                            {
+                                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            }
+                        );
+
+                        const accessToken = tokenResponse.data.access_token;
+
+                        // Check if it's a personal loan or a loan application
+                        if (record.kf_loanapplicationid) {
+                            // If it's a loan application, update the "created by" field
+                            await axios.patch(
+                                `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications(${record.kf_loanapplicationid})`,
+                                { kf_createdby: authenticatedUser.kf_adminname },
+                                {
+                                    headers: { Authorization: `Bearer ${accessToken}` },
+                                }
+                            );
+                        } else if (record.kf_personalloanid) {
+                            // If it's a personal loan, perform the necessary action
+                            // Update the personal loan record as needed
+                            // Example:
+                            await axios.patch(
+                                `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans(${record.kf_personalloanid})`,
+                                { kf_createdby: authenticatedUser.kf_adminname },
+                                {
+                                    headers: { Authorization: `Bearer ${accessToken}` },
+                                }
+                            );
+                        }
+
+                        // After successful update, refresh the data
+                        setRefresh(true);
+                    } catch (error) {
+                        console.error('Error picking record:', error);
+                    }
+                },
+            },
+        ]
+    );
+};
+
+  // const pickRecord = async (record) => {
+  //   // Display an alert to confirm picking the record
+  //   Alert.alert(
+  //     'Confirm Pick Record',
+  //     'Are you sure you want to pick this record?',
+  //     [
+  //       { text: 'No', onPress: () => console.log('Cancel pressed') },
+  //       {
+  //         text: 'Yes',
+  //         onPress: async () => {
+  //           try {
+  //             // Make the necessary API call to update the record's "created by" field
+  //             const tokenResponse = await axios.post(
+  //               'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+  //               querystring.stringify({
+  //                 grant_type: 'client_credentials',
+  //                 client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+  //                 resource: 'https://org0f7e6203.crm5.dynamics.com',
+  //                 scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+  //                 client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+  //               }),
+  //               {
+  //                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  //               }
+  //             );
+
+  //             const accessToken = tokenResponse.data.access_token;
+
+  //             await axios.patch(
+  //               `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications(${record.kf_loanapplicationid})`,
+  //               { kf_createdby: authenticatedUser.kf_adminname },
+  //               {
+  //                 headers: { Authorization: `Bearer ${accessToken}` },
+  //               }
+  //             );
+
+              
+    
+  //             // After successful update, refresh the data
+  //             setRefresh(true);
+  //           } catch (error) {
+  //             console.error('Error picking record:', error);
+  //           }
+  //         },
+  //       },
+  //     ]
+  //   );
+  // };
 
   return (
     <View>
@@ -500,6 +747,9 @@ const fetchNotification = async () => {
           <Text>Approved By: {application.kf_approvedby}</Text>
           <View style={styles.buttonContainer}>
             <Button title="View Record" onPress={() => handleViewHomeLoan(application)} />
+            {!application.kf_createdby && ( // Check if kf_createdby is null or empty
+            <Button title="✓ Accept" onPress={() => pickRecord(application)} color="green" />
+          )}
           </View>
         </View>
       </View>
@@ -548,6 +798,9 @@ const fetchNotification = async () => {
                     <Text>Approved By: {notification.kf_approvedby}</Text>
                     <View style={styles.buttonContainer}>
                       <Button title="View Record" onPress={() => handleViewPersonalLoan(notification)} />
+                      {!notification.kf_createdby && ( // Check if kf_createdby is null or empty
+            <Button title="✓ Accept" onPress={() => pickRecord(notification)} color="green" />
+          )}
                     </View>
                   </View>
                 </View>
@@ -578,7 +831,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: "red"
   },
   // itemContainer: {
   //   borderWidth: 1,

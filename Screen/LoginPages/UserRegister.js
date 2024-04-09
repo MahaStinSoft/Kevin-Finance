@@ -38,7 +38,7 @@ export const UserRegisterScreen = ({ route }) => {
     const isFocused = useIsFocused();
 
     const [errorMessages, setErrorMessages] = useState({
-        UserName: '',
+        firstName: '',
         mobileNumber: '',
         email: '',
     });
@@ -51,12 +51,12 @@ export const UserRegisterScreen = ({ route }) => {
     );
 
 
-  const resetForm = () => {
-    setkf_name('');
-    setkf_mobilenumber(null);
-    setkf_email(null);  
-    setResetFormKey((prevKey) => prevKey + 1);
-  };
+    const resetForm = () => {
+      setkf_name(null);
+      setkf_mobilenumber(null);
+      setkf_email(null);  
+      setResetFormKey((prevKey) => prevKey + 1);
+    };
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -117,9 +117,9 @@ export const UserRegisterScreen = ({ route }) => {
     
     if (onlyAlphabets.test(text) || text === '') {
       setkf_name(text);
-      setErrorMessages({ ...errorMessages, firstName: '' });
-    } else {
       setErrorMessages({ ...errorMessages, firstName: 'Enter a valid First Name' });
+    } else {
+      setErrorMessages({ ...errorMessages, firstName: '' });
     }
   };
  
@@ -196,7 +196,7 @@ export const UserRegisterScreen = ({ route }) => {
     }
 
     const newErrorMessages = {
-        firstName: !kf_name ? ' Enter a First Name' : '',
+        firstName:kf_name ? '' : ' Enter a First Name',
         mobileNumber: /^[6-9]\d{9}$/.test(kf_mobilenumber) ? '' : 'Enter a Valid 10-digit mobile number.',
         email: !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(kf_email) ? 'Enter a Valid Email Address' : '',      
     };
@@ -265,20 +265,22 @@ export const UserRegisterScreen = ({ route }) => {
 
         <ImageBackground source={require('../../assets/red.png')} style={styles.backgroundImage}>
      
-      <Text style={styles.Heading}>Registeration</Text>
+      <Text style={styles.Heading}>Registration</Text>
       <ScrollView key={resetFormKey} keyboardShouldPersistTaps="handled">
           <View style={styles.formContent}>
+
+          <View style={{marginVertical: -4}}>
           <TextInputComponent
             placeholder="Name"
             autoCapitalize="none"
             value={kf_name}
             onChangeText={handleFirstNameChange}
           />
-          {errorMessages.firstName !== '' && (
-            <Text style={styles.errorText}>{errorMessages.firstName}</Text>
-          )}
+           {errorMessages.firstName !== '' && (
+                <Text style={styles.errorText}>{errorMessages.firstName}</Text>
+              )}
+        </View>
 
-        
             <View style={{marginVertical: 6}}>
               <TextInputComponent
                 placeholder="Mobile Number"

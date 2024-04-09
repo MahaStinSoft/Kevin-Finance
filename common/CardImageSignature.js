@@ -449,10 +449,12 @@ import { View, Text, TouchableOpacity, Modal, StyleSheet, Alert } from 'react-na
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CustomAlert from './CustomAlert';
 
 const CardImageSignature = ({ title, setImageContent, navigation, pickImage }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [signatureDrawn, setSignatureDrawn] = useState(false);
+  const [showAlert, setShowAlertConfirmation] = useState(false); 
 
   useEffect(() => {
     // Reset modal state when the component re-renders
@@ -487,12 +489,25 @@ const CardImageSignature = ({ title, setImageContent, navigation, pickImage }) =
             { text: 'OK', onPress: closeModal }
           ]
         );
+      // handleShowAlert();
       }
     } catch (error) {
       console.error('Error taking picture:', error);
     }
   };
 
+  const handleShowAlert = () => {
+    setShowAlertConfirmation(true);
+  };
+
+  const handleCloseAlert = () => {
+    setShowAlertConfirmation(false);
+  };
+
+  const handleCloseAlertConfirmation = () => {
+    setShowAlertConfirmation(false);
+    closeModal();
+  };
 
   return (
     <View style={{ flexDirection: 'row', marginTop: 15, alignContent: 'space-around', width: '26%' }}>
@@ -522,6 +537,18 @@ const CardImageSignature = ({ title, setImageContent, navigation, pickImage }) =
           </View>
         </View>
       </Modal>
+      <CustomAlert
+          visible={showAlert}
+          onClose={handleCloseAlert}
+          onConfirm={handleCloseAlertConfirmation}
+          headerMessage="Signature"
+          message="Signature Captutred Successfully"
+          Button1="Cancel"
+          Button2="OK"
+          style={styles.alertStyle}
+          modalHeaderStyle={[styles.modalheaderStyle, {right: 90}]}
+          textStyle={styles.textStyle}
+        />
     </View>
   );
 };

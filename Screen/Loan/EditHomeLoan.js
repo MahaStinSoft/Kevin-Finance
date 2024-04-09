@@ -53,7 +53,7 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [pancard, setPancard] = useState({ fileName: null, fileContent: null });
   const [applicantImage, setapplicantImage] = useState({ fileName: null, fileContent: null });
   // const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fileContent: null });
-  const [signature, setSignature] = useState({ fileName: null });
+  const [signature, setSignature] = useState({ fileName: null, fileContent: null  });
   const [sendApproval, setSendApproval] = useState(loanApplication?.kf_sendapproval || '');
   const [reason, setReason] = useState(loanApplication?.kf_reason || '');
   const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fileContent: null });
@@ -78,7 +78,6 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [applyForLoan, setapplyForLoan] = useState(loanApplication?.kf_applyforloan || '');
   // const { userapplicationid } = route.params;
   const { signatureImage, userapplicationid } = route.params;
-  console.log('signature', signatureImage);
   // const [signatureImage, setSignatureImage] = useState(null);
   const [recordId, setRecordId] = useState(loanApplication.kf_loanapplicationid);
   const [imageSource, setImageSource] = useState(null);
@@ -142,7 +141,7 @@ const EditHomeLoan = ({ route, navigation }) => {
     setAadharcard({ fileName: null, fileContent: null });
     setPancard({ fileName: null, fileContent: null });
     setkf_applicantimage({ fileName: null, fileContent: null });
-    setSignature({ fileName: null })
+    setSignature({ fileName: null, fileContent: null  })
     console.log('State updated:', {
       applicationnumber,
       createdby,
@@ -831,10 +830,10 @@ const EditHomeLoan = ({ route, navigation }) => {
       const annotations = [
         {
           subject: 'Signature Image',
-          filename: signatureImage.fileName || 'Signature.jpg',
+          filename: signature.fileName || 'Signature.jpg',
           isdocument: true,
           'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
-          documentbody: signatureImage,
+          documentbody:  signature.fileContent ||signatureImage,
         },
       ];
 
@@ -1623,10 +1622,10 @@ const EditHomeLoan = ({ route, navigation }) => {
               <View style={{ marginBottom: 15 }}>
                 <CardImageSignature
                   title="Signature"
-                  imageContent={signatureImage}
+                  imageContent={signature ||signatureImage}
                   pickImage={handleNavigateToSignatureScreen}
                   sendAnnotation={sendAnnotation3}
-                  setImageContent={setImageContent}
+                  setImageContent={setSignature}
                 />
               </View>
 

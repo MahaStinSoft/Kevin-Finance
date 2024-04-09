@@ -62,7 +62,7 @@ const DashboardScreen = ({ navigation, route }) => {
   // const [showAllLoans, setShowAllLoans] = useState(false);
   const [showAllHomeLoans, setShowAllHomeLoans] = useState(false);
   const [showAllPersonalLoans, setShowAllPersonalLoans] = useState(false);
-  const [showAlert, setShowAlert] = useState(false); 
+  const [showAlert, setShowAlert] = useState(false);
   const [isConnected, setIsConnected] = useState(true);
   const isFocused = useIsFocused();
 
@@ -459,11 +459,19 @@ const DashboardScreen = ({ navigation, route }) => {
       });
 
       if (response.data && response.data.value && Array.isArray(response.data.value)) {
-        // Filter loan applications where kf_sendapproval is equal to 1
-        const filteredApplications = response.data.value.filter(application => application.kf_sendapproval == 1);
+        // Filter loan applications based on conditions
+        const filteredApplications = response.data.value.filter(application => {
+          if ((!application.kf_createdby || application.kf_createdby.trim() === '') && application.kf_applyforloan == 1) {
+            return true;
+          } else if (application.kf_sendapproval == 1) {
+            return true;
+          } else {
+            return false;
+          }
+        });
+
         setLoanApplications(filteredApplications);
         setLoanApplicationsCount(filteredApplications.length);
-        // setRefresh(!refresh);
       } else {
         console.error('Invalid loan applications response format:', response.data);
       }
@@ -497,11 +505,19 @@ const DashboardScreen = ({ navigation, route }) => {
       });
 
       if (response.data && response.data.value && Array.isArray(response.data.value)) {
-        // Filter personal loan notifications where kf_sendapproval is equal to 1
-        const filteredNotifications = response.data.value.filter(notification => notification.kf_sendapproval == 1);
+        // Filter personal loan notifications based on conditions
+        const filteredNotifications = response.data.value.filter(notification => {
+          if ((!notification.kf_createdby || notification.kf_createdby.trim() === '') && notification.kf_applyforloan == 1) {
+            return true;
+          } else if (notification.kf_sendapproval == 1) {
+            return true;
+          } else {
+            return false;
+          }
+        });
+
         setNotifications(filteredNotifications);
-        setNotificationsCount(filteredNotifications.length); // Update count based on the fetched data
-        // setRefresh(!refresh);
+        setNotificationsCount(filteredNotifications.length);
       } else {
         console.error('Invalid notifications response format:', response.data);
       }
@@ -551,17 +567,17 @@ const DashboardScreen = ({ navigation, route }) => {
                 loanApplications
                   .filter(
                     application =>
-                      (sendApproval === null || application.kf_sendapproval === (sendApproval ? 1 : 0)) &&
+                    ((sendApproval === null || application.kf_sendapproval === (sendApproval ? 1 : 0)) &&
                       authenticatedUser &&
-                      application.kf_createdby === authenticatedUser.kf_adminname &&
-                      !application.kf_markasread // Filter only unread home loan applications
+                      (application.kf_createdby === authenticatedUser.kf_adminname || !application.kf_createdby) &&
+                      !application.kf_markasread) // Filter only unread home loan applications and applications with createdby null or empty
                   )
                   .length +
                 notifications
                   .filter(
                     notification =>
                       authenticatedUser &&
-                      notification.kf_createdby === authenticatedUser.kf_adminname &&
+                      (notification.kf_createdby === authenticatedUser.kf_adminname || !notification.kf_createdby) &&
                       !notification.kf_markasread // Filter only unread personal loan notifications
                   )
                   .length
@@ -572,17 +588,17 @@ const DashboardScreen = ({ navigation, route }) => {
                         loanApplications
                           .filter(
                             application =>
-                              (sendApproval === null || application.kf_sendapproval === (sendApproval ? 1 : 0)) &&
+                            ((sendApproval === null || application.kf_sendapproval === (sendApproval ? 1 : 0)) &&
                               authenticatedUser &&
-                              application.kf_createdby === authenticatedUser.kf_adminname &&
-                              !application.kf_markasread // Filter only unread home loan applications
+                              (application.kf_createdby === authenticatedUser.kf_adminname || !application.kf_createdby) &&
+                              !application.kf_markasread) // Filter only unread home loan applications and applications with createdby null or empty
                           )
                           .length +
                         notifications
                           .filter(
                             notification =>
                               authenticatedUser &&
-                              notification.kf_createdby === authenticatedUser.kf_adminname &&
+                              (notification.kf_createdby === authenticatedUser.kf_adminname || !notification.kf_createdby) &&
                               !notification.kf_markasread // Filter only unread personal loan notifications
                           )
                           .length
@@ -783,7 +799,7 @@ const DashboardScreen = ({ navigation, route }) => {
               )}
             </View> */}
 
-{/* <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 8 }}>
+            {/* <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 8 }}>
   {initialLoading ? (
     <ActivityIndicator size="large" color="#0000ff" />
   ) : (
@@ -850,7 +866,7 @@ const DashboardScreen = ({ navigation, route }) => {
   )}
 </View> */}
 
-{/* <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 8 }}>
+            {/* <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 8 }}>
   {initialLoading ? (
     <ActivityIndicator size="large" color="#0000ff" />
   ) : (
@@ -910,68 +926,68 @@ const DashboardScreen = ({ navigation, route }) => {
   )}
 </View> */}
 
-<View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 8 }}>
-  {initialLoading ? (
-    <ActivityIndicator size="large" color="#0000ff" />
-  ) : (
-    <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
-      <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 15, width: "100%" }}>
-        <Text style={[styles.heading, { right: 0 }]}>Home Loans</Text>
-        
-        <TouchableOpacity 
-            onPress={toggleShowAllHomeLoans} 
-            style={[styles.viewMoreButton, { opacity: displayedHomeLoans.length === 0 ? 0 : 1 }]}
-            disabled={displayedHomeLoans.length === 0}>
-            <Text style={styles.viewMoreButtonText}>
-              {showAllHomeLoans ? 'View Less' : 'View More'}
-            </Text>
-          </TouchableOpacity>
-      </View>
-      {displayedHomeLoans.length > 0 ? (
-        <>
-          {displayedHomeLoans.map((homeLoan, index) => (
-            <HomeLoanCard
-              key={index}
-              loanApplication={homeLoan}
-              onPress={() => navigateToHomeDetails(homeLoan)}
-            />
-          ))}
-        </>
-      ) : (
-        <View style={styles.noRecordsContainer}>
-          <Text style={styles.noRecordsText}>No Records Found</Text>
-        </View>
-      )}
+            <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 8 }}>
+              {initialLoading ? (
+                <ActivityIndicator size="large" color="#0000ff" />
+              ) : (
+                <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
+                  <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 15, width: "100%" }}>
+                    <Text style={[styles.heading, { right: 0 }]}>Home Loans</Text>
 
-      <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 15, width: "100%" }}>
-        <Text style={[styles.heading, { marginBottom: 0 }]}>Personal Loans</Text>
-        <TouchableOpacity 
-            onPress={toggleShowAllPersonalLoans} 
-            style={[styles.viewMoreButton, { opacity: displayedPersonalLoans.length === 0 ? 0 : 1 }]}
-            disabled={displayedPersonalLoans.length === 0}>
-            <Text style={styles.viewMoreButtonText}>
-              {showAllPersonalLoans ? 'View Less' : 'View More'}
-            </Text>
-          </TouchableOpacity>
-      </View>
-      {displayedPersonalLoans.length > 0 ? (
-        <>
-          {displayedPersonalLoans.map((personalLoan, index) => (
-            <PersonalLoanCard
-              key={index}
-              personalLoan={personalLoan}
-              onPress={() => navigateToPersonalDetails(personalLoan)}
-            />
-          ))}
-        </>
-      ) : (
-        <View style={styles.noRecordsContainer}>
-          <Text style={styles.noRecordsText}>No Records Found</Text>
-        </View>
-      )}
-    </ScrollView>
-  )}
-</View>
+                    <TouchableOpacity
+                      onPress={toggleShowAllHomeLoans}
+                      style={[styles.viewMoreButton, { opacity: displayedHomeLoans.length === 0 ? 0 : 1 }]}
+                      disabled={displayedHomeLoans.length === 0}>
+                      <Text style={styles.viewMoreButtonText}>
+                        {showAllHomeLoans ? 'View Less' : 'View More'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  {displayedHomeLoans.length > 0 ? (
+                    <>
+                      {displayedHomeLoans.map((homeLoan, index) => (
+                        <HomeLoanCard
+                          key={index}
+                          loanApplication={homeLoan}
+                          onPress={() => navigateToHomeDetails(homeLoan)}
+                        />
+                      ))}
+                    </>
+                  ) : (
+                    <View style={styles.noRecordsContainer}>
+                      <Text style={styles.noRecordsText}>No Records Found</Text>
+                    </View>
+                  )}
+
+                  <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 15, width: "100%" }}>
+                    <Text style={[styles.heading, { marginBottom: 0 }]}>Personal Loans</Text>
+                    <TouchableOpacity
+                      onPress={toggleShowAllPersonalLoans}
+                      style={[styles.viewMoreButton, { opacity: displayedPersonalLoans.length === 0 ? 0 : 1 }]}
+                      disabled={displayedPersonalLoans.length === 0}>
+                      <Text style={styles.viewMoreButtonText}>
+                        {showAllPersonalLoans ? 'View Less' : 'View More'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  {displayedPersonalLoans.length > 0 ? (
+                    <>
+                      {displayedPersonalLoans.map((personalLoan, index) => (
+                        <PersonalLoanCard
+                          key={index}
+                          personalLoan={personalLoan}
+                          onPress={() => navigateToPersonalDetails(personalLoan)}
+                        />
+                      ))}
+                    </>
+                  ) : (
+                    <View style={styles.noRecordsContainer}>
+                      <Text style={styles.noRecordsText}>No Records Found</Text>
+                    </View>
+                  )}
+                </ScrollView>
+              )}
+            </View>
 
           </ScrollView>
         </View>
@@ -1036,18 +1052,18 @@ const DashboardScreen = ({ navigation, route }) => {
         </View>
       </KeyboardAvoidingView>
       <CustomAlert
-          // visible={handleShowAlert}
-          visible={showAlert && !isConnected}
-          onClose={handleCloseAlert}
-          onConfirm={handleCloseAlert}
-          headerMessage="No Internet Connection"
-          message="Please check your internet connection and try again."
-          Button1="Cancel"
-          Button2="OK"
-          style={[styles.alertStyle, {height: "23%"}]}
-          modalHeaderStyle={[styles.modalheaderStyle, {right: 40}]}
-          textStyle={styles.textStyle}
-        />
+        // visible={handleShowAlert}
+        visible={showAlert && !isConnected}
+        onClose={handleCloseAlert}
+        onConfirm={handleCloseAlert}
+        headerMessage="No Internet Connection"
+        message="Please check your internet connection and try again."
+        Button1="Cancel"
+        Button2="OK"
+        style={[styles.alertStyle, { height: "23%" }]}
+        modalHeaderStyle={[styles.modalheaderStyle, { right: 40 }]}
+        textStyle={styles.textStyle}
+      />
     </>
   );
 };
@@ -1179,17 +1195,17 @@ const styles = StyleSheet.create({
     marginVertical: 8
   },
   viewMoreButton: {
-  backgroundColor:'red',
-   width: "30%",
-   height: 30, 
-   marginTop: 10,
-  borderRadius: 30,
+    backgroundColor: 'red',
+    width: "30%",
+    height: 30,
+    marginTop: 10,
+    borderRadius: 30,
   },
   viewMoreButtonText: {
     textAlign: "center",
-     color: "white",
-      marginTop: 4,
-       fontWeight: "bold"
+    color: "white",
+    marginTop: 4,
+    fontWeight: "bold"
   },
   chart: {
     marginLeft: 10
@@ -1222,16 +1238,16 @@ const styles = StyleSheet.create({
     fontSize: 12, // Adjust font size for better visibility
   },
   noRecordsContainer: {
-    backgroundColor: '#FFF', 
-    borderRadius: 8, 
-    padding: 16, 
-    marginTop: 16, 
-    shadowColor: '#000', 
+    backgroundColor: '#FFF',
+    borderRadius: 8,
+    padding: 16,
+    marginTop: 16,
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.25, 
+    shadowOpacity: 0.25,
     shadowRadius: 3.84,
     // elevation: 5, 
     width: "100%",
@@ -1285,17 +1301,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  alertStyle:{
+  alertStyle: {
     // backgroundColor: "blue",
     width: "80%",
-      },
-      modalheaderStyle:{
-        // backgroundColor: "green",
-        right: 85
-      },
-      textStyle:{
-        // backgroundColor: "yellow"
-      }
+  },
+  modalheaderStyle: {
+    // backgroundColor: "green",
+    right: 85
+  },
+  textStyle: {
+    // backgroundColor: "yellow"
+  }
 });
 
 export default DashboardScreen;

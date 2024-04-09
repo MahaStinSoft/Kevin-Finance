@@ -52,7 +52,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
   const [pancard, setPancard] = useState({ fileName: null, fileContent: null });
   const [applicantImage, setapplicantImage] = useState({ fileName: null, fileContent: null });
   const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fileContent: null });
-  const [signature, setSignature] = useState({ fileName: null });
+  const [signature, setSignature] = useState({ fileName: null, fileContent: null });
   const [sendApproval, setSendApproval] = useState(personalLoan?.kf_sendapproval || '');
   const [reason, setReason] = useState(personalLoan?.kf_reason || '');
   const [UserApplicantID, setUserApplicantID] = useState(personalLoan?.kf_userapplicantid || '');
@@ -74,7 +74,6 @@ const EditPersonalLoan = ({ route, navigation }) => {
   const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
   // const { userapplicationid } = route.params;
   const { signatureFile, userapplicationid } = route.params;
-  console.log('signature', signatureFile);
   const [recordId, setRecordId] = useState(personalLoan.kf_personalloanid);
   const [imageSource, setImageSource] = useState(null);
   const [applyForLoan, setapplyForLoan] = useState(personalLoan?.kf_applyforloan || '');
@@ -138,7 +137,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
     setAadharcard({ fileName: null, fileContent: null });
     setPancard({ fileName: null, fileContent: null });
     setkf_applicantimage({ fileName: null, fileContent: null });
-    setSignature({ fileName: null })
+    setSignature({ fileName: null, fileContent: null })
     console.log('State updated:', {
       applicationnumber,
       createdby,
@@ -934,14 +933,12 @@ const EditPersonalLoan = ({ route, navigation }) => {
       const annotations = [
         {
           subject: 'Signature Image',
-          filename: signatureFile.fileName || 'Signature.jpg',
+          filename: signature.fileName || 'Signature.jpg',
           isdocument: true,
           'objectid_kf_personalloan@odata.bind': `/kf_personalloans(${recordId})`,
-          documentbody: signatureFile,
+          documentbody: signature.fileContent || signatureFile,
         },
       ];
-
-      console.log('documentbody', signatureFile);
 
       const createAnnotationResponse = await axios.post(
         'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
@@ -1694,7 +1691,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
 
                 <CardImageSignature
                   title="Signature"
-                  imageContent={signatureFile}
+                  imageContent={signature || signatureFile}
                   pickImage={handleNavigateToSignatureScreen}
                   sendAnnotation={sendAnnotation3}
                   setImageContent={setSignature}
