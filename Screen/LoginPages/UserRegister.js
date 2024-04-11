@@ -117,9 +117,9 @@ export const UserRegisterScreen = ({ route }) => {
     
     if (onlyAlphabets.test(text) || text === '') {
       setkf_name(text);
-      setErrorMessages({ ...errorMessages, firstName: 'Enter a valid First Name' });
-    } else {
       setErrorMessages({ ...errorMessages, firstName: '' });
+    } else {
+      setErrorMessages({ ...errorMessages, firstName: 'Enter a valid First Name' });
     }
   };
  
@@ -196,7 +196,7 @@ export const UserRegisterScreen = ({ route }) => {
     }
 
     const newErrorMessages = {
-        firstName:kf_name ? '' : ' Enter a First Name',
+      firstName: !kf_name ? ' Enter a First Name' : '',
         mobileNumber: /^[6-9]\d{9}$/.test(kf_mobilenumber) ? '' : 'Enter a Valid 10-digit mobile number.',
         email: !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(kf_email) ? 'Enter a Valid Email Address' : '',      
     };

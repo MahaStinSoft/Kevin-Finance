@@ -838,6 +838,7 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
               onOptionChange={handleGenderOptionset}
               title="Gender"
               options={['Male', 'Female']}
+              Optiontitle="Gender"
               initialOption={guarantorgender ? getGenderOptionsetStringFromNumericValue(guarantorgender) : 'Gender'}
               style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
             />

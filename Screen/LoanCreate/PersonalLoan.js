@@ -815,6 +815,7 @@ const handleInterestRateChange = (text) => {
           <LoanStatusPicker
             onOptionChange={handleGenderOptionset}
             title="Gender"
+            Optiontitle="Gender"
             options={['Male', 'Female']}
           />
 
@@ -958,6 +959,7 @@ const handleInterestRateChange = (text) => {
             onOptionChange={handleEmiSchedule}
             title="EMI Schedule"
             options={['Daily', 'Weekly', 'Monthly']}
+            Optiontitle="EMI Schedule"
           />
           {errorMessages.emiSchedule !== '' && (
             <Text style={styles.errorText}>{errorMessages.emiSchedule}</Text>

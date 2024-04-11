@@ -1296,16 +1296,19 @@ const EditPersonalLoan = ({ route, navigation }) => {
 
       <View style={styles.detailContainer}>
           <View style={styles.wrapper}>
+  
           {createdby && (
-          <LoanStatusPicker
+              <LoanStatusPicker
               onOptionChange={handleSendApproval}
-              Optiontitle="Send Approval"
-              options={['No', 'Yes']}
+              title="Send Approval" // Corrected the prop name here
+              options={['Yes', 'No']}
+              Optiontitle= "Apply For Loan?"
               initialOption={sendApproval ? 'Yes' : 'No'}
-              style={{ width: '100%', marginLeft: 0, marginTop: 5 }}
-              disabled={UserApplicantID || sendApproval}
+              style={{ width: "100%", marginLeft: 0, marginTop: 5}}
+              disabled={sendApproval}
             />
-          )}
+            )}
+
             <TextInput
               style={[styles.textInputContainer, { color: "gray" }]}
               value={applicationnumber}
@@ -1317,14 +1320,14 @@ const EditPersonalLoan = ({ route, navigation }) => {
             />
 
             <TextInput
-              style={[styles.textInputContainer, { color: "gray" }]}
-              value={createdby}
+              style={[styles.textInputContainer, { marginTop: 5, color: "gray" }]}
               placeholder="Created By"
-              onChangeText={(text) => {
-                setcreatedby(text);
-              }}
-              editable={false}
+              autoCapitalize="none"
+              value={createdby}
+              // onChangeText={UserApplicantID}
+              editable={false} // Make editable only if sendApproval is false
             />
+
 
             <TextInput
               style={[styles.textInputContainer, { marginTop: 5, color: "gray" }]}
