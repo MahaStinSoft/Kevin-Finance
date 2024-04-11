@@ -256,6 +256,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
           kf_sendapproval: sendApproval,
           kf_reason: reason,
           kf_userapplicantid: UserApplicantID,
+          kf_applyforloan:applyForLoan
         },
         {
           headers: {
