@@ -1,17 +1,22 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Svg, { Path } from 'react-native-svg';
 import { captureRef } from 'react-native-view-shot';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import ButtonComponent from '../../common/ButtonComponent';
+import CustomAlert from '../../common/CustomAlert';
 
 const Gurantee2SignatureHome = ({ route }) => {
   const { loanApplication } = route?.params || {}; // Use optional chaining here
   const [path, setPath] = useState('');
   const [signatureImage, setSignatureImage] = useState(null);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [showAlert, setShowAlertConfirmation] = useState(false); 
+  const [base64Data, setBase64Data] = useState(null);
+  const [isLoading, setIsLoading] = useState(false); 
+  
   const svgRef = useRef(null);
   const navigation = useNavigation();
 
@@ -93,29 +98,27 @@ const Gurantee2SignatureHome = ({ route }) => {
 
   const captureSignature = async () => {
     try {
-      // Capture the signature image from the SVG component reference
-      const base64Data = await captureRef(svgRef, {
+      setIsLoading(true); // Start loading indicator
+      const capturedData = await captureRef(svgRef, {
         format: 'png',
         quality: 1,
-        result: 'base64', // Capture the image as base64 directly
+        result: 'base64',
       });
   
-      if (!base64Data) {
+      if (!capturedData) {
         console.error('Captured base64 data is undefined');
         return;
       }
-  // console.log('base64',base64Data);
-      // Set the captured signature image to state and AsyncStorage
-      setSignatureImage(base64Data);
-      await AsyncStorage.setItem('signaturefile', base64Data);
-      
-      // Navigate to the next screen with the signature image
-      navigation.navigate('HomeLoanGurantee2', { signatureImage: base64Data, loanApplication: loanApplication });
+  
+      setSignatureImage(capturedData);
+      await AsyncStorage.setItem('signaturefile', capturedData);
+      setBase64Data(capturedData); // Store captured data in state
+      handleShowAlert();
     } catch (error) {
+      setIsLoading(false); // Stop loading indicator
       console.error('Error capturing signature:', error);
     }
   };
-  
   
   useEffect(() => {
     const loadSignatureImage = async () => {
@@ -135,6 +138,20 @@ const Gurantee2SignatureHome = ({ route }) => {
   const handleSignature = () => {
     navigation.goBack();
   };
+
+  const handleShowAlert = () => {
+    setShowAlertConfirmation(true);
+  };
+
+  const handleCloseAlert = () => {
+    setShowAlertConfirmation(false);
+  };
+
+  const handleCloseAlertConfirmation = () => {
+    setShowAlertConfirmation(false);
+    navigation.navigate('HomeLoanGurantee2', { signatureImage: base64Data, loanApplication: loanApplication });
+  };
+
 
   return (
     <View style={{ flex: 1, marginTop: 150 }}>
@@ -157,8 +174,25 @@ const Gurantee2SignatureHome = ({ route }) => {
         <ButtonComponent title="Clear" onPress={clearSignature} style={{ width: '25%', height: 50 }} />
         <ButtonComponent title="Done" onPress={captureSignature} style={{ width: '25%', height: 50 }} />
       </View>
+      <CustomAlert
+          visible={showAlert}
+          onClose={handleCloseAlert}
+          onConfirm={handleCloseAlertConfirmation}
+          headerMessage="Signature"
+          message="Signature Captutred Successfully"
+          Button1="Cancel"
+          Button2="OK"
+          style={styles.alertStyle}
+          modalHeaderStyle={[styles.modalheaderStyle, {right: 90}]}
+          textStyle={styles.textStyle}
+        />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+ 
+});
+
 
 export default Gurantee2SignatureHome;

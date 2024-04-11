@@ -1296,6 +1296,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
 
       <View style={styles.detailContainer}>
           <View style={styles.wrapper}>
+          {createdby && (
           <LoanStatusPicker
               onOptionChange={handleSendApproval}
               Optiontitle="Send Approval"
@@ -1304,6 +1305,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
               style={{ width: '100%', marginLeft: 0, marginTop: 5 }}
               disabled={UserApplicantID || sendApproval}
             />
+          )}
             <TextInput
               style={[styles.textInputContainer, { color: "gray" }]}
               value={applicationnumber}
