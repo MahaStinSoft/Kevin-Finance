@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
     View, Text, TouchableOpacity, StyleSheet, TextInput, Modal, KeyboardAvoidingView, ScrollView,
     Dimensions, ActivityIndicator, StatusBar, RefreshControl, Alert, BackHandler, SafeAreaView,
-     PermissionsAndroid, Platform, Button
+    PermissionsAndroid, Platform, Button
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -33,13 +33,15 @@ const UserDashboard = ({ navigation, route }) => {
     const [selectedLoanStatus, setSelectedLoanStatus] = useState(null);
     const [kf_adminname, setkf_adminname] = useState(null);
     const [personalLoans, setPersonalLoans] = useState([]);
-    const [kf_mobilenumber, setkf_mobilenumber] = useState([]);
+    const [kf_address, setkf_address] = useState([]);
 
     const [loading, setLoading] = useState(true);
     const [authenticatedUser, setAuthenticatedUser] = useState(null);
     const [gender, setGender] = useState('');
     const [mobileNumber, setMobileNumber] = useState('');
     const [name, setName] = useState('');
+    const [address, setaddress] = useState('');
+
     const [userapplicationid, setuserapplicationid] = useState('');
     const [showAlertInvalidUser, setShowAlertInvalidUser] = useState(false);
 
@@ -62,11 +64,12 @@ const UserDashboard = ({ navigation, route }) => {
     const [showAllPersonalLoans, setShowAllPersonalLoans] = useState(false);
     const [showAlert, setShowAlert] = useState(false);
     const [isConnected, setIsConnected] = useState(true);
-
-  const [currentLongitude, setCurrentLongitude] = useState('...');
-  const [currentLatitude, setCurrentLatitude] = useState('...');
-  const [locationStatus, setLocationStatus] = useState('');
-  const [currentAddress, setCurrentAddress] = useState('');
+    const [loanRecordsUpdated, setLoanRecordsUpdated] = useState(false);
+    const [showAddress, setShowAddress] = useState(false);
+    const [currentLongitude, setCurrentLongitude] = useState('...');
+    const [currentLatitude, setCurrentLatitude] = useState('...');
+    const [locationStatus, setLocationStatus] = useState('');
+    const [currentAddress, setCurrentAddress] = useState('');
 
     const isFocused = useIsFocused();
 
@@ -260,7 +263,7 @@ const UserDashboard = ({ navigation, route }) => {
                     }
                 );
                 const accessToken = tokenResponse.data.access_token;
-    
+
                 const responseLoanApplications = await axios.get(
                     "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications",
                     {
@@ -273,10 +276,10 @@ const UserDashboard = ({ navigation, route }) => {
                         }
                     }
                 );
-    
+
                 const loanApplicationsData = responseLoanApplications.data.value;
                 // console.log("Loan Applications Data:", loanApplicationsData);
-    
+
                 // Set state with fetched loan applications data
                 setLoanApplications(loanApplicationsData);
             } catch (error) {
@@ -286,7 +289,7 @@ const UserDashboard = ({ navigation, route }) => {
                 setLoading(false);
             }
         };
-    
+
         // Fetch loan applications when authenticated user changes or on initial load
         if (authenticatedUser) {
             fetchLoanApplications();
@@ -313,7 +316,7 @@ const UserDashboard = ({ navigation, route }) => {
                     }
                 );
                 const accessToken = tokenResponse.data.access_token;
-    
+
                 const responsePersonalLoans = await axios.get(
                     "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans",
                     {
@@ -326,10 +329,10 @@ const UserDashboard = ({ navigation, route }) => {
                         }
                     }
                 );
-    
+
                 const personalLoansData = responsePersonalLoans.data.value;
                 // console.log("Personal Loans Data:", personalLoansData);
-    
+
                 // Set state with fetched personal loans data
                 setPersonalLoans(personalLoansData);
             } catch (error) {
@@ -339,21 +342,21 @@ const UserDashboard = ({ navigation, route }) => {
                 setLoading(false);
             }
         };
-    
+
         // Fetch personal loans when authenticated user changes or on initial load
         if (authenticatedUser) {
             fetchPersonalLoans();
         }
     }, [authenticatedUser]);
-    
+
     const navigateToHomeDetails = (loanApplication) => {
         setSelectedContact(loanApplication);
-        navigation.navigate('HomeLoanDetailsScreen', { loanApplication });
+        navigation.navigate('HomeLoanDetailsScreen', { loanApplication,  address: address  });
     };
 
     const navigateToPersonalDetails = (personalLoan) => {
         setSelectedContact(personalLoan);
-        navigation.navigate('PersonalLoanDetailsScreen', { personalLoan });
+        navigation.navigate('PersonalLoanDetailsScreen', { personalLoan, address: address });
     };
 
     const handleRefresh = () => {
@@ -448,7 +451,7 @@ const UserDashboard = ({ navigation, route }) => {
                     },
                 });
                 setLoading(false);
-                setGender(response.data.kf_gender);
+                setaddress(response.data.kf_address);
                 setMobileNumber(response.data.kf_mobilenumber);
                 setName(response.data.kf_name);
                 setuserapplicationid(response.data.kf_applicantid);
@@ -503,22 +506,27 @@ const UserDashboard = ({ navigation, route }) => {
                 }
             });
             const accessToken = tokenResponse.data.access_token;
+
+            // Set kf_address with currentAddress value
+            setkf_address(currentAddress);
+
             const updateRecordResponse = await axios.patch(
                 `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_users(${recordId})`,
                 {
-                    kf_mobilenumber: mobileNumber
+                    kf_address: currentAddress
                 },
                 {
-                  headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                    'Content-Type': 'application/json',
-                  },
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json',
+                    },
                 }
             );
             console.log("Update Record Response:", updateRecordResponse); // Log the response
             if (updateRecordResponse.status === 204) {
                 Alert.alert('Success', 'User updated successfully');
                 console.log("User updated successfully");
+                setLoanRecordsUpdated(true);
             } else {
                 Alert.alert('Error', 'Failed to update user'); // Alert for other status codes
                 console.log("Failed to update user");
@@ -530,100 +538,104 @@ const UserDashboard = ({ navigation, route }) => {
         }
     };
 
-  useEffect(() => {
-    const requestLocationPermission = async () => {
-      if (Platform.OS === 'ios') {
-        getOneTimeLocation();
-        subscribeLocationLocation();
-      } else {
-        try {
-          const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-            {
-              title: 'Location Access Required',
-              message: 'This App needs to Access your location',
+    useEffect(() => {
+        const requestLocationPermission = async () => {
+            if (Platform.OS === 'ios') {
+                getOneTimeLocation();
+                subscribeLocationLocation();
+            } else {
+                try {
+                    const granted = await PermissionsAndroid.request(
+                        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+                        {
+                            title: 'Location Access Required',
+                            message: 'This App needs to Access your location',
+                        },
+                    );
+                    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                        getOneTimeLocation();
+                        subscribeLocationLocation();
+                    } else {
+                        setLocationStatus('Permission Denied');
+                    }
+                } catch (err) {
+                    console.warn(err);
+                }
+            }
+        };
+        requestLocationPermission();
+        return () => {
+            Geolocation.clearWatch(watchID);
+        };
+    }, []);
+
+    const getOneTimeLocation = () => {
+        setLocationStatus('Getting Location ...');
+        Geolocation.getCurrentPosition(
+            (position) => {
+                setLocationStatus('You are Here');
+                const currentLongitude = JSON.stringify(position.coords.longitude);
+                const currentLatitude = JSON.stringify(position.coords.latitude);
+                setCurrentLongitude(currentLongitude);
+                setCurrentLatitude(currentLatitude);
+
+                // Call function to fetch address
+                fetchAddress(position.coords.latitude, position.coords.longitude);
             },
-          );
-          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-            getOneTimeLocation();
-            subscribeLocationLocation();
-          } else {
-            setLocationStatus('Permission Denied');
-          }
-        } catch (err) {
-          console.warn(err);
+            (error) => {
+                setLocationStatus(error.message);
+            },
+            {
+                enableHighAccuracy: false,
+                timeout: 30000,
+                maximumAge: 1000,
+            },
+        );
+    };
+
+    const fetchAddress = async (latitude, longitude) => {
+        try {
+            const response = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+            );
+            const data = await response.json();
+            if (data.display_name) {
+                setCurrentAddress(data.display_name);
+            } else {
+                setCurrentAddress('Address not found');
+            }
+        } catch (error) {
+            console.error('Error fetching address:', error);
+            setCurrentAddress('Error fetching address');
         }
-      }
     };
-    requestLocationPermission();
-    return () => {
-      Geolocation.clearWatch(watchID);
+
+    const subscribeLocationLocation = () => {
+        watchID = Geolocation.watchPosition(
+            (position) => {
+                setLocationStatus('You are Here');
+                const currentLongitude = JSON.stringify(position.coords.longitude);
+                const currentLatitude = JSON.stringify(position.coords.latitude);
+                setCurrentLongitude(currentLongitude);
+                setCurrentLatitude(currentLatitude);
+
+                // Call function to fetch address
+                fetchAddress(position.coords.latitude, position.coords.longitude);
+            },
+            (error) => {
+                setLocationStatus(error.message);
+            },
+            {
+                enableHighAccuracy: false,
+                maximumAge: 1000,
+            },
+        );
     };
-  }, []);
 
-  const getOneTimeLocation = () => {
-    setLocationStatus('Getting Location ...');
-    Geolocation.getCurrentPosition(
-      (position) => {
-        setLocationStatus('You are Here');
-        const currentLongitude = JSON.stringify(position.coords.longitude);
-        const currentLatitude = JSON.stringify(position.coords.latitude);
-        setCurrentLongitude(currentLongitude);
-        setCurrentLatitude(currentLatitude);
+    const handleLocationIconClick = () => {
+        setShowAddress(!showAddress);
+    };
 
-        // Call function to fetch address
-        fetchAddress(position.coords.latitude, position.coords.longitude);
-      },
-      (error) => {
-        setLocationStatus(error.message);
-      },
-      {
-        enableHighAccuracy: false,
-        timeout: 30000,
-        maximumAge: 1000,
-      },
-    );
-  };
-
-  const fetchAddress = async (latitude, longitude) => {
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
-      );
-      const data = await response.json();
-      if (data.display_name) {
-        setCurrentAddress(data.display_name);
-      } else {
-        setCurrentAddress('Address not found');
-      }
-    } catch (error) {
-      console.error('Error fetching address:', error);
-      setCurrentAddress('Error fetching address');
-    }
-  };
-
-  const subscribeLocationLocation = () => {
-    watchID = Geolocation.watchPosition(
-      (position) => {
-        setLocationStatus('You are Here');
-        const currentLongitude = JSON.stringify(position.coords.longitude);
-        const currentLatitude = JSON.stringify(position.coords.latitude);
-        setCurrentLongitude(currentLongitude);
-        setCurrentLatitude(currentLatitude);
-
-        // Call function to fetch address
-        fetchAddress(position.coords.latitude, position.coords.longitude);
-      },
-      (error) => {
-        setLocationStatus(error.message);
-      },
-      {
-        enableHighAccuracy: false,
-        maximumAge: 1000,
-      },
-    );
-  };
-    
     return (
         <>
             <StatusBar />
@@ -634,29 +646,29 @@ const UserDashboard = ({ navigation, route }) => {
 
                 <View style={styles.container}>
 
-                <View style={styles.navBar}>
+                    <View style={styles.navBar}>
 
-{/* <TouchableOpacity style={styles.iconButton} onPress={handlelogout}>
+                        {/* <TouchableOpacity style={styles.iconButton} onPress={handlelogout}>
     <Ionicons name="list-sharp" size={25} color="#fff" />
 </TouchableOpacity> */}
-<Text style={styles.text}>Kevin Small Finance</Text>
+                        <Text style={styles.text}>Kevin Small Finance</Text>
 
-<TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
-    <View>
-        <Ionicons name="notifications" size={25} color="#fff" />
-        {unreadMessagesCount > 0 && (
-            <View style={styles.badgeContainer}>
-                <Text style={styles.badgeText}>{unreadMessagesCount}</Text>
-            </View>
-        )}
-    </View>
-   
-</TouchableOpacity>
+                        <TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
+                            <View>
+                                <Ionicons name="notifications" size={25} color="#fff" />
+                                {unreadMessagesCount > 0 && (
+                                    <View style={styles.badgeContainer}>
+                                        <Text style={styles.badgeText}>{unreadMessagesCount}</Text>
+                                    </View>
+                                )}
+                            </View>
 
-<TouchableOpacity style={styles.iconButtonLogout} onPress={handleLogout}>
-            <Ionicons name="md-log-out" size={28} color="#fff" />
-        </TouchableOpacity>
-        </View>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity style={styles.iconButtonLogout} onPress={handleLogout}>
+                            <Ionicons name="md-log-out" size={28} color="#fff" />
+                        </TouchableOpacity>
+                    </View>
 
                     <ScrollView
                         contentContainerStyle={{ width: '100%' }}
@@ -670,7 +682,7 @@ const UserDashboard = ({ navigation, route }) => {
                         showsHorizontalScrollIndicator={false}
                     >
 
-                        <View style={styles.chart}>
+                        {/* <View style={styles.chart}>
                             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                                 <View style={styles.detailsContainer}>
                                     <View style={styles.rowContainer}>
@@ -680,94 +692,108 @@ const UserDashboard = ({ navigation, route }) => {
                                             </View>
                                         ) : null}
                                         <View style={styles.textContainer}>
+                                        <Ionicons name="location" size={25} color="green" style={{left: 160}}/>
+                                        <View  style={{ bottom: 20}}>
                                             <Text style={styles.detailText}>{name}</Text>
-                                            <Text style={styles.detailText}>{mobileNumber}</Text>
                                             <Text style={styles.detailText}>{userapplicationid}</Text>
-                                            <TextInput placeholder='mobile number' onChangeText={(text) => setMobileNumber(text)}  value={mobileNumber}/>
-                                            <TouchableOpacity onPress={UpdateLoanRecords}>
-                                            <Ionicons name ="location" size={25} color="red"/>
+                                            {!address && (
+                                            <TouchableOpacity onPress={UpdateLoanRecords} >
+                                                <Ionicons name="location" size={25} color="red" style={{right: 5}}/>
                                             </TouchableOpacity>
-                                            <Text style={{ justifyContent: 'center', alignItems: 'center', marginTop: 16, }}>
-                                                Latitude: {currentLatitude}
-                                            </Text>
-                                            <Text style={{ justifyContent: 'center', alignItems: 'center', marginTop: 16, }}>
-                                                Longitude: {currentLongitude}
-                                            </Text>
-                                            <Text style={{ justifyContent: 'center', alignItems: 'center', marginTop: 16, }}>
-                                                Address: {currentAddress}
-                                            </Text>
+                                            )}
+
+                                            {address && (
+                                                <Text>{address}</Text>
+                                            )}
+                                            </View>
                                         </View>
                                     </View>
                                 </View>
-
-
-                                <View>
-                                    <View style={[styles.loanButton, { marginTop: 20 }]}>
-                                        <TouchableOpacity onPress={handleHomeLoan} style={styles.button}>
-                                            <Text style={styles.buttonText}>Apply Home Loan</Text>
-                                            <Ionicons name="chevron-forward" size={25} color="white" style={styles.icon} />
-                                        </TouchableOpacity>
-                                    </View>
-                                    <View style={[styles.loanButton, { marginTop: 20 }]}>
-                                        <TouchableOpacity onPress={handlePersonalLoan} style={styles.button}>
-                                            <Text style={[styles.buttonText, { left: 8 }]}>Apply Personal Loan</Text>
-                                            <Ionicons name="chevron-forward" size={25} color="white" style={[styles.icon, { right: 10 }]} />
-                                        </TouchableOpacity>
-                                    </View>
-                                </View>
                             </ScrollView>
-                        </View>
-<View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 8 }}>
-    {initialLoading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
-    ) : (
-        <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
-            {displayedHomeLoans.length === 0 && displayedPersonalLoans.length === 0 ? (
-                <View style={styles.noRecordsContainer}>
-                    <Text style={styles.noRecordsText}>No Records Found</Text>
-                </View>
-            ) : (
-                <>
-                    <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 15, width: "100%" }}>
-                        <Text style={[styles.heading, { right: 0 }]}>Home Loans</Text>
-                    </View>
-                    {displayedHomeLoans.length > 0 && (
-                        <>
-                            {displayedHomeLoans
-                                .filter(record => record.kf_userapplicantid === authenticatedUser?.kf_applicantid)
-                                .map((homeLoan, index) => (
-                                    <HomeLoanCard
-                                        key={index}
-                                        loanApplication={homeLoan}
-                                        onPress={() => navigateToHomeDetails(homeLoan)}
-                                    />
-                                ))
-                            }
-                        </>
-                    )}
+                        </View> */}
 
-                    <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 15, width: "100%" }}>
-                        <Text style={[styles.heading, { marginBottom: 0 }]}>Personal Loans</Text>
+<View style={styles.chart}>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={styles.detailsContainer}>
+            <View style={styles.rowContainer}>
+                {name ? (
+                    <View style={styles.imageContainer}>
+                        <Text style={styles.initial}>{name.charAt(0)}</Text>
                     </View>
-                    {displayedPersonalLoans.length > 0 && (
-                        <>
-                            {displayedPersonalLoans
-                                .filter(record => record.kf_userapplicantid === authenticatedUser?.kf_applicantid)
-                                .map((personalLoan, index) => (
-                                    <PersonalLoanCard
-                                        key={index}
-                                        personalLoan={personalLoan}
-                                        onPress={() => navigateToPersonalDetails(personalLoan)}
-                                    />
-                                ))
-                            }
-                        </>
-                    )}
-                </>
-            )}
-        </ScrollView>
-    )}
+                ) : null}
+                <View style={styles.textContainer}>
+                    <TouchableOpacity onPress={handleLocationIconClick} >
+                    <Ionicons name="location" size={25} color="green" style={{ left: 160 }} />
+                    </TouchableOpacity>
+                    <View style={{ bottom: 20 }}>
+                        <Text style={styles.detailText}>{name}</Text>
+                        <Text style={styles.detailText}>{userapplicationid}</Text>
+                        {!address && (
+                            <TouchableOpacity onPress={UpdateLoanRecords}>
+                                <Ionicons name="location" size={25} color="red" style={{ right: 5 }} />
+                            </TouchableOpacity>
+                        )}
+                         {showAddress && address && (
+                            <Text>{address}</Text>
+                        )}
+                    </View>
+                </View>
+            </View>
+        </View>
+    </ScrollView>
 </View>
+
+                        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 8 }}>
+                            {initialLoading ? (
+                                <ActivityIndicator size="large" color="#0000ff" />
+                            ) : (
+                                <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
+                                    {displayedHomeLoans.length === 0 && displayedPersonalLoans.length === 0 ? (
+                                        <View style={styles.noRecordsContainer}>
+                                            <Text style={styles.noRecordsText}>No Records Found</Text>
+                                        </View>
+                                    ) : (
+                                        <>
+                                            <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 15, width: "100%" }}>
+                                                <Text style={[styles.heading, { right: 0 }]}>Home Loans</Text>
+                                            </View>
+                                            {displayedHomeLoans.length > 0 && (
+                                                <>
+                                                    {displayedHomeLoans
+                                                        .filter(record => record.kf_userapplicantid === authenticatedUser?.kf_applicantid)
+                                                        .map((homeLoan, index) => (
+                                                            <HomeLoanCard
+                                                                key={index}
+                                                                loanApplication={homeLoan}
+                                                                onPress={() => navigateToHomeDetails(homeLoan)}
+                                                            />
+                                                        ))
+                                                    }
+                                                </>
+                                            )}
+
+                                            <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 15, width: "100%" }}>
+                                                <Text style={[styles.heading, { marginBottom: 0 }]}>Personal Loans</Text>
+                                            </View>
+                                            {displayedPersonalLoans.length > 0 && (
+                                                <>
+                                                    {displayedPersonalLoans
+                                                        .filter(record => record.kf_userapplicantid === authenticatedUser?.kf_applicantid)
+                                                        .map((personalLoan, index) => (
+                                                            <PersonalLoanCard
+                                                                key={index}
+                                                                personalLoan={personalLoan}
+                                                                onPress={() => navigateToPersonalDetails(personalLoan)}
+                                                            />
+                                                        ))
+                                                    }
+                                                </>
+                                            )}
+                                        </>
+                                    )}
+                                </ScrollView>
+                            )}
+                        </View>
 
 
                     </ScrollView>

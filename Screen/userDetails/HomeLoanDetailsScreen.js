@@ -13,6 +13,15 @@ const HomeLoanDetailsScreen = ({ route }) => {
   const [showHomeLoanGuarantee1, setShowHomeLoanGuarantee1] = useState(false);
   const [showHomeLoanGuarantee2, setShowHomeLoanGuarantee2] = useState(false);
 
+  const [loading, setLoading] = useState(true);
+  const [authenticatedUser, setAuthenticatedUser] = useState(null);
+  const [gender, setGender] = useState('');
+  const [mobileNumber, setMobileNumber] = useState('');
+  const [name, setName] = useState('');
+  // const [address, setaddress] = useState('');
+
+  const { address } = route.params;
+
   LogBox.ignoreLogs([
     'Non-serializable values were found in the navigation state',
   ]);
@@ -269,6 +278,7 @@ const HomeLoanDetailsScreen = ({ route }) => {
 
         <View style={[styles.personalDetailContainer]} >
           <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10, color: "red" }]}>Personal Details</Text>
+
           <View style={styles.detailItem}>
             <Text style={styles.label}>Gender</Text>
             <Text style={styles.value}>{getGenderLabel()}</Text>
@@ -328,6 +338,11 @@ const HomeLoanDetailsScreen = ({ route }) => {
           <View style={styles.detailItem}>
             <Text style={styles.label}>State</Text>
             <Text style={styles.value}>{loanApplication.kf_state}</Text>
+          </View>
+
+          <View style={styles.detailItem}>
+            <Text style={styles.label}>Geolocation</Text>
+            <Text style={styles.value}>{address}</Text>
           </View>
 
           <View style={styles.detailItem}>

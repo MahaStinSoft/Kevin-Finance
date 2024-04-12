@@ -13,6 +13,8 @@ const PersonalLoanDetailsScreen = ({ route }) => {
   const [showHomeLoanGuarantee1, setShowHomeLoanGuarantee1] = useState(false);
   const [showHomeLoanGuarantee2, setShowHomeLoanGuarantee2] = useState(false);
 
+  const { address } = route.params;
+
   LogBox.ignoreLogs([
     'Non-serializable values were found in the navigation state',
   ]);
@@ -358,6 +360,11 @@ const PersonalLoanDetailsScreen = ({ route }) => {
           <View style={styles.detailItem}>
             <Text style={styles.label}>State</Text>
             <Text style={styles.value}>{personalLoan.kf_state}</Text>
+          </View>
+
+          <View style={styles.detailItem}>
+            <Text style={styles.label}>Geolocation</Text>
+            <Text style={styles.value}>{address}</Text>
           </View>
 
           <View style={styles.detailItem}>
