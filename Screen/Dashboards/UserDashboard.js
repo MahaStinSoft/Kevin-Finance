@@ -648,9 +648,7 @@ const UserDashboard = ({ navigation, route }) => {
 
                     <View style={styles.navBar}>
 
-                        {/* <TouchableOpacity style={styles.iconButton} onPress={handlelogout}>
-    <Ionicons name="list-sharp" size={25} color="#fff" />
-</TouchableOpacity> */}
+                
                         <Text style={styles.text}>Kevin Small Finance</Text>
 
                         <TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
@@ -722,9 +720,11 @@ const UserDashboard = ({ navigation, route }) => {
                     </View>
                 ) : null}
                 <View style={styles.textContainer}>
+                    { address && (
                     <TouchableOpacity onPress={handleLocationIconClick} >
                     <Ionicons name="location" size={25} color="green" style={{ left: 160 }} />
                     </TouchableOpacity>
+                    )}
                     <View style={{ bottom: 20 }}>
                         <Text style={styles.detailText}>{name}</Text>
                         <Text style={styles.detailText}>{userapplicationid}</Text>
@@ -742,6 +742,21 @@ const UserDashboard = ({ navigation, route }) => {
         </View>
     </ScrollView>
 </View>
+<View>
+{/* <View> */}
+                                    <View style={[styles.loanButton, { marginTop: 20 }]}>
+                                        <TouchableOpacity onPress={handleHomeLoan} style={styles.button}>
+                                            <Text style={styles.buttonText}>Apply Home Loan</Text>
+                                            <Ionicons name="chevron-forward" size={25} color="white" style={styles.icon} />
+                                        </TouchableOpacity>
+                                    </View>
+                                    <View style={[styles.loanButton, { marginTop: 20 }]}>
+                                        <TouchableOpacity onPress={handlePersonalLoan} style={styles.button}>
+                                            <Text style={[styles.buttonText, { left: 8 }]}>Apply Personal Loan</Text>
+                                            <Ionicons name="chevron-forward" size={25} color="white" style={[styles.icon, { right: 10 }]} />
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
 
                         <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 8 }}>
                             {initialLoading ? (
