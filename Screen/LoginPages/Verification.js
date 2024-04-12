@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Text, TouchableOpacity, StyleSheet, ImageBackground, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, TextInput, Text, TouchableOpacity, StyleSheet, ImageBackground, ScrollView, Alert, KeyboardAvoidingView, Platform, BackHandler } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -24,6 +24,33 @@ export const VerificationScreen = () => {
   const [isPasswordUpdating, setIsPasswordUpdating] = useState(false);
 
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (navigation.isFocused()) {
+        // If the user is on the login screen, show the exit confirmation alert
+        Alert.alert(
+          'Cancel verfication',
+          'Are you want to cancel verification ?',
+          [
+            {
+              text: 'No',
+              onPress: () => null,
+              style: 'cancel',
+            },
+            {
+              text: 'Yes',
+              onPress: () =>navigation.navigate("Welcome"),
+            },
+          ],
+          { cancelable: false }
+        );
+        return true; 
+      }
+    });
+
+    return () => backHandler.remove();
+  }, [navigation]);
 
   useEffect(() => {
     // Fetch authenticated user from AsyncStorage
