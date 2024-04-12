@@ -25,6 +25,8 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
   const [refresh, setRefresh] = useState(false);
   const { kf_adminname } = route.params;
   const [showAlert, setShowAlert] = useState(false); 
+  const [activeTab, setActiveTab] = useState('All');
+  const [filteredData, setFilteredData] = useState([]);
 
   useEffect(() => {
     // Fetch loan applications and notifications whenever refresh state changes
@@ -124,40 +126,8 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
     }
   };
 
-  // const handleApproveLoan = async (applicationId) => {
-  //   try {
-  //     const tokenResponse = await axios.post(
-  //       'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
-  //       querystring.stringify({
-  //         grant_type: 'client_credentials',
-  //         client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
-  //         resource: 'https://org0f7e6203.crm5.dynamics.com',
-  //         scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
-  //         client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
-  //       }),
-  //       {
-  //         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-  //       }
-  //     );
-
-  //     const accessToken = tokenResponse.data.access_token;
-
-  //     await axios.patch(`https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications(${applicationId})`, {
-  //       kf_status: 123950000, // Approved status
-  //       kf_approvedby: kf_adminname, // Set the admin name
-  //     }, {
-  //       headers: {
-  //         Authorization: `Bearer ${accessToken}`,
-  //       },
-  //     });
-
-  //     // Refresh loan applications after approval
-  //     fetchLoanApplications();
-  //   } catch (error) {
-  //     console.error('Error approving loan application:', error);
-  //   }
-  // };
-
+ 
+// approval loans
   const handleApproveLoan = async (applicationId) => {
     // Display an alert confirming the approval action
     // handleShowAlert();
@@ -210,6 +180,7 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
       { cancelable: false }
     );
   };
+// rejectloans
 
   const handleRejectLoan = async (applicationId) => {
     setSelectedApplicationId(applicationId);
@@ -221,43 +192,7 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
     setShowRejectCommentBox(true); // Open the comment box
   };
 
-  // For Personal Loan 
-
-  // Add functions to handle personal loan approvals, drafts, pending approvals, and rejections
-  // const handleApproveNotification = async (personalLoanId) => {
-  //   try {
-  //     const tokenResponse = await axios.post(
-  //       'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
-  //       querystring.stringify({
-  //         grant_type: 'client_credentials',
-  //         client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
-  //         resource: 'https://org0f7e6203.crm5.dynamics.com',
-  //         scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
-  //         client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
-  //       }),
-  //       {
-  //         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-  //       }
-  //     );
-
-  //     const accessToken = tokenResponse.data.access_token;
-
-  //     await axios.patch(`https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans(${personalLoanId})`, {
-  //       kf_status: 123950000, // Approved status
-  //       kf_approvedby: kf_adminname, // Assuming 123950000 represents the status for approval
-  //     }, {
-  //       headers: {
-  //         Authorization: `Bearer ${accessToken}`,
-  //       },
-  //     });
-
-  //     // Refresh notifications after approval
-  //     fetchNotifications();
-  //   } catch (error) {
-  //     console.error('Error approving personal loan:', error);
-  //   }
-  // };
-
+  
   const handleApproveNotification = async (personalLoanId) => {
     // Display an alert confirming the approval action
     Alert.alert(
@@ -310,38 +245,7 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
     );
   };
 
-  const handlePendingApprovals = async (personalLoanId) => {
-    try {
-      const tokenResponse = await axios.post(
-        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
-        querystring.stringify({
-          grant_type: 'client_credentials',
-          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
-          resource: 'https://org0f7e6203.crm5.dynamics.com',
-          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
-          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
-        }),
-        {
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        }
-      );
 
-      const accessToken = tokenResponse.data.access_token;
-
-      await axios.patch(`https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans(${personalLoanId})`, {
-        kf_status: 123950001 // Assuming 123950000 represents the status for approval
-      }, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      // Refresh notifications after approval
-      fetchNotifications();
-    } catch (error) {
-      console.error('Error approving personal loan:', error);
-    }
-  };
 
   const handleRejectWithComment = async () => {
 
@@ -581,6 +485,214 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
   };
   const approvedApplications = loanApplications.filter(application => application.kf_status === 123950000);
 
+
+// approval loans
+const fetchApproval = async () => {
+  try {
+    const tokenResponse = await axios.post(
+      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+      querystring.stringify({
+        grant_type: 'client_credentials',
+        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+        resource: 'https://org0f7e6203.crm5.dynamics.com',
+        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+      }),
+      {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      }
+    );
+
+    const accessToken = tokenResponse.data.access_token;
+
+    const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    const response1 = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (response.data && response.data.value && Array.isArray(response.data.value)) {
+      // Filter loan applications where kf_sendapproval is equal to 1 and kf_status is equal to 123950000 (Approved)
+      const filteredApplications = response.data.value.filter(application => application.kf_sendapproval == 1 && application.kf_status == 123950000);
+
+      // Sort the filtered applications based on a timestamp or any other relevant field indicating when the approval was sent
+      filteredApplications.sort((a, b) => new Date(b.approvalSentTimestamp) - new Date(a.approvalSentTimestamp));
+
+      setLoanApplications(filteredApplications);
+
+      if (loanApplications.length < filteredApplications.length) {
+          const newApplication = filteredApplications[filteredApplications.length - 1]; // Assuming the last fetched application is the new one
+          // schedulePushNotification(newApplication.kf_applicationnumber, newApplication.kf_n
+        
+      }
+
+    } else {
+      console.error('Invalid loan applications response format:', response.data);
+    }
+
+    if (response1.data && response1.data.value && Array.isArray(response1.data.value)) {
+      // Filter personal loans where kf_sendapproval is equal to 1 and kf_status is equal to 123950000 (Approved)
+      const filteredNotifications = response1.data.value.filter(notification => notification.kf_sendapproval == 1 && notification.kf_status == 123950000);
+
+      // Sort the filtered personal loans based on a timestamp or any other relevant field indicating when the approval was sent
+      filteredNotifications.sort((a, b) => new Date(b.approvalSentTimestamp) - new Date(a.approvalSentTimestamp));
+      setNotifications(filteredNotifications);
+      // Update state or perform any necessary operations with the filtered personal loans
+      // setPersonalLoans(filteredPersonalLoans);
+    } else {
+      console.error('Invalid personal loans response format:', response1.data);
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+};
+
+// rejected loans
+const fetchRejected = async () => {
+  try {
+    const tokenResponse = await axios.post(
+      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+      querystring.stringify({
+        grant_type: 'client_credentials',
+        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+        resource: 'https://org0f7e6203.crm5.dynamics.com',
+        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+      }),
+      {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      }
+    );
+
+    const accessToken = tokenResponse.data.access_token;
+
+    const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    const response1 = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (response.data && response.data.value && Array.isArray(response.data.value)) {
+      // Filter loan applications where kf_sendapproval is equal to 1 and kf_status is equal to 123950000 (Approved)
+      const filteredApplications = response.data.value.filter(application => application.kf_sendapproval == 0 && application.kf_status == 123950004);
+
+      // Sort the filtered applications based on a timestamp or any other relevant field indicating when the approval was sent
+      filteredApplications.sort((a, b) => new Date(b.approvalSentTimestamp) - new Date(a.approvalSentTimestamp));
+
+      setLoanApplications(filteredApplications);
+
+      if (loanApplications.length < filteredApplications.length) {
+          const newApplication = filteredApplications[filteredApplications.length - 1]; // Assuming the last fetched application is the new one
+          // schedulePushNotification(newApplication.kf_applicationnumber, newApplication.kf_n
+      }
+
+    } else {
+      console.error('Invalid loan applications response format:', response.data);
+    }
+
+    if (response1.data && response1.data.value && Array.isArray(response1.data.value)) {
+      // Filter personal loans where kf_sendapproval is equal to 1 and kf_status is equal to 123950000 (Approved)
+      const filteredNotifications = response1.data.value.filter(notification => notification.kf_sendapproval == 0 && notification.kf_status == 123950004);
+      // Sort the filtered personal loans based on a timestamp or any other relevant field indicating when the approval was sent
+      filteredNotifications.sort((a, b) => new Date(b.approvalSentTimestamp) - new Date(a.approvalSentTimestamp));
+      // setLoanApplications(filteredNotifications);
+      setNotifications(filteredNotifications);
+      if (loanApplications.length < filteredNotifications.length) {
+          const newApplication = filteredNotifications[filteredNotifications.length - 1]; // Assuming the last fetched application is the new one
+          // schedulePushNotification(newApplication.kf_applicationnumber, newApplication.kf_n
+      }
+
+    } else {
+      console.error('Invalid loan applications response format:', response.data);
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+};
+
+// Unread messages
+// rejected loans
+const fetchUnread = async () => {
+  try {
+    const tokenResponse = await axios.post(
+      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+      querystring.stringify({
+        grant_type: 'client_credentials',
+        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+        resource: 'https://org0f7e6203.crm5.dynamics.com',
+        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+      }),
+      {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      }
+    );
+
+    const accessToken = tokenResponse.data.access_token;
+
+    const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    const response1 = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (response.data && response.data.value && Array.isArray(response.data.value)) {
+      // Filter loan applications where kf_sendapproval is equal to 1 and kf_status is equal to 123950000 (Approved)
+      const filteredApplications = response.data.value.filter(application => application.kf_sendapproval == 1 && application.kf_markasreadmanager == 0);
+
+      // Sort the filtered applications based on a timestamp or any other relevant field indicating when the approval was sent
+      filteredApplications.sort((a, b) => new Date(b.approvalSentTimestamp) - new Date(a.approvalSentTimestamp));
+
+      setLoanApplications(filteredApplications);
+
+      if (loanApplications.length < filteredApplications.length) {
+          const newApplication = filteredApplications[filteredApplications.length - 1]; // Assuming the last fetched application is the new one
+          // schedulePushNotification(newApplication.kf_applicationnumber, newApplication.kf_n
+      }
+
+    } else {
+      console.error('Invalid loan applications response format:', response.data);
+    }
+
+    if (response1.data && response1.data.value && Array.isArray(response1.data.value)) {
+      // Filter personal loans where kf_sendapproval is equal to 1 and kf_status is equal to 123950000 (Approved)
+      const filteredNotifications = response1.data.value.filter(notification => notification.kf_sendapproval == 1 && notification.kf_markasreadmanager == 0);
+      // Sort the filtered personal loans based on a timestamp or any other relevant field indicating when the approval was sent
+      filteredNotifications.sort((a, b) => new Date(b.approvalSentTimestamp) - new Date(a.approvalSentTimestamp));
+      // setLoanApplications(filteredNotifications);
+      setNotifications(filteredNotifications);
+      if (loanApplications.length < filteredNotifications.length) {
+          const newApplication = filteredNotifications[filteredNotifications.length - 1]; // Assuming the last fetched application is the new one
+          // schedulePushNotification(newApplication.kf_applicationnumber, newApplication.kf_n
+      }
+
+    } else {
+      console.error('Invalid loan applications response format:', response.data);
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+};
+
+
   return (
     <View>
       <View style={styles.navBar}>
@@ -606,7 +718,30 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
       </View>
 
       <ScrollView>
+         
         <View style={styles.container}>
+        <View style={styles.tabContainer}>
+        {/* // Update the onPress handlers for the tab buttons to set the active tab and trigger the corresponding fetch function */}
+<TouchableOpacity style={[styles.tabButton, activeTab === 'Unread' && styles.activeTab]} onPress={() => { setActiveTab('Unread'); fetchUnread(); }}>
+  <Text style={styles.tabText}>Unread</Text>
+</TouchableOpacity>
+
+<TouchableOpacity style={[styles.tabButton, activeTab === 'Approved' && styles.activeTab]} onPress={() => { setActiveTab('Approved'); fetchApproval(); }}>
+  <Text style={styles.tabText}>Approved</Text>
+</TouchableOpacity>
+
+<TouchableOpacity style={[styles.tabButton, activeTab === 'Rejected' && styles.activeTab]} onPress={() => { setActiveTab('Rejected'); fetchRejected(); }}>
+  <Text style={styles.tabText}>Rejected</Text>
+</TouchableOpacity>
+
+<TouchableOpacity 
+  style={[styles.tabButton, activeTab === 'All' && styles.activeTab]} 
+  onPress={() => { setActiveTab('All'); fetchLoanApplications(); fetchNotifications(); }}
+>
+  <Text style={styles.tabText}>All</Text>
+</TouchableOpacity>
+
+        </View>
         <View style={{borderWidth: 1, borderColor: "#b0b0b0", paddingHorizontal: 10, marginTop: 10, borderRadius: 10}}>
           <Text style={styles.header}>Home Loan</Text>
           {loanApplications.length === 0 && (
@@ -907,6 +1042,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center', // Center align the text
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  tabButton: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  tabText: {
+    fontSize: 16,
+  },
+  activeTab: {
+    borderBottomColor: 'red',
   },
   // noRecordsContainer: {
   //   borderColor: '#ff6347', // Red color

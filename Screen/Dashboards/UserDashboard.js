@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
     View, Text, TouchableOpacity, StyleSheet, TextInput, Modal, KeyboardAvoidingView, ScrollView,
-    Dimensions, ActivityIndicator, StatusBar, Platform, RefreshControl, Alert, BackHandler
+    Dimensions, ActivityIndicator, StatusBar, RefreshControl, Alert, BackHandler, SafeAreaView,
+     PermissionsAndroid, Platform, Button
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
+import Geolocation from '@react-native-community/geolocation';
 import querystring from 'querystring';
 import CustomAlert from '../../common/CustomAlert';
 
@@ -31,6 +33,7 @@ const UserDashboard = ({ navigation, route }) => {
     const [selectedLoanStatus, setSelectedLoanStatus] = useState(null);
     const [kf_adminname, setkf_adminname] = useState(null);
     const [personalLoans, setPersonalLoans] = useState([]);
+    const [kf_mobilenumber, setkf_mobilenumber] = useState([]);
 
     const [loading, setLoading] = useState(true);
     const [authenticatedUser, setAuthenticatedUser] = useState(null);
@@ -40,9 +43,9 @@ const UserDashboard = ({ navigation, route }) => {
     const [userapplicationid, setuserapplicationid] = useState('');
     const [showAlertInvalidUser, setShowAlertInvalidUser] = useState(false);
 
-    console.log("authenticatedUser:", authenticatedUser);
+    // console.log("authenticatedUser:", authenticatedUser);
     const recordId = authenticatedUser ? authenticatedUser.kf_userid : null;
-    console.log("recordId:", recordId);
+    // console.log("recordId:", recordId);
 
     const [sendApproval, setSendApproval] = useState(null);
     const [loanApplications, setLoanApplications] = useState([]);
@@ -59,6 +62,11 @@ const UserDashboard = ({ navigation, route }) => {
     const [showAllPersonalLoans, setShowAllPersonalLoans] = useState(false);
     const [showAlert, setShowAlert] = useState(false);
     const [isConnected, setIsConnected] = useState(true);
+
+  const [currentLongitude, setCurrentLongitude] = useState('...');
+  const [currentLatitude, setCurrentLatitude] = useState('...');
+  const [locationStatus, setLocationStatus] = useState('');
+  const [currentAddress, setCurrentAddress] = useState('');
 
     const isFocused = useIsFocused();
 
@@ -267,7 +275,7 @@ const UserDashboard = ({ navigation, route }) => {
                 );
     
                 const loanApplicationsData = responseLoanApplications.data.value;
-                console.log("Loan Applications Data:", loanApplicationsData);
+                // console.log("Loan Applications Data:", loanApplicationsData);
     
                 // Set state with fetched loan applications data
                 setLoanApplications(loanApplicationsData);
@@ -320,7 +328,7 @@ const UserDashboard = ({ navigation, route }) => {
                 );
     
                 const personalLoansData = responsePersonalLoans.data.value;
-                console.log("Personal Loans Data:", personalLoansData);
+                // console.log("Personal Loans Data:", personalLoansData);
     
                 // Set state with fetched personal loans data
                 setPersonalLoans(personalLoansData);
@@ -479,6 +487,143 @@ const UserDashboard = ({ navigation, route }) => {
         setShowAlertInvalidUser(false);
     }
 
+    console.log("recordid: ", recordId);
+    const UpdateLoanRecords = async () => {
+        try {
+            console.log("Updating loan records...");
+            const tokenResponse = await axios.post(
+                "https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token", {
+                grant_type: "client_credentials",
+                client_id: "d9dcdf05-37f4-4bab-b428-323957ad2f86",
+                resource: "https://org0f7e6203.crm5.dynamics.com",
+                client_secret: "JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2",
+            }, {
+                headers: {
+                    "content-type": "application/x-www-form-urlencoded"
+                }
+            });
+            const accessToken = tokenResponse.data.access_token;
+            const updateRecordResponse = await axios.patch(
+                `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_users(${recordId})`,
+                {
+                    kf_mobilenumber: mobileNumber
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json',
+                  },
+                }
+            );
+            console.log("Update Record Response:", updateRecordResponse); // Log the response
+            if (updateRecordResponse.status === 204) {
+                Alert.alert('Success', 'User updated successfully');
+                console.log("User updated successfully");
+            } else {
+                Alert.alert('Error', 'Failed to update user'); // Alert for other status codes
+                console.log("Failed to update user");
+            }
+        } catch (error) {
+            console.error("Error updating loan records:", error);
+            Alert.alert('Error', 'Failed to update user'); // Alert for any errors
+            setLoading(false);
+        }
+    };
+
+  useEffect(() => {
+    const requestLocationPermission = async () => {
+      if (Platform.OS === 'ios') {
+        getOneTimeLocation();
+        subscribeLocationLocation();
+      } else {
+        try {
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+            {
+              title: 'Location Access Required',
+              message: 'This App needs to Access your location',
+            },
+          );
+          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+            getOneTimeLocation();
+            subscribeLocationLocation();
+          } else {
+            setLocationStatus('Permission Denied');
+          }
+        } catch (err) {
+          console.warn(err);
+        }
+      }
+    };
+    requestLocationPermission();
+    return () => {
+      Geolocation.clearWatch(watchID);
+    };
+  }, []);
+
+  const getOneTimeLocation = () => {
+    setLocationStatus('Getting Location ...');
+    Geolocation.getCurrentPosition(
+      (position) => {
+        setLocationStatus('You are Here');
+        const currentLongitude = JSON.stringify(position.coords.longitude);
+        const currentLatitude = JSON.stringify(position.coords.latitude);
+        setCurrentLongitude(currentLongitude);
+        setCurrentLatitude(currentLatitude);
+
+        // Call function to fetch address
+        fetchAddress(position.coords.latitude, position.coords.longitude);
+      },
+      (error) => {
+        setLocationStatus(error.message);
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 30000,
+        maximumAge: 1000,
+      },
+    );
+  };
+
+  const fetchAddress = async (latitude, longitude) => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+      );
+      const data = await response.json();
+      if (data.display_name) {
+        setCurrentAddress(data.display_name);
+      } else {
+        setCurrentAddress('Address not found');
+      }
+    } catch (error) {
+      console.error('Error fetching address:', error);
+      setCurrentAddress('Error fetching address');
+    }
+  };
+
+  const subscribeLocationLocation = () => {
+    watchID = Geolocation.watchPosition(
+      (position) => {
+        setLocationStatus('You are Here');
+        const currentLongitude = JSON.stringify(position.coords.longitude);
+        const currentLatitude = JSON.stringify(position.coords.latitude);
+        setCurrentLongitude(currentLongitude);
+        setCurrentLatitude(currentLatitude);
+
+        // Call function to fetch address
+        fetchAddress(position.coords.latitude, position.coords.longitude);
+      },
+      (error) => {
+        setLocationStatus(error.message);
+      },
+      {
+        enableHighAccuracy: false,
+        maximumAge: 1000,
+      },
+    );
+  };
+    
     return (
         <>
             <StatusBar />
@@ -538,6 +683,19 @@ const UserDashboard = ({ navigation, route }) => {
                                             <Text style={styles.detailText}>{name}</Text>
                                             <Text style={styles.detailText}>{mobileNumber}</Text>
                                             <Text style={styles.detailText}>{userapplicationid}</Text>
+                                            <TextInput placeholder='mobile number' onChangeText={(text) => setMobileNumber(text)}  value={mobileNumber}/>
+                                            <TouchableOpacity onPress={UpdateLoanRecords}>
+                                            <Ionicons name ="location" size={25} color="red"/>
+                                            </TouchableOpacity>
+                                            <Text style={{ justifyContent: 'center', alignItems: 'center', marginTop: 16, }}>
+                                                Latitude: {currentLatitude}
+                                            </Text>
+                                            <Text style={{ justifyContent: 'center', alignItems: 'center', marginTop: 16, }}>
+                                                Longitude: {currentLongitude}
+                                            </Text>
+                                            <Text style={{ justifyContent: 'center', alignItems: 'center', marginTop: 16, }}>
+                                                Address: {currentAddress}
+                                            </Text>
                                         </View>
                                     </View>
                                 </View>
