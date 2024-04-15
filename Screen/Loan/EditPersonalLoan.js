@@ -1595,7 +1595,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
               value={loanAmountRequested ? loanAmountRequested.toString() : ''}
               onChangeText={handleLoanAmountRequestedChange}
               // editable={getStatusStringFromNumericValue(status) !== 'Approved'}
-              editable={false}
+               editable={false}
             />
             {errorMessages.loanAmountRequestedEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.loanAmountRequestedEdit}</Text>
