@@ -336,6 +336,11 @@ const HomeLoanDetailsScreen = ({ route }) => {
           </View>
 
           <View style={styles.detailItem}>
+            <Text style={styles.label}>Pincode</Text>
+            <Text style={styles.value}>{loanApplication.kf_pincode}</Text>
+          </View>
+
+          <View style={styles.detailItem}>
             <Text style={styles.label}>State</Text>
             <Text style={styles.value}>{loanApplication.kf_state}</Text>
           </View>
@@ -457,6 +462,11 @@ const HomeLoanDetailsScreen = ({ route }) => {
           </View>
 
           <View style={styles.detailItem}>
+            <Text style={styles.label}> Pincode</Text>
+            <Text style={styles.value}>{loanApplication.kf_guarantorpincode}</Text>
+          </View>
+
+          <View style={styles.detailItem}>
             <Text style={styles.label}> State</Text>
             <Text style={styles.value}>{loanApplication.kf_guarantorstate}</Text>
           </View>
@@ -532,6 +542,16 @@ const HomeLoanDetailsScreen = ({ route }) => {
           <View style={styles.detailItem}>
             <Text style={styles.label}> City</Text>
             <Text style={styles.value}>{loanApplication.kf_guarantor2city}</Text>
+          </View>
+
+          <View style={styles.detailItem}>
+            <Text style={styles.label}> Pincode</Text>
+            <Text style={styles.value}>{loanApplication.kf_guarantor2pincode}</Text>
+          </View>
+
+          <View style={styles.detailItem}>
+            <Text style={styles.label}> State</Text>
+            <Text style={styles.value}>{loanApplication.kf_guarantor2state}</Text>
           </View>
 
           <View style={styles.detailItem}>

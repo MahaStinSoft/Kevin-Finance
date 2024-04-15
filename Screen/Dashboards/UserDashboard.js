@@ -475,7 +475,7 @@ const UserDashboard = ({ navigation, route }) => {
             await AsyncStorage.setItem('isLoggedIn', 'false');
             navigation.reset({
                 index: 0,
-                routes: [{ name: 'LoginUserForm' }],
+                routes: [{ name: 'Welcome' }],
             });
         } catch (error) {
             console.error('Error clearing authentication state:', error);

@@ -58,7 +58,7 @@ export const PersonalLoan = ({route}) => {
   const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
   const [showAlertDiscardChanges, setShowAlertDiscardChanges] = useState(false);
   const [kf_userapplicantid, setkf_userid] = useState(null);
-  
+  const [kf_pincode, setkf_pincode] = useState(null);
   const { userapplicationid } = route.params || {};
    
   const handleShowDiscardChangesAlert = () => {
@@ -228,7 +228,8 @@ const handleInterestRateChange = (text) => {
     setKf_emi(null);
     setKf_numberofemi(null);
     setKf_emischedule(null);
-    setKf_interestrate(null);    
+    setKf_interestrate(null);  
+    setkf_pincode(null);  
     setkf_applicantimage({ fileName: null, fileContent: null });
     setResetFormKey((prevKey) => prevKey + 1);
   };
@@ -712,7 +713,8 @@ const handleInterestRateChange = (text) => {
           kf_emicollectiondate: kf_emicollectiondate,
           kf_othercharges: kf_othercharges,
           kf_applicantimage:kf_applicantimage.fileContent,
-          kf_userapplicantid: userapplicationid
+          kf_userapplicantid: userapplicationid,
+          kf_pincode: kf_pincode,
         },
         {
           headers: {
@@ -762,6 +764,25 @@ const handleInterestRateChange = (text) => {
     // navigation.navigate('Dashboard');
     navigation.goBack();
   };
+
+  const handlePincodeChange = (text) => {
+    // Remove any non-numeric characters from the input
+    const formattedPincode = text.replace(/[^0-9]/g, '');
+    setkf_pincode(formattedPincode);
+  };
+  const validatePincode = () => {
+    if (kf_pincode.length !== 6) {
+      setError('Pincode must be 6 digits long.');
+      return;
+    }
+    if (!/^[0-9]+$/.test(kf_pincode)) {
+      setError('Pincode must contain only numeric characters.');
+      return;
+    }
+    // Pincode is valid, do something with it (e.g., send to server)
+    Alert.alert('Success', 'Pincode is valid.');
+  };
+
 
   return (
     <>
@@ -890,6 +911,15 @@ const handleInterestRateChange = (text) => {
             autoCapitalize="none"
             value={kf_city}
             onChangeText={(text) => setkf_city(text)}
+          />
+
+          <TextInput
+            placeholder=" Pincode"
+            keyboardType="numeric"
+            value={kf_pincode}
+            onChangeText={handlePincodeChange}
+            maxLength={6}
+            style={[styles.textInputContainer, { marginVertical: 10 }]}
           />
 
           <TextInputComponent
@@ -1031,8 +1061,8 @@ const handleInterestRateChange = (text) => {
           onConfirm={handleConfirmAlert}
           headerMessage="Discard Changes"
           message="Are you sure want to discard the changes?"
-          Button1="Cancel"
-          Button2="Discard"
+          Button1="No"
+          Button2="Yes"
           style={[styles.alertStyle, {height: "23%"}]}
           modalHeaderStyle={[styles.modalheaderStyle, {right: 70}]}
           textStyle={styles.textStyle}

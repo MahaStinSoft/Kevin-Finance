@@ -51,6 +51,7 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [eminAmount, setEmiAmount] = useState(loanApplication?.kf_emi || '');
   const [aadharcard, setAadharcard] = useState({ fileName: null, fileContent: null });
   const [pancard, setPancard] = useState({ fileName: null, fileContent: null });
+  const [Pincode, setPincode] = useState(loanApplication?.kf_pincode || '');
   const [applicantImage, setapplicantImage] = useState({ fileName: null, fileContent: null });
   // const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fileContent: null });
   const [signature, setSignature] = useState({ fileName: null, fileContent: null  });
@@ -141,7 +142,8 @@ const EditHomeLoan = ({ route, navigation }) => {
     setAadharcard({ fileName: null, fileContent: null });
     setPancard({ fileName: null, fileContent: null });
     setkf_applicantimage({ fileName: null, fileContent: null });
-    setSignature({ fileName: null, fileContent: null  })
+    setSignature({ fileName: null, fileContent: null  });
+    setPincode(loanApplication.kf_pincode);
     console.log('State updated:', {
       applicationnumber,
       createdby,
@@ -258,6 +260,7 @@ const EditHomeLoan = ({ route, navigation }) => {
           kf_reason: reason,
           kf_userapplicantid: UserApplicantID,
           kf_applyforloan:applyForLoan,
+          kf_pincode: Pincode
         },
         {
           headers: {
@@ -305,6 +308,7 @@ const EditHomeLoan = ({ route, navigation }) => {
             kf_sendapproval: sendApproval,
             kf_reason: reason,
             kf_applyforloan: applyForLoan,
+            kf_pincode: Pincode
           });
         }
         // console.log(loanAmountRequested)
@@ -596,7 +600,6 @@ const EditHomeLoan = ({ route, navigation }) => {
 
   const handleMobileNumberChange = (text) => {
     setMobileNumber(text);
-
     if (text.trim() === '') {
       setIsMobileNumberValid(false);
       setErrorMessages({
@@ -604,10 +607,10 @@ const EditHomeLoan = ({ route, navigation }) => {
         mobileNumberEdit: 'Enter Mobile Number',
       });
     } else {
-      setIsMobileNumberValid(/^\d{10}$/.test(text));
+      setIsMobileNumberValid(/^[6-9]\d{9}$/.test(text));
       setErrorMessages({
         ...errorMessages,
-        mobileNumberEdit: /^\d{10}$/.test(text) ? '' : 'Please Enter a Valid 10-digit mobile number.',
+        mobileNumberEdit: /^[6-9]\d{9}$/.test(text) ? '' : 'Please Enter a Valid 10-digit mobile number.',
       });
     }
   };
@@ -1358,6 +1361,18 @@ const EditHomeLoan = ({ route, navigation }) => {
               value={city}
               placeholder="City"
               onChangeText={(text) => setCity(text)}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
+            />
+            <TextInput  
+              style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
+              value={Pincode}
+              maxLength={6}
+              keyboardType="numeric"
+              placeholder="Pincode"
+              onChangeText={(text) => setPincode(text)}
               editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             <TextInput

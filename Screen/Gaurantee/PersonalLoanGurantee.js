@@ -33,6 +33,7 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
   const [applicantImage, setapplicantImage] = useState({ fileName: null, fileContent: null });
   const [showImageModal, setShowImageModal] = useState(false);
   const [signature, setSignature] = useState({ fileName: null });
+  const [guarantorpincode, setguarantorpincode] = useState(personalLoan?.kf_guarantorpincode || '');
 
   const [firstEMIDate, setfirstEMIDate] = useState(personalLoan?.kf_firstemidate || '');
   const [guarantoraadharnumber, setAadharcardNumber] = useState(personalLoan?.kf_guarantoraadharnumber || '');
@@ -92,7 +93,8 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
     setAadharcard({ fileName: null, fileContent: null });
     setPancard({ fileName: null, fileContent: null });
     setapplicantImage({ fileName: null, fileContent: null });
-    setSignature({ fileName: null})
+    setSignature({ fileName: null});
+    setguarantorpincode(personalLoan.kf_guarantorpincode);
     setRecordId(personalLoan.kf_personalloanid);
     console.log('State updated:', {
       applicationnumber,
@@ -178,7 +180,8 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
           kf_guarantorcity: guarantorcity,
           kf_guarantorstate: guarantorstate,
           kf_guarantoraadharnumber: guarantoraadharnumber,
-          kf_guarantorpannumber: guarantorpannumber
+          kf_guarantorpannumber: guarantorpannumber,
+          kf_guarantorpincode: guarantorpincode,
         },
         {
           headers: {
@@ -210,7 +213,7 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
             kf_guarantorstate: guarantorstate,
             kf_guarantoraadharnumber: guarantoraadharnumber,
             kf_guarantorpannumber: guarantorpannumber,
-
+            kf_guarantorpincode: guarantorpincode,
           });
         }
         console.log(guarantorage);
@@ -758,6 +761,24 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
     navigation.navigate('EditPersonalLoan', { personalLoan: personalLoan });  
   };
 
+  const handlePincodeChange = (text) => {
+    // Remove any non-numeric characters from the input
+    const formattedPincode = text.replace(/[^0-9]/g, '');
+    setkf_pincode(formattedPincode);
+  };
+  const validatePincode = () => {
+    if (kf_pincode.length !== 6) {
+      setError('Pincode must be 6 digits long.');
+      return;
+    }
+    if (!/^[0-9]+$/.test(kf_pincode)) {
+      setError('Pincode must contain only numeric characters.');
+      return;
+    }
+    // Pincode is valid, do something with it (e.g., send to server)
+    Alert.alert('Success', 'Pincode is valid.');
+  };
+
   const isEditable = loanStatus !== 'Approved';
 
   return (
@@ -918,6 +939,15 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
               value={guarantorcity}
               placeholder="City"
               onChangeText={(text) => setCity(text)}
+              editable={isEditable}
+            />
+            <TextInput
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
+              value={guarantorpincode}
+              placeholder="Pincode"
+              onChangeText={(text) => setguarantorpincode(text)}
+              maxLength={6}
+              keyboardType="numeric"
               editable={isEditable}
             />
             <TextInput

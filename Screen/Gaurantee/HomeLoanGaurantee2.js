@@ -32,6 +32,7 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
   const [aadharcard, setAadharcard] = useState({ fileName: null, fileContent: null });
   const [pancard, setPancard] = useState({ fileName: null, fileContent: null });
   const [applicantImage, setapplicantImage] = useState({ fileName: null, fileContent: null });
+  const [guarantorpincode, setguarantorpincode] = useState(loanApplication?.kf_guarantor2pincode || '');
 
   const [isfirstnameValid, setIsfirstnameValid] = useState(true);
   const [isLastNameValid, setIsLastNameValid] = useState(true);
@@ -86,6 +87,7 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
     setPancard({ fileName: null, fileContent: null });
     setapplicantImage({ fileName: null, fileContent: null });
     setRecordId(loanApplication.kf_loanapplicationid);
+    setguarantorpincode(loanApplication.kf_guarantor2pincode);
     console.log('State updated:', {
       applicationnumber,
       createdby,
@@ -175,7 +177,8 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
           kf_guarantor2city: guarantorcity,
           kf_guarantor2state: guarantorstate,
           kf_guarantor2aadharnumber: guarantoraadharnumber,
-          kf_guarantor2pannumber: guarantorpannumber
+          kf_guarantor2pannumber: guarantorpannumber,
+          kf_guarantor2pincode: guarantorpincode
         },
         {
           headers: {
@@ -208,6 +211,7 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
             kf_guarantor2state: guarantorstate,
             kf_guarantor2aadharnumber: guarantoraadharnumber,
             kf_guarantor2pannumber: guarantorpannumber,
+            kf_guarantor2pincode: guarantorpincode
           });
         }
         // Alert.alert('Updated the record Successfully.', '', [
@@ -745,6 +749,24 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
     navigation.navigate('EditHomeLoan', { loanApplication: loanApplication });
   };
 
+  const handlePincodeChange = (text) => {
+    // Remove any non-numeric characters from the input
+    const formattedPincode = text.replace(/[^0-9]/g, '');
+    setkf_pincode(formattedPincode);
+  };
+  const validatePincode = () => {
+    if (kf_pincode.length !== 6) {
+      setError('Pincode must be 6 digits long.');
+      return;
+    }
+    if (!/^[0-9]+$/.test(kf_pincode)) {
+      setError('Pincode must contain only numeric characters.');
+      return;
+    }
+    // Pincode is valid, do something with it (e.g., send to server)
+    Alert.alert('Success', 'Pincode is valid.');
+  };
+
   const isEditable = loanStatus !== 'Approved';
 
   return (
@@ -904,6 +926,15 @@ const HomeLoanGurantee2 = ({ route, navigation }) => {
               value={guarantorcity}
               placeholder="City"
               onChangeText={(text) => setCity(text)}
+              editable={isEditable}
+            />
+            <TextInput
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
+              value={guarantorpincode}
+              placeholder="Pincode"
+              onChangeText={(text) => setguarantorpincode(text)}
+              maxLength={6}
+              keyboardType="numeric"
               editable={isEditable}
             />
             <TextInput

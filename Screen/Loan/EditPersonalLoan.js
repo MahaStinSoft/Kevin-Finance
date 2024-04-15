@@ -46,10 +46,11 @@ const EditPersonalLoan = ({ route, navigation }) => {
   const [emiCollectionDate, setEmiCollectionDate] = useState(new Date()); // Initialize with today's date
   const [interestRate, setInterestRate] = useState(personalLoan?.kf_interestrate || '');
   const [emiSchedule, setEmiSchedule] = useState(personalLoan?.kf_emischedule || '');
-  const [numberOfEMI, setNumberOfEMI] = useState(personalLoan?.kf_numberofemi || '');
+  const [numberOfEMI, setNumberOfEMI] = useState(personalLoan?.kf_numberofemi || ''); 
   const [eminAmount, setEmiAmount] = useState(personalLoan?.kf_emi || '');
   const [aadharcard, setAadharcard] = useState({ fileName: null, fileContent: null });
   const [pancard, setPancard] = useState({ fileName: null, fileContent: null });
+  const [Pincode, setPincode] = useState(personalLoan?.kf_pincode || '');
   const [applicantImage, setapplicantImage] = useState({ fileName: null, fileContent: null });
   const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fileContent: null });
   const [signature, setSignature] = useState({ fileName: null, fileContent: null });
@@ -137,7 +138,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
     setAadharcard({ fileName: null, fileContent: null });
     setPancard({ fileName: null, fileContent: null });
     setkf_applicantimage({ fileName: null, fileContent: null });
-    setSignature({ fileName: null, fileContent: null })
+    setSignature({ fileName: null, fileContent: null });
+    setPincode(personalLoan.kf_pincode);
     console.log('State updated:', {
       applicationnumber,
       createdby,
@@ -256,7 +258,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
           kf_sendapproval: sendApproval,
           kf_reason: reason,
           kf_userapplicantid: UserApplicantID,
-          kf_applyforloan:applyForLoan
+          kf_applyforloan:applyForLoan,
+          kf_pincode: Pincode
         },
         {
           headers: {
@@ -303,7 +306,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
             kf_sendapproval: sendApproval,
             kf_reason: reason,
             kf_userapplicantid: UserApplicantID,
-            kf_applyforloan:applyForLoan
+            kf_applyforloan:applyForLoan,
+            kf_pincode: Pincode
           });
         }
         // console.log(age);
@@ -591,10 +595,10 @@ const EditPersonalLoan = ({ route, navigation }) => {
         mobileNumberEdit: 'Enter Mobile Number',
       });
     } else {
-      setIsMobileNumberValid(/^\d{10}$/.test(text));
+      setIsMobileNumberValid(/^[6-9]\d{9}$/.test(text));
       setErrorMessages({
         ...errorMessages,
-        mobileNumberEdit: /^\d{10}$/.test(text) ? '' : 'Please Enter a Valid 10-digit mobile number.',
+        mobileNumberEdit: /^[6-9]\d{9}$/.test(text) ? '' : 'Please Enter a Valid 10-digit mobile number.',
       });
     }
   };
@@ -1533,6 +1537,18 @@ const EditPersonalLoan = ({ route, navigation }) => {
               editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             <TextInput
+              style={[
+                styles.textInputContainer,
+                getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
+              ]}
+              value={Pincode}
+              maxLength={6}
+              keyboardType="numeric"
+              placeholder="Pincode"
+              onChangeText={(text) => setPincode(text)}
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
+            />
+            <TextInput
                style={[
                 styles.textInputContainer,
                 getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
@@ -1578,7 +1594,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
               placeholder="Loan Amount Request"
               value={loanAmountRequested ? loanAmountRequested.toString() : ''}
               onChangeText={handleLoanAmountRequestedChange}
-              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
+              // editable={getStatusStringFromNumericValue(status) !== 'Approved'}
+              editable={false}
             />
             {errorMessages.loanAmountRequestedEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.loanAmountRequestedEdit}</Text>

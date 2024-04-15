@@ -61,7 +61,7 @@ export const HomeScreen = ({ route }) => {
   const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
   const [showAlertDiscardChanges, setShowAlertDiscardChanges] = useState(false);
   const [kf_userapplicantid, setkf_userid] = useState(null);
-
+  const [kf_pincode, setkf_pincode] = useState(null);
   const { userapplicationid } = route.params || {};
 
   const navigation = useNavigation();
@@ -125,6 +125,7 @@ export const HomeScreen = ({ route }) => {
     setKf_numberofemi(null);
     setKf_emischedule(null);
     setKf_interestrate(null);
+    setkf_pincode(null);
     setResetFormKey((prevKey) => prevKey + 1);
   };
 
@@ -650,7 +651,8 @@ export const HomeScreen = ({ route }) => {
           kf_emicollectiondate: kf_emicollectiondate,
           kf_othercharges: kf_othercharges,
           kf_createdby: userAdminName,
-          kf_userapplicantid: userapplicationid
+          kf_userapplicantid: userapplicationid,
+          kf_pincode: kf_pincode,
         },
         {
           headers: {
@@ -703,6 +705,24 @@ export const HomeScreen = ({ route }) => {
     navigation.goBack();
   };
 
+  const handlePincodeChange = (text) => {
+    // Remove any non-numeric characters from the input
+    const formattedPincode = text.replace(/[^0-9]/g, '');
+    setkf_pincode(formattedPincode);
+  };
+  const validatePincode = () => {
+    if (kf_pincode.length !== 6) {
+      setError('Pincode must be 6 digits long.');
+      return;
+    }
+    if (!/^[0-9]+$/.test(kf_pincode)) {
+      setError('Pincode must contain only numeric characters.');
+      return;
+    }
+    // Pincode is valid, do something with it (e.g., send to server)
+    Alert.alert('Success', 'Pincode is valid.');
+  };
+
   return (
     <>
       <StatusBar />
@@ -751,7 +771,7 @@ export const HomeScreen = ({ route }) => {
             autoCapitalize="none"
             value={kf_lastname}
             onChangeText={handleLastNameChange}
-          />
+          /> 
           {errorMessages.lastName !== '' && (
             <Text style={styles.errorText}>{errorMessages.lastName}</Text>
           )}
@@ -830,6 +850,15 @@ export const HomeScreen = ({ route }) => {
             autoCapitalize="none"
             value={kf_city}
             onChangeText={(text) => setkf_city(text)}
+          />
+
+          <TextInput
+            placeholder="Pincode"
+            keyboardType="numeric"
+            value={kf_pincode}
+            onChangeText={handlePincodeChange}
+            maxLength={6}
+            style={[styles.textInputContainer, { marginVertical: 10 }]}
           />
 
           <TextInputComponent
@@ -945,11 +974,11 @@ export const HomeScreen = ({ route }) => {
           onConfirm={handleConfirmAlert}
           headerMessage="Discard Changes"
           message="Are you sure want to discard the changes?"
-          Button1="Cancel"
-          Button2="Discard"
+          Button1="No"
+          Button2="Yes"
           style={[styles.alertStyle, {height: "23%"}]}
           modalHeaderStyle={[styles.modalheaderStyle, {right: 70}]}
-          textStyle={styles.textStyle}
+          textStyle={styles.textStyle} 
         />
     </>
   );
