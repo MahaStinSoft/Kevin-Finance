@@ -70,8 +70,23 @@ const UserDashboard = ({ navigation, route }) => {
     const [currentLatitude, setCurrentLatitude] = useState('...');
     const [locationStatus, setLocationStatus] = useState('');
     const [currentAddress, setCurrentAddress] = useState('');
+    const [refreshing, setRefreshing] = useState(false);
 
     const isFocused = useIsFocused();
+
+    const handleRefresh = () => {
+        setRefreshing(true);
+        setTimeout(() => {
+
+            setRefreshing(false);
+        }, 2000);
+    };
+
+    useEffect(() => {
+        if (refreshing) {
+            handleRefresh();
+        }
+    }, [refreshing]);
 
     useEffect(() => {
         const unsubscribe = NetInfo.addEventListener(state => {
@@ -351,7 +366,7 @@ const UserDashboard = ({ navigation, route }) => {
 
     const navigateToHomeDetails = (loanApplication) => {
         setSelectedContact(loanApplication);
-        navigation.navigate('HomeLoanDetailsScreen', { loanApplication,  address: address  });
+        navigation.navigate('HomeLoanDetailsScreen', { loanApplication, address: address });
     };
 
     const navigateToPersonalDetails = (personalLoan) => {
@@ -359,10 +374,10 @@ const UserDashboard = ({ navigation, route }) => {
         navigation.navigate('PersonalLoanDetailsScreen', { personalLoan, address: address });
     };
 
-    const handleRefresh = () => {
-        // This function will be called when you want to refresh the page
-        setRefresh(!refresh);
-    };
+    // const handleRefresh = () => {
+    //     // This function will be called when you want to refresh the page
+    //     setRefresh(!refresh);
+    // };
 
     const handlelogout = () => {
         // navigation.navigate("Setting");
@@ -524,7 +539,10 @@ const UserDashboard = ({ navigation, route }) => {
             );
             console.log("Update Record Response:", updateRecordResponse); // Log the response
             if (updateRecordResponse.status === 204) {
-                Alert.alert('Success', 'User updated successfully');
+                // Alert.alert('Success', 'User updated successfully');
+                Alert.alert('Success', 'User updated successfully', [
+                    { text: 'OK', onPress: () => navigation.replace('UserDashboard') } // Replace 'YourScreenName' with the name of your screen
+                ]);
                 console.log("User updated successfully");
                 setLoanRecordsUpdated(true);
             } else {
@@ -648,7 +666,7 @@ const UserDashboard = ({ navigation, route }) => {
 
                     <View style={styles.navBar}>
 
-                
+
                         <Text style={styles.text}>Kevin Small Finance</Text>
 
                         <TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
@@ -672,15 +690,15 @@ const UserDashboard = ({ navigation, route }) => {
                         contentContainerStyle={{ width: '100%' }}
                         refreshControl={
                             <RefreshControl
-                                refreshing={loading}
-                                onRefresh={handleRefresh}
+                                refreshing={refreshing}
+                                onRefresh={() => setRefreshing(true)} 
                             />
                         }
                         showsVerticalScrollIndicator={false}
                         showsHorizontalScrollIndicator={false}
                     >
 
-                        {/* <View style={styles.chart}>
+                        <View style={styles.chart}>
                             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                                 <View style={styles.detailsContainer}>
                                     <View style={styles.rowContainer}>
@@ -690,73 +708,45 @@ const UserDashboard = ({ navigation, route }) => {
                                             </View>
                                         ) : null}
                                         <View style={styles.textContainer}>
-                                        <Ionicons name="location" size={25} color="green" style={{left: 160}}/>
-                                        <View  style={{ bottom: 20}}>
-                                            <Text style={styles.detailText}>{name}</Text>
-                                            <Text style={styles.detailText}>{userapplicationid}</Text>
-                                            {!address && (
-                                            <TouchableOpacity onPress={UpdateLoanRecords} >
-                                                <Ionicons name="location" size={25} color="red" style={{right: 5}}/>
-                                            </TouchableOpacity>
-                                            )}
+                                            <View style={{ bottom: 0 }}>
+                                                <Text style={styles.detailText}>{name}</Text>
+                                                <Text style={styles.detailText}>{userapplicationid}</Text>
+                                                {!address && (
+                                                    <>
+                                                        <TouchableOpacity onPress={UpdateLoanRecords} style={{ flexDirection: "row" }}>
+                                                            <Ionicons name="location" size={25} color="red" style={{ left: 0 }} />
+                                                            <Text style={{ marginTop: 5 }}> Pick your Location </Text>
+                                                        </TouchableOpacity>
+                                                    </>
+                                                )}
+                                                {address && (
+                                                    <View style={{ flexDirection: "row" }}>
+                                                        <Ionicons name="location" size={25} color="green" style={{ right: 10, top: 2 }} />
+                                                        <Text style={{ width: "90%" }}>{address}</Text>
+                                                    </View>
+                                                )}
 
-                                            {address && (
-                                                <Text>{address}</Text>
-                                            )}
                                             </View>
                                         </View>
                                     </View>
                                 </View>
                             </ScrollView>
-                        </View> */}
+                        </View>
+                        <View>
 
-<View style={styles.chart}>
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={styles.detailsContainer}>
-            <View style={styles.rowContainer}>
-                {name ? (
-                    <View style={styles.imageContainer}>
-                        <Text style={styles.initial}>{name.charAt(0)}</Text>
-                    </View>
-                ) : null}
-                <View style={styles.textContainer}>
-                    { address && (
-                    <TouchableOpacity onPress={handleLocationIconClick} >
-                    <Ionicons name="location" size={25} color="green" style={{ left: 160 }} />
-                    </TouchableOpacity>
-                    )}
-                    <View style={{ bottom: 20 }}>
-                        <Text style={styles.detailText}>{name}</Text>
-                        <Text style={styles.detailText}>{userapplicationid}</Text>
-                        {!address && (
-                            <TouchableOpacity onPress={UpdateLoanRecords}>
-                                <Ionicons name="location" size={25} color="red" style={{ right: 5 }} />
-                            </TouchableOpacity>
-                        )}
-                         {showAddress && address && (
-                            <Text>{address}</Text>
-                        )}
-                    </View>
-                </View>
-            </View>
-        </View>
-    </ScrollView>
-</View>
-<View>
-{/* <View> */}
-                                    <View style={[styles.loanButton, { marginTop: 20 }]}>
-                                        <TouchableOpacity onPress={handleHomeLoan} style={styles.button}>
-                                            <Text style={styles.buttonText}>Apply Home Loan</Text>
-                                            <Ionicons name="chevron-forward" size={25} color="white" style={styles.icon} />
-                                        </TouchableOpacity>
-                                    </View>
-                                    <View style={[styles.loanButton, { marginTop: 20 }]}>
-                                        <TouchableOpacity onPress={handlePersonalLoan} style={styles.button}>
-                                            <Text style={[styles.buttonText, { left: 8 }]}>Apply Personal Loan</Text>
-                                            <Ionicons name="chevron-forward" size={25} color="white" style={[styles.icon, { right: 10 }]} />
-                                        </TouchableOpacity>
-                                    </View>
-                                </View>
+                            <View style={[styles.loanButton, { marginTop: 20 }]}>
+                                <TouchableOpacity onPress={handleHomeLoan} style={styles.button}>
+                                    <Text style={styles.buttonText}>Apply Home Loan</Text>
+                                    <Ionicons name="chevron-forward" size={25} color="white" style={styles.icon} />
+                                </TouchableOpacity>
+                            </View>
+                            <View style={[styles.loanButton, { marginTop: 20 }]}>
+                                <TouchableOpacity onPress={handlePersonalLoan} style={styles.button}>
+                                    <Text style={[styles.buttonText, { left: 8 }]}>Apply Personal Loan</Text>
+                                    <Ionicons name="chevron-forward" size={25} color="white" style={[styles.icon, { right: 10 }]} />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
 
                         <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 8 }}>
                             {initialLoading ? (
