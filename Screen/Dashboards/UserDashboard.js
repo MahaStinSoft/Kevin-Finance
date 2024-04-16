@@ -74,6 +74,7 @@ const UserDashboard = ({ navigation, route }) => {
 
     const isFocused = useIsFocused();
 
+
     const handleRefresh = () => {
         setRefreshing(true);
         setTimeout(() => {
@@ -713,16 +714,16 @@ const UserDashboard = ({ navigation, route }) => {
                                                 <Text style={styles.detailText}>{userapplicationid}</Text>
                                                 {!address && (
                                                     <>
-                                                        <TouchableOpacity onPress={UpdateLoanRecords} style={{ flexDirection: "row" }}>
+                                                        <TouchableOpacity onPress={UpdateLoanRecords} style={{ flexDirection: "row", marginTop: 45, left: 40 }}>
                                                             <Ionicons name="location" size={25} color="red" style={{ left: 0 }} />
-                                                            <Text style={{ marginTop: 5 }}> Pick your Location </Text>
+                                                            <Text style={{ marginTop: 5 }}> Update Location </Text>
                                                         </TouchableOpacity>
                                                     </>
                                                 )}
                                                 {address && (
-                                                    <View style={{ flexDirection: "row" }}>
-                                                        <Ionicons name="location" size={25} color="green" style={{ right: 10, top: 2 }} />
-                                                        <Text style={{ width: "90%" }}>{address}</Text>
+                                                    <View style={{ flexDirection: "row", top: 15 }}>
+                                                        <Ionicons name="location-outline" size={25} color="green" style={{ right: 10, top: 2 }} />
+                                                        <Text style={{ width: "90%", fontSize: 11 }}>{address}</Text>
                                                     </View>
                                                 )}
 
