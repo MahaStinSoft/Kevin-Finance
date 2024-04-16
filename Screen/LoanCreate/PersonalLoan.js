@@ -23,7 +23,7 @@ export const PersonalLoan = ({route}) => {
   const [kf_email, setkf_email] = useState(null);
   const [kf_address1, setkf_address1] = useState(null);
   const [kf_address2, setkf_address2] = useState(null);
-  const [kf_address3, setkf_address3] = useState(null);
+  // const [kf_address3, setkf_address3] = useState(null);
   const [kf_city, setkf_city] = useState(null);
   const [kf_state, setkf_state] = useState(null);
   const [kf_aadharnumber, setkf_aadharnumber] = useState(null);
@@ -217,7 +217,7 @@ const handleInterestRateChange = (text) => {
     setkf_email(null);
     setkf_address1(null);
     setkf_address2(null);
-    setkf_address3(null);
+    // setkf_address3(null);
     setkf_city(null);
     setkf_state(null);
     setkf_loanamountrequested(null);
@@ -699,7 +699,7 @@ const handleInterestRateChange = (text) => {
           kf_email: kf_email,
           kf_address1: kf_address1,
           kf_address2: kf_address2,
-          kf_address3: kf_address3,
+          // kf_address3: kf_address3,
           kf_city: kf_city,
           kf_state: kf_state,
           kf_aadharnumber: kf_aadharnumber,
@@ -899,12 +899,12 @@ const handleInterestRateChange = (text) => {
             onChangeText={(text) => setkf_address2(text)}
           />
 
-          <TextInputComponent
+          {/* <TextInputComponent
             placeholder="Address 3"
             autoCapitalize="none"
             value={kf_address3}
             onChangeText={(text) => setkf_address3(text)}
-          />
+          /> */}
 
           <TextInputComponent
             placeholder="City"

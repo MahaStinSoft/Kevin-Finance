@@ -26,7 +26,7 @@ export const HomeScreen = ({ route }) => {
   const [kf_email, setkf_email] = useState(null);
   const [kf_address1, setkf_address1] = useState(null);
   const [kf_address2, setkf_address2] = useState(null);
-  const [kf_address3, setkf_address3] = useState(null);
+  // const [kf_address3, setkf_address3] = useState(null);
   const [kf_city, setkf_city] = useState(null);
   const [kf_state, setkf_state] = useState(null);
   const [kf_loanamountrequested, setkf_loanamountrequested] = useState(null);
@@ -112,7 +112,7 @@ export const HomeScreen = ({ route }) => {
     setkf_age(null);
     setkf_address1(null);
     setkf_address2(null);
-    setkf_address3(null);
+    // setkf_address3(null);
     setkf_city(null);
     setkf_state(null);
     setkf_loanamountrequested(null);
@@ -346,7 +346,7 @@ export const HomeScreen = ({ route }) => {
     if (text.trim() === '') {
       setErrorMessages({
         ...errorMessages,
-        panCardNumber: 'Enter a PAN Card',
+        // panCardNumber: 'Enter a PAN Card',
       });
       setIsPancardNumberValid(false);
     } else if (/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(text)) {
@@ -635,7 +635,7 @@ export const HomeScreen = ({ route }) => {
           kf_email: kf_email,
           kf_address1: kf_address1,
           kf_address2: kf_address2,
-          kf_address3: kf_address3,
+          // kf_address3: kf_address3,
           kf_city: kf_city,
           kf_state: kf_state,
           kf_loanamountrequested: loanAmount,
@@ -838,12 +838,12 @@ export const HomeScreen = ({ route }) => {
             onChangeText={(text) => setkf_address2(text)}
           />
 
-          <TextInputComponent
+          {/* <TextInputComponent
             placeholder="Address 3"
             autoCapitalize="none"
             value={kf_address3}
             onChangeText={(text) => setkf_address3(text)}
-          />
+          /> */}
 
           <TextInputComponent
             placeholder="City"

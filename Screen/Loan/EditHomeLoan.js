@@ -31,7 +31,7 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [email, setEmail] = useState(loanApplication?.kf_email || '');
   const [address1, setAddress1] = useState(loanApplication?.kf_address1 || '');
   const [address2, setAddress2] = useState(loanApplication?.kf_address2 || '');
-  const [address3, setAddress3] = useState(loanApplication?.kf_address3 || '');
+  // const [address3, setAddress3] = useState(loanApplication?.kf_address3 || '');
   const [city, setCity] = useState(loanApplication?.kf_city || '');
   const [state, setState] = useState(loanApplication?.kf_state || '');
   const [loanAmountRequested, setLoanAmountRequested] = useState(loanApplication?.kf_loanamountrequested || '');
@@ -118,7 +118,7 @@ const EditHomeLoan = ({ route, navigation }) => {
     setEmail(loanApplication.kf_email);
     setAddress1(loanApplication.kf_address1);
     setAddress2(loanApplication.kf_address2);
-    setAddress3(loanApplication.kf_address3);
+    // setAddress3(loanApplication.kf_address3);
     setCity(loanApplication.kf_city);
     setState(loanApplication.kf_state);
     setLoanAmountRequested(loanApplication.kf_loanamountrequested);
@@ -239,7 +239,7 @@ const EditHomeLoan = ({ route, navigation }) => {
           kf_email: email,
           kf_address1: address1,
           kf_address2: address2,
-          kf_address3: address3,
+          // kf_address3: address3,
           kf_city: city,
           kf_state: state,
           kf_loanamountrequested: parseInt(loanAmountRequested),
@@ -288,7 +288,7 @@ const EditHomeLoan = ({ route, navigation }) => {
             kf_email: email,
             kf_address1: address1,
             kf_address2: address2,
-            kf_address3: address3,
+            // kf_address3: address3,
             kf_city: city,
             kf_state: state,
             kf_loanamountrequested: loanAmountRequested,
@@ -1343,7 +1343,7 @@ const EditHomeLoan = ({ route, navigation }) => {
               onChangeText={(text) => setAddress2(text)}
               editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
-            <TextInput
+            {/* <TextInput
               style={[
                 styles.textInputContainer,
                 getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
@@ -1352,7 +1352,7 @@ const EditHomeLoan = ({ route, navigation }) => {
               placeholder="Address Line 3"
               onChangeText={(text) => setAddress3(text)}
               editable={getStatusStringFromNumericValue(status) !== 'Approved'}
-            />
+            /> */}
             <TextInput
               style={[
                 styles.textInputContainer,

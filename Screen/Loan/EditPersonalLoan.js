@@ -31,7 +31,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
   const [email, setEmail] = useState(personalLoan?.kf_email || '');
   const [address1, setAddress1] = useState(personalLoan?.kf_address1 || '');
   const [address2, setAddress2] = useState(personalLoan?.kf_address2 || '');
-  const [address3, setAddress3] = useState(personalLoan?.kf_address3 || '');
+  // const [address3, setAddress3] = useState(personalLoan?.kf_address3 || '');
   const [city, setCity] = useState(personalLoan?.kf_city || '');
   const [state, setState] = useState(personalLoan?.kf_state || '');
   const [loanAmountRequested, setLoanAmountRequested] = useState(personalLoan?.kf_loanamountrequested || '');
@@ -114,7 +114,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
     setEmail(personalLoan.kf_email);
     setAddress1(personalLoan.kf_address1);
     setAddress2(personalLoan.kf_address2);
-    setAddress3(personalLoan.kf_address3);
+    // setAddress3(personalLoan.kf_address3);
     setCity(personalLoan.kf_city);
     setState(personalLoan.kf_state);
     setLoanAmountRequested(personalLoan.kf_loanamountrequested);
@@ -238,7 +238,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
           kf_email: email,
           kf_address1: address1,
           kf_address2: address2,
-          kf_address3: address3,
+          // kf_address3: address3,
           kf_city: city,
           kf_state: state,
           kf_loanamountrequested: loanAmountRequested,
@@ -286,7 +286,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
             kf_email: email,
             kf_address1: address1,
             kf_address2: address2,
-            kf_address3: address3,
+            // kf_address3: address3,
             kf_city: city,
             kf_state: state,
             kf_loanamountrequested: parseInt(loanAmountRequested),
@@ -1516,7 +1516,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
               onChangeText={(text) => setAddress2(text)}
               editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
-            <TextInput
+            {/* <TextInput
               style={[
                 styles.textInputContainer,
                 getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
@@ -1525,7 +1525,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
               placeholder="Address Line 3"
               onChangeText={(text) => setAddress3(text)}
               editable={getStatusStringFromNumericValue(status) !== 'Approved'}
-            />
+            /> */}
             <TextInput
               style={[
                 styles.textInputContainer,
