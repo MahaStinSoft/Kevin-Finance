@@ -199,9 +199,9 @@ const EditHomeLoan = ({ route, navigation }) => {
       dateOfBirthEdit: !dateofbirth ? 'Enter Date of Birth' : '',
       mobileNumberEdit: /^\d{10}$/.test(mobileNumber) ? '' : 'Please Enter a Valid 10-digit mobile number.',
       emailEdit: !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? 'Enter Email Address' : '',
-      // loanAmountRequestedEdit: !loanAmountRequested ? '' : 'Enter Loan Amount',
+      loanAmountRequestedEdit: !loanAmountRequested ? 'Enter Loan Amount' : '',
       aadharCardNumberEdit: /^\d{12}$/.test(aadharcardNumber) ? '' : 'Please Enter Valid Aadharcard Number',
-      panCardNumberEdit: !pancardNumber ? 'Enter PAN Card Number' : '',
+      panCardNumberEdit: !pancardNumber ? '' : '',
     };
     setErrorMessages(newErrorMessages);
 
@@ -450,29 +450,58 @@ const EditHomeLoan = ({ route, navigation }) => {
     }
   };
 
+  // const handlePancardNumberValid = (text) => {
+  //   setPancardNumber(text);
+
+  //   if (text.trim() === '') {
+  //     setErrorMessages({
+  //       ...errorMessages,
+  //       panCardNumberEdit: 'Enter PAN Card',
+  //     });
+  //     setIsPancardNumberValid(false);
+  //   } else if (/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(text)) {
+  //     setErrorMessages({
+  //       ...errorMessages,
+  //       panCardNumberEdit: '',
+  //     });
+  //     setIsPancardNumberValid(true);
+  //   } else {
+  //     setErrorMessages({
+  //       ...errorMessages,
+  //       panCardNumberEdit: 'Enter Valid PAN Card',
+  //     });
+  //     setIsPancardNumberValid(false);
+  //   }
+  // };
+
   const handlePancardNumberValid = (text) => {
     setPancardNumber(text);
-
-    if (text.trim() === '') {
-      setErrorMessages({
-        ...errorMessages,
-        panCardNumberEdit: 'Enter PAN Card',
-      });
-      setIsPancardNumberValid(false);
-    } else if (/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(text)) {
-      setErrorMessages({
-        ...errorMessages,
-        panCardNumberEdit: '',
-      });
-      setIsPancardNumberValid(true);
+  
+    if (text.trim() !== '') {
+      // Validate PAN card format only if it's not empty
+      if (/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(text)) {
+        setErrorMessages({
+          ...errorMessages,
+          panCardNumberEdit: '', // Reset error message if format is valid
+        });
+        setIsPancardNumberValid(true);
+      } else {
+        setErrorMessages({
+          ...errorMessages,
+          panCardNumberEdit: 'Enter Valid PAN Card',
+        });
+        setIsPancardNumberValid(false);
+      }
     } else {
+      // If PAN card is empty, allow saving without validation
       setErrorMessages({
         ...errorMessages,
-        panCardNumberEdit: 'Enter Valid PAN Card',
+        panCardNumberEdit: '', // Reset error message
       });
-      setIsPancardNumberValid(false);
+      setIsPancardNumberValid(true); // Consider it valid
     }
   };
+  
 
   const handleGenderOptionset = (selectedOptionGender) => {
     let numericValue;
@@ -648,17 +677,11 @@ const EditHomeLoan = ({ route, navigation }) => {
         ...errorMessages,
         loanAmountRequestedEdit: 'Enter Loan Amount',
       });
-    }
-    // else if (/^\d{5,7}$/.test(text) && amountRequested !== null && amountRequested >= minLoanAmount && amountRequested <= maxLoanAmount) {
-    //   setErrorMessages({
-    //     ...errorMessages,
-    //     loanAmountRequestedEdit: '',
-    //   });
-    // } 
+    } 
     else {
       setErrorMessages({
         ...errorMessages,
-        // loanAmountRequestedEdit: `Enter Loan Amount (${minLoanAmount} to ${maxLoanAmount} INR)`,
+        loanAmountRequestedEdit: '',
       });
     }
   };

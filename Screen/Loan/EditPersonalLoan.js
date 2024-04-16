@@ -173,13 +173,13 @@ const EditPersonalLoan = ({ route, navigation }) => {
     // const minLoanAmount = 25000;
     // const maxLoanAmount = 1500000;
 
-    // if (loanAmountRequested < minLoanAmount || loanAmountRequested > maxLoanAmount) {
-    //   setErrorMessages({
-    //     ...errorMessages,
-    //     // loanAmountRequestedEdit: `Loan amount should be between ${minLoanAmount} and ${maxLoanAmount} INR.`,
-    //   });
-    //   return;
-    // }
+    if (!loanAmountRequested) {
+      setErrorMessages({
+        ...errorMessages,
+        loanAmountRequestedEdit: `Enter Loan Amount`,
+      });
+      return;
+    }
 
     if (!isPancardNumberValid) {
       setErrorMessages({
@@ -195,9 +195,9 @@ const EditPersonalLoan = ({ route, navigation }) => {
       dateOfBirthEdit: !dateofbirth ? 'Enter Date of Birth' : '',
       mobileNumberEdit: /^\d{10}$/.test(mobileNumber) ? '' : 'Please Enter a Valid 10-digit mobile number.',
       emailEdit: !email ? 'Enter Email Address' : '',
-      loanAmountRequestedEdit: /^\d{5,7}$/.test(loanAmountRequested) ? '' : 'Enter Loan Amount',
+      loanAmountRequestedEdit: !loanAmountRequested ? 'Enter Loan Amount' : '',
       aadharCardNumberEdit: /^\d{12}$/.test(aadharcardNumber) ? '' : 'Please Enter Valid Aadharcard Number',
-      panCardNumberEdit: !pancardNumber ? 'Enter PAN Card Number' : '',
+      panCardNumberEdit: !pancardNumber ? '' : '',
     };
     setErrorMessages(newErrorMessages);
 
@@ -561,27 +561,55 @@ const EditPersonalLoan = ({ route, navigation }) => {
     }
   };
 
+  // const handlePancardNumberValid = (text) => {
+  //   setPancardNumber(text);
+
+  //   if (text.trim() === '') {
+  //     setErrorMessages({
+  //       ...errorMessages,
+  //       panCardNumberEdit: 'Enter PAN Card',
+  //     });
+  //     setIsPancardNumberValid(false);
+  //   } else if (/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(text)) {
+  //     setErrorMessages({
+  //       ...errorMessages,
+  //       panCardNumberEdit: '',
+  //     });
+  //     setIsPancardNumberValid(true);
+  //   } else {
+  //     setErrorMessages({
+  //       ...errorMessages,
+  //       panCardNumberEdit: 'Enter Valid PAN Card',
+  //     });
+  //     setIsPancardNumberValid(false);
+  //   }
+  // };
+
   const handlePancardNumberValid = (text) => {
     setPancardNumber(text);
-
-    if (text.trim() === '') {
-      setErrorMessages({
-        ...errorMessages,
-        panCardNumberEdit: 'Enter PAN Card',
-      });
-      setIsPancardNumberValid(false);
-    } else if (/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(text)) {
-      setErrorMessages({
-        ...errorMessages,
-        panCardNumberEdit: '',
-      });
-      setIsPancardNumberValid(true);
+  
+    if (text.trim() !== '') {
+      // Validate PAN card format only if it's not empty
+      if (/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(text)) {
+        setErrorMessages({
+          ...errorMessages,
+          panCardNumberEdit: '', // Reset error message if format is valid
+        });
+        setIsPancardNumberValid(true);
+      } else {
+        setErrorMessages({
+          ...errorMessages,
+          panCardNumberEdit: 'Enter Valid PAN Card',
+        });
+        setIsPancardNumberValid(false);
+      }
     } else {
+      // If PAN card is empty, allow saving without validation
       setErrorMessages({
         ...errorMessages,
-        panCardNumberEdit: 'Enter Valid PAN Card',
+        panCardNumberEdit: '', // Reset error message
       });
-      setIsPancardNumberValid(false);
+      setIsPancardNumberValid(true); // Consider it valid
     }
   };
 
@@ -624,103 +652,23 @@ const EditPersonalLoan = ({ route, navigation }) => {
     }
   };
 
-
   const handleLoanAmountRequestedChange = (text) => {
     const amountRequested = text.trim() !== '' ? parseFloat(text) : null;
     setLoanAmountRequested(amountRequested);
-
-    const minLoanAmount = 25000;
-    const maxLoanAmount = 1500000;
 
     if (text.trim() === '') {
       setErrorMessages({
         ...errorMessages,
         loanAmountRequestedEdit: 'Enter Loan Amount',
       });
-    } else if (/^\d{5,7}$/.test(text) && amountRequested !== null && amountRequested >= minLoanAmount && amountRequested <= maxLoanAmount) {
+    }
+    else {
       setErrorMessages({
         ...errorMessages,
         loanAmountRequestedEdit: '',
       });
-    } else {
-      setErrorMessages({
-        ...errorMessages,
-        loanAmountRequestedEdit: `Enter Loan Amount (${minLoanAmount} to ${maxLoanAmount} INR)`,
-      });
     }
   };
-
-  // const sendAnnotation = async () => {
-  //   try {
-  //     const tokenResponse = await axios.post(
-  //       'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
-  //       {
-  //         grant_type: 'client_credentials',
-  //         client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
-  //         resource: 'https://org0f7e6203.crm5.dynamics.com',
-  //         scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
-  //         client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
-  //       },
-  //       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
-  //     );
-
-  //     const accessToken = tokenResponse.data.access_token;
-
-  //     // Check if there is an existing Aadhar image annotation
-  //     const existingAnnotationResponse = await axios.get(
-  //       `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations?$filter=_objectid_value eq ${recordId} and subject eq 'AadharCard Image'`,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${accessToken}`,
-  //           'Content-Type': 'application/json',
-  //         },
-  //       }
-  //     );
-
-  //     if (existingAnnotationResponse.data.value.length > 0) {
-  //       // If an existing annotation is found, delete it
-  //       const existingAnnotationId = existingAnnotationResponse.data.value[0].annotationid;
-  //       await deleteAnnotation(existingAnnotationId, accessToken);
-  //     }
-
-  //     // Create a new annotation
-  //     const annotations = [
-  //       {
-  //         subject: 'AadharCard Image',
-  //         filename: aadharcard.fileName || 'AadharCard.jpg',
-  //         isdocument: true,
-  //         'objectid_kf_personalloan@odata.bind': `/kf_personalloans(${recordId})`,
-  //         documentbody: aadharcard.fileContent,
-  //       },
-  //     ];
-
-  //     const createAnnotationResponse = await axios.post(
-  //       'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
-  //       annotations,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${accessToken}`,
-  //           'Content-Type': 'application/json',
-  //         },
-  //       }
-  //     );
-
-  //     if (createAnnotationResponse.status === 204) {
-  //       console.log('Aadhar image annotation created successfully.');
-  //       // Alert.alert('Sucess', '');
-
-  //     } else {
-  //       console.error('Failed to create Aadhar image annotation. Response:', createAnnotationResponse.data);
-  //       Alert.alert('Error', 'Failed to create Aadhar image annotation.');
-  //     }
-
-  //     // Fetch and display the updated annotations
-  //   } catch (error) {
-  //     console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
-  //     Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
-  //   }
-  // };
-  
 
   useEffect(() => {
     fetchAnnotations1();

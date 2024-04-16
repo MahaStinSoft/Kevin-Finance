@@ -444,26 +444,59 @@ const handleInterestRateChange = (text) => {
     }
   };
 
-  const handlePancardNumberValidation = (text) => {
-    setkf_pannumber(text);
+  // const handlePancardNumberValidation = (text) => {
+  //   setkf_pannumber(text);
 
-    if (text.trim() === '') {
-      setErrorMessages({
-        ...errorMessages,
-        panCardNumber: 'Enter PAN Card',
-      });
-      setIsPancardNumberValid(false);
-    } else if (/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(text)) {
-      setErrorMessages({
-        ...errorMessages,
-        panCardNumber: '',
-      });
+  //   if (text.trim() === '') {
+  //     setErrorMessages({
+  //       ...errorMessages,
+  //       panCardNumber: 'Enter PAN Card',
+  //     });
+  //     setIsPancardNumberValid(false);
+  //   } else if (/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(text)) {
+  //     setErrorMessages({
+  //       ...errorMessages,
+  //       panCardNumber: '',
+  //     });
+  //   } else {
+  //     setErrorMessages({
+  //       ...errorMessages,
+  //       panCardNumber: 'Enter Valid PAN Card Number',
+  //     });
+  //   }
+  // };
+
+  const handlePancardNumberValidation = (text) => {
+    // Check if the PAN card field is not empty
+    if (text.trim() !== '') {
+      // Perform PAN card validation
+      if (!isValidPancard(text)) {
+        setErrorMessages((prevErrors) => ({
+          ...prevErrors,
+          panCardNumber: 'Invalid PAN card number.',
+        }));
+      } else {
+        // PAN card number is valid, clear error message
+        setErrorMessages((prevErrors) => ({
+          ...prevErrors,
+          panCardNumber: '',
+        }));
+      }
     } else {
-      setErrorMessages({
-        ...errorMessages,
-        panCardNumber: 'Enter Valid PAN Card Number',
-      });
+      // PAN card field is empty, clear previous error message
+      setErrorMessages((prevErrors) => ({
+        ...prevErrors,
+        panCardNumber: '',
+      }));
     }
+    setkf_pannumber(text);
+  };
+  
+  const isValidPancard = (panNumber) => {
+    // Perform PAN card validation logic here
+    // Example validation: Checking if PAN card number matches a specific pattern
+    const panPattern = /[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+    return panPattern.test(panNumber);
   };
 
   const handleLoanAmountRequestedChange = (text) => {
@@ -652,7 +685,7 @@ const handleInterestRateChange = (text) => {
       email: !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(kf_email) ? 'Enter a Valid Email Address' : '',
       loanAmountRequested: !kf_loanamountrequested ? ' Enter Loan Amount Requested' : '',
       aadharCardNumber: !/^\d{12}$/.test(kf_aadharnumber) ? 'Enter Valid Aadharcard Number' : '',
-      panCardNumber: !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(kf_pannumber) ? 'Enter Valid PAN Card Number' : '',
+      // panCardNumber: !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(kf_pannumber) ? 'Enter Valid PAN Card Number' : '',
       interestRate: !/^\d+(\.\d+)?%?$/.test(kf_interestrate) ? 'Enter a Interest Rate' : '',
       emiSchedule: !kf_emischedule ? 'select a EMISchedule' : '',
       NoOfEMIs: !/^\d+$/.test(kf_numberofemi) ? 'Enter a No of EMI payment' : '',
@@ -726,18 +759,6 @@ const handleInterestRateChange = (text) => {
       if (createRecordResponse.status === 204) {
         setFormDisabled(true);
         console.log("Record created successfully in CRM");
-        // Alert.alert('Personal Loan', 'Created record Successfully.', [
-        //   {
-        //     text: 'Cancel',
-        //     style: 'cancel',
-        //   },
-        //   {
-        //     text: 'OK',
-        //     onPress: () => {
-        //       navigation.navigate('Dashboard');
-        //     },
-        //   },
-        // ]);
         handleShowAlert();
       } else {
         console.log("Failed to create a record in CRM.");
@@ -756,17 +777,14 @@ const handleInterestRateChange = (text) => {
 
   const handleCloseAlert = () => {
     setShowAlert(false);
-    // navigation.navigate('Dashboard');
   };
 
   const handleConfirmAlert = () => {
     setShowAlertConfirmation(false);
-    // navigation.navigate('Dashboard');
     navigation.goBack();
   };
 
   const handlePincodeChange = (text) => {
-    // Remove any non-numeric characters from the input
     const formattedPincode = text.replace(/[^0-9]/g, '');
     setkf_pincode(formattedPincode);
   };
@@ -779,10 +797,8 @@ const handleInterestRateChange = (text) => {
       setError('Pincode must contain only numeric characters.');
       return;
     }
-    // Pincode is valid, do something with it (e.g., send to server)
     Alert.alert('Success', 'Pincode is valid.');
   };
-
 
   return (
     <>
@@ -963,16 +979,6 @@ const handleInterestRateChange = (text) => {
             <Text style={styles.errorText}>{errorMessages.loanAmountRequested}</Text>
           )}
 
-          {/* <TextInput
-            style={[styles.textInputContainer, { marginVertical: 10 }]}
-            placeholder="Interest Rate"
-            // value={kf_interestrate}
-            value={kf_interestrate ? `${kf_interestrate}${kf_interestrate.endsWith('%') ? '' : '%'}` : ''}
-            onChangeText={handleInterestRate}
-            onBlur={handleLoanChange}
-            keyboardType="numeric"
-          /> */}
-
           <TextInput
             style={[styles.textInputContainer, { marginVertical: 10 }]}
             placeholder="Interest Rate %"
@@ -1037,10 +1043,26 @@ const handleInterestRateChange = (text) => {
             )}
           </View>
 
-          <ButtonComponent
+          {/* <ButtonComponent
             title="SUBMIT"
             onPress={handleSaveRecord}
           disabled={formDisabled}
+          /> */}
+
+          <ButtonComponent
+            title="SUBMIT"
+            onPress={() => {
+              if (errorMessages.panCardNumber === '') {
+                handleSaveRecord();
+              } else {
+                {
+                  errorMessages.panCardNumber !== '' && (
+                    <Text style={styles.errorText}>{errorMessages.panCardNumber}</Text>
+                  )
+                }0
+              }
+            }}
+            disabled={formDisabled}
           />
 
 <CustomAlert

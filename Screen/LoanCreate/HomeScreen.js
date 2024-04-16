@@ -341,25 +341,36 @@ export const HomeScreen = ({ route }) => {
   };
 
   const handlePancardNumberValidation = (text) => {
-    setkf_pannumber(text);
-
-    if (text.trim() === '') {
-      setErrorMessages({
-        ...errorMessages,
-        // panCardNumber: 'Enter a PAN Card',
-      });
-      setIsPancardNumberValid(false);
-    } else if (/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(text)) {
-      setErrorMessages({
-        ...errorMessages,
-        panCardNumber: '',
-      });
+    // Check if the PAN card field is not empty
+    if (text.trim() !== '') {
+      // Perform PAN card validation
+      if (!isValidPancard(text)) {
+        setErrorMessages((prevErrors) => ({
+          ...prevErrors,
+          panCardNumber: 'Invalid PAN card number.',
+        }));
+      } else {
+        // PAN card number is valid, clear error message
+        setErrorMessages((prevErrors) => ({
+          ...prevErrors,
+          panCardNumber: '',
+        }));
+      }
     } else {
-      setErrorMessages({
-        ...errorMessages,
-        panCardNumber: 'Enter a Valid PAN Card Number',
-      });
+      // PAN card field is empty, clear previous error message
+      setErrorMessages((prevErrors) => ({
+        ...prevErrors,
+        panCardNumber: '',
+      }));
     }
+    setkf_pannumber(text);
+  };
+  
+  const isValidPancard = (panNumber) => {
+    // Perform PAN card validation logic here
+    // Example validation: Checking if PAN card number matches a specific pattern
+    const panPattern = /[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+    return panPattern.test(panNumber);
   };
 
   const handleLoanAmountRequestedChange = (text) => {
@@ -585,7 +596,7 @@ export const HomeScreen = ({ route }) => {
       email: !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(kf_email) ? 'Enter a Valid Email Address' : '',
       loanAmountRequested: !kf_loanamountrequested ? ' Enter a Loan Amount Requested' : '',
       aadharCardNumber: !/^\d{12}$/.test(kf_aadharnumber) ? 'Enter a Valid Aadharcard Number' : '',
-      panCardNumber: !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(kf_pannumber) ? 'Enter a Valid PAN Card Number' : '',
+      // panCardNumber: !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(kf_pannumber) ? 'Enter a Valid PAN Card Number' : '',
       interestRate: !/^\d+(\.\d+)?%?$/.test(kf_interestrate) ? 'Enter a Interest Rate' : '',
       emiSchedule: !kf_emischedule ? 'select a EMISchedule' : '',
       NoOfEMIs: !/^\d+$/.test(kf_numberofemi) ? 'Enter a No of EMI payment' : '',
@@ -950,7 +961,21 @@ export const HomeScreen = ({ route }) => {
               </View>
           <ButtonComponent
             title="SUBMIT"
-            onPress={handleSaveRecord}
+            onPress={() => {
+              // Check if the PAN card number is valid
+              if (errorMessages.panCardNumber === '') {
+                // PAN card number is valid, allow submission
+                handleSaveRecord();
+              } else {
+                // PAN card number is invalid, display error message
+                // Alert.alert('Error', 'Invalid PAN card number.');
+                {
+                  errorMessages.panCardNumber !== '' && (
+                    <Text style={styles.errorText}>{errorMessages.panCardNumber}</Text>
+                  )
+                }
+              }
+            }}
             disabled={formDisabled}
           />
 
