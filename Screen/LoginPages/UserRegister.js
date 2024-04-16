@@ -303,7 +303,7 @@ export const UserRegisterScreen = ({ route }) => {
             <Text style={[styles.errorText, {top: 8}]}>{errorMessages.email}</Text>
           )}
  <ButtonComponent
-            title="Verify OTP"
+            title="Register"
             onPress={handleSaveRecord}
             disabled={formDisabled}
           />
