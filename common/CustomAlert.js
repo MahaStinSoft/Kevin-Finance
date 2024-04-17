@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal, Text, TouchableHighlight, View, StyleSheet } from 'react-native';
+
 const CustomAlert = ({ visible, onClose, message, headerMessage ,style, modalHeaderStyle, textStyle, onConfirm, Button1, Button2  }) => {
   if (!visible) return null;
 
@@ -75,4 +76,5 @@ const styles = StyleSheet.create({
         marginVertical: -5
     },
 });
+
 export default CustomAlert;

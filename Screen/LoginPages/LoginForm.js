@@ -16,8 +16,8 @@ export const LoginForm = () => {
   const [kf_password, setPassword] = useState(null);
   const [isMounted, setIsMounted] = useState(false);
   const [isConnected, setIsConnected] = useState(true);
-  const [showAlert, setShowAlert] = useState(false); 
-  const [showAlertInvalidUser, setShowAlertInvalidUser] = useState(false); 
+  const [showAlert, setShowAlert] = useState(false);
+  const [showAlertInvalidUser, setShowAlertInvalidUser] = useState(false);
 
   const navigation = useNavigation();
 
@@ -41,12 +41,7 @@ export const LoginForm = () => {
 
   const handleLogin = async () => {
 
-    // if (!isConnected) {
-    //   Alert.alert("No Internet Connection", "Please check your internet connection and try again.");
-    //   return;
-    // };
-
-    if (!kf_name || !kf_password ) {
+    if (!kf_name || !kf_password) {
       Alert.alert("Error", "Please enter both firstname and password");
       return;
     };
@@ -80,7 +75,7 @@ export const LoginForm = () => {
         const matchedUser = response.data.value.find(
           (user) => user.kf_name === kf_name && user.kf_password === kf_password
         );
-  
+
         if (matchedUser) {
           // Authentication successful, save the authentication state and navigate to the Dashboard
           try {
@@ -89,7 +84,7 @@ export const LoginForm = () => {
           } catch (error) {
             console.error('Error storing authentication state:', error);
           }
-  
+
           console.log("Authenticated user:", matchedUser);
           // console.log("response.data", response.data);
           navigation.navigate("Dashboard", { authenticatedUser: matchedUser });
@@ -132,76 +127,64 @@ export const LoginForm = () => {
   return (
     <ImageBackground source={require('../../assets/red.png')} style={styles.backgroundImage}>
       <View style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-          <View style={styles.backgroundContainer}>
-            <View style={styles.modalText}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+          <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+            <View style={styles.backgroundContainer}>
+              <View style={styles.modalText}>
 
-              <Text style={{textAlign: "center", marginBottom: 40, fontSize: 18, fontWeight: "bold",color: "red"}}>ADMINISTRATOR LOGIN</Text>
-            
-              <View style={styles.passwordContainer}>
-                <Ionicons name="person" size={20} color="#888" style={styles.icon} />
-                <TextInput
-                  placeholder="Enter Email Address"
-                  autoCapitalize="none"
-                  style={styles.input}
-                  value={kf_name}
-                  onChangeText={(text) => setName(text)}
-                />
-              </View>
-              <View style={styles.passwordContainer}>
-                <Ionicons name="lock-closed" size={20} color="#888" style={styles.icon} />
-                <TextInput
-                  placeholder="Enter Password"
-                  autoCapitalize="none"
-                  style={styles.passwordInput}
-                  secureTextEntry={!showPassword}
-                  value={kf_password}
-                  onChangeText={(text) => setPassword(text)}
-                />
-                <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                  <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={24} color="#888" style={styles.eyeIcon} />
-                </TouchableOpacity>
-              </View>
-              {/* <TouchableOpacity style={styles.Forgotpassword} onPress={() => console.log('Forgot password')}>
+                <Text style={{ textAlign: "center", marginBottom: 40, fontSize: 18, fontWeight: "bold", color: "red" }}>ADMINISTRATOR LOGIN</Text>
+
+                <View style={styles.passwordContainer}>
+                  <Ionicons name="person" size={20} color="#888" style={styles.icon} />
+                  <TextInput
+                    placeholder="Enter Email Address"
+                    autoCapitalize="none"
+                    style={styles.input}
+                    value={kf_name}
+                    onChangeText={(text) => setName(text)}
+                  />
+                </View>
+                <View style={styles.passwordContainer}>
+                  <Ionicons name="lock-closed" size={20} color="#888" style={styles.icon} />
+                  <TextInput
+                    placeholder="Enter Password"
+                    autoCapitalize="none"
+                    style={styles.passwordInput}
+                    secureTextEntry={!showPassword}
+                    value={kf_password}
+                    onChangeText={(text) => setPassword(text)}
+                  />
+                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                    <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={24} color="#888" style={styles.eyeIcon} />
+                  </TouchableOpacity>
+                </View>
+                {/* <TouchableOpacity style={styles.Forgotpassword} onPress={() => console.log('Forgot password')}>
               <Text style={styles.ForgotText}>Forgot Password?</Text>
               </TouchableOpacity> */}
-              <ButtonComponent
-                title="SIGN IN"
-                onPress={handleLogin}
-                disabled={isSignInDisabled}
-              />
+                <ButtonComponent
+                  title="SIGN IN"
+                  onPress={handleLogin}
+                  disabled={isSignInDisabled}
+                />
+              </View>
             </View>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </View>
       <CustomAlert
-  visible={showAlertInvalidUser} // Corrected the prop value
-  onClose={handledCloseInvalidAlert}
-  onConfirm={handledCloseInvalidAlert}
-  headerMessage="Invalid credentials"
-  message="Please Enter Correct Email & Password."
-  Button1="Cancel"
-  Button2="OK"
-  style={[styles.alertStyle, {height: "23%"}]}
-  modalHeaderStyle={[styles.modalheaderStyle, {right: 65}]}
-  textStyle={styles.textStyle}
-/>
-{/* <CustomAlert
-  visible={showAlertInvalidUser} // Corrected the prop value
-  onClose={handledCloseInvalidAlert}
-  onConfirm={handledCloseInvalidAlert}
-  headerMessage="Invalid credentials"
-  message="Please Enter Correct Email & Password."
-  Button1="Cancel"
-  Button2="OK"
-  style={[styles.alertStyle, {height: "23%"}]}
-  modalHeaderStyle={[styles.modalheaderStyle, {right: 65}]}
-  textStyle={styles.textStyle}
-/> */}
+        visible={showAlertInvalidUser} // Corrected the prop value
+        onClose={handledCloseInvalidAlert}
+        onConfirm={handledCloseInvalidAlert}
+        headerMessage="Invalid credentials"
+        message="Please Enter Correct Email & Password."
+        Button1="Cancel"
+        Button2="OK"
+        style={[styles.alertStyle, { height: "23%" }]}
+        modalHeaderStyle={[styles.modalheaderStyle, { right: 65 }]}
+        textStyle={styles.textStyle}
+      />
     </ImageBackground>
   );
 };
@@ -310,17 +293,17 @@ const styles = StyleSheet.create({
     fontSize: 25,
     fontWeight: "bold"
   },
-  alertStyle:{
+  alertStyle: {
     // backgroundColor: "blue",
     width: "80%",
-      },
-      modalheaderStyle:{
-        // backgroundColor: "green",
-        right: 85
-      },
-      textStyle:{
-        // backgroundColor: "yellow"
-      }
+  },
+  modalheaderStyle: {
+    // backgroundColor: "green",
+    right: 85
+  },
+  textStyle: {
+    // backgroundColor: "yellow"
+  }
 });
 
 

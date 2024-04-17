@@ -1,6 +1,5 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 
 const PersonalLoanCard = ({ personalLoan, onPress, onDelete }) => {
   
@@ -48,17 +47,11 @@ const PersonalLoanCard = ({ personalLoan, onPress, onDelete }) => {
         {renderImage()}
         <View style={styles.cardContent}>
           <Text style={styles.cardTitle}>{`${personalLoan.kf_firstname} ${personalLoan.kf_lastname} - ${personalLoan.kf_applicationnumber }`}</Text>
-           {/* <Text style={styles.cardLabel}>{`Application Number: ${personalLoan.kf_applicationnumber || ''}`}</Text> */}
           <Text style={styles.cardLabel}>{`Mobile Number: ${personalLoan.kf_mobile || ''}`}</Text>
           <Text style={styles.cardLabel}>{`Aadhar Number: ${personalLoan.kf_aadharnumber || ''}`}</Text>
           <Text style={styles.cardLabel}>{`Status: ${getLoanStatusLabel()}`}</Text>
         </View>
       </TouchableOpacity>
-      {/* <View style={styles.deleteIconContainer}>
-        <TouchableOpacity onPress={() => onDelete(personalLoan)}>
-          <Ionicons name="trash" size={25} color="red" />
-        </TouchableOpacity>
-      </View> */}
     </View>
   );
 };

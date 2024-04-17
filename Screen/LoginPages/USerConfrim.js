@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity,Alert, StyleSheet,StatusBar, BackHandler, ImageBackground, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, StyleSheet, StatusBar, BackHandler, ImageBackground, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import HeaderComponent from '../../common/Header';
 import CustomAlert from '../../common/CustomAlert';
@@ -27,8 +27,8 @@ const UserConfrim = () => {
         {
           text: 'Discard',
           onPress: () => {
-           
-            navigation.goBack(); 
+
+            navigation.goBack();
 
           },
         },
@@ -36,7 +36,6 @@ const UserConfrim = () => {
       { cancelable: false }
     );
   };
-
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -57,34 +56,32 @@ const UserConfrim = () => {
           ],
           { cancelable: false }
         );
-        return true; 
+        return true;
       }
     });
 
     return () => backHandler.remove();
   }, [navigation]);
 
-  
-
   return (
     <ImageBackground source={require('../../assets/red.png')} style={styles.backgroundImage}>
-    <View style={styles.container}>    
-    <Text style={styles.title}>Kevin Small Finance</Text>
-    </View>
-    <View style={styles.contentContainer}>
-      <Text style={styles.contenttitle}>Are you above 18 years old?</Text>
-      <Text style={styles.subTitle}>Click to proceed</Text>
-
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={handleYes} style={[styles.button, styles.leftButton]}>
-          <Text style={styles.buttonText}>Yes</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={handleNo} style={[styles.button, styles.rightButton]}>
-          <Text style={styles.buttonText}>No</Text>
-        </TouchableOpacity>
+      <View style={styles.container}>
+        <Text style={styles.title}>Kevin Small Finance</Text>
       </View>
-    </View>
+      <View style={styles.contentContainer}>
+        <Text style={styles.contenttitle}>Are you above 18 years old?</Text>
+        <Text style={styles.subTitle}>Click to proceed</Text>
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity onPress={handleYes} style={[styles.button, styles.leftButton]}>
+            <Text style={styles.buttonText}>Yes</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={handleNo} style={[styles.button, styles.rightButton]}>
+            <Text style={styles.buttonText}>No</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </ImageBackground>
   );
 };
@@ -95,7 +92,7 @@ const styles = StyleSheet.create({
     // justifyContent: 'center',
     // alignItems: 'center',
     // paddingHorizontal: 20,
-        paddingTop: StatusBar.currentHeight,
+    paddingTop: StatusBar.currentHeight,
     paddingHorizontal: 20,
   },
   contentContainer: {

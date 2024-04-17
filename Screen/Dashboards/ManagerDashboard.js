@@ -94,7 +94,6 @@ const ManagerDashboard = ({ navigation, route }) => {
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
       if (navigation.isFocused()) {
-        // If the user is on the login screen, show the exit confirmation alert
         Alert.alert(
           'Exit App',
           'Are you sure you want to exit the app?',
@@ -111,7 +110,7 @@ const ManagerDashboard = ({ navigation, route }) => {
           ],
           { cancelable: false }
         );
-        return true; // Prevent default back button behavior
+        return true; 
       }
     });
 
@@ -119,32 +118,16 @@ const ManagerDashboard = ({ navigation, route }) => {
   }, [navigation]);
 
   
-// useEffect(() => {
-  //   const backAction = () => {
-  //     // navigation.navigate('Login'); 
-  //     return true;
-  //   };
 
-  //   const backHandler = BackHandler.addEventListener(
-  //     'hardwareBackPress',
-  //     backAction
-  //   );
-
-  //   return () => backHandler.remove();
-  // }, []);
-
-  // Update displayed loans based on showAllLoans state
   useEffect(() => {
     setDisplayedHomeLoans(showAllHomeLoans ? HomeLoanRecords : HomeLoanRecords.slice(0, 3));
     setDisplayedPersonalLoans(showAllPersonalLoans ? PersonalLoanRecords : PersonalLoanRecords.slice(0, 3));
   }, [showAllHomeLoans, showAllPersonalLoans, HomeLoanRecords, PersonalLoanRecords]);
 
- // Function to toggle showing all home loans
  const toggleShowAllHomeLoans = () => {
   setShowAllHomeLoans(!showAllHomeLoans);
 };
 
-// Function to toggle showing all personal loans
 const toggleShowAllPersonalLoans = () => {
   setShowAllPersonalLoans(!showAllPersonalLoans);
 };
@@ -176,18 +159,6 @@ const toggleShowAllPersonalLoans = () => {
 
   const deviceWidth = Dimensions.get('window').width;
   const textColor = deviceWidth < 390 ? 'red' : 'blue';
-
-  const handleHomeLoan = () => {
-    navigation.navigate('HomeLoan');
-    setShowLoanModal(false);
-
-  };
-
-  const handlePersonalLoan = () => {
-    navigation.navigate("PersonalLoan");
-    console.log("Personal Selected");
-    setShowLoanModal(false);
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -314,9 +285,6 @@ const toggleShowAllPersonalLoans = () => {
                 Authorization: `Bearer ${accessToken}`,
                 "Content-Type": "application/json",
               },
-              // params: {
-              //   "$filter": `kf_createdby eq '${authenticatedUser.kf_adminname}'`
-              // }
             }
           );
 
@@ -327,9 +295,6 @@ const toggleShowAllPersonalLoans = () => {
                 Authorization: `Bearer ${accessToken}`,
                 "Content-Type": "application/json",
               },
-              // params: {
-              //   "$filter": `kf_createdby eq '${authenticatedUser.kf_adminname}'`
-              // }
             }
           );
 
@@ -375,8 +340,6 @@ const toggleShowAllPersonalLoans = () => {
     }, [authenticatedUser])
   );
 
-
-
   const filteredData = loanData.filter(
     (item) =>
       item.kf_status !== null &&
@@ -393,7 +356,6 @@ const toggleShowAllPersonalLoans = () => {
 
   const handleStatusClick = (status) => {
     if (selectedStatus === status) {
-      // If the same status is clicked again, reset the filter
       setSelectedLoanStatus(null);
     } else {
       setSelectedLoanStatus(status);
@@ -418,10 +380,8 @@ const toggleShowAllPersonalLoans = () => {
   const handleClearSearch = () => {
     setSearchQuery('');
     setShowClearIcon(false);
-    // Optionally, you can reset or re-fetch your data here
   };
   const handleRefresh = () => {
-    // This function will be called when you want to refresh the page
     setRefresh(!refresh);
   };
 
@@ -463,7 +423,6 @@ const fetchLoanApplications = async () => {
     });
 
     if (response.data && response.data.value && Array.isArray(response.data.value)) {
-      // Filter loan applications where kf_sendapproval is equal to 1
       const filteredApplications = response.data.value.filter(application => application.kf_sendapproval == 1);
       setLoanApplications(filteredApplications);
       // setRefresh(true);
@@ -505,15 +464,12 @@ const fetchNotifications = async () => {
     });
 
     if (response.data && response.data.value && Array.isArray(response.data.value)) {
-      // Filter personal loan notifications where kf_sendapproval is equal to 1
       const filteredNotifications = response.data.value.filter(notification => notification.kf_sendapproval == 1);
       setNotifications(filteredNotifications);
       // setRefresh(true);
 
-      // Schedule push notification if new notifications are fetched
       if (notifications.length < filteredNotifications.length) {
-        const newNotification = filteredNotifications[filteredNotifications.length - 1]; // Assuming the last fetched notification is the new one
-        // schedulePushNotification(newNotification.kf_applicationnumber, newNotification.kf_firstname, newNotification.kf_lastname, newNotification.kf_amount, newNotification.kf_createdby); // Schedule push notification with relevant data
+        const newNotification = filteredNotifications[filteredNotifications.length - 1]; 
       }
     } else {
       console.error('Invalid notifications response format:', response.data);
@@ -528,7 +484,6 @@ const handleCloseAlert = () => {
 };
 
   const handlelogout = () => {
-    // navigation.navigate("Setting");
     navigation.navigate('Setting', { isLoggedInAsManager: true });
   };
 
@@ -547,9 +502,6 @@ const handleCloseAlert = () => {
           <View style={styles.container}>
 
             <View style={styles.navBar}>
-              {/* <TouchableOpacity style={styles.iconButton} onPress={() => navigation.openDrawer()}>
-                <Ionicons name="list-sharp" size={25} color="#fff" />
-              </TouchableOpacity> */}
               <TouchableOpacity style={styles.iconButton} onPress={handlelogout}>
                 <Ionicons name="list-sharp" size={25} color="#fff" />
               </TouchableOpacity>
@@ -595,7 +547,6 @@ const handleCloseAlert = () => {
               showsVerticalScrollIndicator={false}
               showsHorizontalScrollIndicator={false}
             >
-
 
               <View style={styles.chart}>
                 <Text style={styles.heading}>Loan Status Chart</Text>
@@ -654,17 +605,6 @@ const handleCloseAlert = () => {
                   }}
                 />
               </View>
-
-              {/* <View style={{ marginRight: 10 }}>
-                <TouchableOpacity
-                  onPress={() => setShowAllLoans(!showAllLoans)}
-                  style={styles.viewButton}
-                >
-                  <Text style={styles.dynamicDashboardButtonText}>
-                    {showAllLoans ? 'View Less' : 'View More'}
-                  </Text>
-                </TouchableOpacity>
-              </View> */}
 
 <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 8 }}>
   {initialLoading ? (
@@ -728,7 +668,6 @@ const handleCloseAlert = () => {
     </ScrollView>
   )}
 </View>
-
 
             </ScrollView>
           </View>

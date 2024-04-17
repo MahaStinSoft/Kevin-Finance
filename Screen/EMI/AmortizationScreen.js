@@ -40,7 +40,7 @@ const AmortizationScreen = ({ route }) => {
   const scrollViewRef = useRef(null);
   const [recordsFetched, setRecordsFetched] = useState(false);
   const [saveButtonDisabled, setSaveButtonDisabled] = useState(false);
-  const [showAlert, setShowAlert] = useState(false); 
+  const [showAlert, setShowAlert] = useState(false);
 
   useEffect(() => {
     if (fetchedRecords.length >= 0) {
@@ -361,11 +361,8 @@ const AmortizationScreen = ({ route }) => {
         paymentDate.setMonth(paymentDate.getMonth() + i);
       }
 
-
-      // Format payment date
       const formattedDate = formatDate(paymentDate);
 
-      // Function to format date
       function formatDate(date) {
         const day = String(date.getDate()).padStart(2, '0');
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -468,9 +465,8 @@ const AmortizationScreen = ({ route }) => {
     await sendRecordsToCRM();
     await fetchData();
     await fetchValues();
-    setRecordsFetched(true); // Set recordsFetched to true when saving is initiated
+    setRecordsFetched(true);
     setSaveButtonDisabled(true);
-
   };
 
   const handlePress = (item) => {
@@ -480,7 +476,7 @@ const AmortizationScreen = ({ route }) => {
       principalLoanAmount: item.kf_principalloanamount,
       kf_paidstatus: item.kf_paidstatus,
       receivedDate: item.kf_receiveddate,
-      isPaid: item.kf_paidstatus, // Assuming this is the same as kf_paidstatus
+      isPaid: item.kf_paidstatus,
       remainingBalance: item.kf_remainingbalance,
       emiAmount: item.kf_emiamount,
       applicationNumber: item.kf_applicationnumber,
@@ -589,16 +585,6 @@ const AmortizationScreen = ({ route }) => {
             />
           </View>
 
-          {/* <View style={{ flexDirection: "row"}}>
-        <Text style={styles.detailsLabel}>EMI Collection date:</Text>
-        <TextInput
-          style={styles.textInputContainer}
-          value={format(kf_emicollectiondate)}
-          onChangeText={(text) => setkf_emicollectiondate()}
-          editable={false}
-        />
-      </View> */}
-
           <View style={{ flexDirection: "row" }}>
             <Text style={styles.detailsLabel}>Loan Term (Months):</Text>
             <TextInput
@@ -681,8 +667,8 @@ const AmortizationScreen = ({ route }) => {
               <View style={styles.scrollViewContent}>
                 {fetchedSavedRecords
                   .filter(record => record.kf_applicationnumber === loanDetails.applicationNumber)
-                  .sort((a, b) => new Date(b.kf_receiveddate) - new Date(a.kf_receiveddate)) // Sort in descending order based on payment date
-                  .reverse() // Reverse the array to display latest updated record first
+                  .sort((a, b) => new Date(b.kf_receiveddate) - new Date(a.kf_receiveddate))
+                  .reverse()
                   .map((item) => (
                     <View key={item.kf_loanId}>
                       <View style={styles.amortizationTile}>
@@ -726,14 +712,14 @@ const AmortizationScreen = ({ route }) => {
                 title="Create EMI Schedule"
                 onPress={() => {
                   handleSave();
-                  setRecordsFetched(true); 
+                  setRecordsFetched(true);
                 }}
                 disabled={isSaving}
-                style={{width: "50%"}}
+                style={{ width: "50%" }}
               />
-             )} 
+            )}
           </View>
-        )} 
+        )}
         <CustomAlert
           visible={showAlert}
           onClose={handleCloseAlert}
@@ -864,38 +850,35 @@ const styles = StyleSheet.create({
     marginLeft: 30
   },
   noRecordsContainer: {
-    backgroundColor: '#FFF', // Background color of the container
-    borderRadius: 8, // Border radius to make it look like a card
-    padding: 16, // Padding around the text
-    margin: 16, // Margin around the container
-    shadowColor: '#000', // Shadow color
+    backgroundColor: '#FFF', 
+    borderRadius: 8, 
+    padding: 16, 
+    margin: 16, 
+    shadowColor: '#000', 
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.25, // Shadow opacity
+    shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    elevation: 5, // Elevation for Android shadow
-    justifyContent: 'center', // Center the text vertically
-    alignItems: 'center', // Center the text horizontally
+    elevation: 5,
+    justifyContent: 'center', 
+    alignItems: 'center', 
   },
   noRecordsText: {
-    color: '#0000cc', // Text color
+    color: '#0000cc', 
     fontSize: 16,
     fontWeight: 'bold',
-    textAlign: 'center', // Center align the text
+    textAlign: 'center', 
   },
-alertStyle: {
-  // backgroundColor: "blue",
-  width: "80%",
-},
-modalheaderStyle: {
-  // backgroundColor: "green",
-  right: 85
-},
-textStyle: {
-  // backgroundColor: "yellow"
-}
+  alertStyle: {
+    width: "80%",
+  },
+  modalheaderStyle: {
+    right: 85
+  },
+  textStyle: {
+  }
 });
 
 export default AmortizationScreen;

@@ -172,7 +172,7 @@ const SignatureScreen = ({ route, navigation }) => {
   const [signatureImage, setSignatureImage] = useState(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [isLoading, setIsLoading] = useState(false); // State for loading indicator
-  const [showAlert, setShowAlertConfirmation] = useState(false); 
+  const [showAlert, setShowAlertConfirmation] = useState(false);
   const [base64Data, setBase64Data] = useState(null);
 
   const svgRef = useRef(null);
@@ -250,12 +250,12 @@ const SignatureScreen = ({ route, navigation }) => {
         quality: 1,
         result: 'base64',
       });
-  
+
       if (!capturedData) {
         console.error('Captured base64 data is undefined');
         return;
       }
-  
+
       setSignatureImage(capturedData);
       await AsyncStorage.setItem('signaturefile', capturedData);
       setBase64Data(capturedData); // Store captured data in state
@@ -316,7 +316,7 @@ const SignatureScreen = ({ route, navigation }) => {
           <View style={styles.modalContent}>
             <CardImageSignature
               title="Upload Signature"
-              setImageContent={() => {}} // Placeholder function, as setImageContent is not needed in this modal
+              setImageContent={() => { }} // Placeholder function, as setImageContent is not needed in this modal
               navigation={navigation}
               closeModal={handleModalClose} // Pass a function to close the modal
             />
@@ -330,17 +330,17 @@ const SignatureScreen = ({ route, navigation }) => {
         </View>
       )}
       <CustomAlert
-          visible={showAlert}
-          onClose={handleCloseAlert}
-          onConfirm={handleCloseAlertConfirmation}
-          headerMessage="Signature"
-          message="Signature Captutred Successfully"
-          Button1="Cancel"
-          Button2="OK"
-          style={styles.alertStyle}
-          modalHeaderStyle={[styles.modalheaderStyle, {right: 90}]}
-          textStyle={styles.textStyle}
-        />
+        visible={showAlert}
+        onClose={handleCloseAlert}
+        onConfirm={handleCloseAlertConfirmation}
+        headerMessage="Signature"
+        message="Signature Captutred Successfully"
+        Button1="Cancel"
+        Button2="OK"
+        style={styles.alertStyle}
+        modalHeaderStyle={[styles.modalheaderStyle, { right: 90 }]}
+        textStyle={styles.textStyle}
+      />
     </View>
   );
 };

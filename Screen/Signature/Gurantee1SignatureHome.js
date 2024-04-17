@@ -66,10 +66,9 @@ const Gurantee1SignatureHome = ({ route }) => {
   const handleTouchStart = (event) => {
     const { nativeEvent } = event;
     const { locationX, locationY } = nativeEvent;
-    
-    // If already drawing, don't reset the path, just set the drawing state
+
     if (!isDrawing) {
-        setPath((prevPath) => `${prevPath} M${locationX},${locationY}`);
+      setPath((prevPath) => `${prevPath} M${locationX},${locationY}`);
     }
 
     setIsDrawing(true);
@@ -96,7 +95,6 @@ const Gurantee1SignatureHome = ({ route }) => {
     clearStoredPath();
   };
 
-  
   const captureSignature = async () => {
     try {
       setIsLoading(true); // Start loading indicator
@@ -105,12 +103,12 @@ const Gurantee1SignatureHome = ({ route }) => {
         quality: 1,
         result: 'base64',
       });
-  
+
       if (!capturedData) {
         console.error('Captured base64 data is undefined');
         return;
       }
-  
+
       setSignatureImage(capturedData);
       await AsyncStorage.setItem('signaturefile', capturedData);
       setBase64Data(capturedData); // Store captured data in state
@@ -120,8 +118,7 @@ const Gurantee1SignatureHome = ({ route }) => {
       console.error('Error capturing signature:', error);
     }
   };
-  
-  
+
   useEffect(() => {
     const loadSignatureImage = async () => {
       try {
@@ -176,23 +173,23 @@ const Gurantee1SignatureHome = ({ route }) => {
         <ButtonComponent title="Done" onPress={captureSignature} style={{ width: '25%', height: 50 }} />
       </View>
       <CustomAlert
-          visible={showAlert}
-          onClose={handleCloseAlert}
-          onConfirm={handleCloseAlertConfirmation}
-          headerMessage="Signature"
-          message="Signature Captutred Successfully"
-          Button1="Cancel"
-          Button2="OK"
-          style={styles.alertStyle}
-          modalHeaderStyle={[styles.modalheaderStyle, {right: 90}]}
-          textStyle={styles.textStyle}
-        />
+        visible={showAlert}
+        onClose={handleCloseAlert}
+        onConfirm={handleCloseAlertConfirmation}
+        headerMessage="Signature"
+        message="Signature Captutred Successfully"
+        Button1="Cancel"
+        Button2="OK"
+        style={styles.alertStyle}
+        modalHeaderStyle={[styles.modalheaderStyle, { right: 90 }]}
+        textStyle={styles.textStyle}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
- 
+
 });
 
 export default Gurantee1SignatureHome;

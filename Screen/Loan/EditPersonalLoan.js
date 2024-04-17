@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, Alert, StyleSheet, ScrollView, Text,Image,TouchableOpacity} from 'react-native';
+import { View, TextInput, Button, Alert, StyleSheet, ScrollView, Text, Image, TouchableOpacity } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
@@ -46,7 +46,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
   const [emiCollectionDate, setEmiCollectionDate] = useState(new Date()); // Initialize with today's date
   const [interestRate, setInterestRate] = useState(personalLoan?.kf_interestrate || '');
   const [emiSchedule, setEmiSchedule] = useState(personalLoan?.kf_emischedule || '');
-  const [numberOfEMI, setNumberOfEMI] = useState(personalLoan?.kf_numberofemi || ''); 
+  const [numberOfEMI, setNumberOfEMI] = useState(personalLoan?.kf_numberofemi || '');
   const [eminAmount, setEmiAmount] = useState(personalLoan?.kf_emi || '');
   const [aadharcard, setAadharcard] = useState({ fileName: null, fileContent: null });
   const [pancard, setPancard] = useState({ fileName: null, fileContent: null });
@@ -71,8 +71,8 @@ const EditPersonalLoan = ({ route, navigation }) => {
   const [item, setItem] = useState(null); // Assuming you have some state to store the current item
   const [imageContent, setImageContent] = useState(null);
   const [aadharImageContent, setAadharImageContent] = useState(null);
-  const [showAlert, setShowAlert] = useState(false); 
-  const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
+  const [showAlert, setShowAlert] = useState(false);
+  const [showAlertConfirmation, setShowAlertConfirmation] = useState(false);
   // const { userapplicationid } = route.params;
   const { signatureFile, userapplicationid } = route.params;
   const [recordId, setRecordId] = useState(personalLoan.kf_personalloanid);
@@ -258,7 +258,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
           kf_sendapproval: sendApproval,
           kf_reason: reason,
           kf_userapplicantid: UserApplicantID,
-          kf_applyforloan:applyForLoan,
+          kf_applyforloan: applyForLoan,
           kf_pincode: Pincode
         },
         {
@@ -306,23 +306,10 @@ const EditPersonalLoan = ({ route, navigation }) => {
             kf_sendapproval: sendApproval,
             kf_reason: reason,
             kf_userapplicantid: UserApplicantID,
-            kf_applyforloan:applyForLoan,
+            kf_applyforloan: applyForLoan,
             kf_pincode: Pincode
           });
         }
-        // console.log(age);
-
-        // Alert.alert('Personal Loan', 'Updated the record Successfully.', [
-        //   {
-        //     text: 'cancel'
-        //   },
-        //   {
-        //     text: 'OK',
-        //     onPress: () => {
-        //       navigation.navigate('PersonalLoanDetailsScreen', { personalLoan: personalLoan });
-        //     },
-        //   },
-        // ]);
         handleShowAlert();
       } else {
         console.log('Error updating record in CRM:', updateRecordResponse);
@@ -561,33 +548,9 @@ const EditPersonalLoan = ({ route, navigation }) => {
     }
   };
 
-  // const handlePancardNumberValid = (text) => {
-  //   setPancardNumber(text);
-
-  //   if (text.trim() === '') {
-  //     setErrorMessages({
-  //       ...errorMessages,
-  //       panCardNumberEdit: 'Enter PAN Card',
-  //     });
-  //     setIsPancardNumberValid(false);
-  //   } else if (/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(text)) {
-  //     setErrorMessages({
-  //       ...errorMessages,
-  //       panCardNumberEdit: '',
-  //     });
-  //     setIsPancardNumberValid(true);
-  //   } else {
-  //     setErrorMessages({
-  //       ...errorMessages,
-  //       panCardNumberEdit: 'Enter Valid PAN Card',
-  //     });
-  //     setIsPancardNumberValid(false);
-  //   }
-  // };
-
   const handlePancardNumberValid = (text) => {
     setPancardNumber(text);
-  
+
     if (text.trim() !== '') {
       // Validate PAN card format only if it's not empty
       if (/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(text)) {
@@ -812,60 +775,6 @@ const EditPersonalLoan = ({ route, navigation }) => {
     }
   };
 
-  // const sendAnnotation2 = async () => {
-  //   try {
-  //     const tokenResponse = await axios.post(
-  //       'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
-  //       {
-  //         grant_type: 'client_credentials',
-  //         client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
-  //         resource: 'https://org0f7e6203.crm5.dynamics.com',
-  //         scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
-  //         client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
-  //       },
-  //       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
-  //     );
-
-  //     const accessToken = tokenResponse.data.access_token;
-
-  //     // Create a new annotation
-  //     const annotations = [
-  //       {
-  //         subject: 'Applicant Image',
-  //         filename: applicantImage.fileName || 'Applicant.jpg',
-  //         isdocument: true,
-  //         'objectid_kf_personalloan@odata.bind': `/kf_personalloans(${recordId})`,
-  //         documentbody: applicantImage.fileContent,
-  //       },
-  //     ];
-
-  //     const createAnnotationResponse = await axios.post(
-  //       'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
-  //       annotations,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${accessToken}`,
-  //           'Content-Type': 'application/json',
-  //         },
-  //       }
-  //     );
-
-  //     if (createAnnotationResponse.status === 204) {
-  //       console.log('ApplicantImage image annotation created successfully.');
-  //       // Alert.alert('Sucess', '');
-
-  //     } else {
-  //       console.error('Failed to create Applicant image annotation. Response:', createAnnotationResponse.data);
-  //       Alert.alert('Error', 'Failed to create Aadhar image annotation.');
-  //     }
-
-  //   } catch (error) {
-  //     console.error('Error sending Aadhar image annotation:', error.response?.data || error.message);
-  //     Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
-  //   }
-  // };
-
-
   const sendAnnotation3 = async () => {
     try {
       const tokenResponse = await axios.post(
@@ -882,7 +791,6 @@ const EditPersonalLoan = ({ route, navigation }) => {
 
       const accessToken = tokenResponse.data.access_token;
 
-      // Create a new annotation
       const annotations = [
         {
           subject: 'Signature Image',
@@ -913,7 +821,6 @@ const EditPersonalLoan = ({ route, navigation }) => {
         Alert.alert('Error', 'Failed to create Aadhar image annotation.');
       }
 
-      // Fetch and display the updated annotations
     } catch (error) {
       // console.error('Error sending Signature image annotation:', error.response?.data || error.message);
       // Alert.alert('Error', 'An error occurred while sending Aadhar image annotation.');
@@ -922,16 +829,13 @@ const EditPersonalLoan = ({ route, navigation }) => {
 
   const handleEmiCollectionDateChange = (date) => {
     setEmiCollectionDate(date);
-    // Additional handling if needed
   };
 
   const handleUpdateRecordAndSendAnnotation = () => {
     sendAnnotation();
     sendAnnotation1();
-    // sendAnnotation2();
     sendAnnotation3();
     handleUpdateRecord();
-
   };
 
   const handleViewImages = () => {
@@ -947,43 +851,23 @@ const EditPersonalLoan = ({ route, navigation }) => {
   const date = emiCollectionDate ? new Date(emiCollectionDate) : null;
   const formattedDate = date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
 
-
-  // const renderImage = () => {
-  //   if (personalLoan.kf_applicantimage) {
-  //     return (
-  //       <Image
-  //         source={{ uri: `data:image/png;base64,${personalLoan.kf_applicantimage}` }}
-  //         style={{width:100, height: 100, borderRadius: 50, objectFit:"fill", marginTop: 15, marginLeft: 15 }}
-  //       />
-  //     );
-  //   } else {
-  //     const initials = personalLoan ? `${personalLoan.kf_firstname[0]}${personalLoan.kf_lastname[0]}` : '';
-  //     return (
-  //       <View style={[styles.cardImage,{ backgroundColor:"gray",width: "100%", height: "100%" } ]}>
-  //         <Text style={styles.placeholderText}>{initials}</Text>
-  //       </View>
-  //     );
-  //   }
-  // };
-
   const renderImage = () => {
     if (personalLoan.kf_applicantimage) {
       return (
         <Image
           source={{ uri: `data:image/png;base64,${personalLoan.kf_applicantimage}` }}
-          style={{width:100, height: 100, borderRadius: 50, objectFit:"fill", marginTop: 15, marginLeft: 15 }}
+          style={{ width: 100, height: 100, borderRadius: 50, objectFit: "fill", marginTop: 15, marginLeft: 15 }}
         />
       );
     } else {
       const initials = personalLoan ? `${personalLoan.kf_firstname[0]}${personalLoan.kf_lastname[0]}` : '';
       return (
-        <View style={[styles.cardImage,{ backgroundColor:"gray",width: "100%", height: "100%" } ]}>
+        <View style={[styles.cardImage, { backgroundColor: "gray", width: "100%", height: "100%" }]}>
           <Text style={styles.placeholderText}>{initials}</Text>
         </View>
       );
     }
   };
-  
 
   const takePictureWithCamera = async () => {
     try {
@@ -998,9 +882,9 @@ const EditPersonalLoan = ({ route, navigation }) => {
       if (result.canceled) {
         return;
       }
-  
+
       const byteArray = result.base64; // Use result.base64 directly
-  
+
       setkf_applicantimage({
         fileName: 'payslip.jpg', // You can set a default file name
         fileContent: byteArray,
@@ -1019,13 +903,13 @@ const EditPersonalLoan = ({ route, navigation }) => {
         quality: 1,
         base64: true,
       });
-  
+
       if (result.canceled) {
         return;
       }
-  
+
       const byteArray = result.base64; // Use result.base64 directly
-  
+
       setkf_applicantimage({
         fileName: 'payslip.jpg', // You can set a default file name
         fileContent: byteArray,
@@ -1052,38 +936,9 @@ const EditPersonalLoan = ({ route, navigation }) => {
 
   const handleCloseAlertConfirmation = () => {
     setShowAlertConfirmation(false);
-    navigation.navigate('PersonalLoanDetailsScreen', { personalLoan: personalLoan });  
+    navigation.navigate('PersonalLoanDetailsScreen', { personalLoan: personalLoan });
   };
 
-
-  // const handleSendApproval = () => {
-  //   // If already approved, show alert to confirm sending approval
-  //   if (sendApproval) {
-  //     Alert.alert(
-  //       'Confirm Send Approval',
-  //       'Are you sure you want to send approval?',
-  //       [
-  //         {
-  //           text: 'No',
-  //           onPress: () => console.log('Approval not sent'),
-  //           style: 'cancel',
-  //         },
-  //         {
-  //           text: 'Yes',
-  //           onPress: () => {
-  //             // Handle sending approval
-  //             handleUpdateRecordAndSendAnnotation();
-  //           },
-  //         },
-  //       ],
-  //       { cancelable: false }
-  //     );
-  //   } else {
-  //     // Toggle sendApproval status if switch is not enabled
-  //     setSendApproval(previousValue => !previousValue);
-  //   }
-  // };
-  
   const handleSendApproval = (selectedOptionGender) => {
     let booleanValue;
     switch (selectedOptionGender) {
@@ -1139,21 +994,21 @@ const EditPersonalLoan = ({ route, navigation }) => {
             {
               text: 'OK',
               onPress: () => {
-                setapplyForLoan(true); 
+                setapplyForLoan(true);
                 console.log('applyForLoan set to true'); // Add logging
               },
             },
           ],
           { cancelable: false }
         );
-        return; 
+        return;
       default:
         booleanValue = null;
     }
     setapplyForLoan(booleanValue);
     console.log('applyForLoan set to', booleanValue); // Add logging
   };
-  
+
   const getLoanStatus = () => {
     switch (personalLoan.kf_status) {
       case 123950000:
@@ -1183,23 +1038,19 @@ const EditPersonalLoan = ({ route, navigation }) => {
   };
 
   const handleNavigateToGuaranteeScreen = () => {
-    // Example navigation code from the previous screen
     navigation.navigate('PersonalLoanGurantee', {
       personalLoan,
       loanStatus: getLoanStatus(),
       onUpdateSuccess: updatedpersonalLoan => setpersonalLoan(updatedpersonalLoan),
     });
-    // Pass any necessary parameters if needed
   };
 
   const handleNavigateToGuaranteeScreen2 = () => {
-    // Example navigation code from the previous screen
     navigation.navigate('PersonalLoanGurantee2', {
       personalLoan,
       loanStatus: getLoanStatus(),
       onUpdateSuccess: updatedpersonalLoan => setpersonalLoan(updatedpersonalLoan),
     });
-    // Pass any necessary parameters if needed
   };
 
   return (
@@ -1213,7 +1064,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
       />
 
       <ScrollView>
-     
+
         <View style={styles.Imagepart}>
           <View style={{ width: 100, height: 100, left: 0, bottom: 5 }}>{renderImage()}</View>
           <View style={{ right: 25, top: 30 }}>
@@ -1247,19 +1098,19 @@ const EditPersonalLoan = ({ route, navigation }) => {
           </View>
         </View>
 
-      <View style={styles.detailContainer}>
+        <View style={styles.detailContainer}>
           <View style={styles.wrapper}>
-  
-          {createdby && (
+
+            {createdby && (
               <LoanStatusPicker
-              onOptionChange={handleSendApproval}
-              title="Send Approval" // Corrected the prop name here
-              options={['Yes', 'No']}
-              Optiontitle= "Apply For Loan?"
-              initialOption={sendApproval ? 'Yes' : 'No'}
-              style={{ width: "100%", marginLeft: 0, marginTop: 5}}
-              disabled={sendApproval}
-            />
+                onOptionChange={handleSendApproval}
+                title="Send Approval" // Corrected the prop name here
+                options={['Yes', 'No']}
+                Optiontitle="Apply For Loan?"
+                initialOption={sendApproval ? 'Yes' : 'No'}
+                style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
+                disabled={sendApproval}
+              />
             )}
 
             <TextInput
@@ -1281,7 +1132,6 @@ const EditPersonalLoan = ({ route, navigation }) => {
               editable={false} // Make editable only if sendApproval is false
             />
 
-
             <TextInput
               style={[styles.textInputContainer, { marginTop: 5, color: "gray" }]}
               placeholder="User Applicant ID"
@@ -1292,7 +1142,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
             />
 
             <TextInput
-               style={[
+              style={[
                 styles.textInputContainer,
                 getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
               ]}
@@ -1301,22 +1151,22 @@ const EditPersonalLoan = ({ route, navigation }) => {
               onChangeText={(text) => {
                 if (isValidInput(text) || text === '') { // Call isValidInput function
 
-                setfirstname(text);
-                setIsfirstnameValid(text.trim() !== '');
+                  setfirstname(text);
+                  setIsfirstnameValid(text.trim() !== '');
 
-                // Update error message
-                setErrorMessages({
-                  ...errorMessages,
-                  firstNameEdit: text.trim() !== '' ? '' : 'Enter First Name',
-                });
-              }
+                  // Update error message
+                  setErrorMessages({
+                    ...errorMessages,
+                    firstNameEdit: text.trim() !== '' ? '' : 'Enter First Name',
+                  });
+                }
               }}
-              editable={getStatusStringFromNumericValue(status) !== 'Approved'} 
+              editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             {errorMessages.firstNameEdit !== '' && <Text style={styles.errorText}>{errorMessages.firstNameEdit}</Text>}
 
             <TextInput
-               style={[
+              style={[
                 styles.textInputContainer,
                 getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
               ]}
@@ -1325,64 +1175,46 @@ const EditPersonalLoan = ({ route, navigation }) => {
               onChangeText={(text) => {
                 if (isValidInput(text) || text === '') { // Call isValidInput function
 
-                setLastname(text);
-                setIsLastNameValid(text.trim() !== '')
+                  setLastname(text);
+                  setIsLastNameValid(text.trim() !== '')
 
-                setErrorMessages({
-                  ...errorMessages,
-                  lastNameEdit: text.trim() !== '' ? '' : 'Enter Last Name',
-                });
-              }
+                  setErrorMessages({
+                    ...errorMessages,
+                    lastNameEdit: text.trim() !== '' ? '' : 'Enter Last Name',
+                  });
+                }
               }}
               editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             {errorMessages.lastNameEdit !== '' && <Text style={styles.errorText}>{errorMessages.lastNameEdit}</Text>}
 
+            <View style={{ position: 'relative' }}>
+              <LoanStatusPicker
+                onOptionChange={handleGenderOptionset}
+                Optiontitle="Gender"
+                options={['Male', 'Female']}
+                initialOption={gender === 123950000 ? 'Male' : 'Female'}
+                style={[
+                  { width: "100%", marginLeft: 0, marginTop: 5 },
+                  getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' } // Change text color to gray based on loan status
+                ]}
+                disabled={getStatusStringFromNumericValue(status) === 'Approved'} // Disable the picker based on loan status
+              />
+              {getStatusStringFromNumericValue(status) === 'Approved' && (
+                <View
+                  style={{
+                    position: 'absolute',
+                    backgroundColor: 'transparent',
+                    top: 0,
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                  }}
+                />
+              )}
+            </View>
 
-            {/* <LoanStatusPicker
-              onOptionChange={handleGenderOptionset}
-              title="Gender"
-              options={['Male', 'Female']}
-              initialOption={gender === 123950000 ? 'Male' : 'Female'}
-              style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
-            /> */}
-
-<View style={{ position: 'relative' }}>
-  <LoanStatusPicker
-    onOptionChange={handleGenderOptionset}
-    Optiontitle="Gender"
-    options={['Male', 'Female']}
-    initialOption={gender === 123950000 ? 'Male' : 'Female'}
-    style={[
-      { width: "100%", marginLeft: 0, marginTop: 5 },
-      getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' } // Change text color to gray based on loan status
-    ]}
-    disabled={getStatusStringFromNumericValue(status) === 'Approved'} // Disable the picker based on loan status
-  />
-  {getStatusStringFromNumericValue(status) === 'Approved' && (
-    <View
-      style={{
-        position: 'absolute',
-        backgroundColor: 'transparent',
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
-      }}
-    />
-  )}
-</View>
-
-
-            {/* <ComponentDatePicker
-              selectedDate={dateofbirth}
-              onDateChange={handleDateOfBirth}
-              placeholder="Date of Birth"
-              style={{ width: "100%", height: 45, marginTop: 5, marginLeft: 0 }}
-            />
-            {errorMessages.dateOfBirthEdit !== '' && <Text style={styles.errorText}>{errorMessages.dateOfBirthEdit}</Text>} */}
-
-<View style={{ position: 'relative' }}>
+            <View style={{ position: 'relative' }}>
               <ComponentDatePicker
                 selectedDate={dateofbirth}
                 onDateChange={handleDateOfBirth}
@@ -1409,7 +1241,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
             {errorMessages.dateOfBirthEdit !== '' && <Text style={styles.errorText}>{errorMessages.dateOfBirthEdit}</Text>}
 
             <TextInput
-              style={[styles.textInputContainer, {color:"gray"}]}
+              style={[styles.textInputContainer, { color: "gray" }]}
               value={age.toString()}
               placeholder="Age"
               onChangeText={(text) => setage(text)}
@@ -1417,7 +1249,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
             />
 
             <TextInput
-               style={[
+              style={[
                 styles.textInputContainer,
                 getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
               ]}
@@ -1431,7 +1263,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
             )}
 
             <TextInput
-               style={[
+              style={[
                 styles.textInputContainer,
                 getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
               ]}
@@ -1445,7 +1277,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
             )}
 
             <TextInput
-               style={[
+              style={[
                 styles.textInputContainer,
                 getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
               ]}
@@ -1455,7 +1287,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
               editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             <TextInput
-               style={[
+              style={[
                 styles.textInputContainer,
                 getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
               ]}
@@ -1497,7 +1329,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
               editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             <TextInput
-               style={[
+              style={[
                 styles.textInputContainer,
                 getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
               ]}
@@ -1507,7 +1339,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
               editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
             <TextInput
-               style={[
+              style={[
                 styles.textInputContainer,
                 getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
               ]}
@@ -1521,7 +1353,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
             )}
 
             <TextInput
-               style={[
+              style={[
                 styles.textInputContainer,
                 getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
               ]}
@@ -1543,7 +1375,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
               value={loanAmountRequested ? loanAmountRequested.toString() : ''}
               onChangeText={handleLoanAmountRequestedChange}
               // editable={getStatusStringFromNumericValue(status) !== 'Approved'}
-               editable={false}
+              editable={false}
             />
             {errorMessages.loanAmountRequestedEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.loanAmountRequestedEdit}</Text>
@@ -1563,7 +1395,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
               placeholder="Interest Rate%"
               value={interestRate}
               editable={false}
-            /> 
+            />
             {/* <TextInput
               style={[styles.textInputContainer, { color: "gray" }]}
               placeholder="EMI Collection Date"
@@ -1604,7 +1436,7 @@ const EditPersonalLoan = ({ route, navigation }) => {
               editable={false}
             />
 
-            {status === 123950004 && ( // Display reason column only when status is 'Rejected'
+            {status === 123950004 && ( 
               <TextInput
                 style={[styles.textInputContainer, { color: "red" }]}
                 placeholder="Reason"
@@ -1620,27 +1452,18 @@ const EditPersonalLoan = ({ route, navigation }) => {
               style={{ width: "100%", height: 45, marginTop: 5, marginLeft: 0 }}
             />
 
-            {/* {statusReason && (
+            {UserApplicantID && (
               <LoanStatusPicker
-                onOptionChange={handleAnotherOptionChange}
-                title="Status Reason"
-                options={['AadharNotMatching', 'InvalidDocuments']}
-                initialOption={statusReason ? getAnotherOptionStringFromNumericValue(statusReason) : ''}
+                onOptionChange={handleApplyForLoan}
+                title="Apply For Loan" // Corrected the prop name here
+                options={['Yes', 'No']}
+                Optiontitle="Apply For Loan?"
+                initialOption={applyForLoan ? 'Yes' : 'No'}
                 style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
+                disabled={applyForLoan}
               />
-            )} */}
-             {UserApplicantID && (
-              <LoanStatusPicker
-              onOptionChange={handleApplyForLoan}
-              title="Apply For Loan" // Corrected the prop name here
-              options={['Yes', 'No']}
-              Optiontitle= "Apply For Loan?"
-              initialOption={applyForLoan ? 'Yes' : 'No'}
-              style={{ width: "100%", marginLeft: 0, marginTop: 5}}
-              disabled={applyForLoan}
-            />
             )}
-           <View style={styles.indentityImage}>
+            <View style={styles.indentityImage}>
               <View style={{ marginVertical: 3 }}>
                 <CardImage
                   title="AadharCard"
@@ -1677,78 +1500,57 @@ const EditPersonalLoan = ({ route, navigation }) => {
                   sendAnnotation={sendAnnotation3}
                   setImageContent={setSignature}
                 />
-              </View>           
+              </View>
 
               <View style={styles.imageView}>
-                  <RenderAnnotation
-                    annotations={annotations}
-                    filteredAnnotations={filteredAnnotations}
-                    showImage={showImage}
-                    handleViewImages={handleViewImages}
-                  />
-             </View>
+                <RenderAnnotation
+                  annotations={annotations}
+                  filteredAnnotations={filteredAnnotations}
+                  showImage={showImage}
+                  handleViewImages={handleViewImages}
+                />
+              </View>
             </View>
-           
-            <View style={{ flexDirection: "row" ,marginTop: -10,marginLeft: 30, marginBottom: 20}}>
-<TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={[styles.buttonContainer, { width: "42%", marginLeft: -15 }]}>
+
+            <View style={{ flexDirection: "row", marginTop: -10, marginLeft: 30, marginBottom: 20 }}>
+              <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={[styles.buttonContainer, { width: "42%", marginLeft: -15 }]}>
                 <Text style={styles.buttonTextGurantor}>Guarantor1</Text>
               </TouchableOpacity>
-      
+
               <TouchableOpacity
                 onPress={handleNavigateToGuaranteeScreen2}
                 style={[
                   styles.buttonContainer,
                   { width: "42%", marginLeft: 10 },
-                  !personalLoan.kf_guarantorfirstname && { backgroundColor: 'gray' } // Disable button if HomeGuarantee 1 doesn't contain any values
+                  !personalLoan.kf_guarantorfirstname && { backgroundColor: 'gray' } 
                 ]}
-                disabled={!personalLoan.kf_guarantorfirstname} // Disable button if HomeGuarantee 1 doesn't contain any values
+                disabled={!personalLoan.kf_guarantorfirstname} 
               >
                 <Text style={styles.buttonTextGurantor}>Guarantor2</Text>
               </TouchableOpacity>
             </View>
-
-       
-      {/* <View style={styles.Approval}>
-        <Text style={{ fontWeight: 'bold', marginRight: 20 }}>Send Approval</Text>
-
-        <TouchableOpacity onPress={handleSendApproval} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: sendApproval ? 'green' : 'black', paddingVertical: 5,marginRight:10, paddingHorizontal: 10, borderRadius: 20 }}>
-  <Text style={{ color: 'white', marginRight: 5 }}>{sendApproval ? 'No' : 'Yes'}</Text>
-  <View style={{ backgroundColor: 'white', borderRadius: 10, width: 30, height: 20, justifyContent: 'center', alignItems: 'center', marginLeft: 'auto' }}>
-    <Text style={{ color: sendApproval ? 'green' : 'black' }}>{sendApproval ? 'Yes' : 'No'}</Text>
-  </View>
-</TouchableOpacity>
-
-
-
-        <TouchableOpacity
-          style={[styles.saveButton, { marginLeft: 0 }]}
-          onPress={handleSendApproval} // Call handleSendApproval function when button is pressed
-        >
-          <Text style={styles.saveButtonText}>Send Approval</Text>
-        </TouchableOpacity>
-      </View> */}
           </View>
-         
+
         </View>
       </ScrollView>
       <CustomAlert
-          visible={showAlert}
-          onClose={handleCloseAlert}
-          onConfirm={handleCloseAlertConfirmation}
-          headerMessage="Personal Loan"
-          message="Record updated Successfully."
-          Button1="Cancel"
-          Button2="OK"
-          style={styles.alertStyle}
-          modalHeaderStyle={[styles.modalheaderStyle, {right: 70}]}
-          textStyle={styles.textStyle}
-        />
+        visible={showAlert}
+        onClose={handleCloseAlert}
+        onConfirm={handleCloseAlertConfirmation}
+        headerMessage="Personal Loan"
+        message="Record updated Successfully."
+        Button1="Cancel"
+        Button2="OK"
+        style={styles.alertStyle}
+        modalHeaderStyle={[styles.modalheaderStyle, { right: 70 }]}
+        textStyle={styles.textStyle}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container:{
+  container: {
     flex: 1,
     width: "100%",
     // marginBottom: 30
@@ -1757,7 +1559,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-evenly",
     backgroundColor: "white",
-     elevation: 2,
+    elevation: 2,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -1766,9 +1568,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
   },
-  indentityImage:{
-    backgroundColor:"white",
-    marginTop:5,
+  indentityImage: {
+    backgroundColor: "white",
+    marginTop: 5,
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: {
@@ -1781,7 +1583,7 @@ const styles = StyleSheet.create({
   wrapper: {
     width: '100%',
     paddingHorizontal: 20,
-    marginTop:5
+    marginTop: 5
   },
   errorText: {
     color: 'red',
@@ -1808,8 +1610,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   annotation: {
-    backgroundColor:"white",
-    marginTop:5,
+    backgroundColor: "white",
+    marginTop: 5,
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: {
@@ -1845,108 +1647,108 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
   },
-  placeholderText:{
+  placeholderText: {
     fontSize: 25,
     color: "white",
     textAlign: "center",
     margin: 32,
-    fontWeight:"bold"
+    fontWeight: "bold"
   },
-  Imagepart:{
-    flexDirection:'row',
-    marginRight:10,
+  Imagepart: {
+    flexDirection: 'row',
+    marginRight: 10,
     marginBottom: 20
   },
-  touch:{
-    flexDirection:'row',
-    marginLeft:40,
-    marginTop:15,
+  touch: {
+    flexDirection: 'row',
+    marginLeft: 40,
+    marginTop: 15,
   },
-  button:{
-    marginLeft: 10, 
+  button: {
+    marginLeft: 10,
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     backgroundColor: 'red',
     borderRadius: 50,
     width: "33%"
   },
-  buttonText:{
+  buttonText: {
     fontSize: 12,
     color: 'white',
     padding: 5,
     fontWeight: "bold"
   },
   disabledButton: {
-    marginLeft: 10, 
+    marginLeft: 10,
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     backgroundColor: 'red',
     borderRadius: 50,
     width: "33%",
-    opacity: 0.5, 
+    opacity: 0.5,
   },
   disabledButton1: {
-    marginLeft: 10, 
+    marginLeft: 10,
     // flexDirection: 'row',
     // justifyContent: 'space-evenly',
     // backgroundColor: 'red',
     borderRadius: 50,
     width: "10%",
-    opacity: 0.5, 
+    opacity: 0.5,
   },
-  imageView:{
-    marginBottom:-150,
+  imageView: {
+    marginBottom: -150,
     width: 85,
     top: -160,
-    left:200
+    left: 200
   },
-buttonContainer: {
-  backgroundColor: 'red',
-  padding: 10,
-  marginTop: 20,
-  borderRadius: 15,
-  marginRight: 40,
-  // width: "55%",
-  height: 35
-},
-buttonTextGurantor: {
-  color: 'white',
-  fontWeight: 'bold',
-  textAlign: 'center',
-  fontSize: 12,
-},
- disabledButton: {
-  backgroundColor: 'gray', 
-},
-saveButton: {
-  backgroundColor: 'red',
-  marginLeft: 10, // Adjust margin as needed
-  padding: 10,
-  borderRadius: 8,
-  justifyContent: 'center',
-  alignItems: 'center',
-  height: 40,
-},
-saveButtonText: {
-  color: 'white',
-  fontWeight: 'bold',
-},  
-Approval:{
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  marginTop: 20,
-  marginBottom: 20,
-  width: "100%",
-  elevation: 2,
-  shadowColor: '#000',
-  shadowOffset: {
-    width: 0,
-    height: 2,
+  buttonContainer: {
+    backgroundColor: 'red',
+    padding: 10,
+    marginTop: 20,
+    borderRadius: 15,
+    marginRight: 40,
+    // width: "55%",
+    height: 35
   },
-  shadowOpacity: 0.25,
-  shadowRadius: 3.84,
-}
+  buttonTextGurantor: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontSize: 12,
+  },
+  disabledButton: {
+    backgroundColor: 'gray',
+  },
+  saveButton: {
+    backgroundColor: 'red',
+    marginLeft: 10, 
+    padding: 10,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 40,
+  },
+  saveButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  Approval: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 20,
+    width: "100%",
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  }
 });
 
 

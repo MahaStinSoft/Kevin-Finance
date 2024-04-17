@@ -43,114 +43,12 @@ export const LoginUserForm = () => {
     checkAuthentication();
   }, []);
 
-  // const handleLogin = async () => {
-  //   // if (!isConnected) {
-  //   //   Alert.alert("No Internet Connection", "Please check your internet connection and try again.");
-  //   //   return;
-  //   // };
-  //   if (!kf_email || !kf_otp || kf_password) {
-  //     Alert.alert("Error", "Please enter both UserName and Password");
-  //     return;
-  //   };
-  //   try {
-  //     // Authenticate and get the access token from Dynamics CRM
-  //     const tokenResponse = await axios.post(
-  //       "https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token",
-  //       `grant_type=client_credentials&client_id=d9dcdf05-37f4-4bab-b428-323957ad2f86&client_secret=JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2&resource=https://org0f7e6203.crm5.dynamics.com&kf_email=${kf_email}&kf_otp=${kf_otp}`,
-  //       {
-  //         headers: {
-  //           "Content-Type": "application/x-www-form-urlencoded",
-  //         },
-  //       }
-  //     );
-  //     const accessToken = tokenResponse.data.access_token;
-  //     // Make requests to both kf_personalloans and kf_loanapplications tables based on the entered email
-  //     try {
-  //       const personalLoansResponse = await axios.get(
-  //         "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans?$select=kf_email,kf_mobile,kf_applicationnumber",
-  //         {
-  //           headers: {
-  //             Authorization: `Bearer ${accessToken}`,
-  //             "Content-Type": "application/json; charset=utf-8",
-  //           },
-  //         }
-  //       );
-  //       const userResponse = await axios.get(
-  //         "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_users?$select=kf_email,kf_password,kf_applicantid",
-  //         {
-  //           headers: {
-  //             Authorization: `Bearer ${accessToken}`,
-  //             "Content-Type": "application/json; charset=utf-8",
-  //           },
-  //         }
-  //       );
-  //       const loanApplicationsResponse = await axios.get(
-  //         "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications?$select=kf_email,kf_otp,kf_applicationnumber",
-  //         {
-  //           headers: {
-  //             Authorization: `Bearer ${accessToken}`,
-  //             "Content-Type": "application/json; charset=utf-8",
-  //           },
-  //         }
-  //       );
-  //       // Check if the user exists in either response
-  //       const matchedUser = userResponse.data.value.find(
-  //         (user) => user.kf_email === kf_email && user.kf_otp === kf_otp && user.kf_password === kf_password
-  //       );
-  //       if (
-  //         personalLoansResponse.status === 200 &&
-  //         loanApplicationsResponse.status === 200 &&
-  //         userResponse.status === 200 &&
-  //         (kf_email.endsWith('.com') || kf_otp.length > 0) &&
-  //         matchedUser
-  //       ) {
-  //         // Authentication successful, save the authentication state and navigate to the Dashboard
-  //         try {
-  //           await AsyncStorage.setItem('isLoggedIn', 'true');
-  //           await AsyncStorage.setItem('authenticatedUser', JSON.stringify(matchedUser));
-  //         } catch (error) {
-  //           console.error('Error storing authentication state:', error);
-  //         }
-  //         console.log("Authenticated user:", matchedUser);
-  //         // Navigate to UserDashboard with the authenticated user's data
-  //         navigation.navigate("UserDashboard", { authenticatedUser: matchedUser });
-  //       } else {
-  //         // Authentication failed, display an error message
-  //         console.log("Failed to authenticate. Invalid credentials.");
-  //         setShowAlertInvalidUser(true);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error during login:", error);
-  //       if (error.response) {
-  //         console.error("Response data:", error.response.data);
-  //         console.error("Response status:", error.response.status);
-  //         console.error("Response headers:", error.response.headers);
-  //       }
-  //       Alert.alert(
-  //         "Error",
-  //         "An unexpected error occurred. Please try again later."
-  //       );
-  //     }
-  //   } catch (error) {
-  //     console.error("Error during login:", error);
-  //     if (error.response) {
-  //       console.error("Response data:", error.response.data);
-  //       console.error("Response status:", error.response.status);
-  //       console.error("Response headers:", error.response.headers);
-  //     }
-  //     Alert.alert(
-  //       "Error",
-  //       "An unexpected error occurred. Please try again later."
-  //     );
-  //   }
-  // };
-
   const handleLogin = async () => {
     if (!kf_email || !kf_password) {
       Alert.alert("Error", "Please enter both UserName and Password");
       return;
     }
-  
+
     try {
       // Authenticate and get the access token from Dynamics CRM
       const tokenResponse = await axios.post(
@@ -163,7 +61,7 @@ export const LoginUserForm = () => {
         }
       );
       const accessToken = tokenResponse.data.access_token;
-  
+
       // Make request to get user data
       const userResponse = await axios.get(
         "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_users?$select=kf_email,kf_password,kf_applicantid",
@@ -174,12 +72,12 @@ export const LoginUserForm = () => {
           },
         }
       );
-  
+
       // Check if the user exists in the response
       const matchedUser = userResponse.data.value.find(
         (user) => user.kf_email === kf_email && user.kf_password === kf_password
       );
-  
+
       if (userResponse.status === 200 && matchedUser) {
         // Authentication successful, save the authentication state and navigate to the Dashboard
         try {
@@ -209,7 +107,7 @@ export const LoginUserForm = () => {
       );
     }
   };
-  
+
   const handledShowInvalidAlert = () => {
     setShowAlertInvalidUser(true);
   }
@@ -266,17 +164,17 @@ export const LoginUserForm = () => {
         </KeyboardAvoidingView>
       </View>
       <CustomAlert
-  visible={showAlertInvalidUser} // Corrected the prop value
-  onClose={handledCloseInvalidAlert}
-  onConfirm={handledCloseInvalidAlert}
-  headerMessage="Invalid credentials"
-  message="Please Enter Correct Email & Password."
-  Button1="Cancel"
-  Button2="OK"
-  style={[styles.alertStyle, {height: "23%"}]}
-  modalHeaderStyle={[styles.modalheaderStyle, {right: 65}]}
-  textStyle={styles.textStyle}
-/>
+        visible={showAlertInvalidUser} // Corrected the prop value
+        onClose={handledCloseInvalidAlert}
+        onConfirm={handledCloseInvalidAlert}
+        headerMessage="Invalid credentials"
+        message="Please Enter Correct Email & Password."
+        Button1="Cancel"
+        Button2="OK"
+        style={[styles.alertStyle, { height: "23%" }]}
+        modalHeaderStyle={[styles.modalheaderStyle, { right: 65 }]}
+        textStyle={styles.textStyle}
+      />
     </ImageBackground>
   );
 };
@@ -382,16 +280,16 @@ const styles = StyleSheet.create({
     fontSize: 25,
     fontWeight: "bold"
   },
-  alertStyle:{
+  alertStyle: {
     // backgroundColor: "blue",
     width: "80%",
-      },
-      modalheaderStyle:{
-        // backgroundColor: "green",
-        right: 85
-      },
-      textStyle:{
-        // backgroundColor: "yellow"
-      }
+  },
+  modalheaderStyle: {
+    // backgroundColor: "green",
+    right: 85
+  },
+  textStyle: {
+    // backgroundColor: "yellow"
+  }
 });
 export default LoginUserForm;
