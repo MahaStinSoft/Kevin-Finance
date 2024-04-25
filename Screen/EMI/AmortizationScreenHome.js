@@ -28,10 +28,10 @@ const AmortizationScreenHome = ({ route }) => {
   });
 
   // const { isPaid, NoOfEMIsPaid } = route.params;
-  const { receivedDate } = route.params;
-  const [isAmortizationLoaded, setIsAmortizationLoaded] = useState(false);
+  // const { receivedDate } = route.params;
+  // const [isAmortizationLoaded, setIsAmortizationLoaded] = useState(false);
 
-  const [kf_emicollectiondate, setkf_emicollectiondate] = useState(route.params.kf_emicollectiondate);
+  // const [kf_emicollectiondate, setkf_emicollectiondate] = useState(route.params.kf_emicollectiondate);
   const [kf_paidstatus, setkf_paidstatus] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const [createdRecords, setCreatedRecords] = useState([]);
@@ -41,7 +41,7 @@ const AmortizationScreenHome = ({ route }) => {
   const scrollViewRef = useRef(null);
   const [recordsFetched, setRecordsFetched] = useState(false);
   const [saveButtonDisabled, setSaveButtonDisabled] = useState(false);
-  const [showAlert, setShowAlert] = useState(false); 
+  const [showAlert, setShowAlert] = useState(false);
 
   useEffect(() => {
     if (fetchedRecords.length >= 0) {
@@ -361,7 +361,6 @@ const AmortizationScreenHome = ({ route }) => {
         paymentDate.setMonth(paymentDate.getMonth() + i);
       }
 
-
       // Format payment date
       const formattedDate = formatDate(paymentDate);
 
@@ -470,7 +469,7 @@ const AmortizationScreenHome = ({ route }) => {
     await sendRecordsToCRM();
     await fetchData();
     await fetchValues();
-    setRecordsFetched(true); // Set recordsFetched to true when saving is initiated
+    setRecordsFetched(true);
     setSaveButtonDisabled(true);
 
   };
@@ -482,7 +481,7 @@ const AmortizationScreenHome = ({ route }) => {
       principalLoanAmount: item.kf_principalloanamount,
       kf_paidstatus: item.kf_paidstatus,
       receivedDate: item.kf_receiveddate,
-      isPaid: item.kf_paidstatus, // Assuming this is the same as kf_paidstatus
+      isPaid: item.kf_paidstatus,
       remainingBalance: item.kf_remainingbalance,
       emiAmount: item.kf_emiamount,
       applicationNumber: item.kf_applicationnumber,
@@ -499,7 +498,6 @@ const AmortizationScreenHome = ({ route }) => {
     const year = date.getFullYear().toString();
     return `${day}/${month}/${year}`;
   };
-
 
   const handleGoBackHomedetails = () => {
     navigation.goBack();
@@ -591,16 +589,6 @@ const AmortizationScreenHome = ({ route }) => {
             />
           </View>
 
-          {/* <View style={{ flexDirection: "row"}}>
-        <Text style={styles.detailsLabel}>EMI Collection date:</Text>
-        <TextInput
-          style={styles.textInputContainer}
-          value={format(kf_emicollectiondate)}
-          onChangeText={(text) => setkf_emicollectiondate()}
-          editable={false}
-        />
-      </View> */}
-
           <View style={{ flexDirection: "row" }}>
             <Text style={styles.detailsLabel}>Loan Term (Months):</Text>
             <TextInput
@@ -683,8 +671,8 @@ const AmortizationScreenHome = ({ route }) => {
               <View style={styles.scrollViewContent}>
                 {fetchedSavedRecords
                   .filter(record => record.kf_applicationnumber === loanDetails.applicationNumber)
-                  .sort((a, b) => new Date(b.kf_receiveddate) - new Date(a.kf_receiveddate)) // Sort in descending order based on payment date
-                  .reverse() // Reverse the array to display latest updated record first
+                  .sort((a, b) => new Date(b.kf_receiveddate) - new Date(a.kf_receiveddate))
+                  .reverse()
                   .map((item) => (
                     <View key={item.kf_loanId}>
                       <View style={styles.amortizationTile}>
@@ -728,26 +716,26 @@ const AmortizationScreenHome = ({ route }) => {
                 title="Create EMI Schedule"
                 onPress={() => {
                   handleSave();
-                  setRecordsFetched(true); // Set recordsFetched to true when saving is initiated
+                  setRecordsFetched(true);
                 }}
                 disabled={isSaving}
-                style={{width: "50%"}}
+                style={{ width: "50%" }}
               />
-             )}
+            )}
           </View>
-         )} 
+        )}
         <CustomAlert
-        visible={showAlert}
-        onClose={handleCloseAlert}
-        onConfirm={handleCloseAlert}
-        headerMessage= "EMI Record"
-        message="All records created successfully"
-        Button1="Cancel"
-        Button2="OK"
-        style={styles.alertStyle}
-        modalHeaderStyle={[styles.modalheaderStyle, {right: 90}]}
-        textStyle={styles.textStyle}
-      />
+          visible={showAlert}
+          onClose={handleCloseAlert}
+          onConfirm={handleCloseAlert}
+          headerMessage="EMI Record"
+          message="All records created successfully"
+          Button1="Cancel"
+          Button2="OK"
+          style={styles.alertStyle}
+          modalHeaderStyle={[styles.modalheaderStyle, { right: 90 }]}
+          textStyle={styles.textStyle}
+        />
 
       </ScrollView>
     </View>

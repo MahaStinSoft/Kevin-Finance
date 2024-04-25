@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, Dimensions, StatusBar } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+
 const Welcome = () => {
   const navigation = useNavigation();
   const handleRegister = () => {
@@ -26,6 +27,7 @@ const Welcome = () => {
     </ImageBackground>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     paddingTop: StatusBar.currentHeight,
@@ -73,4 +75,5 @@ const styles = StyleSheet.create({
     height: Dimensions.get('window').height,
   },
 });
+
 export default Welcome;

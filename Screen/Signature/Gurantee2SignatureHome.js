@@ -152,7 +152,6 @@ const Gurantee2SignatureHome = ({ route }) => {
     navigation.navigate('HomeLoanGurantee2', { signatureImage: base64Data, loanApplication: loanApplication });
   };
 
-
   return (
     <View style={{ flex: 1, marginTop: 150 }}>
       <View style={{ height: '50%', backgroundColor: 'white', margin: 30, padding: 20, position: 'relative' }}>
@@ -193,6 +192,5 @@ const Gurantee2SignatureHome = ({ route }) => {
 const styles = StyleSheet.create({
  
 });
-
 
 export default Gurantee2SignatureHome;

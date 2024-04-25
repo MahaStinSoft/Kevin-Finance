@@ -10,26 +10,25 @@ import ButtonComponent from '../../common/ButtonComponent';
 import CardImageSignature from '../../common/CardImageSignature';
 import CustomAlert from '../../common/CustomAlert';
 
-const Gurantee1SignaturePersonal  = ({ route }) => {
-    const { personalLoan } = route.params || {};
+const Gurantee1SignaturePersonal = ({ route }) => {
+  const { personalLoan } = route.params || {};
   const [path, setPath] = useState('');
   const [signatureFile, setSignatureFile] = useState(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [showAlert, setShowAlertConfirmation] = useState(false); 
+  const [showAlert, setShowAlertConfirmation] = useState(false);
   const [base64Data, setBase64Data] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const svgRef = useRef(null);
   const navigation = useNavigation();
 
-  const [recordId, setRecordId] = useState(personalLoan?.kf_personalloanid|| '');
+  const [recordId, setRecordId] = useState(personalLoan?.kf_personalloanid || '');
 
   useEffect(() => {
     if (personalLoan) {
       setRecordId(personalLoan.kf_personalloanid);
     }
   }, [personalLoan]);
-  
 
   useEffect(() => {
     loadStoredPath();
@@ -69,10 +68,10 @@ const Gurantee1SignaturePersonal  = ({ route }) => {
   const handleTouchStart = (event) => {
     const { nativeEvent } = event;
     const { locationX, locationY } = nativeEvent;
-    
+
     // If already drawing, don't reset the path, just set the drawing state
     if (!isDrawing) {
-        setPath((prevPath) => `${prevPath} M${locationX},${locationY}`);
+      setPath((prevPath) => `${prevPath} M${locationX},${locationY}`);
     }
 
     setIsDrawing(true);
@@ -107,12 +106,12 @@ const Gurantee1SignaturePersonal  = ({ route }) => {
         quality: 1,
         result: 'base64',
       });
-  
+
       if (!capturedData) {
         console.error('Captured base64 data is undefined');
         return;
       }
-  
+
       setSignatureFile(capturedData);
       await AsyncStorage.setItem('signaturefile', capturedData);
       setBase64Data(capturedData); // Store captured data in state
@@ -122,7 +121,7 @@ const Gurantee1SignaturePersonal  = ({ route }) => {
       console.error('Error capturing signature:', error);
     }
   };
-  
+
   useEffect(() => {
     const loadSignatureFile = async () => {
       try {
@@ -182,23 +181,23 @@ const Gurantee1SignaturePersonal  = ({ route }) => {
         </View>
       )}
       <CustomAlert
-          visible={showAlert}
-          onClose={handleCloseAlert}
-          onConfirm={handleCloseAlertConfirmation}
-          headerMessage="Signature"
-          message="Signature Captutred Successfully"
-          Button1="Cancel"
-          Button2="OK"
-          style={styles.alertStyle}
-          modalHeaderStyle={[styles.modalheaderStyle, {right: 90}]}
-          textStyle={styles.textStyle}
-        />
+        visible={showAlert}
+        onClose={handleCloseAlert}
+        onConfirm={handleCloseAlertConfirmation}
+        headerMessage="Signature"
+        message="Signature Captutred Successfully"
+        Button1="Cancel"
+        Button2="OK"
+        style={styles.alertStyle}
+        modalHeaderStyle={[styles.modalheaderStyle, { right: 90 }]}
+        textStyle={styles.textStyle}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
- 
+
 });
 
-export default Gurantee1SignaturePersonal ;
+export default Gurantee1SignaturePersonal;

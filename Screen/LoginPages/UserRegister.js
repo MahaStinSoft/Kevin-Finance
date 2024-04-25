@@ -1,30 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Alert, Image, Text, TextInput, TouchableOpacity, StatusBar, Dimensions, Modal, BackHandler, ImageBackground } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert,  Text, TextInput,  Dimensions,  BackHandler, ImageBackground } from 'react-native';
 import { useNavigation, useIsFocused, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import HeaderComponent from '../../common/Header';
 import TextInputComponent from '../../common/TextInput';
 import ButtonComponent from '../../common/ButtonComponent';
-import LoanStatusPicker from '../../common/LoanStatusPicker ';
-import ComponentDatePicker from '../../common/ComponentDatePicker';
-import CustomAlert from '../../common/CustomAlert';
-import { Ionicons } from '@expo/vector-icons';
-
-// Import the generateOTP function
-function generateOTP() {
-    // Generate a random 6-digit OTP
-    var otp = Math.floor(100000 + Math.random() * 900000);
-    return otp.toString();
-}
 
 export const UserRegisterScreen = ({ route }) => {
     const [kf_name, setkf_name] = useState(null);
-    const [showPassword, setShowPassword] = useState(false);
     const [kf_mobilenumber, setkf_mobilenumber] = useState(null);
     const [kf_email, setkf_email] = useState(null);
-    const [kf_password, setkf_password] = useState(null);
-    const [kf_confirmpassword, setKf_confirmpassword] = useState(null);
     const [resetFormKey, setResetFormKey] = useState(0);
     const [authenticatedUser, setAuthenticatedUser] = useState(null);
  
@@ -46,10 +31,8 @@ export const UserRegisterScreen = ({ route }) => {
     useFocusEffect(
         React.useCallback(() => {
             getAuthenticatedUser();
-            setOTP(generateOTP()); // Generate OTP when the component is focused
         }, [])
     );
-
 
     const resetForm = () => {
       setkf_name(null);
@@ -183,8 +166,6 @@ export const UserRegisterScreen = ({ route }) => {
     }
   };
 
-
-
   const handleSaveRecord = async () => {
     setIsFormSubmitted(true);
     if (handleMobileNumberChange(kf_mobilenumber) > 10) {
@@ -234,6 +215,10 @@ export const UserRegisterScreen = ({ route }) => {
                 },
             }
         );
+
+        const locationHeader = createRecordResponse.headers['location'];
+        const recordid = locationHeader.substring(locationHeader.lastIndexOf('(') + 1, locationHeader.lastIndexOf(')'));
+        console.log("Created Record ID:", recordid);
         if (createRecordResponse.status === 204) {
             setFormDisabled(true);
             Alert.alert(
@@ -242,7 +227,9 @@ export const UserRegisterScreen = ({ route }) => {
                 [
                     {
                         text: 'OK',
-                        onPress: () => navigation.navigate('VerificationScreen', { resetState: true }),
+                        onPress: () => // After successfully registering the user
+                        navigation.navigate('VerificationScreen', { recordid:recordid }),
+                        
                     },
                 ]
             );
@@ -258,13 +245,9 @@ export const UserRegisterScreen = ({ route }) => {
     }
 };
 
-
-
   return (
     <View style={styles.container}>
-
         <ImageBackground source={require('../../assets/red.png')} style={styles.backgroundImage}>
-     
       <Text style={styles.Heading}>Registration</Text>
       <ScrollView key={resetFormKey} keyboardShouldPersistTaps="handled">
           <View style={styles.formContent}>
@@ -307,21 +290,6 @@ export const UserRegisterScreen = ({ route }) => {
             onPress={handleSaveRecord}
             disabled={formDisabled}
           />
- {/* <View style={styles.passwordContainer}>
-                  <Ionicons name="lock-closed" size={20} color="#888" style={styles.icon} /> */}
-                  {/* <TextInput
-                    placeholder="OTP "
-                    autoCapitalize="none"
-                    style={styles.passwordInput}
-                    secureTextEntry={!showPassword}
-                    value={kf_otp}
-                    onChangeText={(text) => setkf_otp(text)}
-                  /> */}
-                  {/* <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                    <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={24} color="#888" style={styles.eyeIcon} />
-                  </TouchableOpacity>
-                </View> */}
-{/* <Text>Generated OTP: {kf_otp}</Text> */}
 </View>
       </ScrollView>
       </ImageBackground>
@@ -372,10 +340,10 @@ const styles = StyleSheet.create({
     marginTop: 80
   },
   input: {
-    // marginBottom: -15, // Default marginBottom when no error message
+    // marginBottom: -15, 
 },
 errorInput: {
-    marginBottom: 50, // MarginBottom when error message is displayed
+    marginBottom: 50,
 },
 textInputContainer: {
   marginVertical: 5,

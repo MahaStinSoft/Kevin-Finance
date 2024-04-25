@@ -33,8 +33,8 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
   const [applicantImage, setapplicantImage] = useState({ fileName: null, fileContent: null });
   const [showImageModal, setShowImageModal] = useState(false);
   const [signature, setSignature] = useState({ fileName: null });
-  const [showAlert, setShowAlert] = useState(false); 
-  const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
+  const [showAlert, setShowAlert] = useState(false);
+  const [showAlertConfirmation, setShowAlertConfirmation] = useState(false);
   const [guarantorpincode, setguarantorpincode] = useState(personalLoan?.kf_guarantor2pincode || '');
 
   const [firstEMIDate, setfirstEMIDate] = useState(personalLoan?.kf_firstemidate || '');
@@ -761,7 +761,7 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
 
   const handleCloseAlertConfirmation = () => {
     setShowAlertConfirmation(false);
-    navigation.navigate('EditPersonalLoan', { personalLoan: personalLoan });  
+    navigation.navigate('EditPersonalLoan', { personalLoan: personalLoan });
   };
 
   const handlePincodeChange = (text) => {
@@ -823,15 +823,15 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
               placeholder="First Name"
               onChangeText={(text) => {
                 if (isValidInput(text) || text === '') { // Call isValidInput function
-                setfirstname(text);
-                setIsfirstnameValid(text.trim() !== '');
+                  setfirstname(text);
+                  setIsfirstnameValid(text.trim() !== '');
 
-                // Update error message
-                setErrorMessages({
-                  ...errorMessages,
-                  guarantorFirstNameEdit: text.trim() !== '' ? '' : 'Enter First Name',
-                });
-              }
+                  // Update error message
+                  setErrorMessages({
+                    ...errorMessages,
+                    guarantorFirstNameEdit: text.trim() !== '' ? '' : 'Enter First Name',
+                  });
+                }
               }}
               editable={isEditable}
             />
@@ -843,14 +843,14 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
               placeholder="Last Name"
               onChangeText={(text) => {
                 if (isValidInput(text) || text === '') { // Call isValidInput function
-                setLastname(text);
-                setIsLastNameValid(text.trim() !== '')
+                  setLastname(text);
+                  setIsLastNameValid(text.trim() !== '')
 
-                setErrorMessages({
-                  ...errorMessages,
-                  guarantorLastNameEdit: text.trim() !== '' ? '' : 'Enter Last Name',
-                });
-              }
+                  setErrorMessages({
+                    ...errorMessages,
+                    guarantorLastNameEdit: text.trim() !== '' ? '' : 'Enter Last Name',
+                  });
+                }
               }}
               editable={isEditable}
             />
@@ -982,97 +982,97 @@ const PersonalLoanGurantee2 = ({ route, navigation }) => {
               <Text style={styles.errorText}>{errorMessages.guarantorPanCardNumberEdit}</Text>
             )}
 
-{isEditable && (
-            <View style={{ backgroundColor: "white", marginTop: 15 }}>
-             <View style={{marginVertical:3}} >
-                    <CardImage
-                      title="AadharCard"
-                      imageContent={aadharcard}
-                      setImageContent={setAadharcard}
-                      // disabled={isEditable} // Set disabled based on isEditable
-                    />
-                    {errorMessages.aadharCardImage !== ''  && Gurantee2Annotation.filteredAnnotations && !selectedImage.includes(latestHG1AadharAnnotation.documentbody) &&(
-                      <Text style={styles.errorText1}>{errorMessages.aadharCardImage}</Text>
-                    )}
-                  </View>
-                  <View style={{marginVertical:3}} >
-                    <CardImage
-                      title="PanCard"
-                      imageContent={pancard}
-                      setImageContent={setPancard}
-                      disabled={isEditable} // Set disabled based on isEditable
-                    />
-                    {/* {errorMessages.panCardImage !== '' && !showImage &&(
+            {isEditable && (
+              <View style={{ backgroundColor: "white", marginTop: 15 }}>
+                <View style={{ marginVertical: 3 }} >
+                  <CardImage
+                    title="AadharCard"
+                    imageContent={aadharcard}
+                    setImageContent={setAadharcard}
+                  // disabled={isEditable} // Set disabled based on isEditable
+                  />
+                  {errorMessages.aadharCardImage !== '' && Gurantee2Annotation.filteredAnnotations && !selectedImage.includes(latestHG1AadharAnnotation.documentbody) && (
+                    <Text style={styles.errorText1}>{errorMessages.aadharCardImage}</Text>
+                  )}
+                </View>
+                <View style={{ marginVertical: 3 }} >
+                  <CardImage
+                    title="PanCard"
+                    imageContent={pancard}
+                    setImageContent={setPancard}
+                    disabled={isEditable} // Set disabled based on isEditable
+                  />
+                  {/* {errorMessages.panCardImage !== '' && !showImage &&(
                       <Text style={styles.errorText1}>{errorMessages.panCardImage}</Text>
                     )} */}
-                  </View>
-                  <View style={{marginVertical:3}}>
-                    <CardImage
-                      title="Applicant"
-                      imageContent={applicantImage}
-                      setImageContent={setapplicantImage}
-                      disabled={isEditable} // Set disabled based on isEditable
-                    />
-                    {/* {errorMessages.applicantCardImage !== '' && !showImage &&(
+                </View>
+                <View style={{ marginVertical: 3 }}>
+                  <CardImage
+                    title="Applicant"
+                    imageContent={applicantImage}
+                    setImageContent={setapplicantImage}
+                    disabled={isEditable} // Set disabled based on isEditable
+                  />
+                  {/* {errorMessages.applicantCardImage !== '' && !showImage &&(
                       <Text style={styles.errorText1}>{errorMessages.applicantCardImage}</Text>
                     )} */}
-                  </View>
-                  <View style={{marginBottom:15}} >
-                    <CardImageSignature
-                      title="Signature"
-                      imageContent={signatureFile}
-                      pickImage={handleNavigateToSignatureScreen}
-                      sendAnnotation={sendAnnotation3}
-                      disabled={isEditable} // Set disabled based on isEditable
-                    />
-                  </View>
-                  <View style={{ width: '25%',top: -200,left: 200,marginBottom: -190}}>
+                </View>
+                <View style={{ marginBottom: 15 }} >
+                  <CardImageSignature
+                    title="Signature"
+                    imageContent={signatureFile}
+                    pickImage={handleNavigateToSignatureScreen}
+                    sendAnnotation={sendAnnotation3}
+                    disabled={isEditable} // Set disabled based on isEditable
+                  />
+                </View>
+                <View style={{ width: '25%', top: -200, left: 200, marginBottom: -190 }}>
                   <Gurantee2Annotation
                     annotations={annotations}
                     filteredAnnotations={filteredAnnotations}
                     showImage={showImage}
                     handleViewImages={handleViewImages}
                   />
-             </View>
-            </View>
-            
-            )} 
+                </View>
+              </View>
+
+            )}
             {!isEditable && (
               <View style={{ backgroundColor: "white", marginTop: 15 }}>
-               <View style={{marginVertical:3}} >
-                 <View style={{marginLeft: 40,top: 10}}>
-                  <View style={styles.textImage}><Text>Aadhar Image</Text></View>                   
-                  <View style={styles.textImage}><Text>PAN Image</Text></View>
-                  <View style={styles.textImage}><Text>Applicant Image</Text></View>
-                  <View style={styles.textImage}><Text>Signature Image</Text></View>
-                    </View>
+                <View style={{ marginVertical: 3 }} >
+                  <View style={{ marginLeft: 40, top: 10 }}>
+                    <View style={styles.textImage}><Text>Aadhar Image</Text></View>
+                    <View style={styles.textImage}><Text>PAN Image</Text></View>
+                    <View style={styles.textImage}><Text>Applicant Image</Text></View>
+                    <View style={styles.textImage}><Text>Signature Image</Text></View>
                   </View>
-                  <View style={{ width:'25%',top: -180,left: 200,marginBottom: -150}}>
+                </View>
+                <View style={{ width: '25%', top: -180, left: 200, marginBottom: -150 }}>
                   <Gurantee2Annotation
                     annotations={annotations}
                     filteredAnnotations={filteredAnnotations}
                     showImage={showImage}
                     handleViewImages={handleViewImages}
                   />
-             </View>
+                </View>
               </View>
-              )}
-     
+            )}
+
           </View>
         </View>
       </ScrollView>
       <CustomAlert
-          visible={showAlert}
-          onClose={handleCloseAlert}
-          onConfirm={handleCloseAlertConfirmation}
-          headerMessage="Personal Loan"
-          message="Record updated Successfully."
-          Button1="Cancel"
-          Button2="OK"
-          style={styles.alertStyle}
-          modalHeaderStyle={[styles.modalheaderStyle, {right: 70}]}
-          textStyle={styles.textStyle}
-        />
+        visible={showAlert}
+        onClose={handleCloseAlert}
+        onConfirm={handleCloseAlertConfirmation}
+        headerMessage="Personal Loan"
+        message="Record updated Successfully."
+        Button1="Cancel"
+        Button2="OK"
+        style={styles.alertStyle}
+        modalHeaderStyle={[styles.modalheaderStyle, { right: 70 }]}
+        textStyle={styles.textStyle}
+      />
     </>
   );
 };
@@ -1120,8 +1120,8 @@ const styles = StyleSheet.create({
     // borderColor: '#ccc',
     borderRadius: 5,
   },
-  textImage:{
-    marginVertical:15
+  textImage: {
+    marginVertical: 15
   }
 });
 

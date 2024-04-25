@@ -31,7 +31,7 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [email, setEmail] = useState(loanApplication?.kf_email || '');
   const [address1, setAddress1] = useState(loanApplication?.kf_address1 || '');
   const [address2, setAddress2] = useState(loanApplication?.kf_address2 || '');
-  const [address3, setAddress3] = useState(loanApplication?.kf_address3 || '');
+  // const [address3, setAddress3] = useState(loanApplication?.kf_address3 || '');
   const [city, setCity] = useState(loanApplication?.kf_city || '');
   const [state, setState] = useState(loanApplication?.kf_state || '');
   const [loanAmountRequested, setLoanAmountRequested] = useState(loanApplication?.kf_loanamountrequested || '');
@@ -54,7 +54,7 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [Pincode, setPincode] = useState(loanApplication?.kf_pincode || '');
   const [applicantImage, setapplicantImage] = useState({ fileName: null, fileContent: null });
   // const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fileContent: null });
-  const [signature, setSignature] = useState({ fileName: null, fileContent: null  });
+  const [signature, setSignature] = useState({ fileName: null, fileContent: null });
   const [sendApproval, setSendApproval] = useState(loanApplication?.kf_sendapproval || '');
   const [reason, setReason] = useState(loanApplication?.kf_reason || '');
   const [kf_applicantimage, setkf_applicantimage] = useState({ fileName: null, fileContent: null });
@@ -74,14 +74,15 @@ const EditHomeLoan = ({ route, navigation }) => {
   const [imageContent, setImageContent] = useState(null);
   const [aadharImageContent, setAadharImageContent] = useState(null);
   const [sendApprovalDisabled, setSendApprovalDisabled] = useState(false);
-  const [showAlert, setShowAlert] = useState(false); 
-  const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
+  const [showAlert, setShowAlert] = useState(false);
+  const [showAlertConfirmation, setShowAlertConfirmation] = useState(false);
   const [applyForLoan, setapplyForLoan] = useState(loanApplication?.kf_applyforloan || '');
   // const { userapplicationid } = route.params;
   const { signatureImage, userapplicationid } = route.params;
   // const [signatureImage, setSignatureImage] = useState(null);
   const [recordId, setRecordId] = useState(loanApplication.kf_loanapplicationid);
   const [imageSource, setImageSource] = useState(null);
+  const [showConfirmationAlert, setShowConfirmationAlert] = useState(false);
 
   const [errorMessages, setErrorMessages] = useState({
     firstNameEdit: '',
@@ -118,7 +119,7 @@ const EditHomeLoan = ({ route, navigation }) => {
     setEmail(loanApplication.kf_email);
     setAddress1(loanApplication.kf_address1);
     setAddress2(loanApplication.kf_address2);
-    setAddress3(loanApplication.kf_address3);
+    // setAddress3(loanApplication.kf_address3);
     setCity(loanApplication.kf_city);
     setState(loanApplication.kf_state);
     setLoanAmountRequested(loanApplication.kf_loanamountrequested);
@@ -142,7 +143,7 @@ const EditHomeLoan = ({ route, navigation }) => {
     setAadharcard({ fileName: null, fileContent: null });
     setPancard({ fileName: null, fileContent: null });
     setkf_applicantimage({ fileName: null, fileContent: null });
-    setSignature({ fileName: null, fileContent: null  });
+    setSignature({ fileName: null, fileContent: null });
     setPincode(loanApplication.kf_pincode);
     console.log('State updated:', {
       applicationnumber,
@@ -199,9 +200,9 @@ const EditHomeLoan = ({ route, navigation }) => {
       dateOfBirthEdit: !dateofbirth ? 'Enter Date of Birth' : '',
       mobileNumberEdit: /^\d{10}$/.test(mobileNumber) ? '' : 'Please Enter a Valid 10-digit mobile number.',
       emailEdit: !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? 'Enter Email Address' : '',
-      // loanAmountRequestedEdit: !loanAmountRequested ? '' : 'Enter Loan Amount',
+      loanAmountRequestedEdit: !loanAmountRequested ? 'Enter Loan Amount' : '',
       aadharCardNumberEdit: /^\d{12}$/.test(aadharcardNumber) ? '' : 'Please Enter Valid Aadharcard Number',
-      panCardNumberEdit: !pancardNumber ? 'Enter PAN Card Number' : '',
+      panCardNumberEdit: !pancardNumber ? '' : '',
     };
     setErrorMessages(newErrorMessages);
 
@@ -239,7 +240,7 @@ const EditHomeLoan = ({ route, navigation }) => {
           kf_email: email,
           kf_address1: address1,
           kf_address2: address2,
-          kf_address3: address3,
+          // kf_address3: address3,
           kf_city: city,
           kf_state: state,
           kf_loanamountrequested: parseInt(loanAmountRequested),
@@ -259,7 +260,7 @@ const EditHomeLoan = ({ route, navigation }) => {
           kf_sendapproval: sendApproval,
           kf_reason: reason,
           kf_userapplicantid: UserApplicantID,
-          kf_applyforloan:applyForLoan,
+          kf_applyforloan: applyForLoan,
           kf_pincode: Pincode
         },
         {
@@ -288,7 +289,7 @@ const EditHomeLoan = ({ route, navigation }) => {
             kf_email: email,
             kf_address1: address1,
             kf_address2: address2,
-            kf_address3: address3,
+            // kf_address3: address3,
             kf_city: city,
             kf_state: state,
             kf_loanamountrequested: loanAmountRequested,
@@ -450,29 +451,58 @@ const EditHomeLoan = ({ route, navigation }) => {
     }
   };
 
+  // const handlePancardNumberValid = (text) => {
+  //   setPancardNumber(text);
+
+  //   if (text.trim() === '') {
+  //     setErrorMessages({
+  //       ...errorMessages,
+  //       panCardNumberEdit: 'Enter PAN Card',
+  //     });
+  //     setIsPancardNumberValid(false);
+  //   } else if (/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(text)) {
+  //     setErrorMessages({
+  //       ...errorMessages,
+  //       panCardNumberEdit: '',
+  //     });
+  //     setIsPancardNumberValid(true);
+  //   } else {
+  //     setErrorMessages({
+  //       ...errorMessages,
+  //       panCardNumberEdit: 'Enter Valid PAN Card',
+  //     });
+  //     setIsPancardNumberValid(false);
+  //   }
+  // };
+
   const handlePancardNumberValid = (text) => {
     setPancardNumber(text);
 
-    if (text.trim() === '') {
-      setErrorMessages({
-        ...errorMessages,
-        panCardNumberEdit: 'Enter PAN Card',
-      });
-      setIsPancardNumberValid(false);
-    } else if (/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(text)) {
-      setErrorMessages({
-        ...errorMessages,
-        panCardNumberEdit: '',
-      });
-      setIsPancardNumberValid(true);
+    if (text.trim() !== '') {
+      // Validate PAN card format only if it's not empty
+      if (/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(text)) {
+        setErrorMessages({
+          ...errorMessages,
+          panCardNumberEdit: '', // Reset error message if format is valid
+        });
+        setIsPancardNumberValid(true);
+      } else {
+        setErrorMessages({
+          ...errorMessages,
+          panCardNumberEdit: 'Enter Valid PAN Card',
+        });
+        setIsPancardNumberValid(false);
+      }
     } else {
+      // If PAN card is empty, allow saving without validation
       setErrorMessages({
         ...errorMessages,
-        panCardNumberEdit: 'Enter Valid PAN Card',
+        panCardNumberEdit: '', // Reset error message
       });
-      setIsPancardNumberValid(false);
+      setIsPancardNumberValid(true); // Consider it valid
     }
   };
+
 
   const handleGenderOptionset = (selectedOptionGender) => {
     let numericValue;
@@ -649,16 +679,10 @@ const EditHomeLoan = ({ route, navigation }) => {
         loanAmountRequestedEdit: 'Enter Loan Amount',
       });
     }
-    // else if (/^\d{5,7}$/.test(text) && amountRequested !== null && amountRequested >= minLoanAmount && amountRequested <= maxLoanAmount) {
-    //   setErrorMessages({
-    //     ...errorMessages,
-    //     loanAmountRequestedEdit: '',
-    //   });
-    // } 
     else {
       setErrorMessages({
         ...errorMessages,
-        // loanAmountRequestedEdit: `Enter Loan Amount (${minLoanAmount} to ${maxLoanAmount} INR)`,
+        loanAmountRequestedEdit: '',
       });
     }
   };
@@ -837,7 +861,7 @@ const EditHomeLoan = ({ route, navigation }) => {
           filename: signature.fileName || 'Signature.jpg',
           isdocument: true,
           'objectid_kf_loanapplication@odata.bind': `/kf_loanapplications(${recordId})`,
-          documentbody:  signature.fileContent ||signatureImage,
+          documentbody: signature.fileContent || signatureImage,
         },
       ];
 
@@ -1075,6 +1099,24 @@ const EditHomeLoan = ({ route, navigation }) => {
     setSendApproval(booleanValue);
   };
 
+  const handleSendApprovalConfirmation = () => {
+    Alert.alert(
+      'Confirmation',
+      'Are you sure you want to send approval?',
+      [
+        {
+          text: 'No',
+          style: 'cancel',
+        },
+        {
+          text: 'Yes',
+          onPress: () => handleUpdateRecord(),
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
   const handleApplyForLoan = (selectedOptionGender) => {
     let booleanValue;
     switch (selectedOptionGender) {
@@ -1095,21 +1137,21 @@ const EditHomeLoan = ({ route, navigation }) => {
             {
               text: 'OK',
               onPress: () => {
-                setapplyForLoan(true); 
+                setapplyForLoan(true);
                 console.log('applyForLoan set to true'); // Add logging
               },
             },
           ],
           { cancelable: false }
         );
-        return; 
+        return;
       default:
         booleanValue = null;
     }
     setapplyForLoan(booleanValue);
     console.log('applyForLoan set to', booleanValue); // Add logging
   };
-   
+
   const getSendApproval = (booleanValue) => {
     switch (booleanValue) {
       case false:
@@ -1166,18 +1208,35 @@ const EditHomeLoan = ({ route, navigation }) => {
         <View style={styles.detailContainer}>
           <View style={styles.wrapper}>
 
-          {createdby && (
-              <LoanStatusPicker
-              onOptionChange={handleSendApproval}
-              title="Send Approval" // Corrected the prop name here
-              options={['Yes', 'No']}
-              Optiontitle= "Apply For Loan?"
-              initialOption={sendApproval ? 'Yes' : 'No'}
-              style={{ width: "100%", marginLeft: 0, marginTop: 5}}
-              disabled={sendApproval}
-            />
+            {createdby && (
+              //   <LoanStatusPicker
+              //   onOptionChange={handleSendApproval}
+              //   title="Send Approval" // Corrected the prop name here
+              //   options={['Yes', 'No']}
+              //   Optiontitle= "Apply For Loan?"
+              //   initialOption={sendApproval ? 'Yes' : 'No'}
+              //   style={{ width: "100%", marginLeft: 0, marginTop: 5}}
+              //   disabled={sendApproval}
+              // />
+              <TouchableOpacity
+                onPress={handleSendApprovalConfirmation}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  backgroundColor: sendApproval ? 'green' : 'red',
+                  paddingVertical: 5,
+                  paddingHorizontal: 10,
+                  borderRadius: 20,
+                  marginRight: 10,
+                }}
+              >
+                <Text style={{ color: 'white', marginRight: 5 }}>
+                  {sendApproval ? 'Approval Sent' : 'Send Approval'}
+                </Text>
+              </TouchableOpacity>
+
             )}
-            
+
             <TextInput
               style={[styles.textInputContainer, { color: "gray" }]}
               value={applicationnumber}
@@ -1235,7 +1294,7 @@ const EditHomeLoan = ({ route, navigation }) => {
               value={lastname}
               placeholder="Last Name"
               onChangeText={(text) => {
-                if (isValidInput(text) || text === '') { 
+                if (isValidInput(text) || text === '') {
                   setLastname(text);
                   setIsLastNameValid(text.trim() !== '')
                   setErrorMessages({
@@ -1343,7 +1402,7 @@ const EditHomeLoan = ({ route, navigation }) => {
               onChangeText={(text) => setAddress2(text)}
               editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
-            <TextInput
+            {/* <TextInput
               style={[
                 styles.textInputContainer,
                 getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
@@ -1352,7 +1411,7 @@ const EditHomeLoan = ({ route, navigation }) => {
               placeholder="Address Line 3"
               onChangeText={(text) => setAddress3(text)}
               editable={getStatusStringFromNumericValue(status) !== 'Approved'}
-            />
+            /> */}
             <TextInput
               style={[
                 styles.textInputContainer,
@@ -1363,7 +1422,7 @@ const EditHomeLoan = ({ route, navigation }) => {
               onChangeText={(text) => setCity(text)}
               editable={getStatusStringFromNumericValue(status) !== 'Approved'}
             />
-            <TextInput  
+            <TextInput
               style={[
                 styles.textInputContainer,
                 getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
@@ -1416,7 +1475,7 @@ const EditHomeLoan = ({ route, navigation }) => {
 
             <TextInput
               style={[
-                styles.textInputContainer, {color: "grey"},
+                styles.textInputContainer, { color: "grey" },
                 getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' }
               ]}
               placeholder="Loan Amount Request"
@@ -1496,7 +1555,7 @@ const EditHomeLoan = ({ route, navigation }) => {
               editable={false}
             />
 
-            {status === 123950004 && ( // Display reason column only when status is 'Rejected'
+            {status === 123950004 && ( 
               <TextInput
                 style={[styles.textInputContainer, { color: "red" }]}
                 placeholder="Reason"
@@ -1506,53 +1565,28 @@ const EditHomeLoan = ({ route, navigation }) => {
             )}
 
             <ComponentDatePicker
-              selectedDate={date} // Pass the Date object directly
+              selectedDate={date}
               onDateChange={handleEmiCollectionDateChange}
               placeholder="Select EMI Collection Date"
               style={{ width: "100%", height: 45, marginTop: 5, marginLeft: 0 }}
             />
 
-            {/* <View style={{ position: 'relative' }}>
-              <ComponentDatePicker
-                selectedDate={emiCollectionDate}
-                onDateChange={handleEmiCollectionDateChange}
-                placeholder="Select EMI Collection Date"
-                style={[
-                  { width: "100%", height: 45, marginTop: 5, marginLeft: 0 },
-                  getStatusStringFromNumericValue(status) === 'Approved' && { color: 'gray' } // Change text color to gray based on loan status
-                ]}
-                onPress={() => getStatusStringFromNumericValue(status) === 'Approved' && handleEmiCollectionDateChange()} // Prevent opening date picker when disabled
-              />
-              {getStatusStringFromNumericValue(status) === 'Approved' && (
-                <View
-                  style={{
-                    position: 'absolute',
-                    backgroundColor: 'transparent',
-                    top: 0,
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                  }}
-                />
-              )}
-            </View> */}
-
             {UserApplicantID && (
               <LoanStatusPicker
-              onOptionChange={handleApplyForLoan}
-              title="Apply For Loan" // Corrected the prop name here
-              options={['Yes', 'No']}
-              Optiontitle= "Apply For Loan?"
-              initialOption={applyForLoan ? 'Yes' : 'No'}
-              style={{ width: "100%", marginLeft: 0, marginTop: 5}}
-              disabled={applyForLoan}
-            />
+                onOptionChange={handleApplyForLoan}
+                title="Apply For Loan"
+                options={['Yes', 'No']}
+                Optiontitle="Apply For Loan?"
+                initialOption={applyForLoan ? 'Yes' : 'No'}
+                style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
+                disabled={applyForLoan}
+              />
             )}
 
             <View style={styles.indentityImage}>
 
-              <View style={{ marginVertical: 3, marginHorizontal: 0  }}>
-                <CardImage 
+              <View style={{ marginVertical: 3, marginHorizontal: 0 }}>
+                <CardImage
                   title="AadharCard"
                   imageContent={aadharcard}
                   setImageContent={setAadharcard}
@@ -1567,16 +1601,12 @@ const EditHomeLoan = ({ route, navigation }) => {
                 />
               </View>
               <View style={{ marginVertical: 3 }}>
-                {/* <CardImage
-            title="Applicant"
-            imageContent={applicantImage}
-            setImageContent={setapplicantImage}
-          /> */}
+                
               </View>
               <View style={{ marginBottom: 15 }}>
                 <CardImageSignature
                   title="Signature"
-                  imageContent={signature ||signatureImage}
+                  imageContent={signature || signatureImage}
                   pickImage={handleNavigateToSignatureScreen}
                   sendAnnotation={sendAnnotation3}
                   setImageContent={setSignature}
@@ -1593,14 +1623,11 @@ const EditHomeLoan = ({ route, navigation }) => {
               </View>
             </View>
 
-            <View style={{ flexDirection: "row" ,marginTop: -20,marginLeft: 20, marginBottom: 20}}>
+            <View style={{ flexDirection: "row", marginTop: -20, marginLeft: 20, marginBottom: 20 }}>
               <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={[styles.buttonContainer, { width: "40%", marginLeft: -5 }]}>
                 <Text style={styles.buttonTextGurantor}>Guarantor1</Text>
               </TouchableOpacity>
-              {/* <TouchableOpacity onPress={handleNavigateToGuaranteeScreen2} style={[styles.buttonContainer, {width: "42%", marginLeft: 10}]}>
-            <Text style={styles.buttonText}>Guarantee2</Text>
-          </TouchableOpacity> */}
-
+             
               <TouchableOpacity
                 onPress={handleNavigateToGuaranteeScreen2}
                 style={[
@@ -1614,45 +1641,21 @@ const EditHomeLoan = ({ route, navigation }) => {
               </TouchableOpacity>
             </View>
 
-
-
-
-      {/* Send Approval Section */}
-      {/* <View style={styles.Approval}>
-        <Text style={{ fontWeight: 'bold', marginRight: 20 }}>Send Approval</Text>
-
-        <TouchableOpacity onPress={handleSendApproval} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: sendApproval ? 'green' : 'black', paddingVertical: 5,marginRight:10, paddingHorizontal: 10, borderRadius: 20 }}>
-  <Text style={{ color: 'white', marginRight: 5 }}>{sendApproval ? 'No' : 'Yes'}</Text>
-  <View style={{ backgroundColor: 'white', borderRadius: 10, width: 30, height: 20, justifyContent: 'center', alignItems: 'center', marginLeft: 'auto' }}>
-    <Text style={{ color: sendApproval ? 'green' : 'black' }}>{sendApproval ? 'Yes' : 'No'}</Text>
-  </View>
-</TouchableOpacity>
-
-
-
-        <TouchableOpacity
-          style={[styles.saveButton, { marginLeft: 0 }]}
-          onPress={handleSendApproval} // Call handleSendApproval function when button is pressed
-        >
-          <Text style={styles.saveButtonText}>Send Approval</Text>
-        </TouchableOpacity>
-      </View> */}
-
           </View>
         </View>
       </ScrollView>
       <CustomAlert
-          visible={showAlert}
-          onClose={handleCloseAlert}
-          onConfirm={handleCloseAlertConfirmation}
-          headerMessage="Home Loan"
-          message="Record updated Successfully."
-          Button1="Cancel"
-          Button2="OK"
-          style={styles.alertStyle}
-          modalHeaderStyle={[styles.modalheaderStyle, {right: 90}]}
-          textStyle={styles.textStyle}
-        />
+        visible={showAlert}
+        onClose={handleCloseAlert}
+        onConfirm={handleCloseAlertConfirmation}
+        headerMessage="Home Loan"
+        message="Record updated Successfully."
+        Button1="Cancel"
+        Button2="OK"
+        style={styles.alertStyle}
+        modalHeaderStyle={[styles.modalheaderStyle, { right: 90 }]}
+        textStyle={styles.textStyle}
+      />
     </View>
   );
 };
@@ -1811,64 +1814,61 @@ const styles = StyleSheet.create({
     top: -160,
     left: 200
   },
-  alertStyle:{
-    // backgroundColor: "blue",
+  alertStyle: {
     width: "80%",
-      },
-      modalheaderStyle:{
-        // backgroundColor: "green",
-        right: 85
-      },
-      textStyle:{
-        // backgroundColor: "yellow"
-      },
-      buttonContainer: {
-        backgroundColor: 'red',
-        padding: 10,
-        // marginTop: 10,
-        borderRadius: 15,
-        marginRight: 40,
-        width: "55%",
-        height: 35
-      },
-      buttonTextGurantor: {
-        color: 'white',
-        fontWeight: 'bold',
-        textAlign: 'center',
-        fontSize: 12,
-      }, 
-      disabledButton: {
-        backgroundColor: 'gray', 
-      },
-      saveButton: {
-        backgroundColor: 'red',
-        marginLeft: 10, // Adjust margin as needed
-        padding: 10,
-        borderRadius: 8,
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: 40,
-      },
-      saveButtonText: {
-        color: 'white',
-        fontWeight: 'bold',
-      },  
-      Approval:{
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 20,
-        marginBottom: 20,
-        width: "100%",
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: {
-          width: 0,
-          height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-      }
+  },
+  modalheaderStyle: {
+    right: 85
+  },
+  textStyle: {
+  },
+  buttonContainer: {
+    backgroundColor: 'red',
+    padding: 10,
+    // marginTop: 10,
+    borderRadius: 15,
+    marginRight: 40,
+    width: "55%",
+    height: 35
+  },
+  buttonTextGurantor: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontSize: 12,
+  },
+  disabledButton: {
+    backgroundColor: 'gray',
+  },
+  saveButton: {
+    backgroundColor: 'red',
+    marginLeft: 10, 
+    padding: 10,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 40,
+  },
+  saveButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  Approval: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 20,
+    width: "100%",
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  }
 });
 
 export default EditHomeLoan;

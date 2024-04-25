@@ -44,7 +44,7 @@
 //     };
 //     return statusLabels[statusCode] || '';
 //   };  
-  
+
 //   // Moved the declaration of fetchUser to the top of useEffect
 //   const fetchUser = async () => {
 //     try {
@@ -210,7 +210,7 @@
 //   columnTitle: {
 //     marginLeft:10,
 //     marginBottom: 5,
-    
+
 //   },
 //   columnTitleText: {
 //     fontSize: 16,
@@ -283,8 +283,8 @@ const AccountScreen = () => {
       1: 'Inactive',
     };
     return statusLabels[statusCode] || '';
-  };  
-  
+  };
+
   // Moved the declaration of fetchUser to the top of useEffect
   const fetchUser = async () => {
     try {
@@ -321,12 +321,12 @@ const AccountScreen = () => {
         const userDetails = userResponse.data;
 
         // Update the user object with the fetched details
-        setUser({ 
+        setUser({
           ...userJson,
           ...userDetails,
           genderLabel: mapGenderLabel(userDetails.gendercode),
           roleLabel: mapRoleLabel(userDetails.accountrolecode),
-          statusLabel: mapStatusLabel(userDetails.statecode), 
+          statusLabel: mapStatusLabel(userDetails.statecode),
         });
       }
     } catch (error) {
@@ -433,8 +433,8 @@ const styles = StyleSheet.create({
   },
   profileInfo: {
     marginLeft: 20,
-    padding:5, 
-    maxWidth: "75%", 
+    padding: 5,
+    maxWidth: "75%",
     // backgroundColor:"green"
   },
   profileText: {
@@ -461,7 +461,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5,
-    color:"red"
+    color: "red"
   },
   input: {
     fontSize: 15,

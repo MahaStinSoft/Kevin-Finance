@@ -16,14 +16,10 @@ import HomeScreen from './Screen/LoanCreate/HomeScreen';
 import PersonalLoan from './Screen/LoanCreate/PersonalLoan';
 import HomeLoanDetailsScreen from './Screen/userDetails/HomeLoanDetailsScreen';
 import PersonalLoanDetailsScreen from './Screen/userDetails/PersonalLoanDetailScreen';
-import ScheduleDetailsScreen from './Screen/EMI/ScheduleDetailScreen';
 import AmortizationScreen from './Screen/EMI/AmortizationScreen';
-import ScheduleDetailsScreenHomeLoan from './Screen/EMI/ScheduleDetailsScreenHomeLoan';
 import AmortizationScreenHome from './Screen/EMI/AmortizationScreenHome';
-import ToggleFormScreen from './Screen/ToggleFormScreen';
 import AccountScreen from './Screen/Account';
 import Setting from './Screen/setting';
-import Notification from './Screen/Notification';
 import LoginManagerScreen from './Screen/LoginPages/LoginManagerScreen';
 import LoginScreen from './Screen/LoginPages/LoginScreen';
 import ManagerDashboard from './Screen/Dashboards/ManagerDashboard';
@@ -35,7 +31,6 @@ import PersonalLoanGurantee from './Screen/Gaurantee/PersonalLoanGurantee';
 import PersonalLoanGurantee2 from './Screen/Gaurantee/PersonalLoanGurantee2';
 import EditLoanDetail from './Screen/EMI/EditLoanDetail';
 import SendNotification from './common/SendNotification';
-import AdminNotification from './Screen/AdminNotification';
 import Gurantee1SignatureHome from './Screen/Signature/Gurantee1SignatureHome';
 import Gurantee2SignatureHome from './Screen/Signature/Gurantee2SignatureHome';
 import Gurantee1SignaturePersonal from './Screen/Signature/Gurantee1SignaturePersonal';
@@ -43,12 +38,13 @@ import Gurantee2SignaturePersonal from './Screen/Signature/Gurantee2SignaturePer
 import LoginForm from './Screen/LoginPages/LoginForm';
 import LoginUserForm from './Screen/LoginPages/LoginUser';
 import UserDashboard from './Screen/Dashboards/UserDashboard';
-import UserLoanDetails from './Screen/EMI/UserLoanDetails';
 import UserRegisterScreen from './Screen/LoginPages/UserRegister';
 import Welcome from './Screen/LoginPages/Welcome';
 import UserConfrim from './Screen/LoginPages/USerConfrim';
 import VerificationScreen from './Screen/LoginPages/Verification';
-import UserNotification from './Screen/Dashboards/UserNotification';
+import UserNotification from './Screen/notification/UserNotification';
+import Notification from './Screen/notification/Notification';
+import AdminNotification from './Screen/notification/AdminNotification';
 
 const Stack = createNativeStackNavigator();
 
@@ -103,8 +99,6 @@ const MainScreen = () => {
           <Stack.Screen name="HomeLoanDetailsScreen" component={HomeLoanDetailsScreen} options={{ headerShown: false }} />
           <Stack.Screen name="PersonalLoanDetailsScreen" component={PersonalLoanDetailsScreen} options={{ headerShown: false }} />
           <Stack.Screen name="AmortizationScreen" component={AmortizationScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="ScheduleDetailsScreen" component={ScheduleDetailsScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="ScheduleDetailsScreenHomeLoan" component={ScheduleDetailsScreenHomeLoan} options={{ headerShown: false }} />
           <Stack.Screen name="AmortizationScreenHome" component={AmortizationScreenHome} options={{ headerShown: false }} />
           <Stack.Screen name="AccountScreen" component={AccountScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Setting" component={Setting} options={{ headerShown: false }} />
@@ -126,7 +120,6 @@ const MainScreen = () => {
           <Stack.Screen name="Gurantee2SignaturePersonal" component={Gurantee2SignaturePersonal} options={{ headerShown: false }} />
           <Stack.Screen name="LoginUserForm" component={LoginUserForm} options={{ headerShown: false }} />
           <Stack.Screen name="UserDashboard" component={UserDashboard} options={{ headerShown: false }} />
-          <Stack.Screen name="UserLoanDetails" component={UserLoanDetails} options={{ headerShown: false }} />
           <Stack.Screen name="VerificationScreen" component={VerificationScreen} options={{ headerShown: false }} />
           <Stack.Screen name="UserNotification" component={UserNotification} options={{ headerShown: false }} />
           </>

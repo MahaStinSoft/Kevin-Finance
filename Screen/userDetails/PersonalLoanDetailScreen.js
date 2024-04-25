@@ -44,8 +44,6 @@ const PersonalLoanDetailsScreen = ({ route }) => {
     setShowHomeLoanGuarantee2(!showMore);
   };
 
-
-
   const getGenderLabel = () => {
     switch (personalLoan.kf_gender) {
       case 123950000:
@@ -78,7 +76,6 @@ const PersonalLoanDetailsScreen = ({ route }) => {
         return '';
     }
   };
-
 
   const getLoanStatus = () => {
     switch (personalLoan.kf_status) {
@@ -166,13 +163,11 @@ const PersonalLoanDetailsScreen = ({ route }) => {
   // };
 
   const handleNavigateToGuaranteeScreen = () => {
-    // Example navigation code from the previous screen
     navigation.navigate('PersonalLoanGurantee', {
       personalLoan,
       loanStatus: getLoanStatus(),
       onUpdateSuccess: updatedpersonalLoan => setpersonalLoan(updatedpersonalLoan),
     });
-    // Pass any necessary parameters if needed
   };
 
   const handleNavigateToGuaranteeScreen2 = () => {
@@ -184,8 +179,6 @@ const PersonalLoanDetailsScreen = ({ route }) => {
     });
     // Pass any necessary parameters if needed
   };
-
-
 
   const handleGoToAmortizationScreen = () => {
     navigation.navigate('AmortizationScreen', {
@@ -229,7 +222,6 @@ const PersonalLoanDetailsScreen = ({ route }) => {
     return `${day}/${month}/${year}`;
   };
 
-
   const handleSendApproval = (selectedSendApproval) => {
     let booleanValue;
     switch (selectedSendApproval) {
@@ -257,7 +249,6 @@ const PersonalLoanDetailsScreen = ({ route }) => {
     }
   };
 
-
   return (
     <View style={styles.container}>
       <HeaderComponent
@@ -277,7 +268,7 @@ const PersonalLoanDetailsScreen = ({ route }) => {
           <View style={{ marginLeft: 20, marginTop: 0, width: 200, position: "relative" }}>
             <Text style={styles.cardTitle}>{personalLoan.kf_applicationnumber}</Text>
             <Text style={[styles.cardTitle]}>{`${personalLoan.kf_firstname} ${personalLoan.kf_lastname}`}</Text>
-            <View style={{ flexDirection: "row", marginTop: 10 ,width:350, height:60}}>
+            <View style={{ flexDirection: "row", marginTop: 10, width: 350, height: 60 }}>
               {/* <TouchableOpacity onPress={handleNavigateToGuaranteeScreen} style={[styles.buttonContainer, { width: "42%", marginLeft: -5 }]}>
                 <Text style={styles.buttonText}>Guarantor1</Text>
               </TouchableOpacity>
@@ -293,7 +284,7 @@ const PersonalLoanDetailsScreen = ({ route }) => {
               >
                 <Text style={styles.buttonText}>Guarantor2</Text>
               </TouchableOpacity> */}
-               <TouchableOpacity onPress={handleEdit} style={[styles.buttonContainer, { width: "42%", marginLeft: -5 }]}>
+              <TouchableOpacity onPress={handleEdit} style={[styles.buttonContainer, { width: "42%", marginLeft: -5 }]}>
                 <Text style={styles.buttonText}>Send For Approval </Text>
               </TouchableOpacity>
             </View>
@@ -301,8 +292,8 @@ const PersonalLoanDetailsScreen = ({ route }) => {
         </View>
 
         <View style={styles.personalDetailContainer} >
-      <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10, color: "red" }]}>Personal Details</Text>
-      <View style={styles.detailItem}>
+          <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10, color: "red" }]}>Personal Details</Text>
+          <View style={styles.detailItem}>
             <Text style={styles.label}>Gender</Text>
             <Text style={styles.value}>{getGenderLabel()}</Text>
           </View>
@@ -317,9 +308,9 @@ const PersonalLoanDetailsScreen = ({ route }) => {
             <Text style={styles.value}>{formatDate(personalLoan.kf_dateofbirth)}</Text>
           </View>
           <View style={styles.detailItem}>
-  <Text style={styles.label}>Send Approval</Text>
-  <Text style={styles.value}>{getSendApproval(sendApproval)}</Text>
-</View>
+            <Text style={styles.label}>Send Approval</Text>
+            <Text style={styles.value}>{getSendApproval(sendApproval)}</Text>
+          </View>
 
 
           <View style={styles.detailItem}>
@@ -376,30 +367,30 @@ const PersonalLoanDetailsScreen = ({ route }) => {
             <Text style={styles.label}>Loan Status</Text>
             <Text style={styles.value}>{getLoanStatus()}</Text>
           </View>
-        
-      </View>
 
-      <View style={styles.IndentityProofField}>
-        <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10,  color: "red" }]}>Indentity Proof</Text>
-        <View style={styles.detailItem}>
-          <Text style={styles.label}>Aadhar Number</Text>
-          <Text style={styles.value}>{personalLoan.kf_aadharnumber}</Text>
+        </View>
+
+        <View style={styles.IndentityProofField}>
+          <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10, color: "red" }]}>Indentity Proof</Text>
+          <View style={styles.detailItem}>
+            <Text style={styles.label}>Aadhar Number</Text>
+            <Text style={styles.value}>{personalLoan.kf_aadharnumber}</Text>
           </View>
 
           <View style={styles.detailItem}>
             <Text style={styles.label}>PAN Number</Text>
             <Text style={styles.value}>{personalLoan.kf_pannumber}</Text>
           </View>
-      </View>
+        </View>
 
-      <View style={styles.loanDetailContainer}>
-      <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10, color: "red" }]}>Loan Details</Text>
-      <View style={styles.detailItem}>
+        <View style={styles.loanDetailContainer}>
+          <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10, color: "red" }]}>Loan Details</Text>
+          <View style={styles.detailItem}>
             <Text style={styles.label}>Loan Amount</Text>
             <Text style={styles.value}>{personalLoan.kf_loanamountrequested}</Text>
           </View>
-          
-      <View style={styles.detailItem}>
+
+          <View style={styles.detailItem}>
             <Text style={styles.label}>EMI Schedule</Text>
             <Text style={styles.value}>{getEmiSchedule()}</Text>
           </View>
@@ -427,177 +418,176 @@ const PersonalLoanDetailsScreen = ({ route }) => {
           <View style={styles.detailItem}>
             <Text style={styles.label}>Other Charges</Text>
             <Text style={styles.value}>{personalLoan.kf_othercharges}</Text>
-          </View>     
-         </View>
-
-
-          {showHomeLoanGuarantee1 && (
-          <View style={[styles.personalDetailContainer,{marginTop:5}]} >
-          <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10,  color: "red" }]}>Guarantor 1</Text>
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> Firstname</Text>
-            <Text style={styles.value}>{personalLoan.kf_guarantorfirstname}</Text>
           </View>
-          
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> Lastname</Text>
-            <Text style={styles.value}>{personalLoan.kf_guarantorlastname}</Text>
-          </View>
+        </View>
 
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> Gender</Text>
-            <Text style={styles.value}>{getGenderLabelG1()}</Text>
-          </View>
+        {showHomeLoanGuarantee1 && (
+          <View style={[styles.personalDetailContainer, { marginTop: 5 }]} >
+            <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10, color: "red" }]}>Guarantor 1</Text>
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> Firstname</Text>
+              <Text style={styles.value}>{personalLoan.kf_guarantorfirstname}</Text>
+            </View>
 
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> Age</Text>
-            <Text style={styles.value}> {personalLoan.kf_guarantorage}</Text>
-          </View>
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> Lastname</Text>
+              <Text style={styles.value}>{personalLoan.kf_guarantorlastname}</Text>
+            </View>
 
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> Mobilenumber</Text>
-            <Text style={styles.value}>{personalLoan.kf_guarantormobilenumber}</Text>
-          </View>
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> Gender</Text>
+              <Text style={styles.value}>{getGenderLabelG1()}</Text>
+            </View>
 
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> Email</Text>
-            <Text style={styles.value}>{personalLoan.kf_guarantoremail}</Text>
-          </View>
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> Age</Text>
+              <Text style={styles.value}> {personalLoan.kf_guarantorage}</Text>
+            </View>
 
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> Address 1</Text>
-            <Text style={styles.value}>{personalLoan.kf_guarantoraddress1}</Text>
-          </View>
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> Mobilenumber</Text>
+              <Text style={styles.value}>{personalLoan.kf_guarantormobilenumber}</Text>
+            </View>
 
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> Address 2</Text>
-            <Text style={styles.value}>{personalLoan.kf_guarantoraddress2}</Text>
-          </View>
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> Email</Text>
+              <Text style={styles.value}>{personalLoan.kf_guarantoremail}</Text>
+            </View>
 
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> Address 3</Text>
-            <Text style={styles.value}>{personalLoan.kf_guarantoraddress3}</Text>
-          </View>
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> Address 1</Text>
+              <Text style={styles.value}>{personalLoan.kf_guarantoraddress1}</Text>
+            </View>
 
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> City</Text>
-            <Text style={styles.value}>{personalLoan.kf_guarantorcity}</Text>
-          </View>
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> Address 2</Text>
+              <Text style={styles.value}>{personalLoan.kf_guarantoraddress2}</Text>
+            </View>
 
-          <View style={styles.detailItem}>
-            <Text style={styles.label}>Pincode</Text>
-            <Text style={styles.value}>{personalLoan.kf_guarantorpincode}</Text>
-          </View>
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> Address 3</Text>
+              <Text style={styles.value}>{personalLoan.kf_guarantoraddress3}</Text>
+            </View>
 
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> State</Text>
-            <Text style={styles.value}>{personalLoan.kf_guarantorstate}</Text>
-          </View>
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> City</Text>
+              <Text style={styles.value}>{personalLoan.kf_guarantorcity}</Text>
+            </View>
 
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> Aadharnumber</Text>
-            <Text style={styles.value}>{personalLoan.kf_guarantoraadharnumber}</Text>
-          </View>
+            <View style={styles.detailItem}>
+              <Text style={styles.label}>Pincode</Text>
+              <Text style={styles.value}>{personalLoan.kf_guarantorpincode}</Text>
+            </View>
 
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> Pannumber</Text>
-            <Text style={styles.value}>{personalLoan.kf_guarantorpannumber}</Text>
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> State</Text>
+              <Text style={styles.value}>{personalLoan.kf_guarantorstate}</Text>
+            </View>
+
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> Aadharnumber</Text>
+              <Text style={styles.value}>{personalLoan.kf_guarantoraadharnumber}</Text>
+            </View>
+
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> Pannumber</Text>
+              <Text style={styles.value}>{personalLoan.kf_guarantorpannumber}</Text>
+            </View>
           </View>
-        </View>  
-          )}  
+        )}
 
         {showHomeLoanGuarantee2 && personalLoan.kf_guarantor2firstname && (
-          <View style={[styles.personalDetailContainer,{marginTop:5}]} >
-          <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10,  color: "red" }]}>Guarantor 2</Text>
+          <View style={[styles.personalDetailContainer, { marginTop: 5 }]} >
+            <Text style={[styles.cardLabel, { fontSize: 15, fontWeight: "bold", marginBottom: 10, color: "red" }]}>Guarantor 2</Text>
 
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> Firstname</Text>
-            <Text style={styles.value}>{personalLoan.kf_guarantor2firstname}</Text>
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> Firstname</Text>
+              <Text style={styles.value}>{personalLoan.kf_guarantor2firstname}</Text>
+            </View>
+
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> Lastname</Text>
+              <Text style={styles.value}>{personalLoan.kf_guarantor2lastname}</Text>
+            </View>
+
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> Gender</Text>
+              <Text style={styles.value}>{getGenderLabelG2()}</Text>
+            </View>
+
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> Dateofbirth</Text>
+              <Text style={styles.value}>{formatDate(personalLoan.kf_guarantor2dateofbirth)}</Text>
+            </View>
+
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> Age</Text>
+              <Text style={styles.value}>{personalLoan.kf_guarantor2age}</Text>
+            </View>
+
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> Mobilenumber</Text>
+              <Text style={styles.value}>{personalLoan.kf_guarantor2mobilenumber}</Text>
+            </View>
+
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> Email</Text>
+              <Text style={styles.value}>{personalLoan.kf_guarantor2email}</Text>
+            </View>
+
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> Address 1</Text>
+              <Text style={styles.value}>{personalLoan.kf_guarantor2address1}</Text>
+            </View>
+
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> Address 2</Text>
+              <Text style={styles.value}>{personalLoan.kf_guarantor2address1}</Text>
+            </View>
+
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> Address 3</Text>
+              <Text style={styles.value}>{personalLoan.kf_guarantor2address1}</Text>
+            </View>
+
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> City</Text>
+              <Text style={styles.value}>{personalLoan.kf_guarantor2city}</Text>
+            </View>
+
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> Pincode</Text>
+              <Text style={styles.value}>{personalLoan.kf_guarantor2pincode}</Text>
+            </View>
+
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> State</Text>
+              <Text style={styles.value}>{personalLoan.kf_guarantor2state}</Text>
+            </View>
+
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> Aadharnumber</Text>
+              <Text style={styles.value}>{personalLoan.kf_guarantor2aadharnumber}</Text>
+            </View>
+
+            <View style={styles.detailItem}>
+              <Text style={styles.label}> Pannumber</Text>
+              <Text style={styles.value}>{personalLoan.kf_guarantor2pannumber}</Text>
+            </View>
           </View>
-
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> Lastname</Text>
-            <Text style={styles.value}>{personalLoan.kf_guarantor2lastname}</Text>
-          </View>
-
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> Gender</Text>
-            <Text style={styles.value}>{getGenderLabelG2()}</Text>
-          </View>
-
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> Dateofbirth</Text>
-            <Text style={styles.value}>{formatDate(personalLoan.kf_guarantor2dateofbirth)}</Text>
-          </View>
-
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> Age</Text>
-            <Text style={styles.value}>{personalLoan.kf_guarantor2age}</Text>
-          </View>
-
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> Mobilenumber</Text>
-            <Text style={styles.value}>{personalLoan.kf_guarantor2mobilenumber}</Text>
-          </View>
-
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> Email</Text>
-            <Text style={styles.value}>{personalLoan.kf_guarantor2email}</Text>
-          </View>
-
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> Address 1</Text>
-            <Text style={styles.value}>{personalLoan.kf_guarantor2address1}</Text>
-          </View>
-
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> Address 2</Text>
-            <Text style={styles.value}>{personalLoan.kf_guarantor2address1}</Text>
-          </View>
-
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> Address 3</Text>
-            <Text style={styles.value}>{personalLoan.kf_guarantor2address1}</Text>
-          </View>
-
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> City</Text>
-            <Text style={styles.value}>{personalLoan.kf_guarantor2city}</Text>
-          </View>
-
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> Pincode</Text>
-            <Text style={styles.value}>{personalLoan.kf_guarantor2pincode}</Text>
-          </View>
-
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> State</Text>
-            <Text style={styles.value}>{personalLoan.kf_guarantor2state}</Text>
-          </View>
-
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> Aadharnumber</Text>
-            <Text style={styles.value}>{personalLoan.kf_guarantor2aadharnumber}</Text>
-          </View>
-
-          <View style={styles.detailItem}>
-            <Text style={styles.label}> Pannumber</Text>
-            <Text style={styles.value}>{personalLoan.kf_guarantor2pannumber}</Text>
-          </View>  
-        </View> 
-          )}
+        )}
 
         <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
-            <ButtonComponent style={{ width: "30%", }}
-              title={showMore ? "View less" : "View more"}
-              onPress={handleShowMoreToggle}
-            />
-            <ButtonComponent
-              style={[styles.calculateButton, { width: "30%"}, getLoanStatus() !== 'Approved' && styles.disabledButton,]}
-              title="Pay EMI"
-              onPress={handleGoToAmortizationScreen}
-              disabled={getLoanStatus() !== 'Approved'}
-            />
+          <ButtonComponent style={{ width: "30%", }}
+            title={showMore ? "View less" : "View more"}
+            onPress={handleShowMoreToggle}
+          />
+          <ButtonComponent
+            style={[styles.calculateButton, { width: "30%" }, getLoanStatus() !== 'Approved' && styles.disabledButton,]}
+            title="Pay EMI"
+            onPress={handleGoToAmortizationScreen}
+            disabled={getLoanStatus() !== 'Approved'}
+          />
         </View>
 
       </ScrollView>
@@ -716,7 +706,7 @@ const styles = StyleSheet.create({
     // backgroundColor: 'red',
   },
   disabledButton: {
-    backgroundColor: 'gray', 
+    backgroundColor: 'gray',
   },
   detailItem: {
     flexDirection: 'row',

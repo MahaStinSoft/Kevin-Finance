@@ -49,14 +49,14 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
   const [annotations, setAnnotations] = useState([]);
   const [aadharImageContent, setAadharImageContent] = useState(null);
   const [showImage, setShowImage] = useState(true);
-  const [showAlert, setShowAlert] = useState(false); 
-  const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
+  const [showAlert, setShowAlert] = useState(false);
+  const [showAlertConfirmation, setShowAlertConfirmation] = useState(false);
 
   const [recordId, setRecordId] = useState(personalLoan.kf_personalloanid);
 
   const { signatureFile } = route.params;
   const { loanStatus } = route.params;
-  console.log('signature',signatureFile);
+  console.log('signature', signatureFile);
 
   const [errorMessages, setErrorMessages] = useState({
     guarantorFirstNameEdit: '',
@@ -93,7 +93,7 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
     setAadharcard({ fileName: null, fileContent: null });
     setPancard({ fileName: null, fileContent: null });
     setapplicantImage({ fileName: null, fileContent: null });
-    setSignature({ fileName: null});
+    setSignature({ fileName: null });
     setguarantorpincode(personalLoan.kf_guarantorpincode);
     setRecordId(personalLoan.kf_personalloanid);
     console.log('State updated:', {
@@ -461,7 +461,7 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
         },
       ];
 
-   console.log('documentbody',signatureFile);
+      console.log('documentbody', signatureFile);
 
       const createAnnotationResponse = await axios.post(
         'https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/annotations',
@@ -758,7 +758,7 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
 
   const handleCloseAlertConfirmation = () => {
     setShowAlertConfirmation(false);
-    navigation.navigate('EditPersonalLoan', { personalLoan: personalLoan });  
+    navigation.navigate('EditPersonalLoan', { personalLoan: personalLoan });
   };
 
   const handlePincodeChange = (text) => {
@@ -821,15 +821,15 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
               placeholder="First Name"
               onChangeText={(text) => {
                 if (isValidInput(text) || text === '') { // Call isValidInput function
-                setfirstname(text);
-                setIsfirstnameValid(text.trim() !== '');
+                  setfirstname(text);
+                  setIsfirstnameValid(text.trim() !== '');
 
-                // Update error message
-                setErrorMessages({
-                  ...errorMessages,
-                  guarantorFirstNameEdit: text.trim() !== '' ? '' : 'Enter First Name',
-                });
-              }
+                  // Update error message
+                  setErrorMessages({
+                    ...errorMessages,
+                    guarantorFirstNameEdit: text.trim() !== '' ? '' : 'Enter First Name',
+                  });
+                }
               }}
               editable={isEditable}
             />
@@ -841,42 +841,42 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
               placeholder="Last Name"
               onChangeText={(text) => {
                 if (isValidInput(text) || text === '') { // Call isValidInput function
-                setLastname(text);
-                setIsLastNameValid(text.trim() !== '')
+                  setLastname(text);
+                  setIsLastNameValid(text.trim() !== '')
 
-                setErrorMessages({
-                  ...errorMessages,
-                  guarantorLastNameEdit: text.trim() !== '' ? '' : 'Enter Last Name',
-                });
-              }
+                  setErrorMessages({
+                    ...errorMessages,
+                    guarantorLastNameEdit: text.trim() !== '' ? '' : 'Enter Last Name',
+                  });
+                }
               }}
               editable={isEditable}
             />
             {errorMessages.guarantorLastNameEdit !== '' && <Text style={styles.errorText}>{errorMessages.guarantorLastNameEdit}</Text>}
 
-{isEditable ? (
-            <LoanStatusPicker
-              onOptionChange={handleGenderOptionset}
-              title="Gender"
-              options={['Male', 'Female']}
-              Optiontitle="Gender"
-              initialOption={guarantorgender ? getGenderOptionsetStringFromNumericValue(guarantorgender) : 'Gender'}
-              style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
-            />
+            {isEditable ? (
+              <LoanStatusPicker
+                onOptionChange={handleGenderOptionset}
+                title="Gender"
+                options={['Male', 'Female']}
+                Optiontitle="Gender"
+                initialOption={guarantorgender ? getGenderOptionsetStringFromNumericValue(guarantorgender) : 'Gender'}
+                style={{ width: "100%", marginLeft: 0, marginTop: 5 }}
+              />
             ) : (
-              <Text style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}>
+              <Text style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}>
                 {guarantorgender ? getGenderOptionsetStringFromNumericValue(guarantorgender) : 'Gender'}
               </Text>
             )}
             {isEditable ? (
-            <ComponentDatePicker
-              selectedDate={guarantordateofbirth}
-              onDateChange={handleDateOfBirth}
-              placeholder="Date of Birth"
-              style={{ width: "100%", height: 45, marginTop: 5, marginLeft: 0 }}
-            />
+              <ComponentDatePicker
+                selectedDate={guarantordateofbirth}
+                onDateChange={handleDateOfBirth}
+                placeholder="Date of Birth"
+                style={{ width: "100%", height: 45, marginTop: 5, marginLeft: 0 }}
+              />
             ) : (
-              <Text style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}>
+              <Text style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}>
                 {guarantordateofbirth ? guarantordateofbirth.toLocaleDateString() : "Date of Birth"}
               </Text>
             )}
@@ -884,7 +884,7 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
 
 
             <TextInput
-              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
               value={guarantorage.toString()}
               placeholder="Age"
               onChangeText={(text) => setage(text)}
@@ -892,7 +892,7 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
             />
 
             <TextInput
-              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
               value={guarantormobilenumber}
               placeholder="Mobile Number"
               onChangeText={handleMobileNumberChange}
@@ -903,7 +903,7 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
             )}
 
             <TextInput
-              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
               value={guarantoremail}
               placeholder="Email"
               onChangeText={handleEmailChange}
@@ -914,28 +914,28 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
             )}
 
             <TextInput
-              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
               value={guarantoraddress1}
               placeholder="Address Line 1"
               onChangeText={(text) => setAddress1(text)}
               editable={isEditable}
             />
             <TextInput
-              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
               value={guarantoraddress2}
               placeholder="Address Line 2"
               onChangeText={(text) => setAddress2(text)}
               editable={isEditable}
             />
             <TextInput
-              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
               value={guarantoraddress3}
               placeholder="Address Line 3"
               onChangeText={(text) => setAddress3(text)}
               editable={isEditable}
             />
             <TextInput
-              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
               value={guarantorcity}
               placeholder="City"
               onChangeText={(text) => setCity(text)}
@@ -951,14 +951,14 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
               editable={isEditable}
             />
             <TextInput
-              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
               value={guarantorstate}
               placeholder="State"
               onChangeText={(text) => setState(text)}
               editable={isEditable}
             />
             <TextInput
-              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
               value={guarantoraadharnumber}
               placeholder="Aadharcard Number"
               onChangeText={handleAadharCardNumberChange}
@@ -970,7 +970,7 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
 
 
             <TextInput
-              style={[styles.textInputContainer,  { color: isEditable ? "black" : "gray" }]}
+              style={[styles.textInputContainer, { color: isEditable ? "black" : "gray" }]}
               value={guarantorpannumber}
               placeholder="PAN Card Number"
               onChangeText={handlePancardNumberValid}
@@ -979,97 +979,97 @@ const PersonalLoanGurantee = ({ route, navigation }) => {
             {errorMessages.guarantorPanCardNumberEdit !== '' && (
               <Text style={styles.errorText}>{errorMessages.guarantorPanCardNumberEdit}</Text>
             )}
- {isEditable && (
-            <View style={{ backgroundColor: "white", marginTop: 15 }}>
-             <View style={{marginVertical:3}} >
-                    <CardImage
-                      title="AadharCard"
-                      imageContent={aadharcard}
-                      setImageContent={setAadharcard}
-                      // disabled={isEditable} // Set disabled based on isEditable
-                    />
-                    {errorMessages.aadharCardImage !== ''  && Gurantee1AnnotationHome.filteredAnnotations && !selectedImage.includes(latestHG1AadharAnnotation.documentbody) &&(
-                      <Text style={styles.errorText1}>{errorMessages.aadharCardImage}</Text>
-                    )}
-                  </View>
-                  <View style={{marginVertical:3}} >
-                    <CardImage
-                      title="PanCard"
-                      imageContent={pancard}
-                      setImageContent={setPancard}
-                      disabled={isEditable} // Set disabled based on isEditable
-                    />
-                    {/* {errorMessages.panCardImage !== '' && !showImage &&(
+            {isEditable && (
+              <View style={{ backgroundColor: "white", marginTop: 15 }}>
+                <View style={{ marginVertical: 3 }} >
+                  <CardImage
+                    title="AadharCard"
+                    imageContent={aadharcard}
+                    setImageContent={setAadharcard}
+                  // disabled={isEditable} // Set disabled based on isEditable
+                  />
+                  {errorMessages.aadharCardImage !== '' && Gurantee1AnnotationHome.filteredAnnotations && !selectedImage.includes(latestHG1AadharAnnotation.documentbody) && (
+                    <Text style={styles.errorText1}>{errorMessages.aadharCardImage}</Text>
+                  )}
+                </View>
+                <View style={{ marginVertical: 3 }} >
+                  <CardImage
+                    title="PanCard"
+                    imageContent={pancard}
+                    setImageContent={setPancard}
+                    disabled={isEditable} // Set disabled based on isEditable
+                  />
+                  {/* {errorMessages.panCardImage !== '' && !showImage &&(
                       <Text style={styles.errorText1}>{errorMessages.panCardImage}</Text>
                     )} */}
-                  </View>
-                  <View style={{marginVertical:3}}>
-                    <CardImage
-                      title="Applicant"
-                      imageContent={applicantImage}
-                      setImageContent={setapplicantImage}
-                      disabled={isEditable} // Set disabled based on isEditable
-                    />
-                    {/* {errorMessages.applicantCardImage !== '' && !showImage &&(
+                </View>
+                <View style={{ marginVertical: 3 }}>
+                  <CardImage
+                    title="Applicant"
+                    imageContent={applicantImage}
+                    setImageContent={setapplicantImage}
+                    disabled={isEditable} // Set disabled based on isEditable
+                  />
+                  {/* {errorMessages.applicantCardImage !== '' && !showImage &&(
                       <Text style={styles.errorText1}>{errorMessages.applicantCardImage}</Text>
                     )} */}
-                  </View>
-                  <View style={{marginBottom:15}} >
-                    <CardImageSignature
-                      title="Signature"
-                      imageContent={signatureFile}
-                      pickImage={handleNavigateToSignatureScreen}
-                      sendAnnotation={sendAnnotation3}
-                      disabled={isEditable} // Set disabled based on isEditable
-                    />
-                  </View>
-                  <View style={{ width: '25%',top: -200,left: 200,marginBottom: -190}}>
+                </View>
+                <View style={{ marginBottom: 15 }} >
+                  <CardImageSignature
+                    title="Signature"
+                    imageContent={signatureFile}
+                    pickImage={handleNavigateToSignatureScreen}
+                    sendAnnotation={sendAnnotation3}
+                    disabled={isEditable} // Set disabled based on isEditable
+                  />
+                </View>
+                <View style={{ width: '25%', top: -200, left: 200, marginBottom: -190 }}>
                   <Gurantee1AnnotationHome
                     annotations={annotations}
                     filteredAnnotations={filteredAnnotations}
                     showImage={showImage}
                     handleViewImages={handleViewImages}
                   />
-             </View>
-            </View>
-            
-            )} 
+                </View>
+              </View>
+
+            )}
             {!isEditable && (
               <View style={{ backgroundColor: "white", marginTop: 15 }}>
-               <View style={{marginVertical:3}} >
-                 <View style={{marginLeft: 40,top: 10}}>
-                  <View style={styles.textImage}><Text>Aadhar Image</Text></View>                   
-                  <View style={styles.textImage}><Text>PAN Image</Text></View>
-                  <View style={styles.textImage}><Text>Applicant Image</Text></View>
-                  <View style={styles.textImage}><Text>Signature Image</Text></View>
-                    </View>
+                <View style={{ marginVertical: 3 }} >
+                  <View style={{ marginLeft: 40, top: 10 }}>
+                    <View style={styles.textImage}><Text>Aadhar Image</Text></View>
+                    <View style={styles.textImage}><Text>PAN Image</Text></View>
+                    <View style={styles.textImage}><Text>Applicant Image</Text></View>
+                    <View style={styles.textImage}><Text>Signature Image</Text></View>
                   </View>
-                  <View style={{ width:'25%',top: -180,left: 200,marginBottom: -150}}>
+                </View>
+                <View style={{ width: '25%', top: -180, left: 200, marginBottom: -150 }}>
                   <Gurantee1AnnotationHome
                     annotations={annotations}
                     filteredAnnotations={filteredAnnotations}
                     showImage={showImage}
                     handleViewImages={handleViewImages}
                   />
-             </View>
+                </View>
               </View>
-              )}
-     
+            )}
+
           </View>
         </View>
       </ScrollView>
       <CustomAlert
-          visible={showAlert}
-          onClose={handleCloseAlert}
-          onConfirm={handleCloseAlertConfirmation}
-          headerMessage="Personal Loan"
-          message="Record updated Successfully."
-          Button1="Cancel"
-          Button2="OK"
-          style={styles.alertStyle}
-          modalHeaderStyle={[styles.modalheaderStyle, {right: 70}]}
-          textStyle={styles.textStyle}
-        />
+        visible={showAlert}
+        onClose={handleCloseAlert}
+        onConfirm={handleCloseAlertConfirmation}
+        headerMessage="Personal Loan"
+        message="Record updated Successfully."
+        Button1="Cancel"
+        Button2="OK"
+        style={styles.alertStyle}
+        modalHeaderStyle={[styles.modalheaderStyle, { right: 70 }]}
+        textStyle={styles.textStyle}
+      />
     </>
   );
 };
@@ -1117,8 +1117,8 @@ const styles = StyleSheet.create({
     // borderColor: '#ccc',
     borderRadius: 5,
   },
-  textImage:{
-    marginVertical:15
+  textImage: {
+    marginVertical: 15
   }
 });
 

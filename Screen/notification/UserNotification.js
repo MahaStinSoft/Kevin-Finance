@@ -10,7 +10,7 @@ import HeaderComponent from '../../common/Header';
 const UserNotification = ({ navigation, route }) => {
   const [loanApplications, setLoanApplications] = useState([]);
   const [notifications, setNotifications] = useState([]);
-  const { authenticatedUser, userapplicationid } = route.params; 
+  const { authenticatedUser, userapplicationid } = route.params;
 
   useEffect(() => {
     fetchLoanApplicationsUser();
@@ -117,7 +117,7 @@ const UserNotification = ({ navigation, route }) => {
 
       // Update kf_markasread field in CRM
       await updateKfMarkAsRead(loanApplication.kf_loanapplicationid, accessToken);
-      
+
       navigation.navigate('HomeLoanDetailsScreen', { loanApplication });
     } catch (error) {
       console.error('Error updating kf_markasread:', error);
@@ -160,7 +160,7 @@ const UserNotification = ({ navigation, route }) => {
       <ScrollView>
         <View style={styles.container}>
           <View style={styles.notificationContainer}>
-            
+
             <Text style={styles.header}>Home Loan</Text>
             {loanApplications.map((application, index) => (
               <View key={index} style={styles.itemContainer}>
@@ -172,7 +172,7 @@ const UserNotification = ({ navigation, route }) => {
                 <Text style={styles.textContent}>Mobile Number: {application.kf_mobilenumber}</Text>
                 <Text style={styles.textContent}>Loan Status: {statusNames[application.kf_status]}</Text>
                 <View style={styles.buttonContainer}>
-                <Button title="View Record" onPress={() => handleViewHomeLoan(application)} style={{width: "50%"}}/>
+                  <Button title="View Record" onPress={() => handleViewHomeLoan(application)} style={{ width: "50%" }} />
                 </View>
               </View>
             ))}
@@ -190,7 +190,7 @@ const UserNotification = ({ navigation, route }) => {
                 <Text style={styles.textContent}>Mobile Number: {notification.kf_mobile}</Text>
                 <Text style={styles.textContent}>Loan Status: {statusNames[notification.kf_status]}</Text>
                 <View style={styles.buttonContainer}>
-                <Button title="View Record" onPress={() => sendNotification(notification)} />
+                  <Button title="View Record" onPress={() => sendNotification(notification)} />
                 </View>
               </View>
             ))}

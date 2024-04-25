@@ -26,7 +26,7 @@ export const HomeScreen = ({ route }) => {
   const [kf_email, setkf_email] = useState(null);
   const [kf_address1, setkf_address1] = useState(null);
   const [kf_address2, setkf_address2] = useState(null);
-  const [kf_address3, setkf_address3] = useState(null);
+  // const [kf_address3, setkf_address3] = useState(null);
   const [kf_city, setkf_city] = useState(null);
   const [kf_state, setkf_state] = useState(null);
   const [kf_loanamountrequested, setkf_loanamountrequested] = useState(null);
@@ -57,8 +57,8 @@ export const HomeScreen = ({ route }) => {
   const [isPancardNumberValid, setIsPancardNumberValid] = useState(true);
   const [isLoanAmountValid, setIsLoanAmountValid] = useState(true);
   const [isEmiCollectionDateTouched, setIsEmiCollectionDateTouched] = useState(false);
-  const [showAlert, setShowAlert] = useState(false); 
-  const [showAlertConfirmation, setShowAlertConfirmation] = useState(false); 
+  const [showAlert, setShowAlert] = useState(false);
+  const [showAlertConfirmation, setShowAlertConfirmation] = useState(false);
   const [showAlertDiscardChanges, setShowAlertDiscardChanges] = useState(false);
   const [kf_userapplicantid, setkf_userid] = useState(null);
   const [kf_pincode, setkf_pincode] = useState(null);
@@ -112,7 +112,7 @@ export const HomeScreen = ({ route }) => {
     setkf_age(null);
     setkf_address1(null);
     setkf_address2(null);
-    setkf_address3(null);
+    // setkf_address3(null);
     setkf_city(null);
     setkf_state(null);
     setkf_loanamountrequested(null);
@@ -132,24 +132,8 @@ export const HomeScreen = ({ route }) => {
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
       if (navigation.isFocused()) {
-        // Alert.alert(
-        //   'Discard Changes',
-        //   'Are you sure want to discard the changes?',
-        //   [
-        //     {
-        //       text: 'cancel',
-        //       onPress: () => null,
-        //       style: 'cancel',
-        //     },
-        //     {
-        //       text: 'Discard',
-        //       onPress: () => BackHandler.exitApp(),
-        //     },
-        //   ],
-        //   { cancelable: false }
-        // );
         handleShowDiscardChangesAlert();
-        return true; 
+        return true;
       }
     });
 
@@ -157,30 +141,10 @@ export const HomeScreen = ({ route }) => {
   }, [navigation]);
 
   const handleViewImages = () => {
-    setShowImage(!showImage); 
+    setShowImage(!showImage);
   };
 
   const handleGoBack = () => {
-    // Alert.alert(
-    //   'Discard Changes',
-    //   'Are you sure you want to discard the changes?',
-    //   [
-    //     {
-    //       text: 'Cancel',
-    //       style: 'cancel',
-    //     },
-    //     {
-    //       text: 'Discard',
-    //       onPress: () => {
-    //         key = { resetFormKey }
-    //         // navigation.navigate('Dashboard', { resetState: true }); // Pass the parameter
-    //         navigation.goBack({ resetState: true }); // Pass the parameter
-
-    //       },
-    //     },
-    //   ],
-    //   { cancelable: false }
-    // );
     handleShowDiscardChangesAlert();
   };
 
@@ -208,7 +172,7 @@ export const HomeScreen = ({ route }) => {
 
   const handleFirstNameChange = (text) => {
     const onlyAlphabets = /^[^!-\/:-@\[-`{-~]+$/;
-    
+
     if (onlyAlphabets.test(text) || text === '') {
       setkf_name(text);
       setErrorMessages({ ...errorMessages, firstName: '' });
@@ -216,7 +180,7 @@ export const HomeScreen = ({ route }) => {
       setErrorMessages({ ...errorMessages, firstName: 'Enter a valid First Name' });
     }
   };
-  
+
   const handleLastNameChange = (text) => {
     const onlyAlphabets = /^[^!-\/:-@\[-`{-~]+$/;
 
@@ -341,25 +305,36 @@ export const HomeScreen = ({ route }) => {
   };
 
   const handlePancardNumberValidation = (text) => {
-    setkf_pannumber(text);
-
-    if (text.trim() === '') {
-      setErrorMessages({
-        ...errorMessages,
-        panCardNumber: 'Enter a PAN Card',
-      });
-      setIsPancardNumberValid(false);
-    } else if (/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(text)) {
-      setErrorMessages({
-        ...errorMessages,
-        panCardNumber: '',
-      });
+    // Check if the PAN card field is not empty
+    if (text.trim() !== '') {
+      // Perform PAN card validation
+      if (!isValidPancard(text)) {
+        setErrorMessages((prevErrors) => ({
+          ...prevErrors,
+          panCardNumber: 'Invalid PAN card number.',
+        }));
+      } else {
+        // PAN card number is valid, clear error message
+        setErrorMessages((prevErrors) => ({
+          ...prevErrors,
+          panCardNumber: '',
+        }));
+      }
     } else {
-      setErrorMessages({
-        ...errorMessages,
-        panCardNumber: 'Enter a Valid PAN Card Number',
-      });
+      // PAN card field is empty, clear previous error message
+      setErrorMessages((prevErrors) => ({
+        ...prevErrors,
+        panCardNumber: '',
+      }));
     }
+    setkf_pannumber(text);
+  };
+
+  const isValidPancard = (panNumber) => {
+    // Perform PAN card validation logic here
+    // Example validation: Checking if PAN card number matches a specific pattern
+    const panPattern = /[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+    return panPattern.test(panNumber);
   };
 
   const handleLoanAmountRequestedChange = (text) => {
@@ -491,7 +466,7 @@ export const HomeScreen = ({ route }) => {
         let n = null; // Number of payments per year
         let N = null; // Total number of payments over the loan tenure
         let t = null; // Loan tenure in years
-  
+
         // Determine the number of payments per year based on the selected EMI schedule
         switch (kf_emischedule) {
           case 1: // Daily
@@ -506,29 +481,29 @@ export const HomeScreen = ({ route }) => {
           default:
             n = 12; // Default to monthly
         }
-  
+
         N = parseInt(kf_numberofemi);
-  
+
         t = N / n;
-  
+
         const R = r / n; // Monthly interest rate
         const EMI = (P * R * Math.pow((1 + R), N)) / (Math.pow((1 + R), N) - 1);
-  
+
         setKf_emi(EMI.toFixed(2));
       }
     };
-      calculateEMI();
+    calculateEMI();
   }, [kf_loanamountrequested, kf_interestrate, kf_emischedule, kf_numberofemi]);
-  
+
   const handleLoanChange = () => {
     if (kf_loanamountrequested && kf_interestrate) {
-      calculateEMI(); 
+      calculateEMI();
     }
   };
 
   const handleEMIScheduleChange = () => {
     if (kf_emischedule && kf_numberofemi) {
-      calculateEMI(); 
+      calculateEMI();
     }
   };
 
@@ -552,7 +527,7 @@ export const HomeScreen = ({ route }) => {
 
   const handleEmiSchedule = (emischedule) => {
     setKf_emischedule(emischedule);
-    handleEmiScheduleOptionset(emischedule); 
+    handleEmiScheduleOptionset(emischedule);
 
     if (emischedule.trim() === '') {
       setErrorMessages({
@@ -585,12 +560,12 @@ export const HomeScreen = ({ route }) => {
       email: !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(kf_email) ? 'Enter a Valid Email Address' : '',
       loanAmountRequested: !kf_loanamountrequested ? ' Enter a Loan Amount Requested' : '',
       aadharCardNumber: !/^\d{12}$/.test(kf_aadharnumber) ? 'Enter a Valid Aadharcard Number' : '',
-      panCardNumber: !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(kf_pannumber) ? 'Enter a Valid PAN Card Number' : '',
+      // panCardNumber: !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(kf_pannumber) ? 'Enter a Valid PAN Card Number' : '',
       interestRate: !/^\d+(\.\d+)?%?$/.test(kf_interestrate) ? 'Enter a Interest Rate' : '',
       emiSchedule: !kf_emischedule ? 'select a EMISchedule' : '',
       NoOfEMIs: !/^\d+$/.test(kf_numberofemi) ? 'Enter a No of EMI payment' : '',
       // emiCollectionDate: !kf_emicollectiondate ? 'select a EMI Collection Date' : ''
-      applicantImage: !kf_applicantimage.fileContent ? 'Applicant image is required.' : '',  
+      applicantImage: !kf_applicantimage.fileContent ? 'Applicant image is required.' : '',
     };
     setErrorMessages(newErrorMessages);
     if (Object.values(newErrorMessages).some(message => message !== '')) {
@@ -616,12 +591,9 @@ export const HomeScreen = ({ route }) => {
       const formattedDateOfBirth = kf_dateofbirth ? kf_dateofbirth.toISOString() : null;
       const loanAmount = parseFloat(kf_loanamountrequested);
       const userAdminName = authenticatedUser ? authenticatedUser.kf_adminname : '';
-      //   const aadharcardImageData = await prepareImageData(kf_aadharcard);
-      // const pancardImageData = await prepareImageData(kf_pancard);
-      // const applicantImageData = await prepareImageData(kf_applicantimage);
 
       console.log("userAdminName", userAdminName);
-      console.log("userid: ",kf_userapplicantid);
+      console.log("userid: ", kf_userapplicantid);
 
       const createRecordResponse = await axios.post(
         "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications",
@@ -635,7 +607,7 @@ export const HomeScreen = ({ route }) => {
           kf_email: kf_email,
           kf_address1: kf_address1,
           kf_address2: kf_address2,
-          kf_address3: kf_address3,
+          // kf_address3: kf_address3,
           kf_city: kf_city,
           kf_state: kf_state,
           kf_loanamountrequested: loanAmount,
@@ -643,7 +615,7 @@ export const HomeScreen = ({ route }) => {
           kf_pannumber: kf_pannumber,
           // kf_aadharcard: aadharcardImageData,
           // kf_pancard: pancardImageData,
-          kf_applicantimage:kf_applicantimage.fileContent,
+          kf_applicantimage: kf_applicantimage.fileContent,
           kf_emischedule: kf_emischedule,
           kf_interestrate: kf_interestrate,
           kf_emi: kf_emi,
@@ -664,18 +636,6 @@ export const HomeScreen = ({ route }) => {
       if (createRecordResponse.status === 204) {
         setFormDisabled(true);
         console.log("Record created successfully in CRM"); //createRecordResponse
-        // Alert.alert('Home Loan', 'Created record Successfully.', [
-        //   {
-        //     text: 'Cancel',
-        //     style: 'cancel',
-        //   },
-        //   {
-        //     text: 'OK',
-        //     onPress: () => {
-        //       navigation.navigate('Dashboard', { resetState: true });
-        //     },
-        //   },
-        // ]);
         handleShowAlert();
       } else {
         console.log("else part");
@@ -701,12 +661,10 @@ export const HomeScreen = ({ route }) => {
 
   const handleConfirmAlert = () => {
     setShowAlertConfirmation(false);
-    // navigation.navigate('Dashboard');
     navigation.goBack();
   };
 
   const handlePincodeChange = (text) => {
-    // Remove any non-numeric characters from the input
     const formattedPincode = text.replace(/[^0-9]/g, '');
     setkf_pincode(formattedPincode);
   };
@@ -733,10 +691,8 @@ export const HomeScreen = ({ route }) => {
               {authenticatedUser && (
                 <Text style={{ color: 'rgba(255, 28, 53, 255)', fontSize: 15, fontWeight: 'bold', textAlign: 'center' }}>Created by: {authenticatedUser.kf_adminname}</Text>
               )}
-            </View> */}
-
-           
-            {/*  <Text>employee{authenticatedUser ? authenticatedUser.kf_adminname : ''}</Text> */}
+            </View> 
+     <Text>employee{authenticatedUser ? authenticatedUser.kf_adminname : ''}</Text> */}
 
           <TextInput style={[styles.textInputContainer, { marginTop: 20, color: "gray" }]}
             placeholder="Created by"
@@ -771,7 +727,7 @@ export const HomeScreen = ({ route }) => {
             autoCapitalize="none"
             value={kf_lastname}
             onChangeText={handleLastNameChange}
-          /> 
+          />
           {errorMessages.lastName !== '' && (
             <Text style={styles.errorText}>{errorMessages.lastName}</Text>
           )}
@@ -800,8 +756,8 @@ export const HomeScreen = ({ route }) => {
             onOptionChange={handleGenderOptionset}
             title="Gender"
             options={['Male', 'Female']}
-          // initialOption="Option1"
-          Optiontitle= "Gender"
+            // initialOption="Option1"
+            Optiontitle="Gender"
           />
 
           <TextInputComponent
@@ -838,12 +794,12 @@ export const HomeScreen = ({ route }) => {
             onChangeText={(text) => setkf_address2(text)}
           />
 
-          <TextInputComponent
+          {/* <TextInputComponent
             placeholder="Address 3"
             autoCapitalize="none"
             value={kf_address3}
             onChangeText={(text) => setkf_address3(text)}
-          />
+          /> */}
 
           <TextInputComponent
             placeholder="City"
@@ -918,7 +874,7 @@ export const HomeScreen = ({ route }) => {
             onOptionChange={handleEmiSchedule}
             title="EMI Schedule"
             options={['Daily', 'Weekly', 'Monthly']}
-            Optiontitle= "EMI Schedule"
+            Optiontitle="EMI Schedule"
           />
           {errorMessages.emiSchedule !== '' && (
             <Text style={styles.errorText}>{errorMessages.emiSchedule}</Text>
@@ -938,48 +894,62 @@ export const HomeScreen = ({ route }) => {
 
           <Text style={[styles.textInputContainer, { marginVertical: 10, height: 48, color: "gray" }]}>EMI: {kf_emi}</Text>
 
-          <View style={{marginLeft: 10}}>
-                <CardImage
-                  title="Upload Image"
-                  imageContent={kf_applicantimage}
-                  setImageContent={setkf_applicantimage}
-                />
-                {!kf_applicantimage.fileContent && errorMessages.applicantImage !== '' && (
-                  <Text style={styles.errorText}>{errorMessages.applicantImage}</Text>
-                )}
-              </View>
+          <View style={{ marginLeft: 10 }}>
+            <CardImage
+              title="Upload Image"
+              imageContent={kf_applicantimage}
+              setImageContent={setkf_applicantimage}
+            />
+            {!kf_applicantimage.fileContent && errorMessages.applicantImage !== '' && (
+              <Text style={styles.errorText}>{errorMessages.applicantImage}</Text>
+            )}
+          </View>
           <ButtonComponent
             title="SUBMIT"
-            onPress={handleSaveRecord}
+            onPress={() => {
+              // Check if the PAN card number is valid
+              if (errorMessages.panCardNumber === '') {
+                // PAN card number is valid, allow submission
+                handleSaveRecord();
+              } else {
+                // PAN card number is invalid, display error message
+                // Alert.alert('Error', 'Invalid PAN card number.');
+                {
+                  errorMessages.panCardNumber !== '' && (
+                    <Text style={styles.errorText}>{errorMessages.panCardNumber}</Text>
+                  )
+                }
+              }
+            }}
             disabled={formDisabled}
           />
 
         </View>
       </ScrollView>
       <CustomAlert
-          visible={showAlert}
-          onClose={handleCloseAlert}
-          onConfirm={handleConfirmAlert}
-          headerMessage="Home Loan"
-          message="Record Created Successfully."
-          Button1="Cancel"
-          Button2="OK"
-          style={styles.alertStyle}
-          modalHeaderStyle={[styles.modalheaderStyle, {right: 80}]}
-          textStyle={styles.textStyle}
-        />
-        <CustomAlert
-          visible={showAlertDiscardChanges}
-          onClose={handleCloseDiscardChangesAlert}
-          onConfirm={handleConfirmAlert}
-          headerMessage="Discard Changes"
-          message="Are you sure want to discard the changes?"
-          Button1="No"
-          Button2="Yes"
-          style={[styles.alertStyle, {height: "23%"}]}
-          modalHeaderStyle={[styles.modalheaderStyle, {right: 70}]}
-          textStyle={styles.textStyle} 
-        />
+        visible={showAlert}
+        onClose={handleCloseAlert}
+        onConfirm={handleConfirmAlert}
+        headerMessage="Home Loan"
+        message="Record Created Successfully."
+        Button1="Cancel"
+        Button2="OK"
+        style={styles.alertStyle}
+        modalHeaderStyle={[styles.modalheaderStyle, { right: 80 }]}
+        textStyle={styles.textStyle}
+      />
+      <CustomAlert
+        visible={showAlertDiscardChanges}
+        onClose={handleCloseDiscardChangesAlert}
+        onConfirm={handleConfirmAlert}
+        headerMessage="Discard Changes"
+        message="Are you sure want to discard the changes?"
+        Button1="No"
+        Button2="Yes"
+        style={[styles.alertStyle, { height: "23%" }]}
+        modalHeaderStyle={[styles.modalheaderStyle, { right: 70 }]}
+        textStyle={styles.textStyle}
+      />
     </>
   );
 };
@@ -1037,7 +1007,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   buttonView: {
-    backgroundColor: 'red', padding: 10, borderRadius: 25, width: 85, marginLeft: -10, height: 30, marginTop: -5 
+    backgroundColor: 'red', padding: 10, borderRadius: 25, width: 85, marginLeft: -10, height: 30, marginTop: -5
   },
   buttonText: {
     fontSize: 16,
@@ -1057,7 +1027,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     alignSelf: 'flex-end',
-    backgroundColor:'red'
+    backgroundColor: 'red'
   },
   closeButtonText: {
     fontSize: 16,
@@ -1067,20 +1037,17 @@ const styles = StyleSheet.create({
     width: 350,
     height: 300,
   },
-  topText:{
-  // position:"absolute"
+  topText: {
+    // position:"absolute"
   },
-  alertStyle:{
-    // backgroundColor: "blue",
+  alertStyle: {
     width: "80%",
-      },
-      modalheaderStyle:{
-        // backgroundColor: "green",
-        right: 85
-      },
-      textStyle:{
-        // backgroundColor: "yellow"
-      }
+  },
+  modalheaderStyle: {
+    right: 85
+  },
+  textStyle: {
+  }
 });
 
 export default HomeScreen;

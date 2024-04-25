@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
 const HomeLoanCard = ({ loanApplication, onPress, onDelete }) => {
 
@@ -42,29 +41,17 @@ const HomeLoanCard = ({ loanApplication, onPress, onDelete }) => {
     }
   };
 
-  
-
   return (
       <View style={{width: "100%"}}>
         <View style={styles.card}>
         {renderImage()}
         <TouchableOpacity  style={styles.cardContent} onPress={() => onPress(loanApplication)}>
         <Text style={styles.cardTitle}>{`${loanApplication.kf_name} ${loanApplication.kf_lastname} - ${loanApplication.kf_applicationnumber}`}</Text>
-        {/* <Text style={styles.cardLabel}>{`Loan Amount: ${loanApplication.kf_loanamountrequested}`}</Text> */}
-        {/* <Text style={styles.cardLabel}>{`Loan Amount: ${loanApplication.kf_loanamountrequested || ''}`}</Text> */}
-        {/* <Text style={styles.cardLabel}>{`Application Number: ${loanApplication.kf_applicationnumber || ''}`}</Text> */}
         <Text style={styles.cardLabel}>{`Mobile Number: ${loanApplication.kf_mobilenumber || ''}`}</Text>
         <Text style={styles.cardLabel}>{`Aadhar Number: ${loanApplication.kf_aadharnumber || ''}`}</Text>
         <Text style={styles.cardLabel}>{`Status: ${getLoanStatusLabel()}`}</Text>
         </TouchableOpacity>
         </View>
-
-        {/* <View style={{}}>
-        <TouchableOpacity onPress={() => onDelete(loanApplication)} style={styles.trashIcon}>
-          <Ionicons name="trash" size={25} color="red" />
-        </TouchableOpacity>
-        </View> */}
-        
       </View>
   );
 };

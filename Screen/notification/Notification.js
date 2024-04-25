@@ -8,8 +8,8 @@ import moment from 'moment'; // Import moment.js for date formatting
 import PushNotification from 'react-native-push-notification';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'react-native';
-import ButtonComponent from '../common/ButtonComponent';
-import CustomAlert from '../common/CustomAlert';
+import ButtonComponent from '../../common/ButtonComponent';
+import CustomAlert from '../../common/CustomAlert';
 
 const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
   const [loanApplications, setLoanApplications] = useState([]);
@@ -24,7 +24,7 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
   const totalRecords = loanApplications.length + notifications.length;
   const [refresh, setRefresh] = useState(false);
   const { kf_adminname } = route.params;
-  const [showAlert, setShowAlert] = useState(false); 
+  const [showAlert, setShowAlert] = useState(false);
   const [activeTab, setActiveTab] = useState('All');
   const [filteredData, setFilteredData] = useState([]);
 
@@ -36,8 +36,6 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
     // Reset refresh state after re-render
     setRefresh(false);
   }, [refresh]);
-
-
 
   const fetchLoanApplications = async () => {
     try {
@@ -68,7 +66,7 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
         const filteredApplications = response.data.value.filter(application => application.kf_sendapproval == 1);
 
         // Sort the filtered applications based on a timestamp or any other relevant field indicating when the approval was sent
-      filteredApplications.sort((a, b) => new Date(b.approvalSentTimestamp) - new Date(a.approvalSentTimestamp));
+        filteredApplications.sort((a, b) => new Date(b.approvalSentTimestamp) - new Date(a.approvalSentTimestamp));
         setLoanApplications(filteredApplications);
 
         if (loanApplications.length < filteredApplications.length) {
@@ -126,8 +124,7 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
     }
   };
 
- 
-// approval loans
+  // approval loans
   const handleApproveLoan = async (applicationId) => {
     // Display an alert confirming the approval action
     // handleShowAlert();
@@ -180,7 +177,6 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
       { cancelable: false }
     );
   };
-// rejectloans
 
   const handleRejectLoan = async (applicationId) => {
     setSelectedApplicationId(applicationId);
@@ -192,7 +188,6 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
     setShowRejectCommentBox(true); // Open the comment box
   };
 
-  
   const handleApproveNotification = async (personalLoanId) => {
     // Display an alert confirming the approval action
     Alert.alert(
@@ -244,8 +239,6 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
       { cancelable: false }
     );
   };
-
-
 
   const handleRejectWithComment = async () => {
 
@@ -485,213 +478,210 @@ const Notification = ({ loanApplication, navigation, personalLoan, route }) => {
   };
   const approvedApplications = loanApplications.filter(application => application.kf_status === 123950000);
 
+  // approval loans
+  const fetchApproval = async () => {
+    try {
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        querystring.stringify({
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        }),
+        {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        }
+      );
 
-// approval loans
-const fetchApproval = async () => {
-  try {
-    const tokenResponse = await axios.post(
-      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
-      querystring.stringify({
-        grant_type: 'client_credentials',
-        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
-        resource: 'https://org0f7e6203.crm5.dynamics.com',
-        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
-        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
-      }),
-      {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      }
-    );
+      const accessToken = tokenResponse.data.access_token;
 
-    const accessToken = tokenResponse.data.access_token;
+      const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
-    const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+      const response1 = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
-    const response1 = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+      if (response.data && response.data.value && Array.isArray(response.data.value)) {
+        // Filter loan applications where kf_sendapproval is equal to 1 and kf_status is equal to 123950000 (Approved)
+        const filteredApplications = response.data.value.filter(application => application.kf_sendapproval == 1 && application.kf_status == 123950000);
 
-    if (response.data && response.data.value && Array.isArray(response.data.value)) {
-      // Filter loan applications where kf_sendapproval is equal to 1 and kf_status is equal to 123950000 (Approved)
-      const filteredApplications = response.data.value.filter(application => application.kf_sendapproval == 1 && application.kf_status == 123950000);
+        // Sort the filtered applications based on a timestamp or any other relevant field indicating when the approval was sent
+        filteredApplications.sort((a, b) => new Date(b.approvalSentTimestamp) - new Date(a.approvalSentTimestamp));
 
-      // Sort the filtered applications based on a timestamp or any other relevant field indicating when the approval was sent
-      filteredApplications.sort((a, b) => new Date(b.approvalSentTimestamp) - new Date(a.approvalSentTimestamp));
+        setLoanApplications(filteredApplications);
 
-      setLoanApplications(filteredApplications);
-
-      if (loanApplications.length < filteredApplications.length) {
+        if (loanApplications.length < filteredApplications.length) {
           const newApplication = filteredApplications[filteredApplications.length - 1]; // Assuming the last fetched application is the new one
           // schedulePushNotification(newApplication.kf_applicationnumber, newApplication.kf_n
-        
+        }
+
+      } else {
+        console.error('Invalid loan applications response format:', response.data);
       }
 
-    } else {
-      console.error('Invalid loan applications response format:', response.data);
-    }
+      if (response1.data && response1.data.value && Array.isArray(response1.data.value)) {
+        // Filter personal loans where kf_sendapproval is equal to 1 and kf_status is equal to 123950000 (Approved)
+        const filteredNotifications = response1.data.value.filter(notification => notification.kf_sendapproval == 1 && notification.kf_status == 123950000);
 
-    if (response1.data && response1.data.value && Array.isArray(response1.data.value)) {
-      // Filter personal loans where kf_sendapproval is equal to 1 and kf_status is equal to 123950000 (Approved)
-      const filteredNotifications = response1.data.value.filter(notification => notification.kf_sendapproval == 1 && notification.kf_status == 123950000);
-
-      // Sort the filtered personal loans based on a timestamp or any other relevant field indicating when the approval was sent
-      filteredNotifications.sort((a, b) => new Date(b.approvalSentTimestamp) - new Date(a.approvalSentTimestamp));
-      setNotifications(filteredNotifications);
-      // Update state or perform any necessary operations with the filtered personal loans
-      // setPersonalLoans(filteredPersonalLoans);
-    } else {
-      console.error('Invalid personal loans response format:', response1.data);
-    }
-  } catch (error) {
-    console.error('Error fetching data:', error);
-  }
-};
-
-// rejected loans
-const fetchRejected = async () => {
-  try {
-    const tokenResponse = await axios.post(
-      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
-      querystring.stringify({
-        grant_type: 'client_credentials',
-        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
-        resource: 'https://org0f7e6203.crm5.dynamics.com',
-        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
-        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
-      }),
-      {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        // Sort the filtered personal loans based on a timestamp or any other relevant field indicating when the approval was sent
+        filteredNotifications.sort((a, b) => new Date(b.approvalSentTimestamp) - new Date(a.approvalSentTimestamp));
+        setNotifications(filteredNotifications);
+        // Update state or perform any necessary operations with the filtered personal loans
+        // setPersonalLoans(filteredPersonalLoans);
+      } else {
+        console.error('Invalid personal loans response format:', response1.data);
       }
-    );
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
-    const accessToken = tokenResponse.data.access_token;
+  // rejected loans
+  const fetchRejected = async () => {
+    try {
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        querystring.stringify({
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        }),
+        {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        }
+      );
 
-    const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+      const accessToken = tokenResponse.data.access_token;
 
-    const response1 = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+      const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
-    if (response.data && response.data.value && Array.isArray(response.data.value)) {
-      // Filter loan applications where kf_sendapproval is equal to 1 and kf_status is equal to 123950000 (Approved)
-      const filteredApplications = response.data.value.filter(application => application.kf_sendapproval == 0 && application.kf_status == 123950004);
+      const response1 = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
-      // Sort the filtered applications based on a timestamp or any other relevant field indicating when the approval was sent
-      filteredApplications.sort((a, b) => new Date(b.approvalSentTimestamp) - new Date(a.approvalSentTimestamp));
+      if (response.data && response.data.value && Array.isArray(response.data.value)) {
+        // Filter loan applications where kf_sendapproval is equal to 1 and kf_status is equal to 123950000 (Approved)
+        const filteredApplications = response.data.value.filter(application => application.kf_sendapproval == 0 && application.kf_status == 123950004);
 
-      setLoanApplications(filteredApplications);
+        // Sort the filtered applications based on a timestamp or any other relevant field indicating when the approval was sent
+        filteredApplications.sort((a, b) => new Date(b.approvalSentTimestamp) - new Date(a.approvalSentTimestamp));
 
-      if (loanApplications.length < filteredApplications.length) {
+        setLoanApplications(filteredApplications);
+
+        if (loanApplications.length < filteredApplications.length) {
           const newApplication = filteredApplications[filteredApplications.length - 1]; // Assuming the last fetched application is the new one
           // schedulePushNotification(newApplication.kf_applicationnumber, newApplication.kf_n
+        }
+
+      } else {
+        console.error('Invalid loan applications response format:', response.data);
       }
 
-    } else {
-      console.error('Invalid loan applications response format:', response.data);
-    }
-
-    if (response1.data && response1.data.value && Array.isArray(response1.data.value)) {
-      // Filter personal loans where kf_sendapproval is equal to 1 and kf_status is equal to 123950000 (Approved)
-      const filteredNotifications = response1.data.value.filter(notification => notification.kf_sendapproval == 0 && notification.kf_status == 123950004);
-      // Sort the filtered personal loans based on a timestamp or any other relevant field indicating when the approval was sent
-      filteredNotifications.sort((a, b) => new Date(b.approvalSentTimestamp) - new Date(a.approvalSentTimestamp));
-      // setLoanApplications(filteredNotifications);
-      setNotifications(filteredNotifications);
-      if (loanApplications.length < filteredNotifications.length) {
+      if (response1.data && response1.data.value && Array.isArray(response1.data.value)) {
+        // Filter personal loans where kf_sendapproval is equal to 1 and kf_status is equal to 123950000 (Approved)
+        const filteredNotifications = response1.data.value.filter(notification => notification.kf_sendapproval == 0 && notification.kf_status == 123950004);
+        // Sort the filtered personal loans based on a timestamp or any other relevant field indicating when the approval was sent
+        filteredNotifications.sort((a, b) => new Date(b.approvalSentTimestamp) - new Date(a.approvalSentTimestamp));
+        // setLoanApplications(filteredNotifications);
+        setNotifications(filteredNotifications);
+        if (loanApplications.length < filteredNotifications.length) {
           const newApplication = filteredNotifications[filteredNotifications.length - 1]; // Assuming the last fetched application is the new one
           // schedulePushNotification(newApplication.kf_applicationnumber, newApplication.kf_n
-      }
+        }
 
-    } else {
-      console.error('Invalid loan applications response format:', response.data);
+      } else {
+        console.error('Invalid loan applications response format:', response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
     }
-  } catch (error) {
-    console.error('Error fetching data:', error);
-  }
-};
+  };
 
-// Unread messages
-// rejected loans
-const fetchUnread = async () => {
-  try {
-    const tokenResponse = await axios.post(
-      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
-      querystring.stringify({
-        grant_type: 'client_credentials',
-        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
-        resource: 'https://org0f7e6203.crm5.dynamics.com',
-        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
-        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
-      }),
-      {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      }
-    );
+  // Unread messages
+  // rejected loans
+  const fetchUnread = async () => {
+    try {
+      const tokenResponse = await axios.post(
+        'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+        querystring.stringify({
+          grant_type: 'client_credentials',
+          client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+          resource: 'https://org0f7e6203.crm5.dynamics.com',
+          scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+          client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+        }),
+        {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        }
+      );
 
-    const accessToken = tokenResponse.data.access_token;
+      const accessToken = tokenResponse.data.access_token;
 
-    const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+      const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
-    const response1 = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+      const response1 = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
-    if (response.data && response.data.value && Array.isArray(response.data.value)) {
-      // Filter loan applications where kf_sendapproval is equal to 1 and kf_status is equal to 123950000 (Approved)
-      const filteredApplications = response.data.value.filter(application => application.kf_sendapproval == 1 && application.kf_markasreadmanager == 0);
+      if (response.data && response.data.value && Array.isArray(response.data.value)) {
+        // Filter loan applications where kf_sendapproval is equal to 1 and kf_status is equal to 123950000 (Approved)
+        const filteredApplications = response.data.value.filter(application => application.kf_sendapproval == 1 && application.kf_markasreadmanager == 0);
 
-      // Sort the filtered applications based on a timestamp or any other relevant field indicating when the approval was sent
-      filteredApplications.sort((a, b) => new Date(b.approvalSentTimestamp) - new Date(a.approvalSentTimestamp));
+        // Sort the filtered applications based on a timestamp or any other relevant field indicating when the approval was sent
+        filteredApplications.sort((a, b) => new Date(b.approvalSentTimestamp) - new Date(a.approvalSentTimestamp));
 
-      setLoanApplications(filteredApplications);
+        setLoanApplications(filteredApplications);
 
-      if (loanApplications.length < filteredApplications.length) {
+        if (loanApplications.length < filteredApplications.length) {
           const newApplication = filteredApplications[filteredApplications.length - 1]; // Assuming the last fetched application is the new one
           // schedulePushNotification(newApplication.kf_applicationnumber, newApplication.kf_n
+        }
+
+      } else {
+        console.error('Invalid loan applications response format:', response.data);
       }
 
-    } else {
-      console.error('Invalid loan applications response format:', response.data);
-    }
-
-    if (response1.data && response1.data.value && Array.isArray(response1.data.value)) {
-      // Filter personal loans where kf_sendapproval is equal to 1 and kf_status is equal to 123950000 (Approved)
-      const filteredNotifications = response1.data.value.filter(notification => notification.kf_sendapproval == 1 && notification.kf_markasreadmanager == 0);
-      // Sort the filtered personal loans based on a timestamp or any other relevant field indicating when the approval was sent
-      filteredNotifications.sort((a, b) => new Date(b.approvalSentTimestamp) - new Date(a.approvalSentTimestamp));
-      // setLoanApplications(filteredNotifications);
-      setNotifications(filteredNotifications);
-      if (loanApplications.length < filteredNotifications.length) {
+      if (response1.data && response1.data.value && Array.isArray(response1.data.value)) {
+        // Filter personal loans where kf_sendapproval is equal to 1 and kf_status is equal to 123950000 (Approved)
+        const filteredNotifications = response1.data.value.filter(notification => notification.kf_sendapproval == 1 && notification.kf_markasreadmanager == 0);
+        // Sort the filtered personal loans based on a timestamp or any other relevant field indicating when the approval was sent
+        filteredNotifications.sort((a, b) => new Date(b.approvalSentTimestamp) - new Date(a.approvalSentTimestamp));
+        // setLoanApplications(filteredNotifications);
+        setNotifications(filteredNotifications);
+        if (loanApplications.length < filteredNotifications.length) {
           const newApplication = filteredNotifications[filteredNotifications.length - 1]; // Assuming the last fetched application is the new one
           // schedulePushNotification(newApplication.kf_applicationnumber, newApplication.kf_n
+        }
+
+      } else {
+        console.error('Invalid loan applications response format:', response.data);
       }
-
-    } else {
-      console.error('Invalid loan applications response format:', response.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
     }
-  } catch (error) {
-    console.error('Error fetching data:', error);
-  }
-};
-
+  };
 
   return (
     <View>
@@ -703,8 +693,6 @@ const fetchUnread = async () => {
           <Ionicons name="chevron-back" size={30} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.text}>Notification</Text>
-
-
         <TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
           <View>
             <Ionicons name="notifications" size={25} color="#fff" />
@@ -718,184 +706,178 @@ const fetchUnread = async () => {
       </View>
 
       <ScrollView>
-         
         <View style={styles.container}>
-        <View style={styles.tabContainer}>
-        {/* // Update the onPress handlers for the tab buttons to set the active tab and trigger the corresponding fetch function */}
-<TouchableOpacity style={[styles.tabButton, activeTab === 'Unread' && styles.activeTab]} onPress={() => { setActiveTab('Unread'); fetchUnread(); }}>
-  <Text style={styles.tabText}>Unread</Text>
-</TouchableOpacity>
+          <View style={styles.tabContainer}>
+            {/* // Update the onPress handlers for the tab buttons to set the active tab and trigger the corresponding fetch function */}
+            <TouchableOpacity style={[styles.tabButton, activeTab === 'Unread' && styles.activeTab]} onPress={() => { setActiveTab('Unread'); fetchUnread(); }}>
+              <Text style={styles.tabText}>Unread</Text>
+            </TouchableOpacity>
 
-<TouchableOpacity style={[styles.tabButton, activeTab === 'Approved' && styles.activeTab]} onPress={() => { setActiveTab('Approved'); fetchApproval(); }}>
-  <Text style={styles.tabText}>Approved</Text>
-</TouchableOpacity>
+            <TouchableOpacity style={[styles.tabButton, activeTab === 'Approved' && styles.activeTab]} onPress={() => { setActiveTab('Approved'); fetchApproval(); }}>
+              <Text style={styles.tabText}>Approved</Text>
+            </TouchableOpacity>
 
-<TouchableOpacity style={[styles.tabButton, activeTab === 'Rejected' && styles.activeTab]} onPress={() => { setActiveTab('Rejected'); fetchRejected(); }}>
-  <Text style={styles.tabText}>Rejected</Text>
-</TouchableOpacity>
+            <TouchableOpacity style={[styles.tabButton, activeTab === 'Rejected' && styles.activeTab]} onPress={() => { setActiveTab('Rejected'); fetchRejected(); }}>
+              <Text style={styles.tabText}>Rejected</Text>
+            </TouchableOpacity>
 
-<TouchableOpacity 
-  style={[styles.tabButton, activeTab === 'All' && styles.activeTab]} 
-  onPress={() => { setActiveTab('All'); fetchLoanApplications(); fetchNotifications(); }}
->
-  <Text style={styles.tabText}>All</Text>
-</TouchableOpacity>
-
-        </View>
-        <View style={{borderWidth: 1, borderColor: "#b0b0b0", paddingHorizontal: 10, marginTop: 10, borderRadius: 10}}>
-          <Text style={styles.header}>Home Loan</Text>
-          {loanApplications.length === 0 && (
-            <View style={styles.noRecordsContainer}>
-            <Text style={styles.noRecordsText}>No Records Found</Text>
-            </View>
-          )}
-          {loanApplications
-          .sort((a, b) => (a.kf_markasreadmanager === b.kf_markasreadmanager ? 0 : a.kf_markasreadmanager ? 1 : -1)) 
-          .map((application, index) => (
-            <View
-              key={index}
-              style={[
-                styles.itemContainer,
-                application.kf_markasreadmanager ? styles.readItemContainer : styles.unreadItemContainer
-              ]}
+            <TouchableOpacity
+              style={[styles.tabButton, activeTab === 'All' && styles.activeTab]}
+              onPress={() => { setActiveTab('All'); fetchLoanApplications(); fetchNotifications(); }}
             >
-              <Text>Application Number: {application.kf_applicationnumber}</Text>
-              <Text>Created By: {application.kf_createdby}</Text>
-              {/* <Text>Admin Name: {kf_adminname}</Text> */}
-              <Text>Name: {application.kf_name} {application.kf_lastname}</Text>
-              <View style={styles.readIndicatorContainer}>
-                {application.kf_markasreadmanager ? (
-                  <Image
-                    source={require('../assets/read_message.png')}
-                    style={styles.twitterImage1}
-                  />
-                ) : (
-                  <Text style={styles.twitterImage}>Unread</Text>
-                )}
-              </View>
-              <Text>Status: {statusNames[application.kf_status]}</Text>
-              {/* <Text>Created At: {formatDateTime(application.created_at)}</Text> */}
-              <View style={styles.buttonContainer}>
-                <Button title="View Record" onPress={() => handleViewHomeLoan(application)} />
-                {showRejectCommentBox && selectedApplicationId === application.kf_loanapplicationid && (
-                  <Modal
-                    transparent
-                    animationType="slide"
-                    visible={showRejectCommentBox}
-                    onRequestClose={() => setShowRejectCommentBox(false)}
-                  >
-                    <View style={styles.modalContainer}>
-                      <View style={styles.commentBoxContainer}>
-                        <Text style={{ fontSize: 16, fontWeight: "bold", }}>Enter Reject Reason:</Text>
-                        <TextInput
-                          style={styles.commentInput}
-                          multiline
-                          value={rejectComment}
-                          onChangeText={(text) => setRejectComment(text)}
-                        />
-                        <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
-                          <ButtonComponent title="Submit" onPress={handleRejectWithComment} style={{ width: "40%", height: "45%", backgroundColor: "green" }} />
-                          <ButtonComponent title="Cancel" onPress={() => setShowRejectCommentBox(false)} style={{ width: "40%", height: "45%" }} />
-                        </View>
-                      </View>
-                    </View>
-                  </Modal>
-                )}
-                <Button title={`✓ Approve`} onPress={() => handleApproveLoan(application.kf_loanapplicationid)} color="green" disabled={application.kf_status === 123950000} />
-                <Button title={`✗ Reject`} onPress={() => handleRejectLoan(application.kf_loanapplicationid)} color="red" disabled={application.kf_status === 123950000} />
+              <Text style={styles.tabText}>All</Text>
+            </TouchableOpacity>
 
+          </View>
+          <View style={{ borderWidth: 1, borderColor: "#b0b0b0", paddingHorizontal: 10, marginTop: 10, borderRadius: 10 }}>
+            <Text style={styles.header}>Home Loan</Text>
+            {loanApplications.length === 0 && (
+              <View style={styles.noRecordsContainer}>
+                <Text style={styles.noRecordsText}>No Records Found</Text>
               </View>
-            </View>
-          ))}
+            )}
+            {loanApplications
+              .sort((a, b) => (a.kf_markasreadmanager === b.kf_markasreadmanager ? 0 : a.kf_markasreadmanager ? 1 : -1))
+              .map((application, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.itemContainer,
+                    application.kf_markasreadmanager ? styles.readItemContainer : styles.unreadItemContainer
+                  ]}
+                >
+                  <Text>Application Number: {application.kf_applicationnumber}</Text>
+                  <Text>Created By: {application.kf_createdby}</Text>
+                  {/* <Text>Admin Name: {kf_adminname}</Text> */}
+                  <Text>Name: {application.kf_name} {application.kf_lastname}</Text>
+                  <View style={styles.readIndicatorContainer}>
+                    {application.kf_markasreadmanager ? (
+                      <Image
+                        source={require('../../assets/read_message.png')}
+                        style={styles.twitterImage1}
+                      />
+                    ) : (
+                      <Text style={styles.twitterImage}>Unread</Text>
+                    )}
+                  </View>
+                  <Text>Status: {statusNames[application.kf_status]}</Text>
+                  {/* <Text>Created At: {formatDateTime(application.created_at)}</Text> */}
+                  <View style={styles.buttonContainer}>
+                    <Button title="View Record" onPress={() => handleViewHomeLoan(application)} />
+                    {showRejectCommentBox && selectedApplicationId === application.kf_loanapplicationid && (
+                      <Modal
+                        transparent
+                        animationType="slide"
+                        visible={showRejectCommentBox}
+                        onRequestClose={() => setShowRejectCommentBox(false)}
+                      >
+                        <View style={styles.modalContainer}>
+                          <View style={styles.commentBoxContainer}>
+                            <Text style={{ fontSize: 16, fontWeight: "bold", }}>Enter Reject Reason:</Text>
+                            <TextInput
+                              style={styles.commentInput}
+                              multiline
+                              value={rejectComment}
+                              onChangeText={(text) => setRejectComment(text)}
+                            />
+                            <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
+                              <ButtonComponent title="Submit" onPress={handleRejectWithComment} style={{ width: "40%", height: "45%", backgroundColor: "green" }} />
+                              <ButtonComponent title="Cancel" onPress={() => setShowRejectCommentBox(false)} style={{ width: "40%", height: "45%" }} />
+                            </View>
+                          </View>
+                        </View>
+                      </Modal>
+                    )}
+                    <Button title={`✓ Approve`} onPress={() => handleApproveLoan(application.kf_loanapplicationid)} color="green" disabled={application.kf_status === 123950000} />
+                    <Button title={`✗ Reject`} onPress={() => handleRejectLoan(application.kf_loanapplicationid)} color="red" disabled={application.kf_status === 123950000} />
+
+                  </View>
+                </View>
+              ))}
           </View>
 
-          <View style={{borderWidth: 1, borderColor: "#b0b0b0", paddingHorizontal: 10, marginTop: 10, borderRadius: 10}}>
-          <Text style={styles.header}>Personal Loan </Text>
-          {notifications.length === 0 && (
-             <View style={styles.noRecordsContainer}>
-             <Text style={styles.noRecordsText}>No Records Found</Text>
-             </View>
-          )}
-          {notifications
-          .sort((a, b) => (a.kf_markasreadmanager === b.kf_markasreadmanager ? 0 : a.kf_markasreadmanager ? 1 : -1)) 
-          .map((notification, index) => (
-            <View
-              key={index}
-              style={[
-                styles.itemContainer,
-                notification.kf_markasreadmanager ? styles.readItemContainer : styles.unreadItemContainer
-              ]}
-            >
-              <Text>Application Number: {notification.kf_applicationnumber}</Text>
-              {/* <Text>Admin Name: {kf_adminname}</Text> */}
-              <Text>Created By: {notification.kf_createdby}</Text>
-              <Text>Name: {notification.kf_firstname} {notification.kf_lastname}</Text>
-              {/* Display the status name */}
-              <View style={styles.readIndicatorContainer}>
-                {notification.kf_markasreadmanager ? (
-                  <Image
-                    source={require('../assets/read_message.png')}
-                    style={styles.twitterImage1}
-                  />
-                ) : (
-                  // <Image
-                  //   source={require('../assets/unread_message.png')}
-                  //   style={styles.twitterImage}
-                  // />
-                  <Text style={styles.twitterImage}>Unread</Text>
-
-                )}
+          <View style={{ borderWidth: 1, borderColor: "#b0b0b0", paddingHorizontal: 10, marginTop: 10, borderRadius: 10 }}>
+            <Text style={styles.header}>Personal Loan </Text>
+            {notifications.length === 0 && (
+              <View style={styles.noRecordsContainer}>
+                <Text style={styles.noRecordsText}>No Records Found</Text>
               </View>
-              <Text>Status: {statusNames[notification.kf_status]}</Text>
-              {/* Buttons for actions */}
-              {/* <Text>Created At: {formatDateTime(notification.created_at)}</Text> */}
-              <View style={styles.buttonContainer}>
-                <Button title="View Record" onPress={() => handleViewPersonalLoan(notification)} />
-                {showRejectCommentBox && selectedPersonalLoanId === notification.kf_personalloanid && (
-                  <Modal
-                    transparent
-                    animationType="slide"
-                    visible={showRejectCommentBox}
-                    onRequestClose={() => setShowRejectCommentBox(false)}
-                  >
-                    <View style={styles.modalContainer}>
-                      <View style={styles.commentBoxContainer}>
-                        <Text style={{ fontSize: 16, fontWeight: "bold" }}>Enter Reject Reason:</Text>
-                        <TextInput
-                          style={styles.commentInput}
-                          multiline
-                          value={rejectComment}
-                          onChangeText={(text) => setRejectComment(text)}
-                        />
+            )}
+            {notifications
+              .sort((a, b) => (a.kf_markasreadmanager === b.kf_markasreadmanager ? 0 : a.kf_markasreadmanager ? 1 : -1))
+              .map((notification, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.itemContainer,
+                    notification.kf_markasreadmanager ? styles.readItemContainer : styles.unreadItemContainer
+                  ]}
+                >
+                  <Text>Application Number: {notification.kf_applicationnumber}</Text>
+                  {/* <Text>Admin Name: {kf_adminname}</Text> */}
+                  <Text>Created By: {notification.kf_createdby}</Text>
+                  <Text>Name: {notification.kf_firstname} {notification.kf_lastname}</Text>
+                  {/* Display the status name */}
+                  <View style={styles.readIndicatorContainer}>
+                    {notification.kf_markasreadmanager ? (
+                      <Image
+                        source={require('../../assets/read_message.png')}
+                        style={styles.twitterImage1}
+                      />
+                    ) : (
+                      <Text style={styles.twitterImage}>Unread</Text>
+                    )}
+                  </View>
+                  <Text>Status: {statusNames[notification.kf_status]}</Text>
+                  {/* Buttons for actions */}
+                  {/* <Text>Created At: {formatDateTime(notification.created_at)}</Text> */}
+                  <View style={styles.buttonContainer}>
+                    <Button title="View Record" onPress={() => handleViewPersonalLoan(notification)} />
+                    {showRejectCommentBox && selectedPersonalLoanId === notification.kf_personalloanid && (
+                      <Modal
+                        transparent
+                        animationType="slide"
+                        visible={showRejectCommentBox}
+                        onRequestClose={() => setShowRejectCommentBox(false)}
+                      >
+                        <View style={styles.modalContainer}>
+                          <View style={styles.commentBoxContainer}>
+                            <Text style={{ fontSize: 16, fontWeight: "bold" }}>Enter Reject Reason:</Text>
+                            <TextInput
+                              style={styles.commentInput}
+                              multiline
+                              value={rejectComment}
+                              onChangeText={(text) => setRejectComment(text)}
+                            />
 
-                        <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
-                          <ButtonComponent title="Submit" onPress={handleRejectPersonalLoanWithComment} style={{ width: "40%", height: "45%", backgroundColor: "green" }} />
-                          <ButtonComponent title="Cancel" onPress={() => setShowRejectCommentBox(false)} style={{ width: "40%", height: "45%" }} />
+                            <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
+                              <ButtonComponent title="Submit" onPress={handleRejectPersonalLoanWithComment} style={{ width: "40%", height: "45%", backgroundColor: "green" }} />
+                              <ButtonComponent title="Cancel" onPress={() => setShowRejectCommentBox(false)} style={{ width: "40%", height: "45%" }} />
+                            </View>
+                          </View>
                         </View>
-                      </View>
-                    </View>
-                  </Modal>
-                )}
-                <Button title={`✓ Approve`} onPress={() => handleApproveNotification(notification.kf_personalloanid)} color="green" disabled={notification.kf_status === 123950000} />
-                <Button title={`✗ Reject`} onPress={() => handleRejectNotification(notification.kf_personalloanid)} color="red" disabled={notification.kf_status === 123950000} />
-              </View>
-            </View>
-          ))}
+                      </Modal>
+                    )}
+                    <Button title={`✓ Approve`} onPress={() => handleApproveNotification(notification.kf_personalloanid)} color="green" disabled={notification.kf_status === 123950000} />
+                    <Button title={`✗ Reject`} onPress={() => handleRejectNotification(notification.kf_personalloanid)} color="red" disabled={notification.kf_status === 123950000} />
+                  </View>
+                </View>
+              ))}
           </View>
         </View>
       </ScrollView>
       <CustomAlert
-          visible={showAlert}
-          onClose={handleCloseAlert}
-          onConfirm={handleCloseAlert}
-          headerMessage="Home Loan"
-          message="Record updated Successfully."
-          Button1="Cancel"
-          Button2="OK"
-          style={styles.alertStyle}
-          modalHeaderStyle={[styles.modalheaderStyle, {right: 90}]}
-          textStyle={styles.textStyle}
-        />
+        visible={showAlert}
+        onClose={handleCloseAlert}
+        onConfirm={handleCloseAlert}
+        headerMessage="Home Loan"
+        message="Record updated Successfully."
+        Button1="Cancel"
+        Button2="OK"
+        style={styles.alertStyle}
+        modalHeaderStyle={[styles.modalheaderStyle, { right: 90 }]}
+        textStyle={styles.textStyle}
+      />
     </View>
   );
 };
@@ -910,11 +892,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // semi-transparent black background
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 
   commentBoxContainer: {
-    backgroundColor: 'white', // White background color for the comment box
+    backgroundColor: 'white',
     padding: 20,
     borderRadius: 10,
     width: '80%',
@@ -925,7 +907,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginVertical: 10,
     padding: 5,
-    color: 'black', // Black text color for the comment input
+    color: 'black',
   },
   header: {
     fontSize: 18,
@@ -966,22 +948,22 @@ const styles = StyleSheet.create({
   },
   badgeContainer: {
     position: 'absolute',
-    top: -7, // Adjust the position of the badge vertically
-    right: -7, // Adjust the position of the badge horizontally
+    top: -7,
+    right: -7,
     backgroundColor: '#697d71',
     borderRadius: 50,
     width: 20,
     height: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1, // Ensure the badge is above the icon
-    borderWidth: 1, // Add border for better visibility
-    borderColor: '#fff', // White border color for better contrast
+    zIndex: 1,
+    borderWidth: 1,
+    borderColor: '#fff',
   },
   badgeText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 10, // Adjust font size for better visibility
+    fontSize: 10,
   },
   unreadItemContainer: {
     borderWidth: 2,
@@ -1022,26 +1004,26 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(243,242,241,255)'
   },
   noRecordsContainer: {
-    backgroundColor: '#FFF', // Background color of the container
-    borderRadius: 8, // Border radius to make it look like a card
-    padding: 16, // Padding around the text
-    margin: 16, // Margin around the container
-    shadowColor: '#000', // Shadow color
+    backgroundColor: '#FFF',
+    borderRadius: 8,
+    padding: 16,
+    margin: 16,
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.25, // Shadow opacity
+    shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    elevation: 5, // Elevation for Android shadow
-    justifyContent: 'center', // Center the text vertically
-    alignItems: 'center', // Center the text horizontally
+    elevation: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   noRecordsText: {
-    color: '#0000cc', // Text color
+    color: '#0000cc',
     fontSize: 16,
     fontWeight: 'bold',
-    textAlign: 'center', // Center align the text
+    textAlign: 'center',
   },
   tabContainer: {
     flexDirection: 'row',
@@ -1062,23 +1044,6 @@ const styles = StyleSheet.create({
   activeTab: {
     borderBottomColor: 'red',
   },
-  // noRecordsContainer: {
-  //   borderColor: '#ff6347', // Red color
-  //   borderWidth: 2,
-  //   borderRadius: 10, // Rounded corners
-  //   padding: 15,
-  //   marginHorizontal: 20,
-  //   marginVertical: 20,
-  //   backgroundColor: '#ffe4e1', // Light red background color
-  //   alignItems: 'center',
-  //   justifyContent: 'center',
-  // },
-  // noRecordsText: {
-  //   color: '#ff6347', // Red color
-  //   fontSize: 18,
-  //   fontWeight: 'bold',
-  //   textAlign: 'center',
-  // },
 });
 
 export default Notification;

@@ -19,25 +19,17 @@ import PersonalLoanCard from '../card/PersonalLoanCard';
 
 const UserDashboard = ({ navigation, route }) => {
     //   const { authenticatedUser } = route.params;
-    const [showLoanModal, setShowLoanModal] = useState(false);
-    const [loanData, setLoanData] = useState([]);
     const [initialLoading, setInitialLoading] = useState(true);
     const [selectedContact, setSelectedContact] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
-    const [showClearIcon, setShowClearIcon] = useState(false);
-    const [kf_status, setkf_status] = useState('');
-    const [selectedStatus, setSelectedStatus] = useState(null);
     const [PersonalLoanRecords, setPersonalLoanRecords] = useState([]);
     const [HomeLoanRecords, setHomeLoanRecords] = useState([]);
-    const [lastMonthData, setLastMonthData] = useState([]);
-    const [selectedLoanStatus, setSelectedLoanStatus] = useState(null);
     const [kf_adminname, setkf_adminname] = useState(null);
     const [personalLoans, setPersonalLoans] = useState([]);
     const [kf_address, setkf_address] = useState([]);
 
     const [loading, setLoading] = useState(true);
     const [authenticatedUser, setAuthenticatedUser] = useState(null);
-    const [gender, setGender] = useState('');
     const [mobileNumber, setMobileNumber] = useState('');
     const [name, setName] = useState('');
     const [address, setaddress] = useState('');
@@ -49,7 +41,6 @@ const UserDashboard = ({ navigation, route }) => {
     const recordId = authenticatedUser ? authenticatedUser.kf_userid : null;
     // console.log("recordId:", recordId);
 
-    const [sendApproval, setSendApproval] = useState(null);
     const [loanApplications, setLoanApplications] = useState([]);
     const [notifications, setNotifications] = useState([]);
     const totalRecords = loanApplications.length + notifications.length;
@@ -59,7 +50,6 @@ const UserDashboard = ({ navigation, route }) => {
 
     const [displayedHomeLoans, setDisplayedHomeLoans] = useState([]);
     const [displayedPersonalLoans, setDisplayedPersonalLoans] = useState([]);
-    const [showAllLoans, setShowAllLoans] = useState(false);
     const [showAllHomeLoans, setShowAllHomeLoans] = useState(false);
     const [showAllPersonalLoans, setShowAllPersonalLoans] = useState(false);
     const [showAlert, setShowAlert] = useState(false);
@@ -114,7 +104,6 @@ const UserDashboard = ({ navigation, route }) => {
     useEffect(() => {
         const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
             if (navigation.isFocused()) {
-                // If the user is on the login screen, show the exit confirmation alert
                 Alert.alert(
                     'Exit App',
                     'Are you sure you want to exit the app?',
@@ -143,16 +132,6 @@ const UserDashboard = ({ navigation, route }) => {
         setDisplayedPersonalLoans(showAllPersonalLoans ? PersonalLoanRecords : PersonalLoanRecords.slice(0, 0));
     }, [showAllHomeLoans, showAllPersonalLoans, HomeLoanRecords, PersonalLoanRecords]);
 
-    // Function to toggle showing all home loans
-    const toggleShowAllHomeLoans = () => {
-        setShowAllHomeLoans(!showAllHomeLoans);
-    };
-
-    // Function to toggle showing all personal loans
-    const toggleShowAllPersonalLoans = () => {
-        setShowAllPersonalLoans(!showAllPersonalLoans);
-    };
-
     useEffect(() => {
         if (route.params?.kf_adminname) {
             console.log("kf_adminname received in Dashboard:", route.params.kf_adminname);
@@ -168,7 +147,6 @@ const UserDashboard = ({ navigation, route }) => {
                 const user = JSON.parse(userString);
                 console.log('Authenticated user Dashboard:', user);
                 setAuthenticatedUser(user);
-                // Update kf_adminname if available in the user object
                 if (user.kf_adminname) {
                     setkf_adminname(user.kf_adminname);
                 }
@@ -305,7 +283,6 @@ const UserDashboard = ({ navigation, route }) => {
             }
         };
 
-        // Fetch loan applications when authenticated user changes or on initial load
         if (authenticatedUser) {
             fetchLoanApplications();
         }
@@ -348,17 +325,14 @@ const UserDashboard = ({ navigation, route }) => {
                 const personalLoansData = responsePersonalLoans.data.value;
                 // console.log("Personal Loans Data:", personalLoansData);
 
-                // Set state with fetched personal loans data
                 setPersonalLoans(personalLoansData);
             } catch (error) {
                 console.error("Error fetching personal loans:", error);
-                // Handle error, show alert or retry mechanism
             } finally {
                 setLoading(false);
             }
         };
 
-        // Fetch personal loans when authenticated user changes or on initial load
         if (authenticatedUser) {
             fetchPersonalLoans();
         }
@@ -374,15 +348,10 @@ const UserDashboard = ({ navigation, route }) => {
         navigation.navigate('PersonalLoanDetailsScreen', { personalLoan, address: address });
     };
 
-    // const handleRefresh = () => {
-    //     // This function will be called when you want to refresh the page
-    //     setRefresh(!refresh);
+    // const handlelogout = () => {
+    //     // navigation.navigate("Setting");
+    //     navigation.navigate('Setting', { isLoggedInAsManager: true });
     // };
-
-    const handlelogout = () => {
-        // navigation.navigate("Setting");
-        navigation.navigate('Setting', { isLoggedInAsManager: true });
-    };
 
     const handleNavigation = () => {
         navigation.navigate("UserNotification", { userapplicationid });
@@ -691,7 +660,7 @@ const UserDashboard = ({ navigation, route }) => {
                         refreshControl={
                             <RefreshControl
                                 refreshing={refreshing}
-                                onRefresh={() => setRefreshing(true)} 
+                                onRefresh={() => setRefreshing(true)}
                             />
                         }
                         showsVerticalScrollIndicator={false}
@@ -713,16 +682,16 @@ const UserDashboard = ({ navigation, route }) => {
                                                 <Text style={styles.detailText}>{userapplicationid}</Text>
                                                 {!address && (
                                                     <>
-                                                        <TouchableOpacity onPress={UpdateLoanRecords} style={{ flexDirection: "row" }}>
+                                                        <TouchableOpacity onPress={UpdateLoanRecords} style={{ flexDirection: "row", marginTop: 45, left: 40 }}>
                                                             <Ionicons name="location" size={25} color="red" style={{ left: 0 }} />
-                                                            <Text style={{ marginTop: 5 }}> Pick your Location </Text>
+                                                            <Text style={{ marginTop: 5 }}> Update Location </Text>
                                                         </TouchableOpacity>
                                                     </>
                                                 )}
                                                 {address && (
-                                                    <View style={{ flexDirection: "row" }}>
-                                                        <Ionicons name="location" size={25} color="green" style={{ right: 10, top: 2 }} />
-                                                        <Text style={{ width: "90%" }}>{address}</Text>
+                                                    <View style={{ flexDirection: "row", top: 15 }}>
+                                                        <Ionicons name="location-outline" size={25} color="green" style={{ right: 10, top: 2 }} />
+                                                        <Text style={{ width: "90%", fontSize: 11 }}>{address}</Text>
                                                     </View>
                                                 )}
 
@@ -799,7 +768,6 @@ const UserDashboard = ({ navigation, route }) => {
                                 </ScrollView>
                             )}
                         </View>
-
 
                     </ScrollView>
                 </View>

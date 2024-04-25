@@ -8,21 +8,19 @@ import NetInfo from "@react-native-community/netinfo";
 import ButtonComponent from '../../common/ButtonComponent';
 import CustomAlert from '../../common/CustomAlert';
 
-export const VerificationScreen = () => {
+export const VerificationScreen = ({ route }) => {
   const [kf_otp, setKf_otp] = useState('');
   const [isConnected, setIsConnected] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
   const [showAlertInvalidUser, setShowAlertInvalidUser] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showRePassword, setshowRePassword] = useState(false);
-  const [password, setPassword] = useState('');
   const [reEnteredPassword, setReEnteredPassword] = useState('');
   const [isOTPVerified, setIsOTPVerified] = useState(false);
-  const [kf_userid, setKf_userid] = useState('');
-  const [recordId, setRecordId] = useState(kf_userid);
   const [errorMessage, setErrorMessage] = useState('');
   const [isPasswordUpdating, setIsPasswordUpdating] = useState(false);
-
+  const { recordid } = route.params;
+  const [password, setPassword] = useState('');
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -40,37 +38,18 @@ export const VerificationScreen = () => {
             },
             {
               text: 'Yes',
-              onPress: () =>navigation.navigate("Welcome"),
+              onPress: () => navigation.navigate("Welcome"),
             },
           ],
           { cancelable: false }
         );
-        return true; 
+        return true;
       }
     });
 
     return () => backHandler.remove();
   }, [navigation]);
 
-  useEffect(() => {
-    // Fetch authenticated user from AsyncStorage
-    const fetchData = async () => {
-      try {
-        const authenticatedUser = await AsyncStorage.getItem('authenticatedUser');
-        if (authenticatedUser) {
-          const user = JSON.parse(authenticatedUser);
-          // Update kf_userid and recordId with the current user's ID
-          setKf_userid(user.kf_userid); // Assuming kf_userid represents the user's ID
-          setRecordId(user.kf_userid);
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    };
-  
-    fetchData(); // Call the fetchData function
-  }, []);
-  
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
       console.log('Network state changed:', state.isConnected);
@@ -88,11 +67,9 @@ export const VerificationScreen = () => {
   }, []);
 
   useEffect(() => {
-    // Check if the user is already authenticated
     const checkAuthentication = async () => {
       const isLoggedIn = await AsyncStorage.getItem('isLoggedIn');
       if (isLoggedIn === 'true') {
-        // If the user is authenticated, navigate to the UserDashboard screen
         const authenticatedUser = await AsyncStorage.getItem('authenticatedUser');
       }
     };
@@ -100,17 +77,12 @@ export const VerificationScreen = () => {
   }, []);
 
   const handleLogin = async () => {
-    // if (!isConnected) {
-    //   Alert.alert("No Internet Connection", "Please check your internet connection and try again.");
-    //   return;
-    // };
     if (!kf_otp) {
       Alert.alert("Error", "Please enter OTP");
       return;
     };
 
     try {
-      // Authenticate and get the access token from Dynamics CRM
       const tokenResponse = await axios.post(
         "https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token",
         `grant_type=client_credentials&client_id=d9dcdf05-37f4-4bab-b428-323957ad2f86&client_secret=JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2&resource=https://org0f7e6203.crm5.dynamics.com&kf_otp=${kf_otp}`,
@@ -124,7 +96,7 @@ export const VerificationScreen = () => {
       // Make requests to both kf_personalloans and kf_loanapplications tables based on the entered email
       try {
         const personalLoansResponse = await axios.get(
-          "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans?$select=kf_email,kf_mobile,kf_applicationnumber",
+          "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans",
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -133,7 +105,7 @@ export const VerificationScreen = () => {
           }
         );
         const userResponse = await axios.get(
-          "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_users?$select=kf_email,kf_otp",
+          "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_users",
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -142,7 +114,7 @@ export const VerificationScreen = () => {
           }
         );
         const loanApplicationsResponse = await axios.get(
-          "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications?$select=kf_email,kf_otp,kf_applicationnumber",
+          "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications",
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -150,7 +122,6 @@ export const VerificationScreen = () => {
             },
           }
         );
-        // Check if the user exists in either response
         const matchedUser = userResponse.data.value.find(
           (user) => user.kf_otp === kf_otp
         );
@@ -161,7 +132,6 @@ export const VerificationScreen = () => {
           kf_otp.length > 0 &&
           matchedUser
         ) {
-          // Authentication successful, save the authentication state and navigate to the Dashboard
           try {
             await AsyncStorage.setItem('isLoggedIn', 'true');
             await AsyncStorage.setItem('authenticatedUser', JSON.stringify(matchedUser));
@@ -172,10 +142,8 @@ export const VerificationScreen = () => {
             console.error('Error storing authentication state:', error);
           }
           console.log("Authenticated user:", matchedUser);
-          // Navigate to UserDashboard with the authenticated user's data
-        //   navigation.navigate("UserDashboard", { authenticatedUser: matchedUser });
+          //   navigation.navigate("UserDashboard", { authenticatedUser: matchedUser });
         } else {
-          // Authentication failed, display an error message
           console.log("Failed to authenticate. Invalid credentials.");
           setShowAlertInvalidUser(true);
         }
@@ -204,10 +172,10 @@ export const VerificationScreen = () => {
       );
     }
   };
-
   const handleUpdatePassword = async () => {
     setIsPasswordUpdating(true);
 
+    // Validate password length and match
     if (password.length < 6 || reEnteredPassword.length < 6) {
       setErrorMessage("Password should be at least 6 characters long");
       setIsPasswordUpdating(false);
@@ -217,13 +185,13 @@ export const VerificationScreen = () => {
     if (password !== reEnteredPassword) {
       setErrorMessage("Passwords do not match");
       setIsPasswordUpdating(false);
-      return; // Prevent further execution
+      return;
     } else {
-      setErrorMessage(""); // Clear the error message
+      setErrorMessage("");
     }
 
     try {
-      // Authenticate and get the access token from Dynamics CRM
+      // Fetch access token
       const tokenResponse = await axios.post(
         "https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token",
         `grant_type=client_credentials&client_id=d9dcdf05-37f4-4bab-b428-323957ad2f86&client_secret=JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2&resource=https://org0f7e6203.crm5.dynamics.com&kf_otp=${kf_otp}`,
@@ -234,10 +202,10 @@ export const VerificationScreen = () => {
         }
       );
       const accessToken = tokenResponse.data.access_token;
-  
-      // Update password using the same user response
+
+      // Update password using PATCH request
       const patchResponse = await axios.patch(
-        `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_users(${recordId})`,
+        `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_users(${recordid})`,
         {
           kf_password: password,
           kf_confirmpassword: reEnteredPassword
@@ -264,7 +232,6 @@ export const VerificationScreen = () => {
       setIsPasswordUpdating(false);
     }
   };
-  
 
   const handledShowInvalidAlert = () => {
     setShowAlertInvalidUser(true);
@@ -284,7 +251,7 @@ export const VerificationScreen = () => {
             <View style={styles.backgroundContainer}>
               <View style={styles.modalText}>
                 {/* <Text style={{ textAlign: "center", marginBottom: 40, fontSize: 18, fontWeight: "bold", color: "red" }}>OTP Verification</Text> */}
-                
+
                 {isOTPVerified ? (
                   <View>
                     <Text style={{ textAlign: "center", marginBottom: 40, fontSize: 18, fontWeight: "bold", color: "red" }}>Password Verification</Text>
@@ -319,11 +286,11 @@ export const VerificationScreen = () => {
                     {errorMessage !== '' && (
                       <Text style={styles.errorText}>{errorMessage}</Text>
                     )}
-                    <ButtonComponent style={{width:"70%", top: 30}}
+                    <ButtonComponent style={{ width: "70%", top: 30 }}
                       title="UPDATE PASSWORD"
                       onPress={handleUpdatePassword}
                       disabled={!password || !reEnteredPassword || isPasswordUpdating}
-                      />
+                    />
                   </View>
                 ) : (
                   <>
@@ -342,7 +309,7 @@ export const VerificationScreen = () => {
                         <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={24} color="#888" style={styles.eyeIcon} />
                       </TouchableOpacity>
                     </View>
-                    <ButtonComponent style={{top: 20}}
+                    <ButtonComponent style={{ top: 20 }}
                       title="VERIFY"
                       onPress={handleLogin}
                       disabled={isSignInDisabled}
@@ -362,13 +329,13 @@ export const VerificationScreen = () => {
         message="Please Enter Correct OTP."
         Button1="Cancel"
         Button2="OK"
-        style={[styles.alertStyle, {height: "23%"}]}
-        modalHeaderStyle={[styles.modalheaderStyle, {right: 65}]}
+        style={[styles.alertStyle, { height: "23%" }]}
+        modalHeaderStyle={[styles.modalheaderStyle, { right: 65 }]}
         textStyle={styles.textStyle}
       />
     </ImageBackground>
   );
-  
+
 };
 
 const styles = StyleSheet.create({
@@ -473,16 +440,13 @@ const styles = StyleSheet.create({
     fontSize: 25,
     fontWeight: "bold"
   },
-  alertStyle:{
-    // backgroundColor: "blue",
+  alertStyle: {
     width: "80%",
   },
-  modalheaderStyle:{
-    // backgroundColor: "green",
+  modalheaderStyle: {
     right: 85
   },
-  textStyle:{
-    // backgroundColor: "yellow"
+  textStyle: {
   }
 });
 

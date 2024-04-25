@@ -1,7 +1,5 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import { Ionicons } from '@expo/vector-icons'; // Import the icons
 
 // import ToggleFormScreen from '../Screen/LoginPages/ToggleFormScreen';
 import DashboardScreen from '../Screen/Dashboards/Dashboard';
@@ -12,19 +10,12 @@ import EditPersonalLoan from '../Screen/Loan/EditPersonalLoan';
 import HomeScreen from '../Screen/LoanCreate/HomeScreen';
 import PersonalLoan from '../Screen/LoanCreate/PersonalLoan';
 import DynamicDashboardScreen from '../Screen/DynamicDashboardScreen';
-import Loan from '../Screen/Loan';
 import Setting from '../Screen/setting';
-import Notification from '../Screen/Notification';
-import CustomDrawerContent from './CustomDrawer';
-import ScheduleDetailsScreen from '../Screen/EMI/ScheduleDetailScreen';
 import AmortizationScreen from '../Screen/EMI/AmortizationScreen';
-import ScheduleDetailsScreenHomeLoan from '../Screen/EMI/ScheduleDetailsScreenHomeLoan';
 import AmortizationScreenHome from '../Screen/EMI/AmortizationScreenHome';
 import SignatureScreen from '../Screen/Signature/signature';
 import PersonalSignatureScreen from '../Screen/Signature/PersonalSignatureScreen';
 import AccountScreen from '../Screen/Account';
-import ToggleFormScreen from '../Screen/ToggleFormScreen';
-// import HomeLoanGaurantee from '../Screen/Gaurantee/HomeLoanGaurantee';
 import LoginScreen from '../Screen/LoginPages/LoginScreen';
 import LoginManagerScreen from '../Screen/LoginPages/LoginManagerScreen';
 import ManagerDashboard from '../Screen/Dashboards/ManagerDashboard';
@@ -35,7 +26,6 @@ import PersonalLoanGurantee from '../Screen/Gaurantee/PersonalLoanGurantee';
 import PersonalLoanGurantee2 from '../Screen/Gaurantee/PersonalLoanGurantee2';
 import EditLoanDetail from '../Screen/EMI/EditLoanDetail';
 import SendNotification from './SendNotification';
-import AdminNotification from '../Screen/AdminNotification';
 import Gurantee1SignatureHome from '../Screen/Signature/Gurantee1SignatureHome';
 import Gurantee2SignatureHome from '../Screen/Signature/Gurantee2SignatureHome';
 import Gurantee1SignaturePersonal from '../Screen/Signature/Gurantee1SignaturePersonal';
@@ -43,22 +33,16 @@ import Gurantee2SignaturePersonal from '../Screen/Signature/Gurantee2SignaturePe
 import LoginForm from '../Screen/LoginPages/LoginForm';
 import LoginUserForm from '../Screen/LoginPages/LoginUser';
 import UserDashboard from '../Screen/Dashboards/UserDashboard';
-import UserLoanDetails from '../Screen/EMI/UserLoanDetails';
 import UserRegisterScreen from '../Screen/LoginPages/UserRegister';
 import UserConfrim from '../Screen/LoginPages/USerConfrim';
 import Welcome from '../Screen/LoginPages/Welcome';
 import VerificationScreen from '../Screen/LoginPages/Verification';
-import UserNotification from '../Screen/Dashboards/UserNotification';
+import Notification from '../Screen/notification/Notification';
+import AdminNotification from '../Screen/notification/AdminNotification';
+import UserNotification from '../Screen/notification/UserNotification';
 
 const Stack = createStackNavigator();
-const Drawer = createDrawerNavigator();
 
-// Example icons for each screen
-const DashboardIcon = () => <Ionicons name="md-home" size={24} color="red" />;
-const AccountIcon = () => <Ionicons name="md-person" size={24} color="red" />;
-const LoanIcon = () => <Ionicons name="md-cash" size={24} color="red" />;
-const SettingIcon = () => <Ionicons name="md-settings" size={24} color="red" />;
-// const NotificationIcon = () => <Ionicons name="md-settings" size={24} color="red" />;
 const StackNavigator = () => (
   <Stack.Navigator>
     <Stack.Screen name="AuthNavigator" component={AuthNavigator} options={{ headerShown: false }} />
@@ -76,8 +60,6 @@ const StackNavigator = () => (
     <Stack.Screen name="EditHomeLoan" component={EditHomeLoan} options={{ headerShown: false }} />
     <Stack.Screen name="EditPersonalLoan" component={EditPersonalLoan} options={{ headerShown: false }} />
     <Stack.Screen name="AmortizationScreen" component={AmortizationScreen} options={{ headerShown: false }} />
-    <Stack.Screen name="ScheduleDetailsScreen" component={ScheduleDetailsScreen} options={{ headerShown: false }} />
-    <Stack.Screen name="ScheduleDetailsScreenHomeLoan" component={ScheduleDetailsScreenHomeLoan} options={{ headerShown: false }} />
     <Stack.Screen name="AmortizationScreenHome" component={AmortizationScreenHome} options={{ headerShown: false }} />
     <Stack.Screen name="SignatureScreen" component={SignatureScreen} options={{ headerShown: false }} />
     <Stack.Screen name="PersonalSignatureScreen" component={PersonalSignatureScreen} options={{ headerShown: false }} />
@@ -98,7 +80,6 @@ const StackNavigator = () => (
     <Stack.Screen name="Gurantee2SignaturePersonal" component={Gurantee2SignaturePersonal} options={{ headerShown: false }} />
     <Stack.Screen name="LoginUserForm" component={LoginUserForm} options={{ headerShown: false }} />
     <Stack.Screen name="UserDashboard" component={UserDashboard} options={{ headerShown: false }} />
-    <Stack.Screen name="UserLoanDetails" component={UserLoanDetails} options={{ headerShown: false }} />
     <Stack.Screen name="VerificationScreen" component={VerificationScreen} options={{ headerShown: false }} />
     <Stack.Screen name="UserNotification" component={UserNotification} options={{ headerShown: false }} />
     <Stack.Screen name="DynamicDashboardScreen" component={DynamicDashboardScreen} options={{
@@ -107,75 +88,5 @@ const StackNavigator = () => (
     }} />
   </Stack.Navigator>
 );
-
-// const DrawerNavigator = () => (
-//   <Drawer.Navigator
-//   initialRouteName='Dashboards'
-//   drawerContent={(props) => <CustomDrawerContent {...props} />}
-//     screenOptions={{
-//       drawerStyle: {
-//         width: 210,
-//         height: "100%"
-//       },
-//       drawerLabelStyle: {
-//         color: 'red',
-//         fontSize: 15
-//       },
-//       drawerItemStyle: {
-//         borderBottomColor: 'gray',
-//         borderBottomWidth: 1,
-//       },
-//     }}>
-//        <Drawer.Screen
-//       name="Dashboards"
-//       component={StackNavigator}
-//       options={{
-//         headerShown: false,
-//         drawerIcon: DashboardIcon,
-//       }}
-//     />
-//       <Drawer.Screen
-//       name="Profile"
-//       component={AccountScreen}
-//       options={{
-//         headerShown: false,
-//         drawerIcon: AccountIcon,
-//       }}
-//     />
-//     {/* <Drawer.Screen
-//       name="Dashboards"
-//       component={StackNavigator}
-//       options={{
-//         headerShown: false,
-//         drawerIcon: DashboardIcon,
-//       }}
-//     /> */}
-//     <Drawer.Screen
-//       name="Loans"
-//       component={Loan}
-//       options={{
-//         headerShown: false,
-//         drawerIcon: LoanIcon,
-//       }}
-//     />
-//     <Drawer.Screen
-//       name="Settings"
-//       component={Setting}
-//       options={{
-//         headerShown: false,
-//         drawerIcon: SettingIcon,
-//         drawerItemStyle: {
-//           marginBottom: 500
-//         },
-//       }}
-//     />
-//   </Drawer.Navigator>
-// );
-
-// const AllStackScreens = () => (
-//   <Drawer.Navigator>
-//     <Drawer.Screen name="MainScreen" component={DrawerNavigator} options={{ headerShown: false }} />
-//   </Drawer.Navigator>
-// );
 
 export default StackNavigator;
