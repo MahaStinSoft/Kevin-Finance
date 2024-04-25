@@ -6,11 +6,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import HeaderComponent from '../common/Header';
 import axios from 'axios';
+import CustomAlert from '../common/CustomAlert';
 
-const Setting = () => {
+const Setting = ({ route }) => {
   const navigation = useNavigation();
   const [user, setUser] = useState(null);
+  const { isLoggedInAsManager } = route.params;
+  const [showAlertInvalidUser, setShowAlertInvalidUser] = useState(false);
 
+  console.log("isLoggedInAsManager: ", isLoggedInAsManager)
   const fetchUser = async () => {
     try {
       // Authenticate and obtain the access token
@@ -45,7 +49,7 @@ const Setting = () => {
 
         const userDetails = userResponse.data;
 
-        setUser({ 
+        setUser({
           ...userJson,
           ...userDetails,
         });
@@ -69,102 +73,140 @@ const Setting = () => {
     navigation.goBack();
   };
 
-   const handleDashboard = () => {
-    navigation.navigate("Dashboard");
+  const handleDashboard = () => {
+    // navigation.navigate("Dashboard");
+    if (isLoggedInAsManager) {
+      navigation.navigate("ManagerDashboard");
+    } else {
+      navigation.navigate("Dashboard");
+    }
   };
 
   const handleAccountScreen = () => {
     navigation.navigate("AccountScreen");
   };
 
-  
   const handleLogout = async () => {
     // Display confirmation alert
-    Alert.alert(
-      'Logout',
-      'Are you sure you want to log out?',
-      [
-        {
-          text: 'No',
-          style: 'cancel',
-        },
-        {
-          text: 'Yes',
-          onPress: async () => {
-            try {
-              // Clear authentication state
-              await AsyncStorage.setItem('isLoggedIn', 'false');
-              // Reset the navigation stack and navigate to the login screen
-              navigation.reset({
-                index: 0,
-                routes: [{ name: 'LoginScreen' }],
-              });
-            } catch (error) {
-              console.error('Error clearing authentication state:', error);
-            }
-          },
-        },
-      ],
-      { cancelable: false }
-    );
+    // Alert.alert(
+    //   'Logout',
+    //   'Are you sure you want to log out?',
+    //   [
+    //     {
+    //       text: 'No',
+    //       style: 'cancel',
+    //     },
+    //     {
+    //       text: 'Yes',
+    //       onPress: async () => {
+    //         try {
+    //           // Clear authentication state
+    //           await AsyncStorage.setItem('isLoggedIn', 'false');
+    //           // Reset the navigation stack and navigate to the login screen
+    //           navigation.reset({
+    //             index: 0,
+    //             routes: [{ name: 'LoginScreen' }],
+    //           });
+    //         } catch (error) {
+    //           console.error('Error clearing authentication state:', error);
+    //         }
+    //       },
+    //     },
+    //   ],
+    //   { cancelable: false }
+    // );
+    handledShowInvalidAlert();
   };
-  
+
+  const handledShowInvalidAlert = () => {
+    setShowAlertInvalidUser(true);
+  }
+
+  const handledCloseInvalidAlert = () => {
+    setShowAlertInvalidUser(false);
+  }
+
+  const handleConfirmLogout = async () => {
+    try {
+      // Clear authentication state
+      await AsyncStorage.setItem('isLoggedIn', 'false');
+      // Reset the navigation stack and navigate to the login screen
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Welcome' }],
+      });
+    } catch (error) {
+      console.error('Error clearing authentication state:', error);
+    }
+  };
+
   return (
-<View style={styles.container}>
-  <HeaderComponent titleText="SettingScreen" onPress={handleGoBack} />
-
-  <View>
-    {user ? (
+    <View style={styles.container}>
+      <HeaderComponent titleText="SettingScreen" onPress={handleGoBack} />
       <View>
-        {user.kf_profilepicture ? (
-          <Image
-            source={{ uri: `data:image/png;base64,${user.kf_profilepicture}` }}
-            style={styles.cardImage}
-            onError={(error) => console.error('Image load error:', error.nativeEvent.error)}
-          />
-         ) : ( 
-          <View style={styles.cardImageInitial}>
-            <Text style={styles.initialLetter}>{user.kf_adminname ? user.kf_adminname.charAt(0) : ''}</Text>
-          </View>
-        )} 
+        {user ? (
+          <View>
+            {user.kf_profilepicture ? (
+              <Image
+                source={{ uri: `data:image/png;base64,${user.kf_profilepicture}` }}
+                style={styles.cardImage}
+                onError={(error) => console.error('Image load error:', error.nativeEvent.error)}
+              />
+            ) : (
+              <View style={styles.cardImageInitial}>
+                <Text style={styles.initialLetter}>{user.kf_adminname ? user.kf_adminname.charAt(0) : ''}</Text>
+              </View>
+            )}
 
-        {/* {user.kf_adminname && (
+            {/* {user.kf_adminname && (
           <Text style={styles.adminName}>{user.kf_adminname}</Text>
         )} */}
 
-        <View style={styles.sepratorContent}>
-          <View style={styles.iconContent}>
-            <Ionicons name="md-person" size={24} color="white" />
-          </View>
-          <TouchableOpacity onPress={handleAccountScreen}>
-            <Text style={styles.textContent}>Profile</Text>
-          </TouchableOpacity>
-        </View>
+            <View style={styles.sepratorContent}>
+              <View style={styles.iconContent}>
+                <Ionicons name="md-person" size={24} color="white" />
+              </View>
+              <TouchableOpacity onPress={handleAccountScreen}>
+                <Text style={styles.textContent}>Profile</Text>
+              </TouchableOpacity>
+            </View>
 
-        <View style={styles.sepratorContent}>
-          <View style={styles.iconContent}>
-            <Ionicons name="md-home" size={24} color="white" />
-          </View>
-          <TouchableOpacity onPress={handleDashboard}>
-            <Text style={styles.textContent}>Dashboard</Text>
-          </TouchableOpacity>
-        </View>
+            <View style={styles.sepratorContent}>
+              <View style={styles.iconContent}>
+                <Ionicons name="md-home" size={24} color="white" />
+              </View>
+              <TouchableOpacity onPress={handleDashboard}>
+                <Text style={styles.textContent}>Dashboard</Text>
+              </TouchableOpacity>
+            </View>
 
-        <View style={styles.sepratorContent}>
-          <View style={styles.iconContent}>
-            <Ionicons name="md-log-out" size={24} color="white" />
+
           </View>
-          <TouchableOpacity onPress={handleLogout}>
-            <Text style={styles.textContent}>Logout</Text>
-          </TouchableOpacity>
-        </View>
+        ) : (
+          <ActivityIndicator size="large" color="#0000ff" />
+        )}
       </View>
-    ) : (
-      <ActivityIndicator size="large" color="#0000ff" />
-    )}
-  </View>
-</View>
-
+      <View style={styles.sepratorContent}>
+        <View style={styles.iconContent}>
+          <Ionicons name="md-log-out" size={24} color="white" />
+        </View>
+        <TouchableOpacity onPress={handleLogout}>
+          <Text style={styles.textContent}>Logout</Text>
+        </TouchableOpacity>
+      </View>
+      <CustomAlert
+        visible={showAlertInvalidUser} // Corrected the prop value
+        onClose={handledCloseInvalidAlert}
+        onConfirm={handleConfirmLogout}
+        headerMessage="Logout"
+        message="Are you sure you want to log out?"
+        Button1="Cancel"
+        Button2="OK"
+        style={[styles.alertStyle, { height: "23%" }]}
+        modalHeaderStyle={[styles.modalheaderStyle, { right: 100 }]}
+        textStyle={styles.textStyle}
+      />
+    </View>
   );
 };
 
@@ -177,8 +219,8 @@ const styles = StyleSheet.create({
     // backgroundColor: '#rgba(255,28,53,255)',
     // marginLeft:0,
     alignSelf: 'center',
-    paddingTop:-20,
-    marginTop:20,
+    paddingTop: -20,
+    marginTop: 20,
     height: 85,
     borderRadius: 50,
   },
@@ -199,15 +241,15 @@ const styles = StyleSheet.create({
     color: "#fff",
     padding: 25
   },
-    iconButton: {
+  iconButton: {
     marginRight: 16,
   },
   accountText: {
     flex: 1,
     textAlign: 'center',
-    color: 'white', 
-    fontSize: 20, 
-    fontWeight: 'bold', 
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
     marginRight: 50,
   },
   sepratorContent: {
@@ -218,11 +260,11 @@ const styles = StyleSheet.create({
     // backgroundColor: "#e6e6e6",
     flexDirection: "row",
     // justifyContent: "space-between"
-  }, 
+  },
   iconContent: {
-  backgroundColor: "red",
-   borderRadius: 20,
-   padding: 5
+    backgroundColor: "red",
+    borderRadius: 20,
+    padding: 5
   },
   textContent: {
     fontSize: 18,

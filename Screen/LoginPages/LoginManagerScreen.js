@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, TouchableOpacity, Text, TextInput, StyleSheet, ScrollView, Alert, Button, KeyboardAvoidingView, ImageBackground, Platform } from 'react-native';
+import { View, TouchableOpacity, Text, TextInput, StyleSheet, ScrollView, Alert, Button, KeyboardAvoidingView, ImageBackground, Platform, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import NetInfo from "@react-native-community/netinfo";
-
+import CustomAlert from '../../common/CustomAlert';
 import ButtonComponent from '../../common/ButtonComponent';
 
 export const LoginManagerScreen = () => {
@@ -15,12 +15,23 @@ export const LoginManagerScreen = () => {
   const [kf_password, setkf_applicationnumber] = useState(null);
   const [isMounted, setIsMounted] = useState(false);
   const [isConnected, setIsConnected] = useState(true);
+  const [showAlert, setShowAlert] = useState(false);
+  const [showAlertInvalidUser, setShowAlertInvalidUser] = useState(false);
+  const [showAlertInvalidUserDenied, setShowAlertInvalidUserDenied] = useState(false);
 
   const navigation = useNavigation();
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
+      console.log('Network state changed:', state.isConnected);
       setIsConnected(state.isConnected);
+
+      if (!state.isConnected) {
+        console.log('No Internet Connection');
+        setShowAlert(true);
+      } else {
+        setShowAlert(false);
+      }
     });
 
     return () => {
@@ -29,10 +40,10 @@ export const LoginManagerScreen = () => {
   }, []);
 
   const handleLogin = async () => {
-    if (!isConnected) {
-      Alert.alert("No Internet Connection", "Please check your internet connection and try again.");
-      return;
-    };
+    // if (!isConnected) {
+    //   Alert.alert("No Internet Connection", "Please check your internet connection and try again.");
+    //   return;
+    // };
 
     if (!kf_name || !kf_password) {
       Alert.alert("Error", "Please enter both mobilenumber and application number");
@@ -81,22 +92,25 @@ export const LoginManagerScreen = () => {
             }
 
             console.log("Authenticated user:", matchedUser);
-            console.log("response.data", response.data);
+            // console.log("response.data", response.data);
             navigation.navigate("ManagerDashboard", { authenticatedUser: matchedUser });
           } else {
             // User is not a Manager, display an error message
             console.log("User does not have the Manager role.");
-            Alert.alert("Error", "You do not have permission to login with these credentials.");
+            // Alert.alert("Error", "You do not have permission to login with these credentials.");
+            handledShowInvalidAlertDenied();
           }
         } else {
           // Authentication failed, display an error message
           console.log("Failed to authenticate. Invalid credentials.", response.data);
-          Alert.alert("Error", "Invalid credentials. Please try again.");
+          // Alert.alert("Invalid credentials", "Please Enter Correct Email & Password.");
+          handledShowInvalidAlert();
         }
       } else {
         // Authentication failed, display an error message
         console.log("Failed to authenticate. Response status:", response.status);
-        Alert.alert("Error", "Invalid credentials. Please try again.");
+        // Alert.alert("Invalid credentials", "Please Enter Correct Email & Password.");
+        handledShowInvalidAlert();
       }
     } catch (error) {
       console.error("Error during login:", error);
@@ -112,57 +126,97 @@ export const LoginManagerScreen = () => {
     }
   };
 
+  const handledShowInvalidAlert = () => {
+    setShowAlertInvalidUser(true);
+  }
+
+  const handledCloseInvalidAlert = () => {
+    setShowAlertInvalidUser(false);
+  }
+
+  const handledShowInvalidAlertDenied = () => {
+    setShowAlertInvalidUserDenied(true);
+  }
+
+  const handledCloseInvalidAlertDenied = () => {
+    setShowAlertInvalidUserDenied(false);
+  }
+
   const isSignInDisabled = !kf_name || !kf_password;
 
   return (
     <ImageBackground source={require('../../assets/red.png')} style={styles.backgroundImage}>
       <View style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-          <View style={styles.backgroundContainer}>
-            <View style={styles.modalText}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+          <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+            <View style={styles.backgroundContainer}>
+              <View style={styles.modalText}>
 
-              <Text style={{textAlign: "center", marginBottom: 40, fontSize: 18, fontWeight: "bold",color: "red"}}>MANAGER LOGIN</Text>
-            
-              <View style={styles.passwordContainer}>
-                <Ionicons name="person" size={20} color="#888" style={styles.icon} />
-                <TextInput
-                  placeholder="Enter mobilenumber"
-                  autoCapitalize="none"
-                  style={styles.input}
-                  value={kf_name}
-                  onChangeText={(text) => setkf_name(text)}
-                />
-              </View>
-              <View style={styles.passwordContainer}>
-                <Ionicons name="lock-closed" size={20} color="#888" style={styles.icon} />
-                <TextInput
-                  placeholder="Enter Password"
-                  autoCapitalize="none"
-                  style={styles.passwordInput}
-                  secureTextEntry={!showkf_applicationnumber}
-                  value={kf_password}
-                  onChangeText={(text) => setkf_applicationnumber(text)}
-                />
-                <TouchableOpacity onPress={() => setShowkf_applicationnumber(!showkf_applicationnumber)}>
-                  <Ionicons name={showkf_applicationnumber ? 'eye' : 'eye-off'} size={24} color="#888" style={styles.eyeIcon} />
-                </TouchableOpacity>
-              </View>
-              <TouchableOpacity style={styles.Forgotpassword} onPress={() => console.log('Forgot password')}>
+                <Text style={{ textAlign: "center", marginBottom: 40, fontSize: 18, fontWeight: "bold", color: "red" }}>MANAGER LOGIN</Text>
+
+                <View style={styles.passwordContainer}>
+                  <Ionicons name="person" size={20} color="#888" style={styles.icon} />
+                  <TextInput
+                    placeholder="Enter Email Address"
+                    autoCapitalize="none"
+                    style={styles.input}
+                    value={kf_name}
+                    onChangeText={(text) => setkf_name(text)}
+                  />
+                </View>
+                <View style={styles.passwordContainer}>
+                  <Ionicons name="lock-closed" size={20} color="#888" style={styles.icon} />
+                  <TextInput
+                    placeholder="Enter Password"
+                    autoCapitalize="none"
+                    style={styles.passwordInput}
+                    secureTextEntry={!showkf_applicationnumber}
+                    value={kf_password}
+                    onChangeText={(text) => setkf_applicationnumber(text)}
+                  />
+                  <TouchableOpacity onPress={() => setShowkf_applicationnumber(!showkf_applicationnumber)}>
+                    <Ionicons name={showkf_applicationnumber ? 'eye' : 'eye-off'} size={24} color="#888" style={styles.eyeIcon} />
+                  </TouchableOpacity>
+                </View>
+                {/* <TouchableOpacity style={styles.Forgotpassword} onPress={() => console.log('Forgot password')}>
               <Text style={styles.ForgotText}>Forgot Password?</Text>
-              </TouchableOpacity>
-              <ButtonComponent
-                title="Login IN"
-                onPress={handleLogin}
-                disabled={isSignInDisabled}
-              />
+              </TouchableOpacity> */}
+                <ButtonComponent
+                  title="SIGN IN"
+                  onPress={handleLogin}
+                  disabled={isSignInDisabled}
+                />
+              </View>
             </View>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </View>
+      <CustomAlert
+        visible={showAlertInvalidUserDenied}
+        onClose={handledCloseInvalidAlertDenied}
+        onConfirm={handledCloseInvalidAlertDenied}
+        headerMessage="Permission denied"
+        message="You do not have permission to login with these credentials."
+        Button1="Cancel"
+        Button2="OK"
+        style={[styles.alertStyle, { height: "23%" }]}
+        modalHeaderStyle={[styles.modalheaderStyle, { right: 65 }]}
+        textStyle={styles.textStyle}
+      />
+      <CustomAlert
+        visible={showAlertInvalidUser}
+        onClose={handledCloseInvalidAlert}
+        onConfirm={handledCloseInvalidAlert}
+        headerMessage="Invalid credentials"
+        message="Please Enter Correct Email & Password."
+        Button1="Cancel"
+        Button2="OK"
+        style={[styles.alertStyle, { height: "23%" }]}
+        modalHeaderStyle={[styles.modalheaderStyle, { right: 65 }]}
+        textStyle={styles.textStyle}
+      />
     </ImageBackground>
   );
 };
@@ -237,10 +291,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 100,
   },
   backgroundImage: {
-    width: '100%',
-    height: '100%',
+    flex: 1,
     resizeMode: 'cover',
-    maxWidth: 900
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height
   },
   backgroundContainer: {
     backgroundColor: 'white',
@@ -249,7 +303,6 @@ const styles = StyleSheet.create({
     height: '60%',
     borderRadius: 40,
     ...Platform.select({
-
       android: {
         elevation: 5,
         shadowColor: 'white',
@@ -271,6 +324,17 @@ const styles = StyleSheet.create({
     fontSize: 25,
     fontWeight: "bold"
   },
+  alertStyle: {
+    // backgroundColor: "blue",
+    width: "80%",
+  },
+  modalheaderStyle: {
+    // backgroundColor: "green",
+    right: 85
+  },
+  textStyle: {
+    // backgroundColor: "yellow"
+  }
 });
 
 export default LoginManagerScreen;

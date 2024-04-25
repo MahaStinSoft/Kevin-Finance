@@ -1,29 +1,72 @@
-// CardImageSignature.js
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, Modal, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, Modal, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import CustomAlert from './CustomAlert';
 
-const CardImageSignature = ({ title, signatureImage, setSignatureImage, pickImage }) => {
+const CardImageSignature = ({ title, setImageContent, navigation, pickImage }) => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [signatureDrawn, setSignatureDrawn] = useState(false);
+  const [showAlert, setShowAlertConfirmation] = useState(false);
+
+  useEffect(() => {
+    setModalVisible(false);
+  }, [title]);
 
   const onViewImage = () => {
-    setModalVisible(true);
+    setModalVisible(!modalVisible); // Toggle modal visibility
   };
 
   const closeModal = () => {
     setModalVisible(false);
   };
 
+  const takePictureWithCamera = async () => {
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+        base64: true,
+      });
+
+      if (!result.cancelled) {
+        setImageContent({ fileName: result.uri.split('/').pop(), fileContent: result.base64 });
+        await AsyncStorage.setItem('selectedImage', JSON.stringify({ fileName: result.uri.split('/').pop(), fileContent: result.base64 }));
+        // Alert.alert(
+        //   'Signature Captured Successfully',
+        //   'The image has been successfully picked',
+        //   [
+        //     { text: 'OK', onPress: closeModal }
+        //   ]
+        // );
+        handleShowAlert();
+      }
+    } catch (error) {
+      console.error('Error taking picture:', error);
+    }
+  };
+
+  const handleShowAlert = () => {
+    setShowAlertConfirmation(true);
+  };
+
+  const handleCloseAlert = () => {
+    setShowAlertConfirmation(false);
+  };
+
+  const handleCloseAlertConfirmation = () => {
+    setShowAlertConfirmation(false);
+    closeModal();
+  };
+
   return (
-    <View style={{ flexDirection: 'row', marginTop: 15, alignContent: 'space-around' }}>
-      <View style={{ marginHorizontal: 25, width: 140 }}>
-        <Text>{title}</Text>
-      </View>
-      <TouchableOpacity onPress={pickImage} style={{ backgroundColor: 'red', marginRight: 20, padding: 10, borderRadius: 25, width: 85, marginLeft: -10 }}>
-        <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold' }}>{title}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={onViewImage} style={{ backgroundColor: signatureImage ? 'red' : 'gray', marginRight: 20, padding: 10, borderRadius: 25, width: 80 }}>
-        <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold' }}>View</Text>
+    <View style={{ flexDirection: 'row', marginTop: 15, alignContent: 'space-around', width: '26%' }}>
+      <Text style={{ textAlign: 'center', width: 100 }}>{title}</Text>
+      <TouchableOpacity onPress={onViewImage} style={{ backgroundColor: 'red', padding: 5, borderRadius: 25, width: 90, top: -12 }}>
+        <Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold' }}>Upload</Text>
       </TouchableOpacity>
       <Modal
         animationType="slide"
@@ -33,18 +76,32 @@ const CardImageSignature = ({ title, signatureImage, setSignatureImage, pickImag
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <View style={styles.imageContainer}>
-              <Image
-                style={{ width: 340, height: 340, objectFit: 'fill' }}
-                source={{ uri: signatureImage }}
-              />
-              <TouchableOpacity onPress={closeModal} style={styles.closeIconContainer}>
-                <Ionicons name="close" size={28} color="white" />
+            <View>
+              <TouchableOpacity onPress={(pickImage)} style={styles.optionButton}>
+                <Text style={styles.optionButtonText}>Capture</Text>
               </TouchableOpacity>
             </View>
+            <TouchableOpacity onPress={takePictureWithCamera} style={styles.optionButton}>
+              <Text style={styles.optionButtonText}>Camera</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={closeModal} style={[styles.optionButton, { backgroundColor: 'gray' }]}>
+              <Text style={styles.optionButtonText}>Cancel</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
+      <CustomAlert
+        visible={showAlert}
+        onClose={handleCloseAlert}
+        onConfirm={handleCloseAlertConfirmation}
+        headerMessage="Signature"
+        message="Signature Captutred Successfully"
+        Button1="Cancel"
+        Button2="OK"
+        style={styles.alertStyle}
+        modalHeaderStyle={[styles.modalheaderStyle, { right: 90 }]}
+        textStyle={styles.textStyle}
+      />
     </View>
   );
 };
@@ -54,24 +111,26 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    padding: 20,
-    borderRadius: 10,
-    backgroundColor:'white'
-  },
-  imageContainer: {
-    position: 'relative',
-    objectFit: 'cover',
-  },
-  closeIconContainer: {
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'white',
     borderRadius: 20,
-    padding: 5,
-    position: 'absolute',
-    top: '6%',
-    right: '-2%',
+    padding: 20,
+    alignItems: 'center',
+    elevation: 5,
+  },
+  optionButton: {
+    backgroundColor: 'red',
+    padding: 10,
+    borderRadius: 25,
+    width: 200,
+    marginBottom: 10,
+  },
+  optionButtonText: {
+    textAlign: 'center',
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 

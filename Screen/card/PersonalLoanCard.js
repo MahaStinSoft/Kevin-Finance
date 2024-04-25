@@ -1,6 +1,5 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 
 const PersonalLoanCard = ({ personalLoan, onPress, onDelete }) => {
   
@@ -15,23 +14,25 @@ const PersonalLoanCard = ({ personalLoan, onPress, onDelete }) => {
       case 123950003:
         return 'Cancelled';
       case 123950004:
-        return 'Expired';
+        return 'Rejected';
       default:
         return 'Pending Approval';
     }
   };
 
   const renderImage = () => {
-    if (personalLoan.entityimage) {
+    if (personalLoan.kf_applicantimage) {
       return (
         <Image
-          source={{ uri: `data:image/png;base64,${personalLoan.entityimage}` }}
+          source={{ uri: `data:image/png;base64,${personalLoan.kf_applicantimage}` }}
           style={styles.cardImage}
           onError={(error) => console.error('Image load error:', error.nativeEvent.error)}
         />
       );
     } else {
-      const initials = `${personalLoan.kf_firstname[0]}${personalLoan.kf_lastname[0]}`;
+      const initials = personalLoan.kf_firstname && personalLoan.kf_lastname
+        ? `${personalLoan.kf_firstname[0]}${personalLoan.kf_lastname[0]}`
+        : '';
       return (
         <View style={[styles.cardImage, styles.placeholderImage]}>
           <Text style={styles.placeholderText}>{initials}</Text>
@@ -46,17 +47,11 @@ const PersonalLoanCard = ({ personalLoan, onPress, onDelete }) => {
         {renderImage()}
         <View style={styles.cardContent}>
           <Text style={styles.cardTitle}>{`${personalLoan.kf_firstname} ${personalLoan.kf_lastname} - ${personalLoan.kf_applicationnumber }`}</Text>
-           {/* <Text style={styles.cardLabel}>{`Application Number: ${personalLoan.kf_applicationnumber || ''}`}</Text> */}
           <Text style={styles.cardLabel}>{`Mobile Number: ${personalLoan.kf_mobile || ''}`}</Text>
           <Text style={styles.cardLabel}>{`Aadhar Number: ${personalLoan.kf_aadharnumber || ''}`}</Text>
           <Text style={styles.cardLabel}>{`Status: ${getLoanStatusLabel()}`}</Text>
         </View>
       </TouchableOpacity>
-      {/* <View style={styles.deleteIconContainer}>
-        <TouchableOpacity onPress={() => onDelete(personalLoan)}>
-          <Ionicons name="trash" size={25} color="red" />
-        </TouchableOpacity>
-      </View> */}
     </View>
   );
 };

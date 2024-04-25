@@ -12,18 +12,23 @@ import {
   ActivityIndicator,
   StatusBar,
   Platform,
-RefreshControl
+  RefreshControl,
+  Alert,
+  BackHandler
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
+import querystring from 'querystring';
+import CustomAlert from '../../common/CustomAlert';
 
 import axios from 'axios';
 import { BarChart } from 'react-native-chart-kit';
 
 import HomeLoanCard from '../card/HomeLoanCard';
 import PersonalLoanCard from '../card/PersonalLoanCard';
+import ButtonComponent from '../../common/ButtonComponent';
 
 const ManagerDashboard = ({ navigation, route }) => {
   // const { authenticatedUser } = route.params;
@@ -44,38 +49,88 @@ const ManagerDashboard = ({ navigation, route }) => {
   const [lastMonthData, setLastMonthData] = useState([]);
   const [selectedLoanStatus, setSelectedLoanStatus] = useState(null);
   const [kf_adminname, setkf_adminname] = useState(null);
-    const [refresh, setRefresh] = useState(false);
+
+  const [sendApproval, setSendApproval] = useState(null);
+  const [loanApplications, setLoanApplications] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const totalRecords = loanApplications.length + notifications.length;
+  const unreadMessagesCount = loanApplications.filter(application => !application.kf_markasread).length + notifications.filter(notification => !notification.kf_markasread).length;
+
+  const [refresh, setRefresh] = useState(false);
 
   const [displayedHomeLoans, setDisplayedHomeLoans] = useState([]);
   const [displayedPersonalLoans, setDisplayedPersonalLoans] = useState([]);
   const [showAllLoans, setShowAllLoans] = useState(false);
+  const [showAllHomeLoans, setShowAllHomeLoans] = useState(false);
+  const [showAllPersonalLoans, setShowAllPersonalLoans] = useState(false);
+  const [showAlert, setShowAlert] = useState(false); 
+  const [isConnected, setIsConnected] = useState(true);
 
   const isFocused = useIsFocused();
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
       console.log('Network state changed:', state.isConnected);
+      setIsConnected(state.isConnected);
+
       if (!state.isConnected) {
         console.log('No Internet Connection');
-        Alert.alert('No Internet Connection', 'Please check your internet connection and try again.');
-      }      
+        setShowAlert(true);
+      } else {
+        setShowAlert(false);
+      }
     });
-  
+
     return () => {
       unsubscribe();
     };
-  }, []);  
+  }, []);
 
   useEffect(() => {
     getAuthenticatedUser();
   }, [isFocused, getAuthenticatedUser]);
 
-  // Update displayed loans based on showAllLoans state
+  
   useEffect(() => {
-    setDisplayedHomeLoans(showAllLoans ? HomeLoanRecords : HomeLoanRecords.slice(0, 3));
-    setDisplayedPersonalLoans(showAllLoans ? PersonalLoanRecords : PersonalLoanRecords.slice(0, 3));
-  }, [showAllLoans, HomeLoanRecords, PersonalLoanRecords]);
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (navigation.isFocused()) {
+        Alert.alert(
+          'Exit App',
+          'Are you sure you want to exit the app?',
+          [
+            {
+              text: 'Cancel',
+              onPress: () => null,
+              style: 'cancel',
+            },
+            {
+              text: 'Exit',
+              onPress: () => BackHandler.exitApp(),
+            },
+          ],
+          { cancelable: false }
+        );
+        return true; 
+      }
+    });
 
+    return () => backHandler.remove();
+  }, [navigation]);
+
+  
+
+  useEffect(() => {
+    setDisplayedHomeLoans(showAllHomeLoans ? HomeLoanRecords : HomeLoanRecords.slice(0, 3));
+    setDisplayedPersonalLoans(showAllPersonalLoans ? PersonalLoanRecords : PersonalLoanRecords.slice(0, 3));
+  }, [showAllHomeLoans, showAllPersonalLoans, HomeLoanRecords, PersonalLoanRecords]);
+
+ const toggleShowAllHomeLoans = () => {
+  setShowAllHomeLoans(!showAllHomeLoans);
+};
+
+const toggleShowAllPersonalLoans = () => {
+  setShowAllPersonalLoans(!showAllPersonalLoans);
+};
 
   useEffect(() => {
     if (route.params?.kf_adminname) {
@@ -104,18 +159,6 @@ const ManagerDashboard = ({ navigation, route }) => {
 
   const deviceWidth = Dimensions.get('window').width;
   const textColor = deviceWidth < 390 ? 'red' : 'blue';
-
-  const handleHomeLoan = () => {
-    navigation.navigate('HomeLoan');
-    setShowLoanModal(false);
-
-  };
-
-  const handlePersonalLoan = () => {
-    navigation.navigate("PersonalLoan");
-    console.log("Personal Selected");
-    setShowLoanModal(false);
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -159,33 +202,42 @@ const ManagerDashboard = ({ navigation, route }) => {
         const homeLoans = responseLoanApplications.data.value;
         const personalLoans = responsePersonalLoans.data.value;
 
+        const sortedHomeLoans = homeLoans.sort((a, b) => new Date(b.createdon) - new Date(a.createdon));
+        const sortedPersonalLoans = personalLoans.sort((a, b) => new Date(b.createdon) - new Date(a.createdon));
+  
+        const latestHomeLoans = sortedHomeLoans.slice(0, 3);
+        const latestPersonalLoans = sortedPersonalLoans.slice(0, 3);
+
         const userAdmin = authenticatedUser ? authenticatedUser.kf_adminname : '';
 
         const homeLoanRecords = homeLoans.filter(
-          (homeLoan) => 
-            // homeLoan.kf_createdby === userAdmin &&
-            (
-              homeLoan.kf_name && homeLoan.kf_name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-              homeLoan.kf_lastname && homeLoan.kf_lastname.toUpperCase().includes(searchQuery.toUpperCase()) ||
-              (homeLoan.kf_mobilenumber && homeLoan.kf_mobilenumber.toLowerCase().includes(searchQuery.toLowerCase())) ||
-              (homeLoan.kf_aadharnumber && homeLoan.kf_aadharnumber.toLowerCase().includes(searchQuery.toLowerCase()))
-            )
-        );        
-        
-        const personalLoanRecords = personalLoans.filter(
-          (personalLoan) => 
-            // personalLoan.kf_createdby === userAdmin &&
-            (
-              personalLoan.kf_firstname && personalLoan.kf_firstname.toUpperCase().includes(searchQuery.toUpperCase()) ||
-              personalLoan.kf_lastname && personalLoan.kf_lastname.toUpperCase().includes(searchQuery.toUpperCase()) ||
-              (personalLoan.kf_mobile && personalLoan.kf_mobile.toLowerCase().includes(searchQuery.toLowerCase())) ||
-              (personalLoan.kf_aadharnumber && personalLoan.kf_aadharnumber.toLowerCase().includes(searchQuery.toLowerCase()))
-            )
+          (homeLoan) =>
+          // homeLoan.kf_createdby === userAdmin &&
+          (
+            homeLoan.kf_name && homeLoan.kf_name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+            homeLoan.kf_lastname && homeLoan.kf_lastname.toUpperCase().includes(searchQuery.toUpperCase()) ||
+            (homeLoan.kf_mobilenumber && homeLoan.kf_mobilenumber.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (homeLoan.kf_aadharnumber && homeLoan.kf_aadharnumber.toLowerCase().includes(searchQuery.toLowerCase()))
+          )
         );
-    
+
+        const personalLoanRecords = personalLoans.filter(
+          (personalLoan) =>
+          // personalLoan.kf_createdby === userAdmin &&
+          (
+            personalLoan.kf_firstname && personalLoan.kf_firstname.toUpperCase().includes(searchQuery.toUpperCase()) ||
+            personalLoan.kf_lastname && personalLoan.kf_lastname.toUpperCase().includes(searchQuery.toUpperCase()) ||
+            (personalLoan.kf_mobile && personalLoan.kf_mobile.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (personalLoan.kf_aadharnumber && personalLoan.kf_aadharnumber.toLowerCase().includes(searchQuery.toLowerCase()))
+          )
+        );
+
+        setDisplayedHomeLoans(latestHomeLoans);
+        setDisplayedPersonalLoans(latestPersonalLoans);
+
         setHomeLoanRecords(homeLoanRecords);
         setPersonalLoanRecords(personalLoanRecords);
-    
+
         setHomeLoanContacts(homeLoanRecords);
         setPersonalLoanContacts(personalLoanRecords);
 
@@ -209,7 +261,7 @@ const ManagerDashboard = ({ navigation, route }) => {
       const fetchLoanData = async () => {
         try {
           setLoading(true);
-  
+
           const data = {
             grant_type: "client_credentials",
             client_id: "d9dcdf05-37f4-4bab-b428-323957ad2f86",
@@ -217,15 +269,15 @@ const ManagerDashboard = ({ navigation, route }) => {
             scope: "https://org0f7e6203.crm5.dynamics.com/.default",
             client_secret: "JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2",
           };
-  
+
           const tokenResponse = await axios.post(
             "https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token",
             new URLSearchParams(data).toString(),
             { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
           );
-  
+
           const accessToken = tokenResponse.data.access_token;
-  
+
           const responseLoanApplications = await axios.get(
             "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications",
             {
@@ -233,12 +285,9 @@ const ManagerDashboard = ({ navigation, route }) => {
                 Authorization: `Bearer ${accessToken}`,
                 "Content-Type": "application/json",
               },
-              // params: {
-              //   "$filter": `kf_createdby eq '${authenticatedUser.kf_adminname}'`
-              // }
             }
           );
-  
+
           const responsePersonalLoans = await axios.get(
             "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans",
             {
@@ -246,38 +295,35 @@ const ManagerDashboard = ({ navigation, route }) => {
                 Authorization: `Bearer ${accessToken}`,
                 "Content-Type": "application/json",
               },
-              // params: {
-              //   "$filter": `kf_createdby eq '${authenticatedUser.kf_adminname}'`
-              // }
             }
           );
-  
+
           const homeLoans = responseLoanApplications.data.value;
           const personalLoans = responsePersonalLoans.data.value;
-  
+
           const filteredHomeLoans = homeLoans.filter(
             (homeLoan) => homeLoan.kf_status !== null
           );
-  
+
           const filteredPersonalLoans = personalLoans.filter(
             (personalLoan) => personalLoan.kf_status !== null
           );
-  
+
           const combinedData = [...filteredHomeLoans, ...filteredPersonalLoans];
-  
+
           setLoanData(combinedData);
-  
+
           const today = new Date();
           const lastMonth = new Date(today);
           lastMonth.setMonth(today.getMonth() - 1);
-  
+
           const lastMonthRecords = combinedData.filter((item) => {
             const createdDate = new Date(item.createdon);
             return createdDate >= lastMonth && createdDate <= today;
           });
-  
+
           setLastMonthData(lastMonthRecords);
-    
+
         } catch (error) {
           console.error("Error fetching loan data:", error);
           console.log("API Response:", error.response?.data);
@@ -285,7 +331,7 @@ const ManagerDashboard = ({ navigation, route }) => {
           setLoading(false);
         }
       };
-  
+
       if (authenticatedUser) {
         fetchLoanData();
       } else {
@@ -293,8 +339,6 @@ const ManagerDashboard = ({ navigation, route }) => {
       }
     }, [authenticatedUser])
   );
-  
-  
 
   const filteredData = loanData.filter(
     (item) =>
@@ -304,15 +348,14 @@ const ManagerDashboard = ({ navigation, route }) => {
 
   const statusCounts = {
     approved: filteredData.filter((item) => item.kf_status === 123950000).length,
-    draft: filteredData.filter((item) => item.kf_status === 123950002).length,
+    // draft: filteredData.filter((item) => item.kf_status === 123950002).length,
     pending: filteredData.filter((item) => item.kf_status === 123950001).length,
-    canceled: filteredData.filter((item) => item.kf_status === 123950003).length,
+    // canceled: filteredData.filter((item) => item.kf_status === 123950003).length,
     expired: filteredData.filter((item) => item.kf_status === 123950004).length,
   };
 
   const handleStatusClick = (status) => {
     if (selectedStatus === status) {
-      // If the same status is clicked again, reset the filter
       setSelectedLoanStatus(null);
     } else {
       setSelectedLoanStatus(status);
@@ -337,280 +380,313 @@ const ManagerDashboard = ({ navigation, route }) => {
   const handleClearSearch = () => {
     setSearchQuery('');
     setShowClearIcon(false);
-    // Optionally, you can reset or re-fetch your data here
   };
   const handleRefresh = () => {
-    // This function will be called when you want to refresh the page
     setRefresh(!refresh);
   };
 
-const handleDynamicDashboard = () => {
- try {
-  navigation.navigate('DynamicDashboardScreen');
-} catch (error) {
-  console.error('Error navigating to DynamicDashboardScreen:', error);
-}
-}
+  const handleDynamicDashboard = () => {
+    try {
+      navigation.navigate('DynamicDashboardScreen');
+    } catch (error) {
+      console.error('Error navigating to DynamicDashboardScreen:', error);
+    }
+  }
 
-const handleSettings = () => {
-  navigation.navigate( "Setting");
+  useEffect(() => {
+    fetchLoanApplications();
+    fetchNotifications();
+  }, []);
+
+const fetchLoanApplications = async () => {
+  try {
+    const tokenResponse = await axios.post(
+      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+      querystring.stringify({
+        grant_type: 'client_credentials',
+        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+        resource: 'https://org0f7e6203.crm5.dynamics.com',
+        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+      }),
+      {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      }
+    );
+
+    const accessToken = tokenResponse.data.access_token;
+
+    const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (response.data && response.data.value && Array.isArray(response.data.value)) {
+      const filteredApplications = response.data.value.filter(application => application.kf_sendapproval == 1);
+      setLoanApplications(filteredApplications);
+      // setRefresh(true);
+
+      if (loanApplications.length < filteredApplications.length) {
+        const newApplication = filteredApplications[filteredApplications.length - 1]; // Assuming the last fetched application is the new one
+        // schedulePushNotification(newApplication.kf_applicationnumber, newApplication.kf_name, newApplication.kf_lastname, newApplication.kf_amount, newApplication.kf_createdby); // Schedule push notification with relevant data
+      }
+    } else {
+      console.error('Invalid loan applications response format:', response.data);
+    }
+  } catch (error) {
+    console.error('Error fetching loan applications:', error);
+  }
 };
 
-  return (
-    <>
-      <StatusBar />
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
+const fetchNotifications = async () => {
+  try {
+    const tokenResponse = await axios.post(
+      'https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token',
+      querystring.stringify({
+        grant_type: 'client_credentials',
+        client_id: 'd9dcdf05-37f4-4bab-b428-323957ad2f86',
+        resource: 'https://org0f7e6203.crm5.dynamics.com',
+        scope: 'https://org0f7e6203.crm5.dynamics.com/.default',
+        client_secret: 'JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2',
+      }),
+      {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      }
+    );
 
-        <View style={styles.container}>
+    const accessToken = tokenResponse.data.access_token;
 
-          <View style={styles.navBar}>
-            {/* <TouchableOpacity style={styles.iconButton} onPress={() => navigation.openDrawer()}>
-              <Ionicons name="list-sharp" size={25} color="#fff" />
-            </TouchableOpacity> */}
-            <Text style={styles.text}>Kevin Small Finance</Text>
-            <TouchableOpacity style={styles.iconButton} onPress={handleSettings}>
-              <Ionicons name="notifications" size={25} color="#fff" />
-            </TouchableOpacity>
-          </View>
+    const response = await axios.get('https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
 
-          <View style={styles.searchSection}>
-            <Ionicons style={styles.searchIcon} name="search" size={25} color="rgba(255, 28, 53, 255)" />
-            <TextInput
-              style={styles.input} placeholder="Search"
-              value={searchQuery}
-              onChangeText={handleSearch}
-            />
-            {showClearIcon && (
-              <Ionicons
-                style={styles.searchIcon}
-                name="close"
-                size={25}
-                color="rgba(255, 28, 53, 255)"
-                onPress={handleClearSearch}
-              />
-            )}
-          </View>
+    if (response.data && response.data.value && Array.isArray(response.data.value)) {
+      const filteredNotifications = response.data.value.filter(notification => notification.kf_sendapproval == 1);
+      setNotifications(filteredNotifications);
+      // setRefresh(true);
 
-          <ScrollView
-            contentContainerStyle={{ width: '100%' }}
-            refreshControl={
-              <RefreshControl
-                refreshing={loading}
-                onRefresh={handleRefresh}
-              />
-            }
-            showsVerticalScrollIndicator={false}
-            showsHorizontalScrollIndicator={false}
-          >
+      if (notifications.length < filteredNotifications.length) {
+        const newNotification = filteredNotifications[filteredNotifications.length - 1]; 
+      }
+    } else {
+      console.error('Invalid notifications response format:', response.data);
+    }
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+  }
+};
 
-            {/* <View>
-              {authenticatedUser && (
-                <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 2, textAlign: "center" }}>Created By: {authenticatedUser.kf_adminname}</Text>
-              )}
-            </View> */}
-            {/* <LogoutButton navigation={navigation}/> */}
+const handleCloseAlert = () => {
+  setShowAlert(false);
+};
 
-            <Text style={{textAlign: "center", marginVertical: 10, fontSize: 18, fontWeight: "bold",color: "red"}}>MANAGER DASHBOARD</Text>
+  const handlelogout = () => {
+    navigation.navigate('Setting', { isLoggedInAsManager: true });
+  };
 
+  const handleNavigation = () => {
+    navigation.navigate("Notification", { kf_adminname });
+  };
 
-            <View style={styles.chart}>
-              <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 10, marginBottom: 10 }}>Loan Status Chart</Text>
-              {/* <Text style={styles.totalLoans}>Total Loans: {filteredData.length}</Text> */}
-
-              <View style={styles.statusContainer}>
-                <TouchableOpacity onPress={() => handleStatusClick(123950000)}>
-                  <Text style={styles.statusText}>Approved: {statusCounts.approved}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleStatusClick(123950002)}>
-                  <Text style={styles.statusText}>Draft: {statusCounts.draft}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleStatusClick(123950001)}>
-                  <Text style={styles.statusText}>Pending: {statusCounts.pending}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleStatusClick(123950003)}>
-                  <Text style={styles.statusText}>Canceled: {statusCounts.canceled}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleStatusClick(123950004)}>
-                  <Text style={styles.statusText}>expired: {statusCounts.expired}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleStatusClick(null)}>
-                  <Text style={styles.statusText}>All: {filteredData.length}</Text>
-                </TouchableOpacity>
-              </View>
-
-              <BarChart
-                data={{
-                  labels: ['Approved', 'Pending', 'Draft', 'Cancelled', 'expired'],
-                  datasets: [
-                    {
-                      data: [
-                        statusCounts.approved,
-                        statusCounts.pending,
-                        statusCounts.draft,
-                        statusCounts.canceled,
-                        statusCounts.expired,
-                      ],
-                    },
-                  ],
-                }}
-                width={deviceWidth - 20}
-                height={220}
-                yAxisLabel=""
-                chartConfig={{
-                  backgroundGradientFrom: '#fff',
-                  backgroundGradientTo: '#fff',
-                  color: (opacity = 1) => `rgba(255, 28, 53, ${opacity})`,
-                  labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                }}
-                bezier
-                style={{
-                  marginVertical: 8,
-                  borderRadius: 16,
-                }}
-              />
-            </View>
-
-              {/* Dynamic Dashboard Button */}
-              {/* <TouchableOpacity style={styles.dynamicDashboardButton} onPress={handleDynamicDashboard}>
-                <Text style={styles.dynamicDashboardButtonText}>Dynamic Dashboard</Text>
-              </TouchableOpacity> */}
-
-              <View style={{ marginLeft: 0 }}>
-                <TouchableOpacity
-                  onPress={() => setShowAllLoans(!showAllLoans)}
-                  style={styles.viewButton}
-                >
-                  <Text style={styles.dynamicDashboardButtonText}>
-                    {showAllLoans ? 'View Less' : 'View More'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-
-
-            {/* <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10 }}>
-            {loading ? (
-              <ActivityIndicator size="large" color="#0000ff" />
-            ) : (
-              <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Home Loans</Text>
-            {displayedHomeLoans.map((homeLoan, index) => (
-              <HomeLoanCard
-                key={index}
-                loanApplication={homeLoan}
-                onPress={() => navigateToHomeDetails(homeLoan)}
-              />
-            ))}
-
-            <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 20, marginBottom: 10 }}>Personal Loans</Text>
-            {displayedPersonalLoans.map((personalLoan, index) => (
-              <PersonalLoanCard
-                key={index}
-                personalLoan={personalLoan}
-                onPress={() => navigateToPersonalDetails(personalLoan)}
-              />
-            ))}
-
-              </ScrollView>
-            )}
-          </View> */}
-
-            <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10 }}>
-            {initialLoading ? (
-                <ActivityIndicator size="large" color="#0000ff" />
-              ) : (
-                <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
-                  {displayedHomeLoans.length === 0 && displayedPersonalLoans.length === 0 && (
-                    <Text style={{ fontSize: 18, fontWeight: "bold", textAlign: "center", marginTop: 20 }}>
-                      No records found
-                    </Text>
-                  )}
-
-                  {displayedHomeLoans.length > 0 && (
-                    <>
-                      <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Home Loans</Text>
-                      {displayedHomeLoans.map((homeLoan, index) => (
-                        <HomeLoanCard
-                          key={index}
-                          loanApplication={homeLoan}
-                          onPress={() => navigateToHomeDetails(homeLoan)}
-                        />
-                      ))}
-                    </>
-                  )}
-
-                  {displayedPersonalLoans.length > 0 && (
-                    <>
-                      <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 20, marginBottom: 10 }}>Personal Loans</Text>
-                      {displayedPersonalLoans.map((personalLoan, index) => (
-                        <PersonalLoanCard
-                          key={index}
-                          personalLoan={personalLoan}
-                          onPress={() => navigateToPersonalDetails(personalLoan)}
-                        />
-                      ))}
-                    </>
-                  )}
-
-                  {displayedHomeLoans.length === 0 && displayedPersonalLoans.length === 0 && (
-                    <Text style={{ fontSize: 18, fontWeight: "bold", textAlign: "center", marginTop: 20 }}>
-                      No records found for both Home Loans and Personal Loans
-                    </Text>
-                  )}
-
-                  {displayedHomeLoans.length === 0 && displayedPersonalLoans.length > 0 && (
-                    <Text style={{ fontSize: 18, fontWeight: "bold", textAlign: "center", marginTop: 20 }}>
-                      No records found for Home Loans
-                    </Text>
-                  )}
-
-                  {displayedHomeLoans.length > 0 && displayedPersonalLoans.length === 0 && (
-                    <Text style={{ fontSize: 18, fontWeight: "bold", textAlign: "center", marginTop: 20 }}>
-                      No records found for Personal Loans
-                    </Text>
-                  )}
-                </ScrollView>
-              )}
-            </View>
-
-          </ScrollView>
-        </View>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={showLoanModal}
-          onRequestClose={() => setShowLoanModal(false)}
+    return (
+      <>
+        <StatusBar />
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
-          <View style={styles.modalBackground}>
-            <View style={styles.modalContainer}>
-              <View style={{ flexDirection: "column" }}>
-                <Text style={styles.modalHeading}>LOAN TYPES</Text>
 
-                <TouchableOpacity style={styles.closeButton} onPress={() => setShowLoanModal(false)}>
-                  <Ionicons name="close" size={20} color="#000" />
-                </TouchableOpacity>
-              </View>
-              <View style={{ marginTop: -20 }}>
-                <TouchableOpacity style={[styles.loanOption, { borderBottomWidth: 1, borderBottomColor: '#ccc', marginTop: 40 }]} onPress={handleHomeLoan}>
-                  <Text style={styles.loanOptionText}>Home Loan</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.loanOption} onPress={handlePersonalLoan}>
-                  <Text style={styles.loanOptionText}>Personal Loan</Text>
-                </TouchableOpacity>
-              </View>
+          <View style={styles.container}>
+
+            <View style={styles.navBar}>
+              <TouchableOpacity style={styles.iconButton} onPress={handlelogout}>
+                <Ionicons name="list-sharp" size={25} color="#fff" />
+              </TouchableOpacity>
+              <Text style={styles.text}>Kevin Small Finance</Text>
+              <TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
+            <View> 
+              <Ionicons name="notifications" size={25} color="#fff" />
+              {unreadMessagesCount > 0 && ( 
+                <View style={styles.badgeContainer}>
+                  <Text style={styles.badgeText}>{unreadMessagesCount}</Text>
+                </View>
+              )}
             </View>
-          </View>
-        </Modal>
-        <View style={styles.plusIconScetion}>
-          <TouchableOpacity style={styles.plusIcon} onPress={() => setShowLoanModal(!showLoanModal)}>
-            <Text style={styles.plusIconText}>+</Text>
           </TouchableOpacity>
+            </View>
+
+            <View style={styles.searchSection}>
+              <Ionicons style={styles.searchIcon} name="search" size={25} color="rgba(255, 28, 53, 255)" />
+              <TextInput
+                style={styles.input} placeholder="Search- Mobile no, Aadhar no, Pancard no"
+                value={searchQuery}
+                onChangeText={handleSearch}
+              />
+              {showClearIcon && (
+                <Ionicons
+                  style={styles.searchIcon}
+                  name="close"
+                  size={25}
+                  color="rgba(255, 28, 53, 255)"
+                  onPress={handleClearSearch}
+                />
+              )}
+            </View>
+
+            <ScrollView
+              contentContainerStyle={{ width: '100%' }}
+              refreshControl={
+                <RefreshControl
+                  refreshing={loading}
+                  onRefresh={handleRefresh}
+                />
+              }
+              showsVerticalScrollIndicator={false}
+              showsHorizontalScrollIndicator={false}
+            >
+
+              <View style={styles.chart}>
+                <Text style={styles.heading}>Loan Status Chart</Text>
+                {/* <Text style={styles.totalLoans}>Total Loans: {filteredData.length}</Text> */}
+
+                <View style={styles.statusContainer}>
+                  <TouchableOpacity onPress={() => handleStatusClick(123950000)}>
+                    <Text style={styles.statusText}>Approved: {statusCounts.approved}</Text>
+                  </TouchableOpacity>
+                  {/* <TouchableOpacity onPress={() => handleStatusClick(123950002)}>
+                    <Text style={styles.statusText}>Draft: {statusCounts.draft}</Text>
+                  </TouchableOpacity> */}
+                  <TouchableOpacity onPress={() => handleStatusClick(123950001)}>
+                    <Text style={styles.statusText}>Pending: {statusCounts.pending}</Text>
+                  </TouchableOpacity>
+                  {/* <TouchableOpacity onPress={() => handleStatusClick(123950003)}>
+                    <Text style={styles.statusText}>Canceled: {statusCounts.canceled}</Text>
+                  </TouchableOpacity> */}
+                  <TouchableOpacity onPress={() => handleStatusClick(123950004)}>
+                    <Text style={styles.statusText}>Rejected: {statusCounts.expired}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleStatusClick(null)}>
+                    <Text style={[styles.statusText, {right: 10,}]}>All: {filteredData.length}</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <BarChart
+                  data={{
+                    labels: ['Approved', 'Pending', 'Rejected'],
+                    datasets: [
+                      {
+                        data: [
+                          statusCounts.approved,
+                          statusCounts.pending,
+                          // statusCounts.draft,
+                          // statusCounts.canceled,
+                          statusCounts.expired,
+                        ],
+                      },
+                    ],
+                  }}
+                  width={deviceWidth - 20}
+                  height={220}
+                  yAxisLabel=""
+                  chartConfig={{
+                    backgroundGradientFrom: '#fff',
+                    backgroundGradientTo: '#fff',
+                    color: (opacity = 1) => `rgba(255, 28, 53, ${opacity})`,
+                    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                    barPercentage: 1.5,
+                  }}
+                  bezier
+                  style={{
+                    marginVertical: 8,
+                    borderRadius: 16,
+                  }}
+                />
+              </View>
+
+<View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 8 }}>
+  {initialLoading ? (
+    <ActivityIndicator size="large" color="#0000ff" />
+  ) : (
+    <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
+      <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 15, width: "100%" }}>
+        <Text style={[styles.heading, { right: 0 }]}>Home Loans</Text>
+        
+        <TouchableOpacity 
+            onPress={toggleShowAllHomeLoans} 
+            style={[styles.viewMoreButton, { opacity: displayedHomeLoans.length === 0 ? 0 : 1 }]}
+            disabled={displayedHomeLoans.length === 0}>
+            <Text style={styles.viewMoreButtonText}>
+              {showAllHomeLoans ? 'View Less' : 'View More'}
+            </Text>
+          </TouchableOpacity>
+      </View>
+      {displayedHomeLoans.length > 0 ? (
+        <>
+          {displayedHomeLoans.map((homeLoan, index) => (
+            <HomeLoanCard
+              key={index}
+              loanApplication={homeLoan}
+              onPress={() => navigateToHomeDetails(homeLoan)}
+            />
+          ))}
+        </>
+      ) : (
+        <View style={styles.noRecordsContainer}>
+          <Text style={styles.noRecordsText}>No Records Found</Text>
         </View>
-      </KeyboardAvoidingView>
-    </>
-  );
+      )}
+
+      <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 15, width: "100%" }}>
+        <Text style={[styles.heading, { marginBottom: 0 }]}>Personal Loans</Text>
+        <TouchableOpacity 
+            onPress={toggleShowAllPersonalLoans} 
+            style={[styles.viewMoreButton, { opacity: displayedPersonalLoans.length === 0 ? 0 : 1 }]}
+            disabled={displayedPersonalLoans.length === 0}>
+            <Text style={styles.viewMoreButtonText}>
+              {showAllPersonalLoans ? 'View Less' : 'View More'}
+            </Text>
+          </TouchableOpacity>
+      </View>
+      {displayedPersonalLoans.length > 0 ? (
+        <>
+          {displayedPersonalLoans.map((personalLoan, index) => (
+            <PersonalLoanCard
+              key={index}
+              personalLoan={personalLoan}
+              onPress={() => navigateToPersonalDetails(personalLoan)}
+            />
+          ))}
+        </>
+      ) : (
+        <View style={styles.noRecordsContainer}>
+          <Text style={styles.noRecordsText}>No Records Found</Text>
+        </View>
+      )}
+    </ScrollView>
+  )}
+</View>
+
+            </ScrollView>
+          </View>
+        </KeyboardAvoidingView>
+        <CustomAlert
+          // visible={handleShowAlert}
+          visible={showAlert && !isConnected}
+          onClose={handleCloseAlert}
+          onConfirm={handleCloseAlert}
+          headerMessage="No Internet Connection"
+          message="Please check your internet connection and try again."
+          Button1="Cancel"
+          Button2="OK"
+          style={[styles.alertStyle, {height: "23%"}]}
+          modalHeaderStyle={[styles.modalheaderStyle, {right: 40}]}
+          textStyle={styles.textStyle}
+        />
+      </>
+    );
 };
 
 const styles = StyleSheet.create({
@@ -694,11 +770,24 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#E5E4E2',
-    marginTop: 45
-  },
+    marginTop: 45,
+    borderColor: "#AAB7B8",
+    borderWidth: 1,
+    shadowColor: '#000', 
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25, 
+    shadowRadius: 3.84,
+    elevation: 5
+    },
   searchIcon: {
     padding: 10,
     marginHorizontal: 10
+  },
+  chart: {
+    marginLeft: 10
   },
   input: {
     flex: 1,
@@ -721,20 +810,74 @@ const styles = StyleSheet.create({
     marginRight: 30
   },
   dynamicDashboardButtonText: {
-    backgroundColor:'rgba(255, 28, 53, 255)',
+    backgroundColor: 'rgba(255, 28, 53, 255)',
     color: '#fff',
     fontSize: 15,
     fontWeight: 'bold',
-    textAlign:"center"
+    textAlign: "center"
   },
-  viewButton: {
-    backgroundColor:'rgba(255, 28, 53, 255)',
-    borderRadius: 25,
-    padding: 10,
+  viewMoreButton: {
+    backgroundColor:'red',
+     width: "30%",
+     height: 30, 
+     marginTop: 10,
+    borderRadius: 30,
+    },
+    viewMoreButtonText: {
+      textAlign: "center",
+       color: "white",
+        marginTop: 4,
+         fontWeight: "bold"
+    },
+  badgeContainer: {
+    position: 'absolute',
+    top: -7, // Adjust the position of the badge vertically
+    right: -7, // Adjust the position of the badge horizontally
+    backgroundColor: '#697d71',
+    borderRadius: 50,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1, // Ensure the badge is above the icon
+    borderWidth: 1, // Add border for better visibility
+    borderColor: '#fff', // White border color for better contrast
+  },
+  badgeText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 10, // Adjust font size for better visibility
+  },
+  heading: {
+    fontSize: 18,
+    fontWeight: 'bold',
     marginTop: 10,
-    width: 100,
-    alignSelf: "flex-end"
-},
+    marginBottom: 10,
+    color: "red"
+  },
+  noRecordsContainer: {
+    backgroundColor: '#FFF', // Background color of the container
+    borderRadius: 8, // Border radius to make it look like a card
+    padding: 16, // Padding around the text
+    marginTop: 16, // Margin around the container
+    shadowColor: '#000', // Shadow color
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25, // Shadow opacity
+    shadowRadius: 3.84,
+    // elevation: 5, // Elevation for Android shadow
+    justifyContent: 'center', // Center the text vertically
+    alignItems: 'center', // Center the text horizontally
+  },
+  noRecordsText: {
+    color: '#0000cc', // Text color
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center', // Center align the text
+  },
+
 });
 
 export default ManagerDashboard;

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, TouchableOpacity, Text, TextInput, StyleSheet, ScrollView, Alert, Button } from 'react-native';
+import { View, TouchableOpacity, Text, TextInput, StyleSheet, ScrollView, Alert, ImageBackground, KeyboardAvoidingView, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 import axios from 'axios';
 import NetInfo from "@react-native-community/netinfo";
+import CustomAlert from '../../common/CustomAlert';
 
 import ButtonComponent from '../../common/ButtonComponent';
 
@@ -15,12 +16,22 @@ export const LoginForm = () => {
   const [kf_password, setPassword] = useState(null);
   const [isMounted, setIsMounted] = useState(false);
   const [isConnected, setIsConnected] = useState(true);
+  const [showAlert, setShowAlert] = useState(false);
+  const [showAlertInvalidUser, setShowAlertInvalidUser] = useState(false);
 
   const navigation = useNavigation();
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
+      console.log('Network state changed:', state.isConnected);
       setIsConnected(state.isConnected);
+
+      if (!state.isConnected) {
+        console.log('No Internet Connection');
+        setShowAlert(true);
+      } else {
+        setShowAlert(false);
+      }
     });
 
     return () => {
@@ -30,12 +41,7 @@ export const LoginForm = () => {
 
   const handleLogin = async () => {
 
-    if (!isConnected) {
-      Alert.alert("No Internet Connection", "Please check your internet connection and try again.");
-      return;
-    };
-
-    if (!kf_name || !kf_password ) {
+    if (!kf_name || !kf_password) {
       Alert.alert("Error", "Please enter both firstname and password");
       return;
     };
@@ -69,7 +75,7 @@ export const LoginForm = () => {
         const matchedUser = response.data.value.find(
           (user) => user.kf_name === kf_name && user.kf_password === kf_password
         );
-  
+
         if (matchedUser) {
           // Authentication successful, save the authentication state and navigate to the Dashboard
           try {
@@ -78,19 +84,21 @@ export const LoginForm = () => {
           } catch (error) {
             console.error('Error storing authentication state:', error);
           }
-  
+
           console.log("Authenticated user:", matchedUser);
-          console.log("response.data", response.data);
+          // console.log("response.data", response.data);
           navigation.navigate("Dashboard", { authenticatedUser: matchedUser });
         } else {
           // Authentication failed, display an error message
-          console.log("Failed to authenticate. Invalid credentials.", response.data);
-          Alert.alert("Error", "Invalid credentials. Please try again.");
+          console.log("Failed to authenticate. Invalid credentials1.", response.data);
+          // Alert.alert("Invalid credentials", "Please Enter t Email & Password.");
+          handledShowInvalidAlert();
         }
       } else {
         // Authentication failed, display an error message
         console.log("Failed to authenticate. Response status:", response.status);
-        Alert.alert("Error", "Invalid credentials. Please try again.");
+        // Alert.alert("Invalid credentials", "Please Enter Correct ");
+        handledShowInvalidAlert();
       }
     } catch (error) {
       console.error("Error during login:", error);
@@ -106,58 +114,92 @@ export const LoginForm = () => {
     }
   };
 
+  const handledShowInvalidAlert = () => {
+    setShowAlertInvalidUser(true);
+  }
+
+  const handledCloseInvalidAlert = () => {
+    setShowAlertInvalidUser(false);
+  }
+
   const isSignInDisabled = !kf_name || !kf_password;
 
   return (
-    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-      <View style={styles.passwordContainer}>
-        <Ionicons name="person" size={20} color="#888" style={styles.icon} />
-        <TextInput
-          placeholder="Enter email or Username"
-          autoCapitalize="none"
-          style={styles.input}
-          value={kf_name}
-          onChangeText={(text) => setName(text)}
-        />
-      </View>
-      <View style={styles.passwordContainer}>
-        <Ionicons name="lock-closed" size={20} color="#888" style={styles.icon} />
-        <TextInput
-          placeholder="Password"
-          autoCapitalize="none"
-          style={styles.passwordInput}
-          secureTextEntry={!showPassword}
-          value={kf_password}
-          onChangeText={(text) => setPassword(text)}
-        />
-        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-          <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={24} color="#888" style={styles.eyeIcon} />
-        </TouchableOpacity>
-      </View>
-      <TouchableOpacity style={styles.Forgotpassword} onPress={() => console.log('Forgot password')}>
-        <Text style={styles.ForgotText}>Forgot Password?</Text>
-      </TouchableOpacity>
+    <ImageBackground source={require('../../assets/red.png')} style={styles.backgroundImage}>
+      <View style={styles.container}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+          <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+            <View style={styles.backgroundContainer}>
+              <View style={styles.modalText}>
 
-      <ButtonComponent
-        title="SIGN IN"
-        onPress={handleLogin}
-        disabled={isSignInDisabled}
+                <Text style={{ textAlign: "center", marginBottom: 40, fontSize: 18, fontWeight: "bold", color: "red" }}>ADMINISTRATOR LOGIN</Text>
+
+                <View style={styles.passwordContainer}>
+                  <Ionicons name="person" size={20} color="#888" style={styles.icon} />
+                  <TextInput
+                    placeholder="Enter Email Address"
+                    autoCapitalize="none"
+                    style={styles.input}
+                    value={kf_name}
+                    onChangeText={(text) => setName(text)}
+                  />
+                </View>
+                <View style={styles.passwordContainer}>
+                  <Ionicons name="lock-closed" size={20} color="#888" style={styles.icon} />
+                  <TextInput
+                    placeholder="Enter Password"
+                    autoCapitalize="none"
+                    style={styles.passwordInput}
+                    secureTextEntry={!showPassword}
+                    value={kf_password}
+                    onChangeText={(text) => setPassword(text)}
+                  />
+                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                    <Ionicons name={showPassword ? 'eye' : 'eye-off'} size={24} color="#888" style={styles.eyeIcon} />
+                  </TouchableOpacity>
+                </View>
+                {/* <TouchableOpacity style={styles.Forgotpassword} onPress={() => console.log('Forgot password')}>
+              <Text style={styles.ForgotText}>Forgot Password?</Text>
+              </TouchableOpacity> */}
+                <ButtonComponent
+                  title="SIGN IN"
+                  onPress={handleLogin}
+                  disabled={isSignInDisabled}
+                />
+              </View>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </View>
+      <CustomAlert
+        visible={showAlertInvalidUser} // Corrected the prop value
+        onClose={handledCloseInvalidAlert}
+        onConfirm={handledCloseInvalidAlert}
+        headerMessage="Invalid credentials"
+        message="Please Enter Correct Email & Password."
+        Button1="Cancel"
+        Button2="OK"
+        style={[styles.alertStyle, { height: "23%" }]}
+        modalHeaderStyle={[styles.modalheaderStyle, { right: 65 }]}
+        textStyle={styles.textStyle}
       />
-
-    </ScrollView>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: 240,
-    height: 40,
-    marginHorizontal: 20,
-    marginBottom: 20,
-    borderBottomColor: '#DAD7D7',
-    borderBottomWidth: 1,
+  container: {
+    height: 800,
+    width: "100%",
+    top: 70,
+    marginLeft: 20
+  },
+  modalText: {
+    height: '100%',
+    width: "100%",
+    top: 80
   },
   icon: {
     marginRight: 10,
@@ -182,10 +224,11 @@ const styles = StyleSheet.create({
   },
   ForgotText: {
     color: '#rgba(255,28,53,255)',
+    marginTop: 10,
+    left: 155
   },
   Forgotpassword: {
-    marginLeft: 175,
-    marginVertical: 10,
+
   },
   passwordContainer: {
     flexDirection: 'row',
@@ -207,7 +250,61 @@ const styles = StyleSheet.create({
     color: 'red',
     marginLeft: 30,
     marginTop: -15,
+  },
+  toggleButtons: {
+    marginTop: 50,
+    marginBottom: 30,
+    width: '75%',
+    borderRadius: 25,
+    marginHorizontal: 100,
+  },
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover',
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height
+  },
+  backgroundContainer: {
+    backgroundColor: 'white',
+    padding: 10,
+    width: '80%',
+    height: '60%',
+    borderRadius: 40,
+    ...Platform.select({
+
+      android: {
+        elevation: 5,
+        shadowColor: 'white',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.5,
+        shadowRadius: 3,
+      },
+    }),
+  },
+  tabButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 10,
+    paddingBottom: 10,
+    width: 110,
+  },
+  activeText: {
+    color: 'rgba(255,28,53,255)',
+    fontSize: 25,
+    fontWeight: "bold"
+  },
+  alertStyle: {
+    // backgroundColor: "blue",
+    width: "80%",
+  },
+  modalheaderStyle: {
+    // backgroundColor: "green",
+    right: 85
+  },
+  textStyle: {
+    // backgroundColor: "yellow"
   }
 });
+
 
 export default LoginForm;

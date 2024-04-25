@@ -1,18 +1,22 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { View, TouchableOpacity, Image } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Svg, { Path } from 'react-native-svg';
 import { captureRef } from 'react-native-view-shot';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
+import ButtonComponent from '../../common/ButtonComponent';
+import CustomAlert from '../../common/CustomAlert';
 
-import ButtonComponent from './common/ButtonComponent';
-
-const SignatureScreen = ({ route }) => {
-  const { loanApplication } = route.params || {}; // Destructure loanApplication from route.params
+const Gurantee2SignatureHome = ({ route }) => {
+  const { loanApplication } = route?.params || {}; // Use optional chaining here
   const [path, setPath] = useState('');
   const [signatureImage, setSignatureImage] = useState(null);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [showAlert, setShowAlertConfirmation] = useState(false); 
+  const [base64Data, setBase64Data] = useState(null);
+  const [isLoading, setIsLoading] = useState(false); 
+  
   const svgRef = useRef(null);
   const navigation = useNavigation();
 
@@ -23,15 +27,12 @@ const SignatureScreen = ({ route }) => {
       setRecordId(loanApplication.kf_loanapplicationid);
     }
   }, [loanApplication]);
-  
 
   useEffect(() => {
-    // Load previously stored path if available
     loadStoredPath();
   }, []);
 
   useEffect(() => {
-    // Clear path when component unmounts
     return () => clearStoredPath();
   }, []);
 
@@ -65,8 +66,12 @@ const SignatureScreen = ({ route }) => {
   const handleTouchStart = (event) => {
     const { nativeEvent } = event;
     const { locationX, locationY } = nativeEvent;
-    const newPath = `M${locationX},${locationY}`;
-    setPath(newPath);
+    
+    // If already drawing, don't reset the path, just set the drawing state
+    if (!isDrawing) {
+        setPath((prevPath) => `${prevPath} M${locationX},${locationY}`);
+    }
+
     setIsDrawing(true);
   };
 
@@ -93,18 +98,27 @@ const SignatureScreen = ({ route }) => {
 
   const captureSignature = async () => {
     try {
-      const uri = await captureRef(svgRef, {
+      setIsLoading(true); // Start loading indicator
+      const capturedData = await captureRef(svgRef, {
         format: 'png',
         quality: 1,
+        result: 'base64',
       });
-      setSignatureImage(uri);
-      await AsyncStorage.setItem('signatureImage', uri);
-      navigation.navigate('EditHomeLoan', { loanApplication, signatureImage: uri });
+  
+      if (!capturedData) {
+        console.error('Captured base64 data is undefined');
+        return;
+      }
+  
+      setSignatureImage(capturedData);
+      await AsyncStorage.setItem('signaturefile', capturedData);
+      setBase64Data(capturedData); // Store captured data in state
+      handleShowAlert();
     } catch (error) {
+      setIsLoading(false); // Stop loading indicator
       console.error('Error capturing signature:', error);
     }
   };
-  
   
   useEffect(() => {
     const loadSignatureImage = async () => {
@@ -117,18 +131,31 @@ const SignatureScreen = ({ route }) => {
         console.error('Error loading signature image:', error);
       }
     };
-  
+
     loadSignatureImage();
-  }, []);  
+  }, []);
 
   const handleSignature = () => {
     navigation.goBack();
-  }
+  };
+
+  const handleShowAlert = () => {
+    setShowAlertConfirmation(true);
+  };
+
+  const handleCloseAlert = () => {
+    setShowAlertConfirmation(false);
+  };
+
+  const handleCloseAlertConfirmation = () => {
+    setShowAlertConfirmation(false);
+    navigation.navigate('HomeLoanGurantee2', { signatureImage: base64Data, loanApplication: loanApplication });
+  };
 
   return (
     <View style={{ flex: 1, marginTop: 150 }}>
-      <View style={{ height: '50%', backgroundColor: 'white', margin: 30, padding: 20, position: 'relative'  }}>
-      <TouchableOpacity onPress={handleSignature} style={{ position: 'absolute', top: 10, right: 10 }}>
+      <View style={{ height: '50%', backgroundColor: 'white', margin: 30, padding: 20, position: 'relative' }}>
+        <TouchableOpacity onPress={handleSignature} style={{ position: 'absolute', top: 10, right: 10 }}>
           <Ionicons name="close" size={24} color="black" />
         </TouchableOpacity>
         <Svg
@@ -143,20 +170,27 @@ const SignatureScreen = ({ route }) => {
         </Svg>
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginBottom: 10 }}>
-        <ButtonComponent title="Clear" onPress={clearSignature} style={{width: "25%", height: 50}} />
-        <ButtonComponent title="Done" onPress={() => captureSignature(loanApplication)} style={{width: "25%", height: 50}} />
+        <ButtonComponent title="Clear" onPress={clearSignature} style={{ width: '25%', height: 50 }} />
+        <ButtonComponent title="Done" onPress={captureSignature} style={{ width: '25%', height: 50 }} />
       </View>
-      {signatureImage && (
-        <View style={{ alignSelf: 'center', backgroundColor: 'white', width: '50%' }}>
-
-          <Image
-            source={{ uri: signatureImage }}
-            style={{ width: 50, height: 50, objectFit: 'fill', alignSelf: 'center' }}
-          />
-        </View>
-      )}
+      <CustomAlert
+          visible={showAlert}
+          onClose={handleCloseAlert}
+          onConfirm={handleCloseAlertConfirmation}
+          headerMessage="Signature"
+          message="Signature Captutred Successfully"
+          Button1="Cancel"
+          Button2="OK"
+          style={styles.alertStyle}
+          modalHeaderStyle={[styles.modalheaderStyle, {right: 90}]}
+          textStyle={styles.textStyle}
+        />
     </View>
   );
 };
 
-export default SignatureScreen;
+const styles = StyleSheet.create({
+ 
+});
+
+export default Gurantee2SignatureHome;

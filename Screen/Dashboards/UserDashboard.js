@@ -1,0 +1,1048 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+    View, Text, TouchableOpacity, StyleSheet, TextInput, Modal, KeyboardAvoidingView, ScrollView,
+    Dimensions, ActivityIndicator, StatusBar, RefreshControl, Alert, BackHandler, SafeAreaView,
+    PermissionsAndroid, Platform, Button
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
+import Geolocation from '@react-native-community/geolocation';
+import querystring from 'querystring';
+import CustomAlert from '../../common/CustomAlert';
+
+import axios from 'axios';
+
+import HomeLoanCard from '../card/HomeLoanCard';
+import PersonalLoanCard from '../card/PersonalLoanCard';
+
+const UserDashboard = ({ navigation, route }) => {
+    //   const { authenticatedUser } = route.params;
+    const [initialLoading, setInitialLoading] = useState(true);
+    const [selectedContact, setSelectedContact] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [PersonalLoanRecords, setPersonalLoanRecords] = useState([]);
+    const [HomeLoanRecords, setHomeLoanRecords] = useState([]);
+    const [kf_adminname, setkf_adminname] = useState(null);
+    const [personalLoans, setPersonalLoans] = useState([]);
+    const [kf_address, setkf_address] = useState([]);
+
+    const [loading, setLoading] = useState(true);
+    const [authenticatedUser, setAuthenticatedUser] = useState(null);
+    const [mobileNumber, setMobileNumber] = useState('');
+    const [name, setName] = useState('');
+    const [address, setaddress] = useState('');
+
+    const [userapplicationid, setuserapplicationid] = useState('');
+    const [showAlertInvalidUser, setShowAlertInvalidUser] = useState(false);
+
+    // console.log("authenticatedUser:", authenticatedUser);
+    const recordId = authenticatedUser ? authenticatedUser.kf_userid : null;
+    // console.log("recordId:", recordId);
+
+    const [loanApplications, setLoanApplications] = useState([]);
+    const [notifications, setNotifications] = useState([]);
+    const totalRecords = loanApplications.length + notifications.length;
+    const unreadMessagesCount = loanApplications.filter(application => !application.kf_markasread).length + notifications.filter(notification => !notification.kf_markasread).length;
+
+    const [refresh, setRefresh] = useState(false);
+
+    const [displayedHomeLoans, setDisplayedHomeLoans] = useState([]);
+    const [displayedPersonalLoans, setDisplayedPersonalLoans] = useState([]);
+    const [showAllHomeLoans, setShowAllHomeLoans] = useState(false);
+    const [showAllPersonalLoans, setShowAllPersonalLoans] = useState(false);
+    const [showAlert, setShowAlert] = useState(false);
+    const [isConnected, setIsConnected] = useState(true);
+    const [loanRecordsUpdated, setLoanRecordsUpdated] = useState(false);
+    const [showAddress, setShowAddress] = useState(false);
+    const [currentLongitude, setCurrentLongitude] = useState('...');
+    const [currentLatitude, setCurrentLatitude] = useState('...');
+    const [locationStatus, setLocationStatus] = useState('');
+    const [currentAddress, setCurrentAddress] = useState('');
+    const [refreshing, setRefreshing] = useState(false);
+
+    const isFocused = useIsFocused();
+
+    const handleRefresh = () => {
+        setRefreshing(true);
+        setTimeout(() => {
+
+            setRefreshing(false);
+        }, 2000);
+    };
+
+    useEffect(() => {
+        if (refreshing) {
+            handleRefresh();
+        }
+    }, [refreshing]);
+
+    useEffect(() => {
+        const unsubscribe = NetInfo.addEventListener(state => {
+            console.log('Network state changed:', state.isConnected);
+            setIsConnected(state.isConnected);
+
+            if (!state.isConnected) {
+                console.log('No Internet Connection');
+                setShowAlert(true);
+            } else {
+                setShowAlert(false);
+            }
+        });
+
+        return () => {
+            unsubscribe();
+        };
+    }, []);
+
+    useEffect(() => {
+        getAuthenticatedUser();
+    }, [isFocused, getAuthenticatedUser]);
+
+
+    useEffect(() => {
+        const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            if (navigation.isFocused()) {
+                Alert.alert(
+                    'Exit App',
+                    'Are you sure you want to exit the app?',
+                    [
+                        {
+                            text: 'Cancel',
+                            onPress: () => null,
+                            style: 'cancel',
+                        },
+                        {
+                            text: 'Exit',
+                            onPress: () => BackHandler.exitApp(),
+                        },
+                    ],
+                    { cancelable: false }
+                );
+                return true; // Prevent default back button behavior
+            }
+        });
+
+        return () => backHandler.remove();
+    }, [navigation]);
+
+    useEffect(() => {
+        setDisplayedHomeLoans(showAllHomeLoans ? HomeLoanRecords : HomeLoanRecords.slice(0, 0));
+        setDisplayedPersonalLoans(showAllPersonalLoans ? PersonalLoanRecords : PersonalLoanRecords.slice(0, 0));
+    }, [showAllHomeLoans, showAllPersonalLoans, HomeLoanRecords, PersonalLoanRecords]);
+
+    useEffect(() => {
+        if (route.params?.kf_adminname) {
+            console.log("kf_adminname received in Dashboard:", route.params.kf_adminname);
+            setkf_adminname(route.params.kf_adminname);
+        }
+    }, [route.params?.kf_adminname]);
+
+    const getAuthenticatedUser = useCallback(async () => {
+        try {
+            const userString = await AsyncStorage.getItem('authenticatedUser');
+
+            if (userString) {
+                const user = JSON.parse(userString);
+                console.log('Authenticated user Dashboard:', user);
+                setAuthenticatedUser(user);
+                if (user.kf_adminname) {
+                    setkf_adminname(user.kf_adminname);
+                }
+            }
+        } catch (error) {
+            console.error('Error getting authenticated user:', error);
+        }
+    }, []);
+
+    const deviceWidth = Dimensions.get('window').width;
+    const textColor = deviceWidth < 390 ? 'red' : 'blue';
+
+    const handleHomeLoan = () => {
+        navigation.navigate('HomeLoan', { userapplicationid });
+    };
+
+    const handlePersonalLoan = () => {
+        navigation.navigate("PersonalLoan", { userapplicationid });
+    };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const data = {
+                    grant_type: "client_credentials",
+                    client_id: "d9dcdf05-37f4-4bab-b428-323957ad2f86",
+                    resource: "https://org0f7e6203.crm5.dynamics.com",
+                    scope: "https://org0f7e6203.crm5.dynamics.com/.default",
+                    client_secret: "JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2",
+                };
+                const tokenResponse = await axios.post(
+                    "https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token",
+                    data,
+                    { headers: { "content-type": "application/x-www-form-urlencoded" } }
+                );
+
+                const accessToken = tokenResponse.data.access_token;
+
+                const responseLoanApplications = await axios.get(
+                    "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+
+                const responsePersonalLoans = await axios.get(
+                    "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+
+                const homeLoans = responseLoanApplications.data.value;
+                const personalLoans = responsePersonalLoans.data.value;
+
+                // const sortedHomeLoans = homeLoans.sort((a, b) => new Date(b.createdon) - new Date(a.createdon));
+                // const sortedPersonalLoans = personalLoans.sort((a, b) => new Date(b.createdon) - new Date(a.createdon));
+
+                // const latestHomeLoans = sortedHomeLoans.slice(0, 3);
+                // const latestPersonalLoans = sortedPersonalLoans.slice(0, 3);
+
+                const userAdmin = authenticatedUser ? authenticatedUser.kf_adminname : '';
+
+                setDisplayedHomeLoans(homeLoans);
+                setDisplayedPersonalLoans(personalLoans);
+
+
+            } catch (error) {
+                console.error("Error during data fetch error:", error);
+            } finally {
+                setInitialLoading(false);
+                setLoading(false);
+            }
+        };
+
+        if (authenticatedUser) {
+            fetchData();
+        } else {
+            console.log('authenticatedUser is null, cannot fetch data');
+        }
+    }, [searchQuery, isFocused, authenticatedUser]);
+
+    useEffect(() => {
+        const fetchLoanApplications = async () => {
+            try {
+                setLoading(true);
+                const tokenResponse = await axios.post(
+                    "https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token",
+                    {
+                        grant_type: "client_credentials",
+                        client_id: "d9dcdf05-37f4-4bab-b428-323957ad2f86",
+                        resource: "https://org0f7e6203.crm5.dynamics.com",
+                        scope: "https://org0f7e6203.crm5.dynamics.com/.default",
+                        client_secret: "JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2",
+                    },
+                    {
+                        headers: {
+                            "content-type": "application/x-www-form-urlencoded"
+                        }
+                    }
+                );
+                const accessToken = tokenResponse.data.access_token;
+
+                const responseLoanApplications = await axios.get(
+                    "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_loanapplications",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                            "Content-Type": "application/json",
+                        },
+                        params: {
+                            "$filter": `kf_userapplicantid eq '${authenticatedUser.kf_userid}'`
+                        }
+                    }
+                );
+
+                const loanApplicationsData = responseLoanApplications.data.value;
+                // console.log("Loan Applications Data:", loanApplicationsData);
+
+                // Set state with fetched loan applications data
+                setLoanApplications(loanApplicationsData);
+            } catch (error) {
+                console.error("Error fetching loan applications:", error);
+                // Handle error, show alert or retry mechanism
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (authenticatedUser) {
+            fetchLoanApplications();
+        }
+    }, [authenticatedUser]);
+
+    useEffect(() => {
+        const fetchPersonalLoans = async () => {
+            try {
+                setLoading(true);
+                const tokenResponse = await axios.post(
+                    "https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token",
+                    {
+                        grant_type: "client_credentials",
+                        client_id: "d9dcdf05-37f4-4bab-b428-323957ad2f86",
+                        resource: "https://org0f7e6203.crm5.dynamics.com",
+                        scope: "https://org0f7e6203.crm5.dynamics.com/.default",
+                        client_secret: "JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2",
+                    },
+                    {
+                        headers: {
+                            "content-type": "application/x-www-form-urlencoded"
+                        }
+                    }
+                );
+                const accessToken = tokenResponse.data.access_token;
+
+                const responsePersonalLoans = await axios.get(
+                    "https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_personalloans",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                            "Content-Type": "application/json",
+                        },
+                        params: {
+                            "$filter": `kf_userapplicantid eq '${authenticatedUser.kf_userid}'`
+                        }
+                    }
+                );
+
+                const personalLoansData = responsePersonalLoans.data.value;
+                // console.log("Personal Loans Data:", personalLoansData);
+
+                setPersonalLoans(personalLoansData);
+            } catch (error) {
+                console.error("Error fetching personal loans:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (authenticatedUser) {
+            fetchPersonalLoans();
+        }
+    }, [authenticatedUser]);
+
+    const navigateToHomeDetails = (loanApplication) => {
+        setSelectedContact(loanApplication);
+        navigation.navigate('HomeLoanDetailsScreen', { loanApplication, address: address });
+    };
+
+    const navigateToPersonalDetails = (personalLoan) => {
+        setSelectedContact(personalLoan);
+        navigation.navigate('PersonalLoanDetailsScreen', { personalLoan, address: address });
+    };
+
+    // const handlelogout = () => {
+    //     // navigation.navigate("Setting");
+    //     navigation.navigate('Setting', { isLoggedInAsManager: true });
+    // };
+
+    const handleNavigation = () => {
+        navigation.navigate("UserNotification", { userapplicationid });
+    };
+
+    useEffect(() => {
+        const unsubscribe = NetInfo.addEventListener(state => {
+            console.log('Network state changed:', state.isConnected);
+            if (!state.isConnected) {
+                console.log('No Internet Connection');
+                Alert.alert('No Internet Connection', 'Please check your internet connection and try again.');
+            }
+        });
+        return () => {
+            unsubscribe();
+        };
+    }, []);
+
+    useEffect(() => {
+        const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            // Check if the user is on the dashboard screen
+            if (navigation.isFocused()) {
+                // Show the exit confirmation alert
+                Alert.alert(
+                    'Exit App',
+                    'Are you sure you want to exit the app?',
+                    [
+                        {
+                            text: 'Cancel',
+                            onPress: () => null,
+                            style: 'cancel',
+                        },
+                        {
+                            text: 'Exit',
+                            onPress: () => BackHandler.exitApp(),
+                        },
+                    ],
+                    { cancelable: false }
+                );
+                return true; // Prevent default back button behavior
+            }
+        });
+        return () => backHandler.remove();
+    }, [navigation]);
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const userString = await AsyncStorage.getItem('authenticatedUser');
+                if (userString) {
+                    const user = JSON.parse(userString);
+                    setAuthenticatedUser(user);
+                }
+            } catch (error) {
+                console.error('Error getting authenticated user:', error);
+            }
+        };
+        fetchUserData();
+    }, []);
+
+    useEffect(() => {
+        const fetchLoanRecords = async () => {
+            try {
+                const tokenResponse = await axios.post(
+                    "https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token", {
+                    grant_type: "client_credentials",
+                    client_id: "d9dcdf05-37f4-4bab-b428-323957ad2f86",
+                    resource: "https://org0f7e6203.crm5.dynamics.com",
+                    client_secret: "JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2",
+                }, {
+                    headers: {
+                        "content-type": "application/x-www-form-urlencoded"
+                    }
+                });
+                const accessToken = tokenResponse.data.access_token;
+                const response = await axios.get(
+                    `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_users(${recordId})`, {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                        "Content-Type": "application/json",
+                    },
+                });
+                setLoading(false);
+                setaddress(response.data.kf_address);
+                setMobileNumber(response.data.kf_mobilenumber);
+                setName(response.data.kf_name);
+                setuserapplicationid(response.data.kf_applicantid);
+            } catch (error) {
+                setLoading(false);
+            }
+        };
+        fetchLoanRecords();
+    }, [authenticatedUser]);
+
+    const handleLogout = () => {
+        setShowAlertInvalidUser(true);
+    };
+
+    const handleCloseAlert = () => {
+        setShowAlertInvalidUser(false);
+    };
+
+    const handleConfirmLogout = async () => {
+        try {
+            await AsyncStorage.setItem('isLoggedIn', 'false');
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Welcome' }],
+            });
+        } catch (error) {
+            console.error('Error clearing authentication state:', error);
+        }
+    };
+
+    const handledShowInvalidAlert = () => {
+        setShowAlertInvalidUser(true);
+    }
+
+    const handledCloseInvalidAlert = () => {
+        setShowAlertInvalidUser(false);
+    }
+
+    console.log("recordid: ", recordId);
+    const UpdateLoanRecords = async () => {
+        try {
+            console.log("Updating loan records...");
+            const tokenResponse = await axios.post(
+                "https://login.microsoftonline.com/722711d7-e701-4afa-baf6-8df9f453216b/oauth2/token", {
+                grant_type: "client_credentials",
+                client_id: "d9dcdf05-37f4-4bab-b428-323957ad2f86",
+                resource: "https://org0f7e6203.crm5.dynamics.com",
+                client_secret: "JRC8Q~MLbvG1RHclKXGxhvk3jidKX11unzB2gcA2",
+            }, {
+                headers: {
+                    "content-type": "application/x-www-form-urlencoded"
+                }
+            });
+            const accessToken = tokenResponse.data.access_token;
+
+            // Set kf_address with currentAddress value
+            setkf_address(currentAddress);
+
+            const updateRecordResponse = await axios.patch(
+                `https://org0f7e6203.crm5.dynamics.com/api/data/v9.0/kf_users(${recordId})`,
+                {
+                    kf_address: currentAddress
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+            console.log("Update Record Response:", updateRecordResponse); // Log the response
+            if (updateRecordResponse.status === 204) {
+                // Alert.alert('Success', 'User updated successfully');
+                Alert.alert('Success', 'User updated successfully', [
+                    { text: 'OK', onPress: () => navigation.replace('UserDashboard') } // Replace 'YourScreenName' with the name of your screen
+                ]);
+                console.log("User updated successfully");
+                setLoanRecordsUpdated(true);
+            } else {
+                Alert.alert('Error', 'Failed to update user'); // Alert for other status codes
+                console.log("Failed to update user");
+            }
+        } catch (error) {
+            console.error("Error updating loan records:", error);
+            Alert.alert('Error', 'Failed to update user'); // Alert for any errors
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        const requestLocationPermission = async () => {
+            if (Platform.OS === 'ios') {
+                getOneTimeLocation();
+                subscribeLocationLocation();
+            } else {
+                try {
+                    const granted = await PermissionsAndroid.request(
+                        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+                        {
+                            title: 'Location Access Required',
+                            message: 'This App needs to Access your location',
+                        },
+                    );
+                    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                        getOneTimeLocation();
+                        subscribeLocationLocation();
+                    } else {
+                        setLocationStatus('Permission Denied');
+                    }
+                } catch (err) {
+                    console.warn(err);
+                }
+            }
+        };
+        requestLocationPermission();
+        return () => {
+            Geolocation.clearWatch(watchID);
+        };
+    }, []);
+
+    const getOneTimeLocation = () => {
+        setLocationStatus('Getting Location ...');
+        Geolocation.getCurrentPosition(
+            (position) => {
+                setLocationStatus('You are Here');
+                const currentLongitude = JSON.stringify(position.coords.longitude);
+                const currentLatitude = JSON.stringify(position.coords.latitude);
+                setCurrentLongitude(currentLongitude);
+                setCurrentLatitude(currentLatitude);
+
+                // Call function to fetch address
+                fetchAddress(position.coords.latitude, position.coords.longitude);
+            },
+            (error) => {
+                setLocationStatus(error.message);
+            },
+            {
+                enableHighAccuracy: false,
+                timeout: 30000,
+                maximumAge: 1000,
+            },
+        );
+    };
+
+    const fetchAddress = async (latitude, longitude) => {
+        try {
+            const response = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+            );
+            const data = await response.json();
+            if (data.display_name) {
+                setCurrentAddress(data.display_name);
+            } else {
+                setCurrentAddress('Address not found');
+            }
+        } catch (error) {
+            console.error('Error fetching address:', error);
+            setCurrentAddress('Error fetching address');
+        }
+    };
+
+    const subscribeLocationLocation = () => {
+        watchID = Geolocation.watchPosition(
+            (position) => {
+                setLocationStatus('You are Here');
+                const currentLongitude = JSON.stringify(position.coords.longitude);
+                const currentLatitude = JSON.stringify(position.coords.latitude);
+                setCurrentLongitude(currentLongitude);
+                setCurrentLatitude(currentLatitude);
+
+                // Call function to fetch address
+                fetchAddress(position.coords.latitude, position.coords.longitude);
+            },
+            (error) => {
+                setLocationStatus(error.message);
+            },
+            {
+                enableHighAccuracy: false,
+                maximumAge: 1000,
+            },
+        );
+    };
+
+    const handleLocationIconClick = () => {
+        setShowAddress(!showAddress);
+    };
+
+    return (
+        <>
+            <StatusBar />
+            <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            >
+
+                <View style={styles.container}>
+
+                    <View style={styles.navBar}>
+
+
+                        <Text style={styles.text}>Kevin Small Finance</Text>
+
+                        <TouchableOpacity style={styles.iconButton} onPress={handleNavigation}>
+                            <View>
+                                <Ionicons name="notifications" size={25} color="#fff" />
+                                {unreadMessagesCount > 0 && (
+                                    <View style={styles.badgeContainer}>
+                                        <Text style={styles.badgeText}>{unreadMessagesCount}</Text>
+                                    </View>
+                                )}
+                            </View>
+
+                        </TouchableOpacity>
+
+                        <TouchableOpacity style={styles.iconButtonLogout} onPress={handleLogout}>
+                            <Ionicons name="md-log-out" size={28} color="#fff" />
+                        </TouchableOpacity>
+                    </View>
+
+                    <ScrollView
+                        contentContainerStyle={{ width: '100%' }}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={refreshing}
+                                onRefresh={() => setRefreshing(true)}
+                            />
+                        }
+                        showsVerticalScrollIndicator={false}
+                        showsHorizontalScrollIndicator={false}
+                    >
+
+                        <View style={styles.chart}>
+                            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                                <View style={styles.detailsContainer}>
+                                    <View style={styles.rowContainer}>
+                                        {name ? (
+                                            <View style={styles.imageContainer}>
+                                                <Text style={styles.initial}>{name.charAt(0)}</Text>
+                                            </View>
+                                        ) : null}
+                                        <View style={styles.textContainer}>
+                                            <View style={{ bottom: 0 }}>
+                                                <Text style={styles.detailText}>{name}</Text>
+                                                <Text style={styles.detailText}>{userapplicationid}</Text>
+                                                {!address && (
+                                                    <>
+                                                        <TouchableOpacity onPress={UpdateLoanRecords} style={{ flexDirection: "row", marginTop: 45, left: 40 }}>
+                                                            <Ionicons name="location" size={25} color="red" style={{ left: 0 }} />
+                                                            <Text style={{ marginTop: 5 }}> Update Location </Text>
+                                                        </TouchableOpacity>
+                                                    </>
+                                                )}
+                                                {address && (
+                                                    <View style={{ flexDirection: "row", top: 15 }}>
+                                                        <Ionicons name="location-outline" size={25} color="green" style={{ right: 10, top: 2 }} />
+                                                        <Text style={{ width: "90%", fontSize: 11 }}>{address}</Text>
+                                                    </View>
+                                                )}
+
+                                            </View>
+                                        </View>
+                                    </View>
+                                </View>
+                            </ScrollView>
+                        </View>
+                        <View>
+
+                            <View style={[styles.loanButton, { marginTop: 20 }]}>
+                                <TouchableOpacity onPress={handleHomeLoan} style={styles.button}>
+                                    <Text style={styles.buttonText}>Apply Home Loan</Text>
+                                    <Ionicons name="chevron-forward" size={25} color="white" style={styles.icon} />
+                                </TouchableOpacity>
+                            </View>
+                            <View style={[styles.loanButton, { marginTop: 20 }]}>
+                                <TouchableOpacity onPress={handlePersonalLoan} style={styles.button}>
+                                    <Text style={[styles.buttonText, { left: 8 }]}>Apply Personal Loan</Text>
+                                    <Ionicons name="chevron-forward" size={25} color="white" style={[styles.icon, { right: 10 }]} />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+
+                        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: -10, paddingHorizontal: 8 }}>
+                            {initialLoading ? (
+                                <ActivityIndicator size="large" color="#0000ff" />
+                            ) : (
+                                <ScrollView contentContainerStyle={{ width: "100%", paddingTop: 0 }}>
+                                    {displayedHomeLoans.length === 0 && displayedPersonalLoans.length === 0 ? (
+                                        <View style={styles.noRecordsContainer}>
+                                            <Text style={styles.noRecordsText}>No Records Found</Text>
+                                        </View>
+                                    ) : (
+                                        <>
+                                            <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 15, width: "100%" }}>
+                                                <Text style={[styles.heading, { right: 0 }]}>Home Loans</Text>
+                                            </View>
+                                            {displayedHomeLoans.length > 0 && (
+                                                <>
+                                                    {displayedHomeLoans
+                                                        .filter(record => record.kf_userapplicantid === authenticatedUser?.kf_applicantid)
+                                                        .map((homeLoan, index) => (
+                                                            <HomeLoanCard
+                                                                key={index}
+                                                                loanApplication={homeLoan}
+                                                                onPress={() => navigateToHomeDetails(homeLoan)}
+                                                            />
+                                                        ))
+                                                    }
+                                                </>
+                                            )}
+
+                                            <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 15, width: "100%" }}>
+                                                <Text style={[styles.heading, { marginBottom: 0 }]}>Personal Loans</Text>
+                                            </View>
+                                            {displayedPersonalLoans.length > 0 && (
+                                                <>
+                                                    {displayedPersonalLoans
+                                                        .filter(record => record.kf_userapplicantid === authenticatedUser?.kf_applicantid)
+                                                        .map((personalLoan, index) => (
+                                                            <PersonalLoanCard
+                                                                key={index}
+                                                                personalLoan={personalLoan}
+                                                                onPress={() => navigateToPersonalDetails(personalLoan)}
+                                                            />
+                                                        ))
+                                                    }
+                                                </>
+                                            )}
+                                        </>
+                                    )}
+                                </ScrollView>
+                            )}
+                        </View>
+
+                    </ScrollView>
+                </View>
+            </KeyboardAvoidingView>
+            <CustomAlert
+                visible={showAlertInvalidUser}
+                onClose={handledCloseInvalidAlert}
+                onConfirm={handleConfirmLogout}
+                headerMessage="Logout"
+                message="Are you sure you want to logout?"
+                Button1="Cancel"
+                Button2="OK"
+            />
+        </>
+    );
+};
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        width: '100%',
+    },
+    navBar: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+        padding: 10,
+        backgroundColor: 'rgba(255, 28, 53, 255)',
+        position: 'absolute',
+        top: 0,
+        zIndex: 10,
+    },
+    statusContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: 16,
+    },
+    statusText: {
+        fontSize: 12,
+        color: "#007bff",
+    },
+    iconButton: {
+        marginLeft: 50,
+    },
+    plusIconScetion: {
+        position: 'absolute',
+        bottom: 40,
+        right: 30,
+    },
+    plusIcon: {
+        backgroundColor: 'rgba(255, 28, 53, 255)',
+        borderRadius: 50,
+        padding: 10,
+        width: 60
+    },
+    plusIconText: {
+        fontSize: 30,
+        color: "#fff",
+        alignSelf: "center"
+    },
+    modalBackground: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContainer: {
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        padding: 20,
+        width: '80%',
+        height: "25%"
+    },
+    closeButton: {
+        position: 'absolute',
+        top: 5,
+        right: 15,
+    },
+    loanOption: {
+        paddingVertical: 10,
+    },
+    loanOptionText: {
+        fontSize: 18,
+        color: '#333',
+        marginHorizontal: 70,
+        marginBottom: 10
+    },
+    text: {
+        color: "#fff",
+        fontSize: 20,
+        fontWeight: "bold"
+    },
+    searchSection: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#E5E4E2',
+        marginTop: 45,
+        borderColor: "#AAB7B8",
+        borderWidth: 1,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5
+    },
+    searchIcon: {
+        padding: 10,
+        marginHorizontal: 10
+    },
+    chart: {
+        marginLeft: 0
+    },
+    input: {
+        flex: 1,
+        paddingTop: 10,
+        paddingRight: 10,
+        paddingBottom: 10,
+        paddingLeft: 0,
+        color: '#424242',
+    },
+    deviceWidthText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    modalHeading: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginTop: 10,
+        color: '#333',
+        textAlign: 'center',
+        marginRight: 30
+    },
+    dynamicDashboardButtonText: {
+        backgroundColor: 'rgba(255, 28, 53, 255)',
+        color: '#fff',
+        fontSize: 15,
+        fontWeight: 'bold',
+        textAlign: "center"
+    },
+    viewMoreButton: {
+        backgroundColor: 'red',
+        width: "30%",
+        height: 30,
+        marginTop: 10,
+        borderRadius: 30,
+    },
+    viewMoreButtonText: {
+        textAlign: "center",
+        color: "white",
+        marginTop: 4,
+        fontWeight: "bold"
+    },
+    badgeContainer: {
+        position: 'absolute',
+        top: -7, // Adjust the position of the badge vertically
+        right: -7, // Adjust the position of the badge horizontally
+        backgroundColor: '#697d71',
+        borderRadius: 50,
+        width: 20,
+        height: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1, // Ensure the badge is above the icon
+        borderWidth: 1, // Add border for better visibility
+        borderColor: '#fff', // White border color for better contrast
+    },
+    badgeText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: 10, // Adjust font size for better visibility
+    },
+    heading: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginTop: 10,
+        marginBottom: 10,
+        color: "red"
+    },
+    noRecordsContainer: {
+        backgroundColor: '#FFF', // Background color of the container
+        borderRadius: 8, // Border radius to make it look like a card
+        padding: 16, // Padding around the text
+        marginTop: 16, // Margin around the container
+        shadowColor: '#000', // Shadow color
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25, // Shadow opacity
+        shadowRadius: 3.84,
+        // elevation: 5, // Elevation for Android shadow
+        justifyContent: 'center', // Center the text vertically
+        alignItems: 'center', // Center the text horizontally
+        marginHorizontal: 80,
+        width: "80%"
+    },
+    noRecordsText: {
+        color: '#0000cc', // Text color
+        fontSize: 16,
+        fontWeight: 'bold',
+        textAlign: 'center', // Center align the text
+    },
+    text: {
+        color: "#fff",
+        fontSize: 20,
+        fontWeight: "bold",
+    },
+    iconButtonLogout: {
+        marginHorizontal: 10,
+    },
+    detailsContainer: {
+        backgroundColor: '#fff',
+        paddingHorizontal: 20,
+        borderRadius: 10,
+        elevation: 3,
+        marginTop: 70,
+        marginHorizontal: 10,
+        paddingVertical: 14,
+    },
+    rowContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 5
+    },
+    imageContainer: {
+        width: 120,
+        height: 120,
+        marginRight: 10,
+        borderRadius: 60,
+        backgroundColor: '#ccc',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    initial: {
+        fontSize: 40,
+        fontWeight: 'bold',
+        color: '#fff',
+    },
+    textContainer: {
+        flex: 1,
+        marginLeft: 10,
+        // backgroundColor:"black"
+    },
+    detailText: {
+        fontSize: 16,
+        marginBottom: 5,
+        fontWeight: 'bold',
+        color: "red",
+    },
+    loanButton: {
+        marginTop: 20,
+        alignItems: "center"
+    },
+    button: {
+        backgroundColor: "red",
+        padding: 5,
+        borderRadius: 30,
+        width: "50%",
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center"
+    },
+    buttonText: {
+        fontSize: 14,
+        fontWeight: "bold",
+        color: "white",
+        textAlign: "center",
+        marginRight: 15
+    },
+
+});
+
+export default UserDashboard;
